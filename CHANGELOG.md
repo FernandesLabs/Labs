@@ -1,38 +1,34 @@
 # Changelog
 
-All notable changes to Fernandes Labs OS.
+All notable changes to the Fernandes Labs tool network are documented here.
+Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [v0.2.0] - 2026-07-17
+---
 
-### Added
-- AGENTS.md - Comprehensive AI engineer handbook
-- INDEX.md - Navigation hub for all documentation
-- MEMORY.md - Persistent engineering knowledge
-- standards/ - Detailed coding standards directory
-- standards/README.md - Standards index
-- standards/code-quality.md - Code quality requirements
-- .github/PULL_REQUEST_TEMPLATE.md - PR template with quality checks
-- handbook/review-process.md - Review workflow documentation
-- engineering/backend-standards.md - Backend development standards
-- templates/adr-template.md - ADR template for future decisions
-
-### Improved
-- decisions/ADR-001.md - Complete ADR format with context, decision, consequences
-- decisions/ADR-002.md - Complete ADR format with implementation checklist
-- decisions/ADR-003.md - Complete ADR format with implementation details
-- design-system/accessibility.md - WCAG AA standards with code examples
-- design-system/colors.md - Semantic color palette with themes
-- CONSTITUTION.md - Full principle explanations
-- README.md - Comprehensive navigation and team structure
-- handbook/ai-team.md - Detailed role definitions and collaboration
-
-## [v0.1.0] - 2026-01-15
+## [Unreleased]
 
 ### Added
-- Initial repository structure
-- Core principles in CONSTITUTION.md
-- Basic design system documentation
-- Engineering standards foundation
-- Product specification templates
-- Architecture Decision Records (ADR-001, ADR-002, ADR-003)
-- AI team role definitions
+- QR Generator (misc) — QR codes from text/URL, PNG download. (`/tools/misc/qr-generator/`)
+- Percentage Calculator (finance) — three percentage calculation modes. (`/tools/finance/percentage-calculator/`)
+- Word Counter (text) — live word/char/sentence count + reading time. (`/tools/text/word-counter/`)
+- Meta Tag Generator (seo) — SEO meta tag generation (title, OG, Twitter, canonical). (`/tools/seo/meta-tag-generator/`)
+- JSON Formatter (developer) — format, minify, validate JSON. (`/tools/developer/json-formatter/`)
+
+---
+
+## [0.1.0] — 2026-07-17
+
+### Added
+- Central configuration file (`config.json`) controlling AdSense, crypto wallets, analytics, branding, and SEO defaults across all tools.
+- Shared config loader (`assets/config-loader.js`) — fetches `/config.json`, caches in localStorage (1h TTL), deep-merges with fallback defaults so tools work even if the fetch fails.
+- Shared design system (`assets/styles.css`) — semantic CSS tokens (light/dark via `[data-theme]`), spacing scale, typography, component classes (buttons, cards, inputs, header, footer, ad placeholders).
+- Tools index (`index.html`) — searchable grid with category badges, loads config.
+- Fernandes Labs logo (`assets/logo.svg`).
+- Restrictive license (`LICENSE`) — Fernandes Labs Source License (FLSL) v1.0. Commercial Use (ads, affiliate links, donations, paid products) requires a paid Commercial License. Non-Commercial Use permitted with attribution.
+- Progress ledger (`PROGRESS.md`) — permanent audit trail of every tool built.
+- README with setup, deployment (GitHub Pages / Cloudflare Pages), AdSense approval checklist, and licensing terms.
+
+### Decisions
+- Chose standalone single-file HTML tools (not a framework) so each tool is independently deployable and has zero build step.
+- Chose a central `config.json` over per-tool config so monetization settings update network-wide in one edit.
+- Chose the FLSL license over MIT to create a legal moat — others cannot legally monetize this code without a paid Commercial License.

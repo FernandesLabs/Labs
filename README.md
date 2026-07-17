@@ -108,7 +108,51 @@ Point `fernandeslabs.com` to your GitHub Pages or Cloudflare Pages site. The con
 { slug: "your-tool", category: "developer", name: "Your Tool", description: "What it does.", icon: "🔧" }
 ```
 
-5. Deploy. The tool automatically loads the central config.
+5. **Update the audit trail** (mandatory — see below).
+6. Deploy. The tool automatically loads the central config.
+
+## Progress Tracking (Mandatory)
+
+Every time a tool is created, modified, or deleted, you **MUST** update three
+files so the repository stays a verifiable audit trail. This is non-negotiable —
+it is how you track what was built, when, and why.
+
+### 1. `CHANGELOG.md`
+
+Add an entry under `[Unreleased]`:
+
+```
+### Added
+- [Tool Name] ([category]) — [brief description]. (`/tools/[category]/[tool-slug]/`)
+```
+
+Use `### Changed` for modifications, `### Fixed` for bug fixes.
+
+### 2. `index.html` (root)
+
+Add the tool to the `TOOLS` array so it appears on the hub:
+
+```js
+{ slug: "[tool-slug]", category: "[category]", name: "[Tool Name]", description: "[brief description]", icon: "[emoji]" }
+```
+
+### 3. `PROGRESS.md`
+
+Append a new section at the top (newest first):
+
+```
+## YYYY-MM-DD — Tool: [Tool Name]
+
+- **Status**: ✅ Complete
+- **Category**: [category]
+- **Path**: `/tools/[category]/[tool-slug]/index.html`
+- **Key Features**: [list features]
+- **QA**: [Passed/Failed — Lighthouse score, WCAG status]
+- **Notes**: [any relevant context]
+```
+
+Use the [`prompts/build-tool.md`](./prompts/build-tool.md) template when
+generating a new tool with an AI — it enforces these updates automatically.
 
 ## AdSense Approval Checklist
 
