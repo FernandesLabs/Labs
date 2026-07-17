@@ -8,12 +8,12 @@
 |----------|--------|--------------|
 | [Code Quality](./code-quality.md) | Active | v0.2.0 |
 | [CSS Architecture](./css-architecture.md) | Active | v0.2.0 |
-| [HTML Semantics](./html-semantics.md) | Active | v0.2.0 |
-| [JavaScript/TypeScript](./javascript-typescript.md) | Active | v0.2.0 |
-| [Testing Strategy](./testing-strategy.md) | Active | v0.2.0 |
-| [Performance Budget](./performance-budget.md) | Active | v0.2.0 |
-| [Security Checklist](./security-checklist.md) | Active | v0.2.0 |
-| [Accessibility Standards](./accessibility-standards.md) | Active | v0.2.0 |
+| [Security Checklist](./security-checklist.md) | Active | v0.3.0 |
+| HTML Semantics | Planned | — |
+| JavaScript/TypeScript | Planned | — |
+| Testing Strategy | Planned | — |
+| Performance Budget | Planned | — |
+| Accessibility Standards | Planned | — |
 
 ## Versioning
 

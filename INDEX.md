@@ -90,6 +90,7 @@ All ADRs follow [RFC 2119](https://tools.ietf.org/html/rfc2119) keywords.
 | [ADR-002](decisions/ADR-002-seo.md) | SEO Requirements | Accepted |
 | [ADR-003](decisions/ADR-003-branding.md) | Company Branding | Accepted |
 | [ADR-004](decisions/ADR-004-qa-automation.md) | QA Automation | Proposed |
+| [ADR-005](decisions/ADR-005-client-side-crypto.md) | Client-Side Cryptography | Accepted |
 
 ## Additional Resources
 

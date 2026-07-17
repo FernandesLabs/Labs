@@ -2,27 +2,37 @@
 
 Planned enhancements for KeyForge.
 
-## v0.2.0
+## Completed (v1.6.0)
 
-- [ ] Dark mode implementation
-- [ ] Password history in localStorage
-- [ ] Export to CSV functionality
+- [x] Password generation with customizable length and character classes
+- [x] Dark mode implementation (system-aware, no-flash, persisted)
+- [x] Custom character sets
+- [x] Password strength suggestions (warnings for common passwords, patterns, single-class)
+- [x] Copy feedback animation (toast + icon spin)
+- [x] Generate pronounceable passwords (speakable mode)
+- [x] Password entropy calculation (Shannon, authoritative for generated values)
+- [x] Complete accessibility audit (ARIA, keyboard, reduced-motion, WCAG AA)
+- [x] Passphrase mode (diceware wordlist)
+- [x] PIN mode (numeric, 4–8 digits)
+- [x] Target-entropy mode
+- [x] Session history export
 
-## v0.3.0
+## v1.7.0 (Planned)
 
-- [ ] Custom character sets
-- [ ] Password strength suggestions
-- [ ] Copy feedback animation
+- [ ] EFF 7776-word list for higher-grade passphrases (~12.9 bits/word)
+- [ ] Password character grouping toggle (user-configurable block size)
+- [ ] Localized copy (i18n foundation)
+- [ ] Breach-check affordance (educational, client-side only)
 
-## v1.0.0
+## v2.0.0 (Future)
 
-- [ ] Generate pronounceable passwords
-- [ ] Password entropy calculation
-- [ ] Complete accessibility audit
-- [ ] Performance optimization
+- [ ] Bulk password generation
+- [ ] Integration with password managers (export formats)
+- [ ] Password strength history graph
+- [ ] Pronounceable mode syllable set expansion
 
 ## Future Considerations
 
 - Password breach checking (k-anonymity API)
-- Bulk password generation
-- Integration with password managers
+- Browser extension companion
+- API endpoint for programmatic generation

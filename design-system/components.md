@@ -96,6 +96,6 @@ Company links, copyright, trust elements.
 
 ## References
 
-- [Design System](./README.md)
+- [Design System](../INDEX.md)
 - [Colors](./colors.md)
 - [Typography](./typography.md)

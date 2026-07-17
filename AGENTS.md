@@ -7,7 +7,7 @@ This document provides the essential context and working patterns for AI collabo
 ## Onboarding Checklist
 
 - [ ] Read [Constitution](./CONSTITUTION.md)
-- [ ] Read [ Engineering Philosophy](./handbook/engineering-philosophy.md)
+- [ ] Read [Engineering Philosophy](./handbook/engineering-philosophy.md)
 - [ ] Read [Coding Principles](./handbook/coding-principles.md)
 - [ ] Read [Architecture](./engineering/architecture.md)
 - [ ] Review [Design System](./design-system/)
