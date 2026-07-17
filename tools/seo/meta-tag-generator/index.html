@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meta Tag Generator — Fernandes Labs</title>
+  <meta name="description" content="Free SEO meta tag generator. Create title, description, Open Graph, and Twitter Card tags for any page.">
+  <link rel="canonical" href="https://fernandeslabs.com/tools/seo/meta-tag-generator/">
+  <meta property="og:title" content="Meta Tag Generator — Fernandes Labs">
+  <meta property="og:description" content="Free SEO meta tag generator. Create title, description, Open Graph, and Twitter Card tags.">
+  <link rel="icon" href="/assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <script src="/assets/config-loader.js"></script>
+</head>
+<body>
+
+<header class="fl-header">
+  <div class="fl-container fl-header-inner">
+    <a href="/" class="fl-brand"><img src="/assets/logo.svg" alt="Fernandes Labs" class="fl-brand-logo"><span>Fernandes Labs</span></a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+  </div>
+</header>
+
+<main>
+  <section class="fl-hero fl-container">
+    <h1>Meta Tag Generator</h1>
+    <p>Generate SEO meta tags for any page — title, description, Open Graph, Twitter Cards, and JSON-LD.</p>
+  </section>
+
+  <section class="fl-container fl-section">
+    <div class="card">
+      <div style="display: grid; gap: var(--space-4);">
+        <div><label for="title">Page Title</label><input class="input" id="title" placeholder="My Awesome Page"></div>
+        <div><label for="desc">Meta Description</label><input class="input" id="desc" placeholder="A brief description of the page (150-160 chars)"></div>
+        <div><label for="url">Canonical URL</label><input class="input" id="url" placeholder="https://example.com/page"></div>
+        <div><label for="image">Social Image URL</label><input class="input" id="image" placeholder="https://example.com/og-image.png"></div>
+        <div><label for="sitename">Site Name</label><input class="input" id="sitename" placeholder="My Site"></div>
+      </div>
+
+      <div style="margin-top: var(--space-4); display: flex; gap: var(--space-2);">
+        <button class="btn btn-primary" id="btn-generate">Generate Tags</button>
+        <button class="btn btn-ghost" id="btn-copy">Copy</button>
+      </div>
+
+      <label for="output" style="margin-top: var(--space-5);">Generated Meta Tags</label>
+      <textarea class="textarea" id="output" readonly aria-label="Generated meta tags"></textarea>
+    </div>
+  </section>
+</main>
+
+<footer class="fl-footer">
+  <div class="fl-container fl-footer-inner">
+    <a href="/">← Back to Tools</a>
+    <p id="footer-text">Built by Fernandes Labs</p>
+  </div>
+</footer>
+
+<script>
+  var themeToggle = document.getElementById("theme-toggle");
+  var savedTheme = localStorage.getItem("fl-theme") || "light";
+  document.documentElement.setAttribute("data-theme", savedTheme);
+  themeToggle.textContent = savedTheme === "dark" ? "☀️" : "🌙";
+  themeToggle.addEventListener("click", function () {
+    var next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    localStorage.setItem("fl-theme", next);
+    themeToggle.textContent = next === "dark" ? "☀️" : "🌙";
+  });
+
+  function val(id) { return document.getElementById(id).value.trim(); }
+  function esc(s) { return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+  document.getElementById("btn-generate").addEventListener("click", function () {
+    var title = val("title"), desc = val("desc"), url = val("url"), image = val("image"), site = val("sitename");
+    var tags = [];
+    if (title) tags.push('<title>' + esc(title) + '</title>');
+    if (desc) tags.push('<meta name="description" content="' + esc(desc) + '">');
+    if (url) tags.push('<link rel="canonical" href="' + esc(url) + '">');
+    tags.push('');
+    if (title) tags.push('<meta property="og:title" content="' + esc(title) + '">');
+    if (desc) tags.push('<meta property="og:description" content="' + esc(desc) + '">');
+    if (url) tags.push('<meta property="og:url" content="' + esc(url) + '">');
+    if (image) tags.push('<meta property="og:image" content="' + esc(image) + '">');
+    if (site) tags.push('<meta property="og:site_name" content="' + esc(site) + '">');
+    tags.push('<meta property="og:type" content="website">');
+    tags.push('');
+    tags.push('<meta name="twitter:card" content="summary_large_image">');
+    if (title) tags.push('<meta name="twitter:title" content="' + esc(title) + '">');
+    if (desc) tags.push('<meta name="twitter:description" content="' + esc(desc) + '">');
+    if (image) tags.push('<meta name="twitter:image" content="' + esc(image) + '">');
+    document.getElementById("output").value = tags.join('\n');
+  });
+
+  document.getElementById("btn-copy").addEventListener("click", function () {
+    var out = document.getElementById("output");
+    if (out.value) navigator.clipboard.writeText(out.value);
+  });
+
+  FernandesConfig.load().then(function (config) {
+    document.getElementById("footer-text").textContent = config.branding.footer_text;
+  });
+</script>
+
+</body>
+</html>

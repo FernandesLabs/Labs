@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR Generator — Fernandes Labs</title>
+  <meta name="description" content="Free online QR code generator. Create QR codes for any text, URL, or contact info. No sign-up required.">
+  <link rel="canonical" href="https://fernandeslabs.com/tools/misc/qr-generator/">
+  <meta property="og:title" content="QR Generator — Fernandes Labs">
+  <meta property="og:description" content="Free QR code generator for text, URLs, and contact info.">
+  <link rel="icon" href="/assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <script src="/assets/config-loader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+</head>
+<body>
+
+<header class="fl-header">
+  <div class="fl-container fl-header-inner">
+    <a href="/" class="fl-brand"><img src="/assets/logo.svg" alt="Fernandes Labs" class="fl-brand-logo"><span>Fernandes Labs</span></a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+  </div>
+</header>
+
+<main>
+  <section class="fl-hero fl-container">
+    <h1>QR Code Generator</h1>
+    <p>Generate QR codes for any text or URL. Download as PNG. All generation happens in your browser.</p>
+  </section>
+
+  <section class="fl-container fl-section">
+    <div class="card">
+      <label for="qr-input">Text or URL</label>
+      <input class="input" id="qr-input" placeholder="https://fernandeslabs.com" value="https://fernandeslabs.com">
+
+      <div style="display: flex; gap: var(--space-4); margin-top: var(--space-4); align-items: flex-end; flex-wrap: wrap;">
+        <div>
+          <label for="qr-size">Size</label>
+          <select class="select" id="qr-size" style="width: 120px;">
+            <option value="128">128px</option>
+            <option value="256" selected>256px</option>
+            <option value="512">512px</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" id="btn-generate">Generate</button>
+        <button class="btn btn-secondary" id="btn-download">Download PNG</button>
+      </div>
+
+      <div style="margin-top: var(--space-5); text-align: center;">
+        <canvas id="qr-canvas" aria-label="Generated QR code"></canvas>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="fl-footer">
+  <div class="fl-container fl-footer-inner">
+    <a href="/">← Back to Tools</a>
+    <p id="footer-text">Built by Fernandes Labs</p>
+  </div>
+</footer>
+
+<script>
+  var themeToggle = document.getElementById("theme-toggle");
+  var savedTheme = localStorage.getItem("fl-theme") || "light";
+  document.documentElement.setAttribute("data-theme", savedTheme);
+  themeToggle.textContent = savedTheme === "dark" ? "☀️" : "🌙";
+  themeToggle.addEventListener("click", function () {
+    var next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    localStorage.setItem("fl-theme", next);
+    themeToggle.textContent = next === "dark" ? "☀️" : "🌙";
+  });
+
+  var canvas = document.getElementById("qr-canvas");
+  var input = document.getElementById("qr-input");
+  var sizeSelect = document.getElementById("qr-size");
+
+  function generate() {
+    var text = input.value.trim();
+    if (!text) return;
+    var size = parseInt(sizeSelect.value, 10);
+    QRCode.toCanvas(canvas, text, { width: size, margin: 2 }, function (error) {
+      if (error) console.error(error);
+    });
+  }
+
+  document.getElementById("btn-generate").addEventListener("click", generate);
+  input.addEventListener("input", generate);
+  sizeSelect.addEventListener("change", generate);
+
+  document.getElementById("btn-download").addEventListener("click", function () {
+    var link = document.createElement("a");
+    link.download = "qr-code.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  });
+
+  generate();
+
+  FernandesConfig.load().then(function (config) {
+    document.getElementById("footer-text").textContent = config.branding.footer_text;
+  });
+</script>
+
+</body>
+</html>
