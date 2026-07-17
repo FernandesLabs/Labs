@@ -9,6 +9,42 @@ for the exact format.
 
 ---
 
+## 2026-07-17 — Infrastructure: Automation System
+
+- **Status**: ✅ Complete
+- **Category**: infrastructure
+- **Path**: `/automation/` + `/.github/workflows/deploy.yml`
+- **Key Features**:
+  - `create-tool.sh` — scaffolds a new tool from template + updates CHANGELOG, index.html TOOLS array, and PROGRESS.md automatically.
+  - `qa-check.sh` — validates all tools: config-loader, styles, SEO metadata, standard layout, no console.log, no Math.random, no secrets, registered in index. Exits 0/1.
+  - `build-all.sh` — assembles a clean `deploy/` artifact (idempotent, recreates on each run).
+  - `deploy.sh` — builds + deploys to Cloudflare Pages (Wrangler) or GitHub Pages (gh-pages branch) or local.
+  - `.github/workflows/deploy.yml` — CI: runs qa-check on push to main/laguna, builds, deploys to Cloudflare (if secrets set) or GitHub Pages (fallback).
+- **QA**: Passed — all scripts tested: create-tool creates + updates audit trail; qa-check exits 0; build-all produces correct deploy/ with 6 tools; idempotency verified.
+- **Notes**: Scripts are portable bash (macOS/Linux), idempotent, exit non-zero on failure, include usage instructions. The GitHub workflow auto-deploys on push.
+
+---
+
+## 2026-07-17 — Tool: UUID Generator
+
+- **Status**: ✅ Scaffolded
+- **Category**: developer
+- **Path**: `/tools/developer/uuid-generator/index.html`
+- **Key Features**: Placeholder — implement the tool's logic.
+- **QA**: Pending — run `./automation/qa-check.sh` after implementation.
+- **Notes**: Created by `create-tool.sh`. Replace the placeholder card with real functionality.
+
+
+## 2026-07-17 — Tool: Test Tool
+
+- **Status**: ✅ Scaffolded
+- **Category**: developer
+- **Path**: `/tools/developer/test-tool/index.html`
+- **Key Features**: Placeholder — implement the tool's logic.
+- **QA**: Pending — run `./automation/qa-check.sh` after implementation.
+- **Notes**: Created by `create-tool.sh`. Replace the placeholder card with real functionality.
+
+
 ## 2026-07-17 — Tool: QR Generator
 
 - **Status**: ✅ Complete

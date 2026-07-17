@@ -8,11 +8,15 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
+- Automation System — `create-tool.sh`, `qa-check.sh`, `build-all.sh`, `deploy.sh`, and GitHub Actions CI/CD workflow. (`/automation/`, `/.github/workflows/deploy.yml`)
+- UUID Generator (developer) — scaffolded by `create-tool.sh` as a test; implements RFC 4122 UUID generation via Web Crypto API. (`/tools/developer/uuid-generator/`)
 - QR Generator (misc) — QR codes from text/URL, PNG download. (`/tools/misc/qr-generator/`)
 - Percentage Calculator (finance) — three percentage calculation modes. (`/tools/finance/percentage-calculator/`)
 - Word Counter (text) — live word/char/sentence count + reading time. (`/tools/text/word-counter/`)
 - Meta Tag Generator (seo) — SEO meta tag generation (title, OG, Twitter, canonical). (`/tools/seo/meta-tag-generator/`)
 - JSON Formatter (developer) — format, minify, validate JSON. (`/tools/developer/json-formatter/`)
+- Test Tool (developer) — A test tool for validation (`/tools/developer/test-tool/`)
+- UUID Generator (developer) — Generate RFC 4122 UUIDs with Web Crypto API (`/tools/developer/uuid-generator/`)
 
 ---
 

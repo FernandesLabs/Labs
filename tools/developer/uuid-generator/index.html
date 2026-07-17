@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UUID Generator — Fernandes Labs</title>
+  <meta name="description" content="Generate RFC 4122 UUIDs with Web Crypto API Runs entirely in your browser.">
+  <link rel="canonical" href="https://fernandeslabs.com/tools/developer/uuid-generator/">
+  <meta property="og:title" content="UUID Generator — Fernandes Labs">
+  <meta property="og:description" content="Generate RFC 4122 UUIDs with Web Crypto API">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="/assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <script src="/assets/config-loader.js"></script>
+</head>
+<body>
+
+<header class="fl-header">
+  <div class="fl-container fl-header-inner">
+    <a href="/" class="fl-brand"><img src="/assets/logo.svg" alt="Fernandes Labs" class="fl-brand-logo"><span>Fernandes Labs</span></a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+  </div>
+</header>
+
+<main>
+  <section class="fl-hero fl-container">
+    <h1>UUID Generator</h1>
+    <p>Generate RFC 4122 UUIDs with Web Crypto API</p>
+  </section>
+
+  <section class="fl-container fl-section">
+    <div class="card">
+      <!-- TODO: Replace this placeholder with the tool's actual functionality. -->
+      <p style="text-align: center; color: var(--color-text-muted);">Tool functionality goes here.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="fl-footer">
+  <div class="fl-container fl-footer-inner">
+    <a href="/">← Back to Tools</a>
+    <p id="footer-text">Built by Fernandes Labs</p>
+  </div>
+</footer>
+
+<script>
+  // Theme toggle
+  var themeToggle = document.getElementById("theme-toggle");
+  var savedTheme = localStorage.getItem("fl-theme") || "light";
+  document.documentElement.setAttribute("data-theme", savedTheme);
+  themeToggle.textContent = savedTheme === "dark" ? "☀️" : "🌙";
+  themeToggle.addEventListener("click", function () {
+    var next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    localStorage.setItem("fl-theme", next);
+    themeToggle.textContent = next === "dark" ? "☀️" : "🌙";
+  });
+
+  // Load central config and apply branding
+  FernandesConfig.load().then(function (config) {
+    document.getElementById("footer-text").textContent = config.branding.footer_text;
+  });
+</script>
+
+</body>
+</html>
