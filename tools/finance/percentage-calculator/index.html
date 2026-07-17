@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Percentage Calculator — Fernandes Labs</title>
+  <meta name="description" content="Free online percentage calculator. Calculate percentages, increases, decreases, and ratios instantly.">
+  <link rel="canonical" href="https://fernandeslabs.com/tools/finance/percentage-calculator/">
+  <meta property="og:title" content="Percentage Calculator — Fernandes Labs">
+  <meta property="og:description" content="Free percentage calculator. Calculate percentages, increases, and decreases.">
+  <link rel="icon" href="/assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <script src="/assets/config-loader.js"></script>
+</head>
+<body>
+
+<header class="fl-header">
+  <div class="fl-container fl-header-inner">
+    <a href="/" class="fl-brand"><img src="/assets/logo.svg" alt="Fernandes Labs" class="fl-brand-logo"><span>Fernandes Labs</span></a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+  </div>
+</header>
+
+<main>
+  <section class="fl-hero fl-container">
+    <h1>Percentage Calculator</h1>
+    <p>Calculate percentages, increases, and decreases. Three modes — all instant.</p>
+  </section>
+
+  <section class="fl-container fl-section">
+    <div style="display: grid; gap: var(--space-4);">
+
+      <div class="card">
+        <h2 style="font-size: var(--font-size-lg); margin-bottom: var(--space-3);">What is X% of Y?</h2>
+        <div style="display: flex; gap: var(--space-2); align-items: center; flex-wrap: wrap;">
+          <input class="input" id="p1-x" type="number" placeholder="25" style="width: 100px;" aria-label="Percentage">
+          <span>% of</span>
+          <input class="input" id="p1-y" type="number" placeholder="200" style="width: 100px;" aria-label="Value">
+          <span>=</span>
+          <strong id="p1-result" style="color: var(--color-accent); font-size: var(--font-size-lg);">0</strong>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 style="font-size: var(--font-size-lg); margin-bottom: var(--space-3);">X is what % of Y?</h2>
+        <div style="display: flex; gap: var(--space-2); align-items: center; flex-wrap: wrap;">
+          <input class="input" id="p2-x" type="number" placeholder="50" style="width: 100px;" aria-label="Value X">
+          <span>is what % of</span>
+          <input class="input" id="p2-y" type="number" placeholder="200" style="width: 100px;" aria-label="Value Y">
+          <span>=</span>
+          <strong id="p2-result" style="color: var(--color-accent); font-size: var(--font-size-lg);">0%</strong>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 style="font-size: var(--font-size-lg); margin-bottom: var(--space-3);">Percentage increase/decrease</h2>
+        <div style="display: flex; gap: var(--space-2); align-items: center; flex-wrap: wrap;">
+          <span>From</span>
+          <input class="input" id="p3-from" type="number" placeholder="100" style="width: 100px;" aria-label="From value">
+          <span>to</span>
+          <input class="input" id="p3-to" type="number" placeholder="150" style="width: 100px;" aria-label="To value">
+          <span>=</span>
+          <strong id="p3-result" style="color: var(--color-accent); font-size: var(--font-size-lg);">0%</strong>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</main>
+
+<footer class="fl-footer">
+  <div class="fl-container fl-footer-inner">
+    <a href="/">← Back to Tools</a>
+    <p id="footer-text">Built by Fernandes Labs</p>
+  </div>
+</footer>
+
+<script>
+  var themeToggle = document.getElementById("theme-toggle");
+  var savedTheme = localStorage.getItem("fl-theme") || "light";
+  document.documentElement.setAttribute("data-theme", savedTheme);
+  themeToggle.textContent = savedTheme === "dark" ? "☀️" : "🌙";
+  themeToggle.addEventListener("click", function () {
+    var next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    localStorage.setItem("fl-theme", next);
+    themeToggle.textContent = next === "dark" ? "☀️" : "🌙";
+  });
+
+  function num(id) { return parseFloat(document.getElementById(id).value) || 0; }
+  function round(n) { return Math.round(n * 100) / 100; }
+
+  function calc1() { document.getElementById("p1-result").textContent = round(num("p1-x") / 100 * num("p1-y")); }
+  function calc2() { var y = num("p2-y"); document.getElementById("p2-result").textContent = (y === 0 ? "—" : round(num("p2-x") / y * 100) + "%"); }
+  function calc3() { var f = num("p3-from"); document.getElementById("p3-result").textContent = (f === 0 ? "—" : round((num("p3-to") - f) / f * 100) + "%"); }
+
+  ["p1-x","p1-y"].forEach(function(id){ document.getElementById(id).addEventListener("input", calc1); });
+  ["p2-x","p2-y"].forEach(function(id){ document.getElementById(id).addEventListener("input", calc2); });
+  ["p3-from","p3-to"].forEach(function(id){ document.getElementById(id).addEventListener("input", calc3); });
+
+  FernandesConfig.load().then(function (config) {
+    document.getElementById("footer-text").textContent = config.branding.footer_text;
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fernandes Labs — Free Online Tools</title>
+  <meta name="description" content="Free online tools for developers, designers, and marketers. JSON formatter, QR generator, password generator, and more.">
+  <link rel="canonical" href="https://fernandeslabs.com/">
+  <meta property="og:title" content="Fernandes Labs — Free Online Tools">
+  <meta property="og:description" content="Free online tools for developers, designers, and marketers.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="/assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <script src="/assets/config-loader.js"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Fernandes Labs",
+    "url": "https://fernandeslabs.com"
+  }
+  </script>
+</head>
+<body>
+
+<header class="fl-header">
+  <div class="fl-container fl-header-inner">
+    <a href="/" class="fl-brand">
+      <img src="/assets/logo.svg" alt="Fernandes Labs" class="fl-brand-logo">
+      <span>Fernandes Labs</span>
+    </a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+  </div>
+</header>
+
+<main>
+  <section class="fl-hero fl-container">
+    <h1>Free Online Tools</h1>
+    <p>A growing collection of fast, privacy-first tools for developers, designers, and marketers. No sign-up. No tracking. Works offline.</p>
+  </section>
+
+  <section class="fl-container fl-section">
+    <div style="margin-bottom: var(--space-5);">
+      <input type="search" class="input" id="tool-search" placeholder="Search tools..." aria-label="Search tools">
+    </div>
+
+    <div id="tools-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--space-4);">
+      <!-- Tools injected by JS -->
+    </div>
+  </section>
+</main>
+
+<footer class="fl-footer">
+  <div class="fl-container fl-footer-inner">
+    <div class="fl-footer-links" id="footer-links"></div>
+    <p id="footer-text">Built by Fernandes Labs</p>
+  </div>
+</footer>
+
+<script>
+  // Tool registry — add new tools here
+  var TOOLS = [
+    { slug: "json-formatter", category: "developer", name: "JSON Formatter", description: "Format, validate, and minify JSON.", icon: "{}" },
+    { slug: "meta-tag-generator", category: "seo", name: "Meta Tag Generator", description: "Generate SEO meta tags for any page.", icon: "🔍" },
+    { slug: "word-counter", category: "text", name: "Word Counter", description: "Count words, characters, and reading time.", icon: "📝" },
+    { slug: "percentage-calculator", category: "finance", name: "Percentage Calculator", description: "Calculate percentages, increases, and decreases.", icon: "%" },
+    { slug: "qr-generator", category: "misc", name: "QR Generator", description: "Generate QR codes for any text or URL.", icon: "▦" }
+    { slug: "uuid-generator", category: "developer", name: "UUID Generator", description: "Generate RFC 4122 UUIDs with Web Crypto API", icon: "🔧" },
+  ];
+
+  // Theme toggle
+  var themeToggle = document.getElementById("theme-toggle");
+  var savedTheme = localStorage.getItem("fl-theme") || "light";
+  document.documentElement.setAttribute("data-theme", savedTheme);
+  themeToggle.textContent = savedTheme === "dark" ? "☀️" : "🌙";
+  themeToggle.addEventListener("click", function () {
+    var next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    localStorage.setItem("fl-theme", next);
+    themeToggle.textContent = next === "dark" ? "☀️" : "🌙";
+  });
+
+  // Render tools grid
+  var grid = document.getElementById("tools-grid");
+  function renderTools(filter) {
+    grid.innerHTML = "";
+    var filtered = TOOLS.filter(function (t) {
+      if (!filter) return true;
+      var q = filter.toLowerCase();
+      return t.name.toLowerCase().indexOf(q) > -1 || t.description.toLowerCase().indexOf(q) > -1 || t.category.indexOf(q) > -1;
+    });
+    filtered.forEach(function (tool) {
+      var card = document.createElement("a");
+      card.href = "/tools/" + tool.category + "/" + tool.slug + "/";
+      card.className = "card";
+      card.style.textDecoration = "none";
+      card.style.color = "var(--color-text)";
+      card.innerHTML =
+        '<div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-2);">' +
+        '<span style="font-size:1.5rem;font-weight:700;color:var(--color-accent);">' + tool.icon + '</span>' +
+        '<strong style="font-size:var(--font-size-base);">' + tool.name + '</strong>' +
+        '</div>' +
+        '<p style="font-size:var(--font-size-sm);color:var(--color-text-muted);">' + tool.description + '</p>' +
+        '<span class="badge" style="margin-top:var(--space-3);background:var(--color-surface);color:var(--color-text-muted);">' + tool.category + '</span>';
+      grid.appendChild(card);
+    });
+  }
+  renderTools();
+
+  document.getElementById("tool-search").addEventListener("input", function (e) {
+    renderTools(e.target.value);
+  });
+
+  // Load config and apply branding
+  FernandesConfig.load().then(function (config) {
+    document.getElementById("footer-text").textContent = config.branding.footer_text;
+    if (config.monetization.affiliate.enabled) {
+      var links = config.monetization.affiliate.links;
+      var container = document.getElementById("footer-links");
+      Object.keys(links).forEach(function (key) {
+        var a = document.createElement("a");
+        a.href = links[key];
+        a.textContent = key.charAt(0).toUpperCase() + key.slice(1);
+        a.target = "_blank";
+        a.rel = "noopener";
+        container.appendChild(a);
+      });
+    }
+  });
+</script>
+
+</body>
+</html>

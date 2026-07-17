@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JSON Formatter — Fernandes Labs</title>
+  <meta name="description" content="Free online JSON formatter. Format, validate, and minify JSON instantly. No data sent to servers.">
+  <link rel="canonical" href="https://fernandeslabs.com/tools/developer/json-formatter/">
+  <meta property="og:title" content="JSON Formatter — Fernandes Labs">
+  <meta property="og:description" content="Free online JSON formatter. Format, validate, and minify JSON instantly.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="/assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <script src="/assets/config-loader.js"></script>
+</head>
+<body>
+
+<header class="fl-header">
+  <div class="fl-container fl-header-inner">
+    <a href="/" class="fl-brand">
+      <img src="/assets/logo.svg" alt="Fernandes Labs" class="fl-brand-logo">
+      <span>Fernandes Labs</span>
+    </a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+  </div>
+</header>
+
+<main>
+  <section class="fl-hero fl-container">
+    <h1>JSON Formatter</h1>
+    <p>Format, validate, and minify JSON. All processing happens in your browser — nothing is sent to a server.</p>
+  </section>
+
+  <section class="fl-container fl-section">
+    <div class="ad-placeholder" id="ad-top">Advertisement</div>
+
+    <div class="card">
+      <label for="json-input">Paste your JSON</label>
+      <textarea class="textarea" id="json-input" placeholder='{"hello":"world","numbers":[1,2,3]}' aria-describedby="json-status"></textarea>
+      <p id="json-status" role="status" style="margin-top: var(--space-2); font-size: var(--font-size-sm); min-height: 1.5em;"></p>
+
+      <div style="display: flex; gap: var(--space-2); margin-top: var(--space-4); flex-wrap: wrap;">
+        <button class="btn btn-primary" id="btn-format">Format</button>
+        <button class="btn btn-secondary" id="btn-minify">Minify</button>
+        <button class="btn btn-secondary" id="btn-validate">Validate</button>
+        <button class="btn btn-ghost" id="btn-copy">Copy</button>
+        <button class="btn btn-ghost" id="btn-clear">Clear</button>
+      </div>
+
+      <label for="json-output" style="margin-top: var(--space-5);">Result</label>
+      <textarea class="textarea" id="json-output" readonly aria-label="Formatted JSON output"></textarea>
+    </div>
+
+    <div class="ad-placeholder" id="ad-bottom">Advertisement</div>
+  </section>
+</main>
+
+<footer class="fl-footer">
+  <div class="fl-container fl-footer-inner">
+    <a href="/" id="back-link">← Back to Tools</a>
+    <p id="footer-text">Built by Fernandes Labs</p>
+  </div>
+</footer>
+
+<script>
+  // Theme toggle
+  var themeToggle = document.getElementById("theme-toggle");
+  var savedTheme = localStorage.getItem("fl-theme") || "light";
+  document.documentElement.setAttribute("data-theme", savedTheme);
+  themeToggle.textContent = savedTheme === "dark" ? "☀️" : "🌙";
+  themeToggle.addEventListener("click", function () {
+    var next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    localStorage.setItem("fl-theme", next);
+    themeToggle.textContent = next === "dark" ? "☀️" : "🌙";
+  });
+
+  var input = document.getElementById("json-input");
+  var output = document.getElementById("json-output");
+  var status = document.getElementById("json-status");
+
+  function setStatus(msg, isError) {
+    status.textContent = msg;
+    status.style.color = isError ? "var(--color-danger)" : "var(--color-success)";
+  }
+
+  document.getElementById("btn-format").addEventListener("click", function () {
+    try {
+      var parsed = JSON.parse(input.value);
+      output.value = JSON.stringify(parsed, null, 2);
+      setStatus("Valid JSON — formatted successfully.", false);
+    } catch (e) {
+      setStatus("Invalid JSON: " + e.message, true);
+    }
+  });
+
+  document.getElementById("btn-minify").addEventListener("click", function () {
+    try {
+      var parsed = JSON.parse(input.value);
+      output.value = JSON.stringify(parsed);
+      setStatus("Valid JSON — minified successfully.", false);
+    } catch (e) {
+      setStatus("Invalid JSON: " + e.message, true);
+    }
+  });
+
+  document.getElementById("btn-validate").addEventListener("click", function () {
+    try {
+      JSON.parse(input.value);
+      setStatus("Valid JSON.", false);
+    } catch (e) {
+      setStatus("Invalid JSON: " + e.message, true);
+    }
+  });
+
+  document.getElementById("btn-copy").addEventListener("click", function () {
+    if (output.value) {
+      navigator.clipboard.writeText(output.value);
+      setStatus("Copied to clipboard.", false);
+    }
+  });
+
+  document.getElementById("btn-clear").addEventListener("click", function () {
+    input.value = "";
+    output.value = "";
+    status.textContent = "";
+  });
+
+  // Load config
+  FernandesConfig.load().then(function (config) {
+    document.getElementById("footer-text").textContent = config.branding.footer_text;
+  });
+</script>
+
+</body>
+</html>
