@@ -11,7 +11,6 @@ import {
   Sparkles,
   Command as CommandIcon,
   Wand2,
-  Trophy,
 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -179,20 +178,6 @@ export function HubView({
         />
         <div className="relative mx-auto max-w-6xl px-4 py-14 sm:py-20">
           <div className="mx-auto max-w-3xl text-center">
-            {tools.length >= 100 ? (
-              <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-3 py-1 text-xs font-bold text-white shadow-sm">
-                <Trophy className="size-3.5" />
-                {tools.length}+ tools milestone reached!
-              </div>
-            ) : null}
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/60 px-3 py-1 text-xs font-medium text-muted-foreground backdrop-blur">
-              <span className="relative flex size-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary/60" />
-                <span className="relative inline-flex size-2 rounded-full bg-primary" />
-              </span>
-              <AnimatedCounter value={tools.length} /> privacy-first tools · 100%
-              client-side
-            </div>
             <h1 className="text-balance text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl md:text-6xl">
               Free Online&nbsp;
               <span className="bg-gradient-to-r from-primary via-[oklch(0.65_0.2_280)] to-[oklch(0.7_0.16_200)] bg-clip-text text-transparent">
@@ -200,12 +185,14 @@ export function HubView({
               </span>
             </h1>
             <p className="mx-auto mt-4 max-w-2xl text-pretty text-base text-muted-foreground sm:text-lg">
-              A growing collection of fast, privacy-first tools for developers,
+              A growing collection of {tools.length} fast, privacy-first tools for developers,
               designers, and marketers. No sign-up. No tracking. Works offline.
             </p>
 
             <div className="relative mx-auto mt-7 max-w-xl">
-              <Search className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <div className="pointer-events-none absolute left-3.5 top-1/2 z-10 -translate-y-1/2 text-foreground/40">
+                <Search className="size-4" />
+              </div>
               <Input
                 ref={searchRef}
                 value={query}
@@ -248,18 +235,6 @@ export function HubView({
           </div>
         </div>
       </section>
-
-      {/* Stats strip */}
-      {!isFiltering ? (
-        <section className="border-b border-border/60 bg-muted/20">
-          <div className="mx-auto grid max-w-6xl grid-cols-2 gap-px overflow-hidden border-x border-border/40 bg-border/40 sm:grid-cols-4">
-            <StatCell label="Total tools" value={tools.length} accent="var(--primary)" />
-            <StatCell label="Categories" value={CATEGORY_ORDER.length} />
-            <StatCell label="Network tools" value={tools.filter((t) => ['dns-lookup','ip-lookup','http-header-checker','ssl-checker','ping-tool','redirect-checker'].includes(t.slug)).length} />
-            <StatCell label="Client-side" value="100%" />
-          </div>
-        </section>
-      ) : null}
 
       {/* Category filter */}
       <section className="sticky top-14 z-30 border-b border-border/60 bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/65">
@@ -417,27 +392,6 @@ export function HubView({
       ) : null}
     </main>
   )
-}
-
-/** Animated count-up for the hero badge. */
-function AnimatedCounter({ value }: { value: number }) {
-  const [display, setDisplay] = React.useState(0)
-  React.useEffect(() => {
-    if (display === value) return
-    const step = Math.max(1, Math.ceil((value - display) / 12))
-    const id = setInterval(() => {
-      setDisplay((d) => {
-        const next = d + step
-        if (next >= value) {
-          clearInterval(id)
-          return value
-        }
-        return next
-      })
-    }, 24)
-    return () => clearInterval(id)
-  }, [value, display])
-  return <span className="tabular-nums">{display}</span>
 }
 
 function QuickRow({
@@ -605,30 +559,6 @@ function ToolCard({
         <Wand2 className="size-2.5" />
         {CATEGORY_META[tool.category].label}
       </span>
-    </div>
-  )
-}
-
-function StatCell({
-  label,
-  value,
-  accent,
-}: {
-  label: string
-  value: React.ReactNode
-  accent?: string
-}) {
-  return (
-    <div className="bg-background px-4 py-3">
-      <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-        {label}
-      </div>
-      <div
-        className="mt-0.5 text-xl font-bold tabular-nums"
-        style={accent ? { color: accent } : undefined}
-      >
-        {value}
-      </div>
     </div>
   )
 }

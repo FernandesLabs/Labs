@@ -111,7 +111,7 @@ export function ResultBox({
       </div>
       <pre
         style={{ minHeight: `${rows * 1.5}rem` }}
-        className={`fl-scroll overflow-auto rounded-lg border border-border bg-muted/30 p-3 text-sm ${
+        className={`fl-scroll w-full max-w-full overflow-x-auto overflow-y-auto rounded-lg border border-border bg-muted/30 p-3 text-sm ${
           mono ? 'font-mono' : 'font-sans'
         } whitespace-pre-wrap break-words`}
       >
@@ -132,12 +132,12 @@ export function Stat({
   accent?: string
 }) {
   return (
-    <div className="rounded-lg border border-border bg-card p-3">
+    <div className="min-w-0 overflow-hidden rounded-lg border border-border bg-card p-3">
       <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
         {label}
       </div>
       <div
-        className="mt-1 font-mono text-lg font-semibold tabular-nums"
+        className="mt-1 break-all font-mono text-lg font-semibold tabular-nums"
         style={accent ? { color: accent } : undefined}
       >
         {value}

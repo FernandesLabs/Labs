@@ -10,6 +10,23 @@ export function ThemeToggle() {
   const [mounted, setMounted] = React.useState(false)
   React.useEffect(() => setMounted(true), [])
 
+  // Render a completely static placeholder until mounted.
+  // This guarantees the server and client first render are identical,
+  // preventing any hydration mismatch from next-themes.
+  if (!mounted) {
+    return (
+      <Button
+        variant="ghost"
+        size="icon"
+        aria-label="Toggle dark mode"
+        className="rounded-full"
+        disabled
+      >
+        <div className="size-4" />
+      </Button>
+    )
+  }
+
   const isDark = resolvedTheme === 'dark'
 
   return (
@@ -21,14 +38,10 @@ export function ThemeToggle() {
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
       className="rounded-full"
     >
-      {mounted ? (
-        isDark ? (
-          <Sun className="size-4" />
-        ) : (
-          <Moon className="size-4" />
-        )
+      {isDark ? (
+        <Sun className="size-4" />
       ) : (
-        <div className="size-4" />
+        <Moon className="size-4" />
       )}
     </Button>
   )

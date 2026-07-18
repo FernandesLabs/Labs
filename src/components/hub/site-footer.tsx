@@ -52,7 +52,6 @@ export function SiteFooter() {
                   fernandeslabs.com
                 </a>
               </li>
-              <li>KeyForge Password Tool</li>
             </ul>
           </div>
 

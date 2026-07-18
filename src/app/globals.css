@@ -184,3 +184,25 @@
 @media (prefers-reduced-motion: reduce) {
   .fl-fade-in, .fl-card-hover { animation: none; transition: none; }
 }
+
+/* Overflow safety: prevent tool results from breaking out of their containers */
+pre, code, table {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+table {
+  display: block;
+  overflow-x: auto;
+  width: 100%;
+}
+textarea {
+  max-width: 100%;
+}
+/* Ensure tool card content never causes horizontal scroll */
+.fl-section, main {
+  overflow-x: hidden;
+}

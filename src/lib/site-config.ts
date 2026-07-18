@@ -25,7 +25,7 @@ export const siteConfig = {
     url: 'https://fernandeslabs.com',
     description:
       'Free online tools for developers, designers, and marketers. No sign-up. No tracking. Works offline.',
-    contactEmail: 'hello@fernandeslabs.com',
+    contactEmail: 'fernandeslabssupport@gmail.com',
   },
 
   /** Google AdSense — apply at https://adsense.google.com */
