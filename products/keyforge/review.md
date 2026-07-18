@@ -1,3 +1,0 @@
-# Review
-
-Independent review findings.
