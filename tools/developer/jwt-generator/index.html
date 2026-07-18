@@ -60,10 +60,11 @@ t.textContent=s==="dark"?"☀️":"🌙";
 t.addEventListener("click",function(){var n=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);localStorage.setItem("fl-theme",n);t.textContent=n==="dark"?"☀️":"🌙";});
 FernandesConfig.load().then(function(c){document.getElementById("footer-text").textContent=c.branding.footer_text;});
 document.getElementById("btn-go").addEventListener("click",async function(){
-  try{var h=JSON.parse(document.getElementById("header-input").value);var p=JSON.parse(document.getElementById("payload-input").value);var s=document.getElementById("secret").value;
+  try{var h=JSON.parse(document.getElementById("header-input").value);var p=JSON.parse(document.getElementById("payload-input").value);var secret=document.getElementById("secret").value;
+  if(!secret){document.getElementById("output").value="Error: Please enter a secret key.";return}
   var b64=function(o){return btoa(JSON.stringify(o)).replace(/=/g,"").replace(/\+/g,"-").replace(/\//g,"_")};
   var header=b64(h);var payload=b64(p);var data=header+"."+payload;
-  var enc=new TextEncoder();var key=await crypto.subtle.importKey("raw",enc.encode(s),{name:"HMAC",hash:"SHA-256"},false,["sign"]);
+  var enc=new TextEncoder();var key=await crypto.subtle.importKey("raw",enc.encode(secret),{name:"HMAC",hash:"SHA-256"},false,["sign"]);
   var sig=await crypto.subtle.sign("HMAC",key,enc.encode(data));var signature=btoa(String.fromCharCode.apply(null,new Uint8Array(sig))).replace(/=/g,"").replace(/\+/g,"-").replace(/\//g,"_");
   document.getElementById("output").value=data+"."+signature}catch(e){document.getElementById("output").value="Error: "+e.message}});
 

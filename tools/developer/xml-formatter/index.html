@@ -61,8 +61,26 @@ t.textContent=s==="dark"?"☀️":"🌙";
 t.addEventListener("click",function(){var n=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);localStorage.setItem("fl-theme",n);t.textContent=n==="dark"?"☀️":"🌙";});
 FernandesConfig.load().then(function(c){document.getElementById("footer-text").textContent=c.branding.footer_text;});
 document.getElementById("btn-go").addEventListener("click",function(){
-  try{var i=document.getElementById("input").value;var formatted="";var indent=0;i.split(/>(?=\s*[^<])/).forEach(function(part){part=part.trim();if(!part)return;if(part.startsWith("</"))indent--;formatted+="  ".repeat(Math.max(0,indent))+part+">\n";if(part.startsWith("<")&&!part.startsWith("</")&&!part.startsWith("<?")&&!part.endsWith("/>")&&!part.includes("</"))indent++});
-  document.getElementById("output").value=formatted}catch(e){document.getElementById("output").value="Error: "+e.message}});
+  try{
+    var xml=document.getElementById("input").value.trim();
+    if(!xml){document.getElementById("output").value="";return}
+    var formatted="";
+    var indent=0;
+    var reg=/>(?=\s*(?:<))/g;
+    var padded=xml.replace(reg,">\n");
+    var lines=padded.split("\n").map(function(l){return l.trim()}).filter(function(l){return l});
+    lines.forEach(function(line){
+      if(line.startsWith("</")){
+        indent=Math.max(0,indent-1);
+      }
+      formatted+="  ".repeat(indent)+line+"\n";
+      if(line.startsWith("<")&&!line.startsWith("</")&&!line.startsWith("<?")&&!line.startsWith("<!")&&!line.endsWith("/>")&&!line.endsWith("</"+line.slice(1).split(" ")[0].split(">")[0]+">")){
+        indent++;
+      }
+    });
+    document.getElementById("output").value=formatted.trim();
+  }catch(e){document.getElementById("output").value="Error: "+e.message}
+});
 document.getElementById("btn-copy").addEventListener("click",function(){var o=document.getElementById("output");if(o.value)navigator.clipboard.writeText(o.value)});
 document.getElementById("btn-clear").addEventListener("click",function(){document.getElementById("input").value="";document.getElementById("output").value=""});
 

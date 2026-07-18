@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>UUID Generator — Fernandes Labs</title>
-  <meta name="description" content="Generate RFC 4122 UUIDs with Web Crypto API Runs entirely in your browser.">
+  <meta name="description" content="Generate RFC 4122 UUIDs with Web Crypto API. Runs entirely in your browser.">
   <link rel="canonical" href="https://fernandeslabs.com/tools/developer/uuid-generator/">
   <meta property="og:title" content="UUID Generator — Fernandes Labs">
   <meta property="og:description" content="Generate RFC 4122 UUIDs with Web Crypto API">
@@ -25,14 +25,43 @@
 <main>
   <section class="fl-hero fl-container">
     <h1>UUID Generator</h1>
-    <p>Generate RFC 4122 UUIDs with Web Crypto API</p>
+    <p>Generate RFC 4122 version 4 UUIDs using the Web Crypto API. No server, no tracking.</p>
   </section>
 
   <section class="fl-container fl-section">
+    <div class="ad-placeholder">Advertisement</div>
     <div class="card">
-      <!-- TODO: Replace this placeholder with the tool's actual functionality. -->
-      <p style="text-align: center; color: var(--color-text-muted);">Tool functionality goes here.</p>
+      <div style="display: grid; gap: var(--space-3); max-width: 400px;">
+        <div>
+          <label for="count">How many UUIDs?</label>
+          <input class="input" id="count" type="number" value="1" min="1" max="100">
+        </div>
+        <div>
+          <label for="uppercase">Uppercase</label>
+          <select class="select" id="uppercase">
+            <option value="false">Lowercase (standard)</option>
+            <option value="true">Uppercase</option>
+          </select>
+        </div>
+        <div>
+          <label for="hyphens">Hyphens</label>
+          <select class="select" id="hyphens">
+            <option value="true">With hyphens (standard)</option>
+            <option value="false">Without hyphens</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: var(--space-2); margin-top: var(--space-4);">
+        <button class="btn btn-primary" id="btn-generate">Generate UUID</button>
+        <button class="btn btn-ghost" id="btn-copy">Copy</button>
+        <button class="btn btn-ghost" id="btn-clear">Clear</button>
+      </div>
+
+      <label for="output" style="margin-top: var(--space-4);">Generated UUIDs</label>
+      <textarea class="textarea" id="output" readonly style="min-height: 120px;" aria-label="Generated UUIDs"></textarea>
     </div>
+    <div class="ad-placeholder">Advertisement</div>
   </section>
 </main>
 
@@ -44,7 +73,6 @@
 </footer>
 
 <script>
-  // Theme toggle
   var themeToggle = document.getElementById("theme-toggle");
   var savedTheme = localStorage.getItem("fl-theme") || "light";
   document.documentElement.setAttribute("data-theme", savedTheme);
@@ -56,7 +84,67 @@
     themeToggle.textContent = next === "dark" ? "☀️" : "🌙";
   });
 
-  // Load central config and apply branding
+  /**
+   * Generate a single RFC 4122 version 4 UUID using crypto.getRandomValues.
+   * Sets the version (4) and variant bits per the spec.
+   */
+  function generateUUID() {
+    var bytes = new Uint8Array(16);
+    crypto.getRandomValues(bytes);
+    // Set version 4 (bits 12-15 of time_hi_and_version)
+    bytes[6] = (bytes[6] & 0x0f) | 0x40;
+    // Set variant to RFC 4122 (bits 6-7 of clock_seq_hi_and_reserved)
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+
+    var hex = Array.from(bytes, function (b) {
+      return b.toString(16).padStart(2, "0");
+    }).join("");
+
+    // Format as 8-4-4-4-12 with hyphens
+    var uuid =
+      hex.slice(0, 8) + "-" +
+      hex.slice(8, 12) + "-" +
+      hex.slice(12, 16) + "-" +
+      hex.slice(16, 20) + "-" +
+      hex.slice(20, 32);
+
+    return uuid;
+  }
+
+  function generate() {
+    var count = parseInt(document.getElementById("count").value, 10) || 1;
+    count = Math.min(Math.max(count, 1), 100);
+    var upper = document.getElementById("uppercase").value === "true";
+    var hyphens = document.getElementById("hyphens").value === "true";
+
+    var uuids = [];
+    for (var i = 0; i < count; i++) {
+      var uuid = generateUUID();
+      if (!hyphens) uuid = uuid.replace(/-/g, "");
+      if (upper) uuid = uuid.toUpperCase();
+      uuids.push(uuid);
+    }
+
+    document.getElementById("output").value = uuids.join("\n");
+  }
+
+  document.getElementById("btn-generate").addEventListener("click", generate);
+  document.getElementById("count").addEventListener("input", generate);
+  document.getElementById("uppercase").addEventListener("change", generate);
+  document.getElementById("hyphens").addEventListener("change", generate);
+
+  document.getElementById("btn-copy").addEventListener("click", function () {
+    var output = document.getElementById("output");
+    if (output.value) navigator.clipboard.writeText(output.value);
+  });
+
+  document.getElementById("btn-clear").addEventListener("click", function () {
+    document.getElementById("output").value = "";
+  });
+
+  // Generate one on load
+  generate();
+
   FernandesConfig.load().then(function (config) {
     document.getElementById("footer-text").textContent = config.branding.footer_text;
   });
