@@ -148,67 +148,46 @@ Use the included `Caddyfile` as a reverse proxy template.
 
 **Total cost to launch: $0**
 
-### Activate monetization in ONE file
+### Activate monetization with Environment Variables
 
-Edit `src/lib/site-config.ts`:
+All monetization settings are controlled by **environment variables** — no code
+editing required. Set them in your hosting platform's dashboard (Vercel:
+Settings → Environment Variables).
 
-```typescript
-export const siteConfig = {
-  site: {
-    contactEmail: 'fernandeslabssupport@gmail.com',  // ← your email
-  },
-  adsense: {
-    enabled: true,                                    // ← flip to true
-    clientId: 'ca-pub-1234567890123456',             // ← your AdSense ID
-    slots: {
-      horizontal: '1234567890',                       // ← your ad slot IDs
-      vertical: '0987654321',
-      footer: '1111111111',
-    },
-  },
-  analytics: {
-    googleAnalyticsId: 'G-XXXXXXXXXX',                // ← your GA4 ID
-  },
-  searchConsole: {
-    verificationToken: 'your-token',                  // ← Search Console token
-  },
-  crypto: {
-    enabled: true,
-    wallets: {
-      bitcoin: 'bc1qYOURADDRESS',                     // ← your wallet
-      ethereum: '0xYOURADDRESS',
-    },
-  },
-  affiliate: {
-    enabled: true,
-    links: {
-      hosting: 'https://cloudflare.com/?aff=YOURID',  // ← your affiliate links
-      domain: 'https://namecheap.com/?aff=YOURID',
-      vpn: 'https://protonvpn.com/?ref=YOURID',
-      passwordManager: 'https://1password.com/?ref=YOURID',
-      seoTool: 'https://ahrefs.com/affiliate/YOURID',
-    },
-  },
-}
-```
+See `.env.example` for the full list. Key variables:
 
-Everything else is automatic — ads appear, analytics track, donations show, affiliate links display per category.
+| Variable | What it does | Example |
+|----------|-------------|---------|
+| `DATABASE_URL` | Database connection (required) | `file:./db/custom.db` |
+| `NEXT_PUBLIC_CONTACT_EMAIL` | Support email | `fernandeslabssupport@gmail.com` |
+| `NEXT_PUBLIC_SEARCH_CONSOLE_TOKEN` | Google Search Console verification | `ABC123XYZ=` |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID` | Google Analytics 4 ID | `G-XXXXXXXXXX` |
+| `NEXT_PUBLIC_ADSENSE_ENABLED` | Turn on AdSense ads | `true` |
+| `NEXT_PUBLIC_ADSENSE_CLIENT_ID` | AdSense client ID | `ca-pub-1234567890123456` |
+| `NEXT_PUBLIC_ADSENSE_SLOT_HORIZONTAL` | Horizontal ad slot ID | `1234567890` |
+| `NEXT_PUBLIC_CRYPTO_BTC` | Bitcoin donation address | `bc1q...` |
+| `NEXT_PUBLIC_AFF_HOSTING` | Hosting affiliate link | `https://cloudflare.com/?aff=YOURID` |
+
+**For local development:** copy `.env.example` to `.env.local` and fill in values.
+**For production:** set them in Vercel → Settings → Environment Variables → Redeploy.
+
+See `DEPLOYMENT-TUTORIAL.md` for the complete step-by-step guide.
 
 ### Step-by-step monetization setup
 
 1. **Deploy to Vercel** (see above)
-2. **Set up Google Search Console** → verify ownership → submit `sitemap.xml`
-3. **Set up Google Analytics 4** → paste measurement ID in config
+2. **Set up Google Search Console** → verify ownership → add `NEXT_PUBLIC_SEARCH_CONSOLE_TOKEN` env var → submit `sitemap.xml`
+3. **Set up Google Analytics 4** → add `NEXT_PUBLIC_GA_MEASUREMENT_ID` env var
 4. **Wait 1-2 weeks** for Google to index your tools
-5. **Apply for Google AdSense** → paste client ID in config → request review
-6. **Create ad units** in AdSense → paste slot IDs in config
+5. **Apply for Google AdSense** → add `NEXT_PUBLIC_ADSENSE_ENABLED` + `NEXT_PUBLIC_ADSENSE_CLIENT_ID` env vars → request review
+6. **Create ad units** in AdSense → add `NEXT_PUBLIC_ADSENSE_SLOT_*` env vars
 7. **Sign up for affiliate programs** (all free):
    - [Namecheap](https://www.namecheap.com/affiliates/) (domains)
    - [Cloudflare](https://www.cloudflare.com/partners/) (hosting)
    - [1Password](https://1password.com/partnerships/) (password manager)
    - [ProtonVPN](https://protonvpn.com) (VPN)
    - [Ahrefs](https://ahrefs.com/affiliate) (SEO tool — high commission)
-8. **Add crypto wallet addresses** for donations
+8. **Add crypto wallet addresses** via `NEXT_PUBLIC_CRYPTO_*` env vars
 
 ### Revenue expectations
 
@@ -261,7 +240,9 @@ src/
 │       ├── media/            # 28 tools
 │       └── misc/             # 9 tools
 ├── lib/
-│   ├── site-config.ts        # ← EDIT THIS: all monetization config
+│   ├── site-config.ts        # Reads env vars (no editing needed)
+├── .env.example              # ← Copy to .env.local, fill in your IDs
+├── .env.local                # ← Your local env vars (not committed)
 │   ├── tools/
 │   │   ├── registry.tsx      # Tool registry (132 tools + lazy imports + preload map)
 │   │   ├── types.ts          # ToolCategory types + category metadata
@@ -285,8 +266,21 @@ src/
 
 ## 🔧 Configuration
 
-### Site Config (`src/lib/site-config.ts`)
-The one file you edit for monetization. Contains: AdSense, Analytics, Search Console, crypto wallets, affiliate links, social links, contact email.
+### Environment Variables (`.env.example`)
+All monetization and site config is controlled by environment variables —
+**no code editing required**. Copy `.env.example` to `.env.local` for
+development, or set them in Vercel → Settings → Environment Variables for
+production. See the [monetization section](#-monetization-guide-all-configurable-in-one-file)
+and `DEPLOYMENT-TUTORIAL.md` for details.
+
+Key variables:
+- `DATABASE_URL` — database connection (required)
+- `NEXT_PUBLIC_CONTACT_EMAIL` — support email
+- `NEXT_PUBLIC_ADSENSE_*` — Google AdSense (client ID + slot IDs)
+- `NEXT_PUBLIC_GA_MEASUREMENT_ID` — Google Analytics 4
+- `NEXT_PUBLIC_SEARCH_CONSOLE_TOKEN` — Google Search Console verification
+- `NEXT_PUBLIC_CRYPTO_*` — crypto donation wallet addresses
+- `NEXT_PUBLIC_AFF_*` — affiliate links
 
 ### Theme
 Colors are defined as OKLCH values in `src/app/globals.css` (`:root` and `.dark`).

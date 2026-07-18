@@ -1,93 +1,105 @@
 /**
  * Fernandes Labs — Site Configuration
  *
- * This is the ONE file you edit to activate monetization.
- * Fill in your IDs/links and everything updates automatically.
+ * All monetization settings are read from environment variables (with safe
+ * fallbacks so the app works in development without any config).
  *
- * --- QUICK START ---
- * 1. Google AdSense: apply at adsense.google.com, get your client ID
- *    (looks like "ca-pub-1234567890123456"), paste it below.
- * 2. Google Analytics: create a GA4 property, get your Measurement ID
- *    (looks like "G-XXXXXXXXXX"), paste it below.
- * 3. Google Search Console: add your site, get the verification token,
- *    paste it below.
- * 4. Crypto donations: paste your wallet addresses below.
- * 5. Affiliate links: replace the example URLs with your affiliate links.
+ * On Vercel (or any hosting platform), set these as Environment Variables
+ * in the project settings dashboard. Variables prefixed with NEXT_PUBLIC_
+ * are exposed to the browser — that's intentional here because the tools
+ * run client-side and need to render ads/analytics/donation widgets.
  *
- * Until you fill these in, the app shows branded placeholders — it works
- * perfectly without any of this configured.
+ * See .env.example for a complete list of variables to set.
  */
+
+function str(value: string | undefined, fallback = ''): string {
+  return value && value.trim() ? value.trim() : fallback
+}
+
+function bool(value: string | undefined, fallback = false): boolean {
+  if (value === undefined || value === null) return fallback
+  return value === 'true' || value === '1' || value === 'yes'
+}
+
+function nullableStr(value: string | undefined): string | null {
+  const v = value?.trim()
+  return v ? v : null
+}
 
 export const siteConfig = {
   site: {
-    name: 'Fernandes Labs',
-    domain: 'fernandeslabs.com',
-    url: 'https://fernandeslabs.com',
-    description:
-      'Free online tools for developers, designers, and marketers. No sign-up. No tracking. Works offline.',
-    contactEmail: 'fernandeslabssupport@gmail.com',
+    name: str(process.env.NEXT_PUBLIC_SITE_NAME, 'Fernandes Labs'),
+    domain: str(process.env.NEXT_PUBLIC_SITE_DOMAIN, 'fernandeslabs.com'),
+    url: str(
+      process.env.NEXT_PUBLIC_SITE_URL,
+      `https://${str(process.env.NEXT_PUBLIC_SITE_DOMAIN, 'fernandeslabs.com')}`
+    ),
+    description: str(
+      process.env.NEXT_PUBLIC_SITE_DESCRIPTION,
+      'Free online tools for developers, designers, and marketers. No sign-up. No tracking. Works offline.'
+    ),
+    contactEmail: str(
+      process.env.NEXT_PUBLIC_CONTACT_EMAIL,
+      'fernandeslabssupport@gmail.com'
+    ),
   },
 
   /** Google AdSense — apply at https://adsense.google.com */
   adsense: {
-    enabled: false, // set to true once you have a client_id
-    clientId: null as string | null, // "ca-pub-1234567890123456"
+    enabled: bool(process.env.NEXT_PUBLIC_ADSENSE_ENABLED, false),
+    clientId: nullableStr(process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID),
     slots: {
-      horizontal: null as string | null, // "1234567890"
-      vertical: null as string | null,
-      footer: null as string | null,
+      horizontal: nullableStr(process.env.NEXT_PUBLIC_ADSENSE_SLOT_HORIZONTAL),
+      vertical: nullableStr(process.env.NEXT_PUBLIC_ADSENSE_SLOT_VERTICAL),
+      footer: nullableStr(process.env.NEXT_PUBLIC_ADSENSE_SLOT_FOOTER),
     },
   },
 
   /** Google Analytics 4 — create at https://analytics.google.com */
   analytics: {
-    googleAnalyticsId: null as string | null, // "G-XXXXXXXXXX"
+    googleAnalyticsId: nullableStr(process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID),
   },
 
   /** Google Search Console — verify at https://search.google.com/search-console */
   searchConsole: {
-    /** The content attribute of the verification meta tag.
-     *  Looks like "google-site-verification=ABC123...". Paste ONLY the token part. */
-    verificationToken: null as string | null,
+    verificationToken: nullableStr(
+      process.env.NEXT_PUBLIC_SEARCH_CONSOLE_TOKEN
+    ),
   },
 
-  /** Crypto donations — paste your wallet addresses */
+  /** Crypto donations */
   crypto: {
-    enabled: true,
+    enabled: bool(process.env.NEXT_PUBLIC_CRYPTO_ENABLED, true),
     wallets: {
-      bitcoin: null as string | null, // "bc1q..."
-      ethereum: null as string | null, // "0x..."
-      usdc_base: null as string | null, // "0x..." (on Base network)
-      solana: null as string | null, // "..." 
+      bitcoin: nullableStr(process.env.NEXT_PUBLIC_CRYPTO_BTC),
+      ethereum: nullableStr(process.env.NEXT_PUBLIC_CRYPTO_ETH),
+      usdc_base: nullableStr(process.env.NEXT_PUBLIC_CRYPTO_USDC),
+      solana: nullableStr(process.env.NEXT_PUBLIC_CRYPTO_SOL),
     },
     donationAmounts: [1, 5, 10, 25, 50],
   },
 
-  /** Affiliate links — replace with your affiliate URLs.
-   *  Sign up for these programs (all free to join):
-   *  - Cloudflare (hosting/CDN): https://www.cloudflare.com/partners/
-   *  - Namecheap (domains): https://www.namecheap.com/affiliates/
-   *  - 1Password (password manager): https://1password.com/partnerships/
-   *  - NordVPN: https://nordvpn.com/affiliate/
-   *  - Ahrefs (SEO): https://ahrefs.com/affiliate
-   */
+  /** Affiliate links */
   affiliate: {
-    enabled: true,
+    enabled: bool(process.env.NEXT_PUBLIC_AFFILIATE_ENABLED, true),
     links: {
-      hosting: 'https://cloudflare.com',
-      domain: 'https://namecheap.com',
-      vpn: 'https://protonvpn.com',
-      passwordManager: null as string | null,
-      seoTool: null as string | null,
+      hosting: nullableStr(process.env.NEXT_PUBLIC_AFF_HOSTING) || 'https://cloudflare.com',
+      domain: nullableStr(process.env.NEXT_PUBLIC_AFF_DOMAIN) || 'https://namecheap.com',
+      vpn: nullableStr(process.env.NEXT_PUBLIC_AFF_VPN) || 'https://protonvpn.com',
+      passwordManager: nullableStr(process.env.NEXT_PUBLIC_AFF_PASSWORD_MANAGER),
+      seoTool: nullableStr(process.env.NEXT_PUBLIC_AFF_SEO_TOOL),
     },
   },
 
-  /** Social/profile links (shown in footer) */
+  /** Social/profile links */
   social: {
-    github: 'https://github.com/FernandesLabs/Labs',
-    twitter: null as string | null,
+    github: str(
+      process.env.NEXT_PUBLIC_SOCIAL_GITHUB,
+      'https://github.com/FernandesLabs/Labs'
+    ),
+    twitter: nullableStr(process.env.NEXT_PUBLIC_SOCIAL_TWITTER),
   },
-} as const
+}
 
 /** Helper: is AdSense fully configured and ready to show real ads? */
 export function isAdsenseConfigured(): boolean {
