@@ -1,0 +1,42 @@
+{
+  "name": "Fernandes Labs — Tool Network",
+  "short_name": "Fernandes Labs",
+  "description": "Free, privacy-first online tools for developers, designers, and marketers. No sign-up. No tracking. Works offline.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "categories": ["productivity", "developer", "utilities"],
+  "icons": [
+    {
+      "src": "/fl-logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "JSON Formatter",
+      "short_name": "JSON",
+      "url": "/#tool=json-formatter"
+    },
+    {
+      "name": "Password Generator",
+      "short_name": "Password",
+      "url": "/#tool=password-generator"
+    },
+    {
+      "name": "QR Generator",
+      "short_name": "QR",
+      "url": "/#tool=qr-generator"
+    },
+    {
+      "name": "UUID Generator",
+      "short_name": "UUID",
+      "url": "/#tool=uuid-generator"
+    }
+  ]
+}
