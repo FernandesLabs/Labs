@@ -76,6 +76,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Google AdSense loader — must be in <head> for crawler verification.
+            Set NEXT_PUBLIC_ADSENSE_CLIENT_ID env var to activate. */}
+        {siteConfig.adsense.enabled && siteConfig.adsense.clientId ? (
+          <script
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${siteConfig.adsense.clientId}`}
+            crossOrigin="anonymous"
+          />
+        ) : null}
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >

@@ -11,10 +11,20 @@ declare global {
 
 /**
  * AdSense ad unit. Shows a real Google ad when configured, falls back to
- * a branded placeholder when not. Used in place of the old AdPlaceholder.
+ * a branded placeholder when not.
  *
- * To activate: set `siteConfig.adsense.enabled = true` and fill in
- * `clientId` + `slots.horizontal` in src/lib/site-config.ts.
+ * The AdSense loader script is injected in src/app/layout.tsx (<head>),
+ * NOT here — that way it's in the server-rendered HTML for Google's
+ * crawler to verify.
+ *
+ * This component only renders the <ins> ad tag and pushes it to AdSense.
+ *
+ * Env vars (set in Vercel → Settings → Environment Variables):
+ *   NEXT_PUBLIC_ADSENSE_ENABLED = true
+ *   NEXT_PUBLIC_ADSENSE_CLIENT_ID = ca-pub-XXXXXXXXXXXXXXXX
+ *   NEXT_PUBLIC_ADSENSE_SLOT_HORIZONTAL = 1234567890
+ *   NEXT_PUBLIC_ADSENSE_SLOT_VERTICAL = 0987654321
+ *   NEXT_PUBLIC_ADSENSE_SLOT_FOOTER = 1111111111
  */
 export function AdUnit({
   slot = 'horizontal',
@@ -28,49 +38,45 @@ export function AdUnit({
     siteConfig.adsense.slots[slot] || siteConfig.adsense.slots.horizontal
   const [pushed, setPushed] = React.useState(false)
 
-  // Inject the AdSense loader script once (head)
-  React.useEffect(() => {
-    if (!configured) return
-    if (document.getElementById('adsbygoogle-js')) return
-    const s = document.createElement('script')
-    s.id = 'adsbygoogle-js'
-    s.async = true
-    s.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${siteConfig.adsense.clientId}`
-    s.crossOrigin = 'anonymous'
-    document.head.appendChild(s)
-  }, [configured])
-
   // Push the ad to AdSense after the <ins> renders
   React.useEffect(() => {
     if (!configured || !adSlot || pushed) return
-    try {
-      ;(window.adsbygoogle = window.adsbygoogle || []).push({})
-      setPushed(true)
-    } catch {
-      /* AdSense not loaded yet — will retry */
+    // Wait for the AdSense script (loaded in <head>) to be ready
+    const tryPush = () => {
+      try {
+        ;(window.adsbygoogle = window.adsbygoogle || []).push({})
+        setPushed(true)
+      } catch {
+        // AdSense script not loaded yet — retry in 500ms
+        setTimeout(tryPush, 500)
+      }
     }
+    tryPush()
   }, [configured, adSlot, pushed])
 
+  // Not configured or no slot ID → show branded placeholder
   if (!configured || !adSlot) {
     return (
       <div
         aria-hidden="true"
-        className={`flex h-20 items-center justify-center rounded-lg border border-dashed border-border/70 bg-muted/30 text-xs font-medium uppercase tracking-wider text-muted-foreground/60 ${className || ''}`}
+        className={`flex h-20 w-full items-center justify-center rounded-lg border border-dashed border-border/70 bg-muted/30 text-xs font-medium uppercase tracking-wider text-muted-foreground/60 ${className || ''}`}
       >
         Advertisement{slot ? ` · ${slot}` : ''}
       </div>
     )
   }
 
-  const format = slot === 'vertical' ? 'vertical' : 'auto'
+  const isVertical = slot === 'vertical'
+  const format = isVertical ? 'vertical' : 'auto'
 
   return (
-    <div className={`overflow-hidden rounded-lg ${className || ''}`}>
+    <div className={`w-full overflow-hidden rounded-lg ${className || ''}`}>
       <ins
         className="adsbygoogle"
         style={{
           display: 'block',
-          minHeight: slot === 'horizontal' ? 90 : 200,
+          width: '100%',
+          minHeight: isVertical ? 600 : 100,
         }}
         data-ad-client={siteConfig.adsense.clientId!}
         data-ad-slot={adSlot}
