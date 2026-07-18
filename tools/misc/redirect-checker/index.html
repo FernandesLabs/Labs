@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redirect Checker — Fernandes Labs</title>
+  <meta name="description" content="Check redirect chain for a URL. Runs entirely in your browser — no data sent to servers.">
+  <link rel="canonical" href="https://fernandeslabs.com/tools/misc/redirect-checker/">
+  <meta property="og:title" content="Redirect Checker — Fernandes Labs">
+  <meta property="og:description" content="Check redirect chain for a URL.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Redirect Checker — Fernandes Labs">
+  <meta name="twitter:description" content="Check redirect chain for a URL.">
+  <link rel="icon" href="../../../assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../../assets/styles.css">
+  <script src="../../../assets/config-loader.js"></script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebApplication","name":"Redirect Checker","description":"Check redirect chain for a URL.","applicationCategory":"Utilities","operatingSystem":"All","url":"https://fernandeslabs.com/tools/misc/redirect-checker/"}
+  </script>
+</head>
+<body>
+<header class="fl-header">
+  <div class="fl-container fl-header-inner">
+    <a href="../../../" class="fl-brand"><img src="../../../assets/logo.svg" alt="Fernandes Labs" class="fl-brand-logo"><span>Fernandes Labs</span></a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+  </div>
+</header>
+<main>
+  <section class="fl-hero fl-container">
+    <h1>Redirect Checker</h1>
+    <p>Check redirect chain for a URL.</p>
+  </section>
+  <section class="fl-container fl-section">
+    <div class="ad-placeholder">Advertisement</div>
+    <div class="card">
+<label for="url">URL</label>
+      <input class="input" id="url" placeholder="https://example.com/old">
+      <button class="btn btn-primary" id="btn-go" style="margin-top:var(--space-3);">Check Redirects</button>
+      <div id="result" style="margin-top:var(--space-4);"></div>
+    </div>
+    <div class="ad-placeholder">Advertisement</div>
+  </section>
+</main>
+<footer class="fl-footer">
+  <div class="fl-container fl-footer-inner">
+    <a href="../../../">← Back to Tools</a>
+    <p id="footer-text">Built by Fernandes Labs</p>
+  </div>
+</footer>
+<script>
+var t=document.getElementById("theme-toggle"),s=localStorage.getItem("fl-theme")||"light";
+document.documentElement.setAttribute("data-theme",s);
+t.textContent=s==="dark"?"☀️":"🌙";
+t.addEventListener("click",function(){var n=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);localStorage.setItem("fl-theme",n);t.textContent=n==="dark"?"☀️":"🌙";});
+FernandesConfig.load().then(function(c){document.getElementById("footer-text").textContent=c.branding.footer_text;});
+document.getElementById("btn-go").addEventListener("click",async function(){
+  var u=document.getElementById("url").value;if(!u)return;var r=document.getElementById("result");r.innerHTML="<p>Checking...</p>";
+  try{var res=await fetch(u,{redirect:"follow"});var chain="Final URL: "+res.url+" (Status: "+res.status+")";
+  r.innerHTML="<p>"+chain+"</p>"}catch(e){r.innerHTML="<p style='color:var(--color-danger)'>Error: "+e.message+"</p>"}});
+
+</script>
+</body>
+</html>

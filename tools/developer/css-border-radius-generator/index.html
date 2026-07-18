@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Border Radius Generator — Fernandes Labs</title>
+  <meta name="description" content="Generate CSS border-radius with visual sliders. Runs entirely in your browser — no data sent to servers.">
+  <link rel="canonical" href="https://fernandeslabs.com/tools/developer/css-border-radius-generator/">
+  <meta property="og:title" content="CSS Border Radius Generator — Fernandes Labs">
+  <meta property="og:description" content="Generate CSS border-radius with visual sliders.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="CSS Border Radius Generator — Fernandes Labs">
+  <meta name="twitter:description" content="Generate CSS border-radius with visual sliders.">
+  <link rel="icon" href="../../../assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../../assets/styles.css">
+  <script src="../../../assets/config-loader.js"></script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebApplication","name":"CSS Border Radius Generator","description":"Generate CSS border-radius with visual sliders.","applicationCategory":"Utilities","operatingSystem":"All","url":"https://fernandeslabs.com/tools/developer/css-border-radius-generator/"}
+  </script>
+</head>
+<body>
+<header class="fl-header">
+  <div class="fl-container fl-header-inner">
+    <a href="../../../" class="fl-brand"><img src="../../../assets/logo.svg" alt="Fernandes Labs" class="fl-brand-logo"><span>Fernandes Labs</span></a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+  </div>
+</header>
+<main>
+  <section class="fl-hero fl-container">
+    <h1>CSS Border Radius Generator</h1>
+    <p>Generate CSS border-radius with visual sliders.</p>
+  </section>
+  <section class="fl-container fl-section">
+    <div class="ad-placeholder">Advertisement</div>
+    <div class="card">
+<div style="display:grid;gap:var(--space-3);grid-template-columns:repeat(2,1fr);">
+      <div><label for="tl">Top-left</label><input class="input" id="tl" type="number" value="8"></div>
+      <div><label for="tr">Top-right</label><input class="input" id="tr" type="number" value="8"></div>
+      <div><label for="br">Bottom-right</label><input class="input" id="br" type="number" value="8"></div>
+      <div><label for="bl">Bottom-left</label><input class="input" id="bl" type="number" value="8"></div>
+    </div>
+      <button class="btn btn-primary" id="btn-go" style="margin-top:var(--space-4);">Generate</button>
+      <div id="preview" style="margin:var(--space-4) auto;width:150px;height:150px;background:var(--color-accent);"></div>
+      <label for="output">CSS</label>
+      <input class="input" id="output" readonly>
+    </div>
+    <div class="ad-placeholder">Advertisement</div>
+  </section>
+</main>
+<footer class="fl-footer">
+  <div class="fl-container fl-footer-inner">
+    <a href="../../../">← Back to Tools</a>
+    <p id="footer-text">Built by Fernandes Labs</p>
+  </div>
+</footer>
+<script>
+var t=document.getElementById("theme-toggle"),s=localStorage.getItem("fl-theme")||"light";
+document.documentElement.setAttribute("data-theme",s);
+t.textContent=s==="dark"?"☀️":"🌙";
+t.addEventListener("click",function(){var n=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);localStorage.setItem("fl-theme",n);t.textContent=n==="dark"?"☀️":"🌙";});
+FernandesConfig.load().then(function(c){document.getElementById("footer-text").textContent=c.branding.footer_text;});
+document.getElementById("btn-go").addEventListener("click",function(){
+  var v=["tl","tr","br","bl"].map(function(id){return document.getElementById(id).value+"px"}).join(" ");
+  document.getElementById("preview").style.borderRadius=v;document.getElementById("output").value="border-radius: "+v+";"});
+document.getElementById("btn-go").click();
+
+</script>
+</body>
+</html>

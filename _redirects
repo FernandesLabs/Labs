@@ -1,0 +1,4 @@
+# Cloudflare Pages / GitHub Pages redirects
+# Ensures /tools/category/slug/ resolves to the index.html in that directory.
+
+/*    /index.html   200

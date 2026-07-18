@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Twitter Card Preview — Fernandes Labs</title>
+  <meta name="description" content="Preview how your page appears in Twitter cards. Runs entirely in your browser — no data sent to servers.">
+  <link rel="canonical" href="https://fernandeslabs.com/tools/seo/twitter-card-preview/">
+  <meta property="og:title" content="Twitter Card Preview — Fernandes Labs">
+  <meta property="og:description" content="Preview how your page appears in Twitter cards.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Twitter Card Preview — Fernandes Labs">
+  <meta name="twitter:description" content="Preview how your page appears in Twitter cards.">
+  <link rel="icon" href="../../../assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../../assets/styles.css">
+  <script src="../../../assets/config-loader.js"></script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebApplication","name":"Twitter Card Preview","description":"Preview how your page appears in Twitter cards.","applicationCategory":"Utilities","operatingSystem":"All","url":"https://fernandeslabs.com/tools/seo/twitter-card-preview/"}
+  </script>
+</head>
+<body>
+<header class="fl-header">
+  <div class="fl-container fl-header-inner">
+    <a href="../../../" class="fl-brand"><img src="../../../assets/logo.svg" alt="Fernandes Labs" class="fl-brand-logo"><span>Fernandes Labs</span></a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+  </div>
+</header>
+<main>
+  <section class="fl-hero fl-container">
+    <h1>Twitter Card Preview</h1>
+    <p>Preview how your page appears in Twitter cards.</p>
+  </section>
+  <section class="fl-container fl-section">
+    <div class="ad-placeholder">Advertisement</div>
+    <div class="card">
+<div style="display:grid;gap:var(--space-3);">
+      <div><label for="title">Title</label><input class="input" id="title" value="My Page"></div>
+      <div><label for="desc">Description</label><input class="input" id="desc" value="Page description."></div>
+      <div><label for="image">Image URL</label><input class="input" id="image" placeholder="https://example.com/card.png"></div>
+    </div>
+      <button class="btn btn-primary" id="btn-go" style="margin-top:var(--space-4);">Preview</button>
+      <div id="preview" style="margin-top:var(--space-4);max-width:500px;"></div>
+    </div>
+    <div class="ad-placeholder">Advertisement</div>
+  </section>
+</main>
+<footer class="fl-footer">
+  <div class="fl-container fl-footer-inner">
+    <a href="../../../">← Back to Tools</a>
+    <p id="footer-text">Built by Fernandes Labs</p>
+  </div>
+</footer>
+<script>
+var t=document.getElementById("theme-toggle"),s=localStorage.getItem("fl-theme")||"light";
+document.documentElement.setAttribute("data-theme",s);
+t.textContent=s==="dark"?"☀️":"🌙";
+t.addEventListener("click",function(){var n=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);localStorage.setItem("fl-theme",n);t.textContent=n==="dark"?"☀️":"🌙";});
+FernandesConfig.load().then(function(c){document.getElementById("footer-text").textContent=c.branding.footer_text;});
+document.getElementById("btn-go").addEventListener("click",function(){
+  var t=document.getElementById("title").value,d=document.getElementById("desc").value,img=document.getElementById("image").value;
+  var p=document.getElementById("preview");p.innerHTML="";
+  var card=document.createElement("div");card.style.cssText="border:1px solid var(--color-border);border-radius:var(--radius);overflow:hidden;background:var(--color-surface);";
+  if(img){var i=document.createElement("img");i.src=img;i.style.cssText="width:100%;height:260px;object-fit:cover;";i.alt="Twitter card preview";card.appendChild(i)}
+  var body=document.createElement("div");body.style.cssText="padding:var(--space-3);";
+  body.innerHTML="<div style='font-weight:600;'>"+t+"</div><div style='color:var(--color-text-muted);font-size:0.875rem;margin-top:var(--space-1);'>"+d+"</div>";
+  card.appendChild(body);p.appendChild(card)});
+document.getElementById("btn-go").click();
+
+</script>
+</body>
+</html>

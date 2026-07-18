@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Secure Passphrase Generator — Fernandes Labs</title>
+  <meta name="description" content="Generate diceware-style passphrases with Web Crypto. Runs entirely in your browser — no data sent to servers.">
+  <link rel="canonical" href="https://fernandeslabs.com/tools/security/secure-passphrase-generator/">
+  <meta property="og:title" content="Secure Passphrase Generator — Fernandes Labs">
+  <meta property="og:description" content="Generate diceware-style passphrases with Web Crypto.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Secure Passphrase Generator — Fernandes Labs">
+  <meta name="twitter:description" content="Generate diceware-style passphrases with Web Crypto.">
+  <link rel="icon" href="../../../assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../../assets/styles.css">
+  <script src="../../../assets/config-loader.js"></script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebApplication","name":"Secure Passphrase Generator","description":"Generate diceware-style passphrases with Web Crypto.","applicationCategory":"Utilities","operatingSystem":"All","url":"https://fernandeslabs.com/tools/security/secure-passphrase-generator/"}
+  </script>
+</head>
+<body>
+<header class="fl-header">
+  <div class="fl-container fl-header-inner">
+    <a href="../../../" class="fl-brand"><img src="../../../assets/logo.svg" alt="Fernandes Labs" class="fl-brand-logo"><span>Fernandes Labs</span></a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+  </div>
+</header>
+<main>
+  <section class="fl-hero fl-container">
+    <h1>Secure Passphrase Generator</h1>
+    <p>Generate diceware-style passphrases with Web Crypto.</p>
+  </section>
+  <section class="fl-container fl-section">
+    <div class="ad-placeholder">Advertisement</div>
+    <div class="card">
+<div style="display:grid;gap:var(--space-3);max-width:300px;">
+      <div><label for="words">Number of words</label><input class="input" id="words" type="number" value="6"></div>
+      <div><label for="sep">Separator</label><input class="input" id="sep" value="-"></div>
+    </div>
+      <button class="btn btn-primary" id="btn-go" style="margin-top:var(--space-4);">Generate</button>
+      <button class="btn btn-ghost" id="btn-copy" style="margin-top:var(--space-4);">Copy</button>
+      <label for="output" style="margin-top:var(--space-4);">Passphrase</label>
+      <input class="input" id="output" readonly style="font-family:var(--font-mono);">
+      <p id="entropy" style="margin-top:var(--space-2);color:var(--color-text-muted);font-size:var(--font-size-sm);"></p>
+    </div>
+    <div class="ad-placeholder">Advertisement</div>
+  </section>
+</main>
+<footer class="fl-footer">
+  <div class="fl-container fl-footer-inner">
+    <a href="../../../">← Back to Tools</a>
+    <p id="footer-text">Built by Fernandes Labs</p>
+  </div>
+</footer>
+<script>
+var t=document.getElementById("theme-toggle"),s=localStorage.getItem("fl-theme")||"light";
+document.documentElement.setAttribute("data-theme",s);
+t.textContent=s==="dark"?"☀️":"🌙";
+t.addEventListener("click",function(){var n=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);localStorage.setItem("fl-theme",n);t.textContent=n==="dark"?"☀️":"🌙";});
+FernandesConfig.load().then(function(c){document.getElementById("footer-text").textContent=c.branding.footer_text;});
+var WL="able acid aged also area army away baby back ball band bank base bath beam bean bear beat been beer bell belt best bike bill bird blue boat body bold bomb bond bone book boom born boss both bowl bulk burn busy call calm came camp card care case cash cast cell chat chip city claim club coal coat code cold come cook cool cope copy core cost crew crop dark data date dawn dead deal dean dear debt deep deny desk dial diet dirt disc disk does done door dose down draw drew drop drug dual duke dust duty each earn ease east easy edge else even ever evil exit face fact fade fail fair fall farm fast fate fear feed feel fell felt file fill film find fine fire firm fish five flag flat flow food foot form fort four free from fuel full fund gain game gate gave gear gene gift girl give glad goal goes gold golf gone good gray grew grow gulf hair half hall hand hang hard harm hate have head hear heat held hell help here hero high hill hint hire hold hole holy home hope horn host hour huge hung hunt hurt idea inch into iron item join jump jury just keen keep kept kick kill kind king knee knew know lack lady laid lake land lane last late lawn lazy lead leaf lean left lend less lift like line link lion list live load loan lock logo long look lord lose loss lost loud love luck made mail main make male many mark mass math meal mean meat meet menu mere milk mill mind mine miss mode mood moon more most move much must myth nail name navy near neat neck need news next nice nine none nose note noun null oath obey odds only open oral over pace pack page paid pain pair palm park part pass past path peak pear peer pick pile pine pink pipe plan play plot plug plus poem poet pole poll pond pool poor port post pour pray prep prey pull pump pure push quit quiz race rack rage rail rain rank rare rate read real rear reef rely rent rest rice rich ride ring rise risk road rock role roll roof room root rope rose ruby rule rush rust safe sage sail sake sale salt same sand sang save scan seal seat seed seek seem seen self sell send sent ship shoe shop shot show shut sick side sign silk sing sink site size skin slim slip slot slow snap snow soap soft soil sold sole some song soon sort soul soup spin spot star stay step stir stop such suit sure swim tail take tale talk tall tame tank tape task team tear tell tend term test text than that them then they thin this thus tide till time tiny tire told tone tool torn tour town trap tray tree trim trip true tube tuna turn twin type ugly unit upon used user vain vary vast verb very view vine void vote wage wait wake walk wall want ward warm warn wash wave ways weak wear week well went were west what when whom wide wife wild will wind wine wing wipe wire wise wish with wolf wood wool word wore work worm worn wrap yard yarn year yoga your zero zone".split(" ");
+function ri(max){var b=new Uint32Array(1);var lim=0xffffffff-(0xffffffff%max);var v;do{v=crypto.getRandomValues(b)[0]}while(v>=lim);return v%max}
+document.getElementById("btn-go").addEventListener("click",function(){
+  var n=parseInt(document.getElementById("words").value,10)||6;var sep=document.getElementById("sep").value;var out=[];
+  for(var i=0;i<n;i++)out.push(WL[ri(WL.length)]);
+  document.getElementById("output").value=out.join(sep);
+  document.getElementById("entropy").textContent="~"+Math.round(n*Math.log2(WL.length))+" bits of entropy"});
+document.getElementById("btn-copy").addEventListener("click",function(){var o=document.getElementById("output");if(o.value)navigator.clipboard.writeText(o.value)});
+document.getElementById("btn-go").click();
+
+</script>
+</body>
+</html>

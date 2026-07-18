@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSP Generator — Fernandes Labs</title>
+  <meta name="description" content="Generate Content-Security-Policy headers. Runs entirely in your browser — no data sent to servers.">
+  <link rel="canonical" href="https://fernandeslabs.com/tools/security/csp-generator/">
+  <meta property="og:title" content="CSP Generator — Fernandes Labs">
+  <meta property="og:description" content="Generate Content-Security-Policy headers.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="CSP Generator — Fernandes Labs">
+  <meta name="twitter:description" content="Generate Content-Security-Policy headers.">
+  <link rel="icon" href="../../../assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../../assets/styles.css">
+  <script src="../../../assets/config-loader.js"></script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebApplication","name":"CSP Generator","description":"Generate Content-Security-Policy headers.","applicationCategory":"Utilities","operatingSystem":"All","url":"https://fernandeslabs.com/tools/security/csp-generator/"}
+  </script>
+</head>
+<body>
+<header class="fl-header">
+  <div class="fl-container fl-header-inner">
+    <a href="../../../" class="fl-brand"><img src="../../../assets/logo.svg" alt="Fernandes Labs" class="fl-brand-logo"><span>Fernandes Labs</span></a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+  </div>
+</header>
+<main>
+  <section class="fl-hero fl-container">
+    <h1>CSP Generator</h1>
+    <p>Generate Content-Security-Policy headers.</p>
+  </section>
+  <section class="fl-container fl-section">
+    <div class="ad-placeholder">Advertisement</div>
+    <div class="card">
+<div style="display:grid;gap:var(--space-3);">
+      <div><label for="default">Default src</label><input class="input" id="default" value="'self'"></div>
+      <div><label for="script">Script src</label><input class="input" id="script" value="'self'"></div>
+      <div><label for="style">Style src</label><input class="input" id="style" value="'self'"></div>
+      <div><label for="img">Image src</label><input class="input" id="img" value="'self' data:"></div>
+    </div>
+      <button class="btn btn-primary" id="btn-go" style="margin-top:var(--space-4);">Generate</button>
+      <button class="btn btn-ghost" id="btn-copy" style="margin-top:var(--space-4);">Copy</button>
+      <label for="output" style="margin-top:var(--space-4);">Content-Security-Policy</label>
+      <textarea class="textarea" id="output" readonly></textarea>
+    </div>
+    <div class="ad-placeholder">Advertisement</div>
+  </section>
+</main>
+<footer class="fl-footer">
+  <div class="fl-container fl-footer-inner">
+    <a href="../../../">← Back to Tools</a>
+    <p id="footer-text">Built by Fernandes Labs</p>
+  </div>
+</footer>
+<script>
+var t=document.getElementById("theme-toggle"),s=localStorage.getItem("fl-theme")||"light";
+document.documentElement.setAttribute("data-theme",s);
+t.textContent=s==="dark"?"☀️":"🌙";
+t.addEventListener("click",function(){var n=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);localStorage.setItem("fl-theme",n);t.textContent=n==="dark"?"☀️":"🌙";});
+FernandesConfig.load().then(function(c){document.getElementById("footer-text").textContent=c.branding.footer_text;});
+document.getElementById("btn-go").addEventListener("click",function(){
+  var parts=[];["default","script","style","img"].forEach(function(d){var v=document.getElementById(d).value;if(v)parts.push(d+"-src "+v)});
+  document.getElementById("output").value=parts.join("; ")});
+document.getElementById("btn-copy").addEventListener("click",function(){var o=document.getElementById("output");if(o.value)navigator.clipboard.writeText(o.value)});
+document.getElementById("btn-go").click();
+
+</script>
+</body>
+</html>

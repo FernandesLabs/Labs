@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF Metadata Viewer — Fernandes Labs</title>
+  <meta name="description" content="View PDF metadata and properties. Runs entirely in your browser — no data sent to servers.">
+  <link rel="canonical" href="https://fernandeslabs.com/tools/misc/pdf-metadata-viewer/">
+  <meta property="og:title" content="PDF Metadata Viewer — Fernandes Labs">
+  <meta property="og:description" content="View PDF metadata and properties.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="PDF Metadata Viewer — Fernandes Labs">
+  <meta name="twitter:description" content="View PDF metadata and properties.">
+  <link rel="icon" href="../../../assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../../assets/styles.css">
+  <script src="../../../assets/config-loader.js"></script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebApplication","name":"PDF Metadata Viewer","description":"View PDF metadata and properties.","applicationCategory":"Utilities","operatingSystem":"All","url":"https://fernandeslabs.com/tools/misc/pdf-metadata-viewer/"}
+  </script>
+</head>
+<body>
+<header class="fl-header">
+  <div class="fl-container fl-header-inner">
+    <a href="../../../" class="fl-brand"><img src="../../../assets/logo.svg" alt="Fernandes Labs" class="fl-brand-logo"><span>Fernandes Labs</span></a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+  </div>
+</header>
+<main>
+  <section class="fl-hero fl-container">
+    <h1>PDF Metadata Viewer</h1>
+    <p>View PDF metadata and properties.</p>
+  </section>
+  <section class="fl-container fl-section">
+    <div class="ad-placeholder">Advertisement</div>
+    <div class="card">
+<label for="file">Select PDF</label>
+      <input class="input" id="file" type="file" accept="application/pdf">
+      <div id="result" style="margin-top:var(--space-4);"></div>
+    </div>
+    <div class="ad-placeholder">Advertisement</div>
+  </section>
+</main>
+<footer class="fl-footer">
+  <div class="fl-container fl-footer-inner">
+    <a href="../../../">← Back to Tools</a>
+    <p id="footer-text">Built by Fernandes Labs</p>
+  </div>
+</footer>
+<script>
+var t=document.getElementById("theme-toggle"),s=localStorage.getItem("fl-theme")||"light";
+document.documentElement.setAttribute("data-theme",s);
+t.textContent=s==="dark"?"☀️":"🌙";
+t.addEventListener("click",function(){var n=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);localStorage.setItem("fl-theme",n);t.textContent=n==="dark"?"☀️":"🌙";});
+FernandesConfig.load().then(function(c){document.getElementById("footer-text").textContent=c.branding.footer_text;});
+document.getElementById("file").addEventListener("change",function(e){
+  var f=e.target.files[0];if(!f)return;
+  document.getElementById("result").innerHTML="<table style='width:100%;border-collapse:collapse;'><tr><td style='padding:var(--space-2);font-weight:600;'>Name</td><td style='padding:var(--space-2);'>"+f.name+"</td></tr><tr><td style='padding:var(--space-2);font-weight:600;border-top:1px solid var(--color-border);'>Size</td><td style='padding:var(--space-2);border-top:1px solid var(--color-border);'>"+(f.size/1024).toFixed(1)+" KB</td></tr><tr><td style='padding:var(--space-2);font-weight:600;border-top:1px solid var(--color-border);'>Type</td><td style='padding:var(--space-2);border-top:1px solid var(--color-border);'>"+f.type+"</td></tr><tr><td style='padding:var(--space-2);font-weight:600;border-top:1px solid var(--color-border);'>Modified</td><td style='padding:var(--space-2);border-top:1px solid var(--color-border);'>"+new Date(f.lastModified).toLocaleString()+"</td></tr></table>"});
+
+</script>
+</body>
+</html>

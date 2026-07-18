@@ -16,7 +16,23 @@
 
   var CACHE_KEY = "fernandes-config-cache";
   var CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
-  var CONFIG_URL = "/config.json";
+
+  // Resolve the config URL relative to the document, not the script.
+  // This allows the tool network to work whether deployed at the domain root
+  // or in a subdirectory. We walk up from the current page to find config.json
+  // at the repo root. For a tool at /tools/cat/slug/, that's ../../../config.json.
+  function resolveConfigUrl() {
+    var path = window.location.pathname;
+    // If the path ends with / (a directory), strip it for counting.
+    var clean = path.replace(/\/$/, "");
+    // Count depth: /tools/developer/json-formatter → 3 levels → ../../../
+    var parts = clean.split("/").filter(Boolean);
+    var depth = parts.length;
+    var prefix = depth === 0 ? "" : "../".repeat(depth);
+    return prefix + "config.json";
+  }
+
+  var CONFIG_URL = resolveConfigUrl();
 
   /** Fallback defaults used when the fetch fails or the config is missing. */
   var DEFAULTS = {
@@ -146,9 +162,20 @@
     if (config.branding.favicon) {
       var link = document.querySelector("link[rel='icon']") || document.createElement("link");
       link.rel = "icon";
-      link.href = config.branding.favicon;
+      // Resolve favicon relative to the page, not the domain root.
+      link.href = resolveRelative(config.branding.favicon);
       document.head.appendChild(link);
     }
+  }
+
+  /** Resolve a root-relative URL (e.g. /assets/x) to a path relative to the current page. */
+  function resolveRelative(url) {
+    if (!url || !url.startsWith("/")) return url;
+    var path = window.location.pathname.replace(/\/$/, "");
+    var parts = path.split("/").filter(Boolean);
+    var depth = parts.length;
+    var prefix = depth === 0 ? "" : "../".repeat(depth);
+    return prefix + url.slice(1);
   }
 
   var pendingPromise = null;

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Token Counter — Fernandes Labs</title>
+  <meta name="description" content="Estimate token count for AI prompts. Runs entirely in your browser — no data sent to servers.">
+  <link rel="canonical" href="https://fernandeslabs.com/tools/misc/token-counter/">
+  <meta property="og:title" content="Token Counter — Fernandes Labs">
+  <meta property="og:description" content="Estimate token count for AI prompts.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Token Counter — Fernandes Labs">
+  <meta name="twitter:description" content="Estimate token count for AI prompts.">
+  <link rel="icon" href="../../../assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../../assets/styles.css">
+  <script src="../../../assets/config-loader.js"></script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebApplication","name":"Token Counter","description":"Estimate token count for AI prompts.","applicationCategory":"Utilities","operatingSystem":"All","url":"https://fernandeslabs.com/tools/misc/token-counter/"}
+  </script>
+</head>
+<body>
+<header class="fl-header">
+  <div class="fl-container fl-header-inner">
+    <a href="../../../" class="fl-brand"><img src="../../../assets/logo.svg" alt="Fernandes Labs" class="fl-brand-logo"><span>Fernandes Labs</span></a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+  </div>
+</header>
+<main>
+  <section class="fl-hero fl-container">
+    <h1>Token Counter</h1>
+    <p>Estimate token count for AI prompts.</p>
+  </section>
+  <section class="fl-container fl-section">
+    <div class="ad-placeholder">Advertisement</div>
+    <div class="card">
+<label for="input">Text</label>
+      <textarea class="textarea" id="input" style="min-height:200px;"></textarea>
+      <div id="result" style="margin-top:var(--space-4);"></div>
+    </div>
+    <div class="ad-placeholder">Advertisement</div>
+  </section>
+</main>
+<footer class="fl-footer">
+  <div class="fl-container fl-footer-inner">
+    <a href="../../../">← Back to Tools</a>
+    <p id="footer-text">Built by Fernandes Labs</p>
+  </div>
+</footer>
+<script>
+var t=document.getElementById("theme-toggle"),s=localStorage.getItem("fl-theme")||"light";
+document.documentElement.setAttribute("data-theme",s);
+t.textContent=s==="dark"?"☀️":"🌙";
+t.addEventListener("click",function(){var n=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);localStorage.setItem("fl-theme",n);t.textContent=n==="dark"?"☀️":"🌙";});
+FernandesConfig.load().then(function(c){document.getElementById("footer-text").textContent=c.branding.footer_text;});
+document.getElementById("input").addEventListener("input",function(){
+  var t=this.value;var chars=t.length;var words=t.trim()?t.trim().split(/\s+/).length:0;
+  var tokens=Math.ceil(chars/4);
+  document.getElementById("result").innerHTML="<div style='display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-3);text-align:center;'>"+
+  "<div class='card' style='padding:var(--space-3);'><div style='font-size:1.5rem;font-weight:700;color:var(--color-accent);'>"+tokens+"</div><div style='font-size:0.75rem;color:var(--color-text-muted);'>Tokens (est.)</div></div>"+
+  "<div class='card' style='padding:var(--space-3);'><div style='font-size:1.5rem;font-weight:700;color:var(--color-accent);'>"+words+"</div><div style='font-size:0.75rem;color:var(--color-text-muted);'>Words</div></div>"+
+  "<div class='card' style='padding:var(--space-3);'><div style='font-size:1.5rem;font-weight:700;color:var(--color-accent);'>"+chars+"</div><div style='font-size:0.75rem;color:var(--color-text-muted);'>Characters</div></div></div>"});
+
+</script>
+</body>
+</html>

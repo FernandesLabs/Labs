@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invoice Number Generator — Fernandes Labs</title>
+  <meta name="description" content="Generate sequential invoice numbers with a prefix. Runs entirely in your browser — no data sent to servers.">
+  <link rel="canonical" href="https://fernandeslabs.com/tools/finance/invoice-number-generator/">
+  <meta property="og:title" content="Invoice Number Generator — Fernandes Labs">
+  <meta property="og:description" content="Generate sequential invoice numbers with a prefix.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Invoice Number Generator — Fernandes Labs">
+  <meta name="twitter:description" content="Generate sequential invoice numbers with a prefix.">
+  <link rel="icon" href="../../../assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../../assets/styles.css">
+  <script src="../../../assets/config-loader.js"></script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebApplication","name":"Invoice Number Generator","description":"Generate sequential invoice numbers with a prefix.","applicationCategory":"Utilities","operatingSystem":"All","url":"https://fernandeslabs.com/tools/finance/invoice-number-generator/"}
+  </script>
+</head>
+<body>
+<header class="fl-header">
+  <div class="fl-container fl-header-inner">
+    <a href="../../../" class="fl-brand"><img src="../../../assets/logo.svg" alt="Fernandes Labs" class="fl-brand-logo"><span>Fernandes Labs</span></a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+  </div>
+</header>
+<main>
+  <section class="fl-hero fl-container">
+    <h1>Invoice Number Generator</h1>
+    <p>Generate sequential invoice numbers with a prefix.</p>
+  </section>
+  <section class="fl-container fl-section">
+    <div class="ad-placeholder">Advertisement</div>
+    <div class="card">
+<div style="display:grid;gap:var(--space-3);max-width:300px;">
+      <div><label for="prefix">Prefix</label><input class="input" id="prefix" value="INV-"></div>
+      <div><label for="start">Start Number</label><input class="input" id="start" type="number" value="1001"></div>
+      <div><label for="count">How many</label><input class="input" id="count" type="number" value="10"></div>
+    </div>
+      <button class="btn btn-primary" id="btn-go" style="margin-top:var(--space-4);">Generate</button>
+      <button class="btn btn-ghost" id="btn-copy" style="margin-top:var(--space-4);">Copy</button>
+      <label for="output" style="margin-top:var(--space-4);">Invoice Numbers</label>
+      <textarea class="textarea" id="output" readonly></textarea>
+    </div>
+    <div class="ad-placeholder">Advertisement</div>
+  </section>
+</main>
+<footer class="fl-footer">
+  <div class="fl-container fl-footer-inner">
+    <a href="../../../">← Back to Tools</a>
+    <p id="footer-text">Built by Fernandes Labs</p>
+  </div>
+</footer>
+<script>
+var t=document.getElementById("theme-toggle"),s=localStorage.getItem("fl-theme")||"light";
+document.documentElement.setAttribute("data-theme",s);
+t.textContent=s==="dark"?"☀️":"🌙";
+t.addEventListener("click",function(){var n=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);localStorage.setItem("fl-theme",n);t.textContent=n==="dark"?"☀️":"🌙";});
+FernandesConfig.load().then(function(c){document.getElementById("footer-text").textContent=c.branding.footer_text;});
+document.getElementById("btn-go").addEventListener("click",function(){
+  var p=document.getElementById("prefix").value;var s=parseInt(document.getElementById("start").value,10);var c=parseInt(document.getElementById("count").value,10);
+  var out=[];for(var i=0;i<c;i++)out.push(p+(s+i));
+  document.getElementById("output").value=out.join("\n")});
+document.getElementById("btn-copy").addEventListener("click",function(){var o=document.getElementById("output");if(o.value)navigator.clipboard.writeText(o.value)});
+
+</script>
+</body>
+</html>

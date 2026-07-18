@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grade Calculator — Fernandes Labs</title>
+  <meta name="description" content="Calculate weighted grades. Runs entirely in your browser — no data sent to servers.">
+  <link rel="canonical" href="https://fernandeslabs.com/tools/finance/grade-calculator/">
+  <meta property="og:title" content="Grade Calculator — Fernandes Labs">
+  <meta property="og:description" content="Calculate weighted grades.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Grade Calculator — Fernandes Labs">
+  <meta name="twitter:description" content="Calculate weighted grades.">
+  <link rel="icon" href="../../../assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../../assets/styles.css">
+  <script src="../../../assets/config-loader.js"></script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebApplication","name":"Grade Calculator","description":"Calculate weighted grades.","applicationCategory":"Utilities","operatingSystem":"All","url":"https://fernandeslabs.com/tools/finance/grade-calculator/"}
+  </script>
+</head>
+<body>
+<header class="fl-header">
+  <div class="fl-container fl-header-inner">
+    <a href="../../../" class="fl-brand"><img src="../../../assets/logo.svg" alt="Fernandes Labs" class="fl-brand-logo"><span>Fernandes Labs</span></a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+  </div>
+</header>
+<main>
+  <section class="fl-hero fl-container">
+    <h1>Grade Calculator</h1>
+    <p>Calculate weighted grades.</p>
+  </section>
+  <section class="fl-container fl-section">
+    <div class="ad-placeholder">Advertisement</div>
+    <div class="card">
+<label for="input">Items (name | score | weight %, one per line)</label>
+      <textarea class="textarea" id="input">Homework | 90 | 20
+Midterm | 85 | 30
+Final | 88 | 50</textarea>
+      <button class="btn btn-primary" id="btn-go" style="margin-top:var(--space-3);">Calculate</button>
+      <div id="result" style="margin-top:var(--space-4);"></div>
+    </div>
+    <div class="ad-placeholder">Advertisement</div>
+  </section>
+</main>
+<footer class="fl-footer">
+  <div class="fl-container fl-footer-inner">
+    <a href="../../../">← Back to Tools</a>
+    <p id="footer-text">Built by Fernandes Labs</p>
+  </div>
+</footer>
+<script>
+var t=document.getElementById("theme-toggle"),s=localStorage.getItem("fl-theme")||"light";
+document.documentElement.setAttribute("data-theme",s);
+t.textContent=s==="dark"?"☀️":"🌙";
+t.addEventListener("click",function(){var n=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);localStorage.setItem("fl-theme",n);t.textContent=n==="dark"?"☀️":"🌙";});
+FernandesConfig.load().then(function(c){document.getElementById("footer-text").textContent=c.branding.footer_text;});
+document.getElementById("btn-go").addEventListener("click",function(){
+  var lines=document.getElementById("input").value.split("\n").filter(function(l){return l.trim()});var total=0;var weight=0;
+  lines.forEach(function(l){var p=l.split("|");var score=parseFloat(p[1])||0;var w=parseFloat(p[2])||0;total+=score*w;weight+=w});
+  var grade=weight>0?(total/weight).toFixed(1):0;
+  document.getElementById("result").innerHTML="<p>Final grade: <strong style='font-size:2rem;color:var(--color-accent);'>"+grade+"%</strong></p>"});
+
+</script>
+</body>
+</html>

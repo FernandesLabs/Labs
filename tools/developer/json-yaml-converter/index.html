@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JSON ↔ YAML Converter — Fernandes Labs</title>
+  <meta name="description" content="Convert between JSON and YAML formats. Runs entirely in your browser — no data sent to servers.">
+  <link rel="canonical" href="https://fernandeslabs.com/tools/developer/json-yaml-converter/">
+  <meta property="og:title" content="JSON ↔ YAML Converter — Fernandes Labs">
+  <meta property="og:description" content="Convert between JSON and YAML formats.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="JSON ↔ YAML Converter — Fernandes Labs">
+  <meta name="twitter:description" content="Convert between JSON and YAML formats.">
+  <link rel="icon" href="../../../assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../../assets/styles.css">
+  <script src="../../../assets/config-loader.js"></script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebApplication","name":"JSON ↔ YAML Converter","description":"Convert between JSON and YAML formats.","applicationCategory":"Utilities","operatingSystem":"All","url":"https://fernandeslabs.com/tools/developer/json-yaml-converter/"}
+  </script>
+</head>
+<body>
+<header class="fl-header">
+  <div class="fl-container fl-header-inner">
+    <a href="../../../" class="fl-brand"><img src="../../../assets/logo.svg" alt="Fernandes Labs" class="fl-brand-logo"><span>Fernandes Labs</span></a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+  </div>
+</header>
+<main>
+  <section class="fl-hero fl-container">
+    <h1>JSON ↔ YAML Converter</h1>
+    <p>Convert between JSON and YAML formats.</p>
+  </section>
+  <section class="fl-container fl-section">
+    <div class="ad-placeholder">Advertisement</div>
+    <div class="card">
+
+      <label for="input">JSON or YAML</label>
+      <textarea class="textarea" id="input" placeholder=""></textarea>
+      <div style="display:flex;gap:var(--space-2);margin-top:var(--space-3);flex-wrap:wrap;">
+        <button class="btn btn-primary" id="btn-go">Convert</button>
+        <button class="btn btn-ghost" id="btn-copy">Copy</button>
+        <button class="btn btn-ghost" id="btn-clear">Clear</button>
+      </div>
+      <label for="output" style="margin-top:var(--space-4);">Result</label>
+      <textarea class="textarea" id="output" readonly></textarea>
+    </div>
+    <div class="ad-placeholder">Advertisement</div>
+  </section>
+</main>
+<footer class="fl-footer">
+  <div class="fl-container fl-footer-inner">
+    <a href="../../../">← Back to Tools</a>
+    <p id="footer-text">Built by Fernandes Labs</p>
+  </div>
+</footer>
+<script>
+var t=document.getElementById("theme-toggle"),s=localStorage.getItem("fl-theme")||"light";
+document.documentElement.setAttribute("data-theme",s);
+t.textContent=s==="dark"?"☀️":"🌙";
+t.addEventListener("click",function(){var n=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);localStorage.setItem("fl-theme",n);t.textContent=n==="dark"?"☀️":"🌙";});
+FernandesConfig.load().then(function(c){document.getElementById("footer-text").textContent=c.branding.footer_text;});
+document.getElementById("btn-go").addEventListener("click",function(){
+  var i=document.getElementById("input").value.trim();
+  try{
+    if(i.startsWith("{")||i.startsWith("[")){
+      var j=JSON.parse(i);
+      document.getElementById("output").value=toYaml(j);
+    }else{
+      document.getElementById("output").value=JSON.stringify(fromYaml(i),null,2);
+    }
+  }catch(e){document.getElementById("output").value="Error: "+e.message;}
+});
+function toYaml(obj,indent){indent=indent||"";if(Array.isArray(obj)){return obj.map(function(v){return indent+"- "+(typeof v==="object"?toYaml(v,indent+"  "):v)}).join("\n")}
+var lines=[];for(var k in obj){if(typeof obj[k]==="object"&&obj[k]!==null){lines.push(indent+k+":");lines.push(toYaml(obj[k],indent+"  "))}else{lines.push(indent+k+": "+obj[k])}}
+return lines.join("\n")}
+function fromYaml(s){var lines=s.split("\n").filter(function(l){return l.trim()});var root={};var stack=[{indent:-1,obj:root}];
+lines.forEach(function(l){var indent=l.length-l.trimStart().length;var trimmed=l.trim();var isArr=trimmed.startsWith("- ");var key=isArr?trimmed.slice(2):trimmed.split(":")[0];var val=isArr?trimmed.slice(2):trimmed.split(":")[1];
+while(stack.length>1&&indent<=stack[stack.length-1].indent)stack.pop();
+var parent=stack[stack.length-1].obj;if(isArr){if(!Array.isArray(parent)){}parent.push(val?val.trim():{})}else{parent[key]=val?val.trim():{};if(!val)stack.push({indent:indent,obj:parent[key]})}}
+);return root}
+document.getElementById("btn-copy").addEventListener("click",function(){var o=document.getElementById("output");if(o.value)navigator.clipboard.writeText(o.value)});
+document.getElementById("btn-clear").addEventListener("click",function(){document.getElementById("input").value="";document.getElementById("output").value=""});
+
+</script>
+</body>
+</html>

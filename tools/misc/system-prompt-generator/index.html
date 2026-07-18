@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>System Prompt Generator — Fernandes Labs</title>
+  <meta name="description" content="Build structured system prompts for AI assistants. Runs entirely in your browser — no data sent to servers.">
+  <link rel="canonical" href="https://fernandeslabs.com/tools/misc/system-prompt-generator/">
+  <meta property="og:title" content="System Prompt Generator — Fernandes Labs">
+  <meta property="og:description" content="Build structured system prompts for AI assistants.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="System Prompt Generator — Fernandes Labs">
+  <meta name="twitter:description" content="Build structured system prompts for AI assistants.">
+  <link rel="icon" href="../../../assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../../assets/styles.css">
+  <script src="../../../assets/config-loader.js"></script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebApplication","name":"System Prompt Generator","description":"Build structured system prompts for AI assistants.","applicationCategory":"Utilities","operatingSystem":"All","url":"https://fernandeslabs.com/tools/misc/system-prompt-generator/"}
+  </script>
+</head>
+<body>
+<header class="fl-header">
+  <div class="fl-container fl-header-inner">
+    <a href="../../../" class="fl-brand"><img src="../../../assets/logo.svg" alt="Fernandes Labs" class="fl-brand-logo"><span>Fernandes Labs</span></a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+  </div>
+</header>
+<main>
+  <section class="fl-hero fl-container">
+    <h1>System Prompt Generator</h1>
+    <p>Build structured system prompts for AI assistants.</p>
+  </section>
+  <section class="fl-container fl-section">
+    <div class="ad-placeholder">Advertisement</div>
+    <div class="card">
+<div style="display:grid;gap:var(--space-3);max-width:400px;">
+      <div><label for="role">Role</label><input class="input" id="role" placeholder="Senior software engineer"></div>
+      <div><label for="task">Primary task</label><input class="input" id="task" placeholder="Code review and architecture advice"></div>
+      <div><label for="tone">Tone</label><input class="input" id="tone" value="Professional, direct, constructive"></div>
+      <div><label for="rules">Rules (one per line)</label><textarea class="textarea" id="rules">Always explain reasoning
+Cite best practices
+Suggest alternatives</textarea></div>
+    </div>
+      <button class="btn btn-primary" id="btn-go" style="margin-top:var(--space-4);">Generate</button>
+      <button class="btn btn-ghost" id="btn-copy" style="margin-top:var(--space-4);">Copy</button>
+      <label for="output" style="margin-top:var(--space-4);">System Prompt</label>
+      <textarea class="textarea" id="output" readonly></textarea>
+    </div>
+    <div class="ad-placeholder">Advertisement</div>
+  </section>
+</main>
+<footer class="fl-footer">
+  <div class="fl-container fl-footer-inner">
+    <a href="../../../">← Back to Tools</a>
+    <p id="footer-text">Built by Fernandes Labs</p>
+  </div>
+</footer>
+<script>
+var t=document.getElementById("theme-toggle"),s=localStorage.getItem("fl-theme")||"light";
+document.documentElement.setAttribute("data-theme",s);
+t.textContent=s==="dark"?"☀️":"🌙";
+t.addEventListener("click",function(){var n=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);localStorage.setItem("fl-theme",n);t.textContent=n==="dark"?"☀️":"🌙";});
+FernandesConfig.load().then(function(c){document.getElementById("footer-text").textContent=c.branding.footer_text;});
+document.getElementById("btn-go").addEventListener("click",function(){
+  var role=document.getElementById("role").value;var task=document.getElementById("task").value;var tone=document.getElementById("tone").value;
+  var rules=document.getElementById("rules").value.split("\n").filter(function(l){return l.trim()}).map(function(l){return "- "+l}).join("\n");
+  var out="You are a "+role+".\n\nYour primary task is to "+task+".\n\nTone: "+tone+".\n\nRules:\n"+rules+"\n\nAlways ask clarifying questions if the request is ambiguous. Provide structured, actionable output.";
+  document.getElementById("output").value=out});
+document.getElementById("btn-copy").addEventListener("click",function(){var o=document.getElementById("output");if(o.value)navigator.clipboard.writeText(o.value)});
+</script>
+</body>
+</html>

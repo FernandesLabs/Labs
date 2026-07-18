@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IP Lookup — Fernandes Labs</title>
+  <meta name="description" content="Look up IP address information. Runs entirely in your browser — no data sent to servers.">
+  <link rel="canonical" href="https://fernandeslabs.com/tools/misc/ip-lookup/">
+  <meta property="og:title" content="IP Lookup — Fernandes Labs">
+  <meta property="og:description" content="Look up IP address information.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="IP Lookup — Fernandes Labs">
+  <meta name="twitter:description" content="Look up IP address information.">
+  <link rel="icon" href="../../../assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../../assets/styles.css">
+  <script src="../../../assets/config-loader.js"></script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebApplication","name":"IP Lookup","description":"Look up IP address information.","applicationCategory":"Utilities","operatingSystem":"All","url":"https://fernandeslabs.com/tools/misc/ip-lookup/"}
+  </script>
+</head>
+<body>
+<header class="fl-header">
+  <div class="fl-container fl-header-inner">
+    <a href="../../../" class="fl-brand"><img src="../../../assets/logo.svg" alt="Fernandes Labs" class="fl-brand-logo"><span>Fernandes Labs</span></a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+  </div>
+</header>
+<main>
+  <section class="fl-hero fl-container">
+    <h1>IP Lookup</h1>
+    <p>Look up IP address information.</p>
+  </section>
+  <section class="fl-container fl-section">
+    <div class="ad-placeholder">Advertisement</div>
+    <div class="card">
+<label for="ip">IP address</label>
+      <input class="input" id="ip" placeholder="8.8.8.8">
+      <button class="btn btn-primary" id="btn-go" style="margin-top:var(--space-3);">Lookup</button>
+      <div id="result" style="margin-top:var(--space-4);"></div>
+    </div>
+    <div class="ad-placeholder">Advertisement</div>
+  </section>
+</main>
+<footer class="fl-footer">
+  <div class="fl-container fl-footer-inner">
+    <a href="../../../">← Back to Tools</a>
+    <p id="footer-text">Built by Fernandes Labs</p>
+  </div>
+</footer>
+<script>
+var t=document.getElementById("theme-toggle"),s=localStorage.getItem("fl-theme")||"light";
+document.documentElement.setAttribute("data-theme",s);
+t.textContent=s==="dark"?"☀️":"🌙";
+t.addEventListener("click",function(){var n=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);localStorage.setItem("fl-theme",n);t.textContent=n==="dark"?"☀️":"🌙";});
+FernandesConfig.load().then(function(c){document.getElementById("footer-text").textContent=c.branding.footer_text;});
+document.getElementById("btn-go").addEventListener("click",async function(){
+  var ip=document.getElementById("ip").value;if(!ip)return;var r=document.getElementById("result");r.innerHTML="<p>Looking up...</p>";
+  try{var res=await fetch("https://ipapi.co/"+encodeURIComponent(ip)+"/json/");var data=await res.json();
+  r.innerHTML="<table style='width:100%;border-collapse:collapse;'>"+Object.keys(data).filter(function(k){return["ip","city","region","country_name","org","asn","timezone"].includes(k)}).map(function(k){return"<tr><td style='padding:var(--space-2);border-bottom:1px solid var(--color-border);font-weight:600;'>"+k+"</td><td style='padding:var(--space-2);border-bottom:1px solid var(--color-border);'>"+data[k]+"</td></tr>"}).join("")+"</table>"}catch(e){r.innerHTML="<p style='color:var(--color-danger)'>Error: "+e.message+"</p>"}});
+
+</script>
+</body>
+</html>

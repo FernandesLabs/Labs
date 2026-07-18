@@ -10,11 +10,22 @@
 # Also checks that CHANGELOG.md and PROGRESS.md are present and non-empty.
 #
 # Usage:
-#   ./automation/qa-check.sh
+#   ./automation/qa-check.sh              # static checks only (fast)
+#   ./automation/qa-check.sh --functional # static + functional (Playwright)
 #
 # Exits 0 if all checks pass, 1 otherwise.
 #
 set -uo pipefail
+
+# --- Parse arguments --------------------------------------------------------
+
+RUN_FUNCTIONAL=false
+for arg in "$@"; do
+  case "$arg" in
+    --functional) RUN_FUNCTIONAL=true ;;
+    *) ;;
+  esac
+done
 
 # --- Locate repo root -------------------------------------------------------
 
@@ -181,6 +192,23 @@ else
   log_fail "PROGRESS.md is empty or missing"
 fi
 echo ""
+
+# --- Functional tests (optional) --------------------------------------------
+
+if [ "$RUN_FUNCTIONAL" = true ]; then
+  echo "=== Functional Tests (Playwright) ==="
+  echo ""
+  if [ -x "$SCRIPT_DIR/functional-test.sh" ]; then
+    "$SCRIPT_DIR/functional-test.sh"
+    FUNC_EXIT=$?
+    if [ $FUNC_EXIT -ne 0 ]; then
+      FAILURES=$((FAILURES + 1))
+    fi
+  else
+    echo "  ⚠ functional-test.sh not found or not executable — skipping"
+  fi
+  echo ""
+fi
 
 # --- Summary ----------------------------------------------------------------
 

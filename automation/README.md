@@ -7,7 +7,9 @@
 | Script | Purpose | Usage |
 |--------|---------|-------|
 | `create-tool.sh` | Scaffold a new tool + update audit trail | `./create-tool.sh "Tool Name" category "description"` |
-| `qa-check.sh` | Run all quality gates | `./qa-check.sh` |
+| `qa-check.sh` | Run all quality gates (static) | `./qa-check.sh` |
+| `qa-check.sh --functional` | Static + functional (Playwright) tests | `./qa-check.sh --functional` |
+| `functional-test.sh` | Run functional tests only | `./functional-test.sh` |
 | `build-all.sh` | Assemble deploy/ artifact | `./build-all.sh [output-dir]` |
 | `deploy.sh` | Build + deploy to Cloudflare or GitHub | `./deploy.sh <target> [project]` |
 
@@ -160,3 +162,84 @@ export CLOUDFLARE_API_TOKEN="your-token"
 export CLOUDFLARE_ACCOUNT_ID="your-account-id"
 ./automation/deploy.sh cloudflare fernandes-labs
 ```
+
+---
+
+## Functional Testing
+
+Static QA (`qa-check.sh`) validates file structure, tags, and forbidden
+patterns. Functional testing goes deeper — it opens each tool in a real
+headless browser (Playwright/Chromium), simulates user interactions, and
+**asserts that the output logic is correct**.
+
+### Files
+
+| File | Purpose |
+|------|---------|
+| `tool-test-manifest.js` | Test plan: maps each tool to specific input → expected output pairs |
+| `functional-test.js` | Playwright runner: starts a server, visits each tool, runs assertions, screenshots failures |
+| `functional-test.sh` | Wrapper: checks for Node/Playwright, installs if missing, runs the tests |
+| `mime-types.js` | MIME map for the built-in static server |
+
+### Running functional tests
+
+```bash
+# Functional tests only
+./automation/functional-test.sh
+
+# Static + functional (full QA)
+./automation/qa-check.sh --functional
+```
+
+### What the tests validate
+
+Each tool in the manifest has at least one test case with specific assertions:
+
+| Tool | Input | Action | Expected |
+|------|-------|--------|----------|
+| JSON Formatter | `{"a":1}` | Format | Valid JSON with indentation |
+| Base64 Encoder | `test` | Encode | `dGVzdA==` |
+| Slug Generator | `Hello World!` | Generate | `hello-world` |
+| Word Counter | `Hello world` | (auto) | 2 words, 11 chars |
+| Percentage Calc | 25, 200 | (auto) | 50 |
+| Hash Generator | `test` | Generate | 64-char hex (SHA-256) |
+| Password Checker | `password123` | Check | Label is not "Strong" |
+
+Tools with random output (UUID, passphrase) validate the **format** rather than
+the exact value. Tools requiring file uploads (Image Compressor, PDF Merge)
+are tested for UI load only — documented in the manifest.
+
+### Assertion types
+
+- `exact` — strict equality (trimmed)
+- `regex` — regular expression match
+- `contains` — substring check
+- `not-empty` — value is present
+- `json-valid` — output parses as JSON
+
+### Adding a test case
+
+Add an entry to the `module.exports` array in `tool-test-manifest.js`:
+
+```javascript
+{
+  slug: "your-tool",
+  category: "developer",
+  url: "/tools/developer/your-tool/",
+  tests: [{
+    name: "Does the right thing",
+    steps: [
+      { action: "fill", selector: "#input", value: "test data" },
+      { action: "click", selector: "#btn-go" },
+      { action: "wait", ms: 200 },
+      { action: "assert", selector: "#output", type: "contains", expected: "expected result" }
+    ]
+  }]
+}
+```
+
+### Failure output
+
+When a test fails, the runner prints the tool name, the assertion that failed,
+and why. A screenshot is saved to `test-failures/<slug>.png` for debugging.
+

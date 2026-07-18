@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Title Generator — Fernandes Labs</title>
+  <meta name="description" content="Generate SEO-optimized page titles. Runs entirely in your browser — no data sent to servers.">
+  <link rel="canonical" href="https://fernandeslabs.com/tools/seo/title-generator/">
+  <meta property="og:title" content="Title Generator — Fernandes Labs">
+  <meta property="og:description" content="Generate SEO-optimized page titles.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Title Generator — Fernandes Labs">
+  <meta name="twitter:description" content="Generate SEO-optimized page titles.">
+  <link rel="icon" href="../../../assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../../assets/styles.css">
+  <script src="../../../assets/config-loader.js"></script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebApplication","name":"Title Generator","description":"Generate SEO-optimized page titles.","applicationCategory":"Utilities","operatingSystem":"All","url":"https://fernandeslabs.com/tools/seo/title-generator/"}
+  </script>
+</head>
+<body>
+<header class="fl-header">
+  <div class="fl-container fl-header-inner">
+    <a href="../../../" class="fl-brand"><img src="../../../assets/logo.svg" alt="Fernandes Labs" class="fl-brand-logo"><span>Fernandes Labs</span></a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+  </div>
+</header>
+<main>
+  <section class="fl-hero fl-container">
+    <h1>Title Generator</h1>
+    <p>Generate SEO-optimized page titles.</p>
+  </section>
+  <section class="fl-container fl-section">
+    <div class="ad-placeholder">Advertisement</div>
+    <div class="card">
+<label for="keyword">Primary keyword</label>
+      <input class="input" id="keyword" value="password generator">
+      <button class="btn btn-primary" id="btn-go" style="margin-top:var(--space-3);">Generate Titles</button>
+      <div id="result" style="margin-top:var(--space-4);"></div>
+    </div>
+    <div class="ad-placeholder">Advertisement</div>
+  </section>
+</main>
+<footer class="fl-footer">
+  <div class="fl-container fl-footer-inner">
+    <a href="../../../">← Back to Tools</a>
+    <p id="footer-text">Built by Fernandes Labs</p>
+  </div>
+</footer>
+<script>
+var t=document.getElementById("theme-toggle"),s=localStorage.getItem("fl-theme")||"light";
+document.documentElement.setAttribute("data-theme",s);
+t.textContent=s==="dark"?"☀️":"🌙";
+t.addEventListener("click",function(){var n=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);localStorage.setItem("fl-theme",n);t.textContent=n==="dark"?"☀️":"🌙";});
+FernandesConfig.load().then(function(c){document.getElementById("footer-text").textContent=c.branding.footer_text;});
+document.getElementById("btn-go").addEventListener("click",function(){
+  var k=document.getElementById("keyword").value;var templates=[
+  k+" — Free Online Tool",
+  "Best "+k+" in 2025",
+  "Free "+k+" | No Sign-up Required",
+  k+": Fast, Easy & Secure",
+  "Online "+k+" Tool — Free",
+  "How to Use a "+k,
+  k+" — Save Time Online",
+  "Professional "+k+" Tool"
+  ];
+  var html="<ul style='list-style:none;padding:0;'>";
+  templates.forEach(function(t,i){var len=t.length;var good=len>=50&&len<=60;
+  html+="<li style='padding:var(--space-2);border-bottom:1px solid var(--color-border);'>"+t+" <span style='color:"+(good?"var(--color-success)":"var(--color-text-muted)")+";font-size:0.75rem;'>("+len+" chars"+(good?" ✓":"")+")</span> <button class='btn btn-ghost btn-sm' data-copy='"+t.replace(/'/g,"\\'")+"'>Copy</button></li>"});
+  document.getElementById("result").innerHTML=html+"</ul>";
+  var btns=document.querySelectorAll("[data-copy]");btns.forEach(function(b){b.addEventListener("click",function(){navigator.clipboard.writeText(this.getAttribute("data-copy"))})});
+});
+
+</script>
+</body>
+</html>

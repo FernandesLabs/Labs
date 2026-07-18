@@ -9,16 +9,16 @@
   <meta property="og:title" content="JSON Formatter — Fernandes Labs">
   <meta property="og:description" content="Free online JSON formatter. Format, validate, and minify JSON instantly.">
   <meta property="og:type" content="website">
-  <link rel="icon" href="/assets/logo.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/assets/styles.css">
-  <script src="/assets/config-loader.js"></script>
+  <link rel="icon" href="../../../assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../../assets/styles.css">
+  <script src="../../../assets/config-loader.js"></script>
 </head>
 <body>
 
 <header class="fl-header">
   <div class="fl-container fl-header-inner">
-    <a href="/" class="fl-brand">
-      <img src="/assets/logo.svg" alt="Fernandes Labs" class="fl-brand-logo">
+    <a href="../../../" class="fl-brand">
+      <img src="../../../assets/logo.svg" alt="Fernandes Labs" class="fl-brand-logo">
       <span>Fernandes Labs</span>
     </a>
     <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">🌙</button>
@@ -57,7 +57,7 @@
 
 <footer class="fl-footer">
   <div class="fl-container fl-footer-inner">
-    <a href="/" id="back-link">← Back to Tools</a>
+    <a href="../../../" id="back-link">← Back to Tools</a>
     <p id="footer-text">Built by Fernandes Labs</p>
   </div>
 </footer>
@@ -77,11 +77,12 @@
 
   var input = document.getElementById("json-input");
   var output = document.getElementById("json-output");
-  var status = document.getElementById("json-status");
+  var statusEl = document.getElementById("json-status");
 
   function setStatus(msg, isError) {
-    status.textContent = msg;
-    status.style.color = isError ? "var(--color-danger)" : "var(--color-success)";
+    if (!statusEl) return;
+    statusEl.textContent = msg;
+    statusEl.style.color = isError ? "var(--color-danger)" : "var(--color-success)";
   }
 
   document.getElementById("btn-format").addEventListener("click", function () {
@@ -123,7 +124,7 @@
   document.getElementById("btn-clear").addEventListener("click", function () {
     input.value = "";
     output.value = "";
-    status.textContent = "";
+    statusEl.textContent = "";
   });
 
   // Load config

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quote Generator — Fernandes Labs</title>
+  <meta name="description" content="Generate a simple price quote. Runs entirely in your browser — no data sent to servers.">
+  <link rel="canonical" href="https://fernandeslabs.com/tools/finance/quote-generator/">
+  <meta property="og:title" content="Quote Generator — Fernandes Labs">
+  <meta property="og:description" content="Generate a simple price quote.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Quote Generator — Fernandes Labs">
+  <meta name="twitter:description" content="Generate a simple price quote.">
+  <link rel="icon" href="../../../assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../../assets/styles.css">
+  <script src="../../../assets/config-loader.js"></script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebApplication","name":"Quote Generator","description":"Generate a simple price quote.","applicationCategory":"Utilities","operatingSystem":"All","url":"https://fernandeslabs.com/tools/finance/quote-generator/"}
+  </script>
+</head>
+<body>
+<header class="fl-header">
+  <div class="fl-container fl-header-inner">
+    <a href="../../../" class="fl-brand"><img src="../../../assets/logo.svg" alt="Fernandes Labs" class="fl-brand-logo"><span>Fernandes Labs</span></a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+  </div>
+</header>
+<main>
+  <section class="fl-hero fl-container">
+    <h1>Quote Generator</h1>
+    <p>Generate a simple price quote.</p>
+  </section>
+  <section class="fl-container fl-section">
+    <div class="ad-placeholder">Advertisement</div>
+    <div class="card">
+<label for="items">Items (description | qty | unit_price, one per line)</label>
+      <textarea class="textarea" id="items">Web design | 1 | 500
+Hosting | 12 | 10
+Domain | 1 | 15</textarea>
+      <button class="btn btn-primary" id="btn-go" style="margin-top:var(--space-3);">Generate Quote</button>
+      <div id="result" style="margin-top:var(--space-4);"></div>
+    </div>
+    <div class="ad-placeholder">Advertisement</div>
+  </section>
+</main>
+<footer class="fl-footer">
+  <div class="fl-container fl-footer-inner">
+    <a href="../../../">← Back to Tools</a>
+    <p id="footer-text">Built by Fernandes Labs</p>
+  </div>
+</footer>
+<script>
+var t=document.getElementById("theme-toggle"),s=localStorage.getItem("fl-theme")||"light";
+document.documentElement.setAttribute("data-theme",s);
+t.textContent=s==="dark"?"☀️":"🌙";
+t.addEventListener("click",function(){var n=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);localStorage.setItem("fl-theme",n);t.textContent=n==="dark"?"☀️":"🌙";});
+FernandesConfig.load().then(function(c){document.getElementById("footer-text").textContent=c.branding.footer_text;});
+document.getElementById("btn-go").addEventListener("click",function(){
+  var lines=document.getElementById("items").value.split("\n").filter(function(l){return l.trim()});var total=0;
+  var html="<table style='width:100%;border-collapse:collapse;'><thead><tr><th style='text-align:left;padding:var(--space-2);border-bottom:1px solid var(--color-border);'>Item</th><th style='padding:var(--space-2);border-bottom:1px solid var(--color-border);'>Qty</th><th style='padding:var(--space-2);border-bottom:1px solid var(--color-border);'>Price</th><th style='padding:var(--space-2);border-bottom:1px solid var(--color-border);'>Total</th></tr></thead><tbody>";
+  lines.forEach(function(l){var p=l.split("|");var desc=p[0].trim();var qty=parseFloat(p[1])||0;var price=parseFloat(p[2])||0;var lineTotal=qty*price;total+=lineTotal;
+  html+="<tr><td style='padding:var(--space-2);'>"+desc+"</td><td style='padding:var(--space-2);text-align:center;'>"+qty+"</td><td style='padding:var(--space-2);text-align:right;'>$"+price.toFixed(2)+"</td><td style='padding:var(--space-2);text-align:right;'>$"+lineTotal.toFixed(2)+"</td></tr>"});
+  html+="</tbody><tfoot><tr><td colspan='3' style='padding:var(--space-2);text-align:right;font-weight:700;'>Total:</td><td style='padding:var(--space-2);text-align:right;font-weight:700;color:var(--color-accent);'>$"+total.toFixed(2)+"</td></tr></tfoot></table>";
+  document.getElementById("result").innerHTML=html});
+
+</script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Break-even Calculator — Fernandes Labs</title>
+  <meta name="description" content="Find the break-even point for your business. Runs entirely in your browser — no data sent to servers.">
+  <link rel="canonical" href="https://fernandeslabs.com/tools/finance/break-even-calculator/">
+  <meta property="og:title" content="Break-even Calculator — Fernandes Labs">
+  <meta property="og:description" content="Find the break-even point for your business.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Break-even Calculator — Fernandes Labs">
+  <meta name="twitter:description" content="Find the break-even point for your business.">
+  <link rel="icon" href="../../../assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../../assets/styles.css">
+  <script src="../../../assets/config-loader.js"></script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebApplication","name":"Break-even Calculator","description":"Find the break-even point for your business.","applicationCategory":"Utilities","operatingSystem":"All","url":"https://fernandeslabs.com/tools/finance/break-even-calculator/"}
+  </script>
+</head>
+<body>
+<header class="fl-header">
+  <div class="fl-container fl-header-inner">
+    <a href="../../../" class="fl-brand"><img src="../../../assets/logo.svg" alt="Fernandes Labs" class="fl-brand-logo"><span>Fernandes Labs</span></a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+  </div>
+</header>
+<main>
+  <section class="fl-hero fl-container">
+    <h1>Break-even Calculator</h1>
+    <p>Find the break-even point for your business.</p>
+  </section>
+  <section class="fl-container fl-section">
+    <div class="ad-placeholder">Advertisement</div>
+    <div class="card">
+<div style="display:grid;gap:var(--space-3);max-width:300px;">
+      <div><label for="fixed">Fixed Costs</label><input class="input" id="fixed" type="number"></div>
+      <div><label for="price">Price per Unit</label><input class="input" id="price" type="number"></div>
+      <div><label for="varcost">Variable Cost per Unit</label><input class="input" id="varcost" type="number"></div>
+    </div>
+      <button class="btn btn-primary" id="btn-go" style="margin-top:var(--space-4);">Calculate</button>
+      <div id="result" style="margin-top:var(--space-4);"></div>
+    </div>
+    <div class="ad-placeholder">Advertisement</div>
+  </section>
+</main>
+<footer class="fl-footer">
+  <div class="fl-container fl-footer-inner">
+    <a href="../../../">← Back to Tools</a>
+    <p id="footer-text">Built by Fernandes Labs</p>
+  </div>
+</footer>
+<script>
+var t=document.getElementById("theme-toggle"),s=localStorage.getItem("fl-theme")||"light";
+document.documentElement.setAttribute("data-theme",s);
+t.textContent=s==="dark"?"☀️":"🌙";
+t.addEventListener("click",function(){var n=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);localStorage.setItem("fl-theme",n);t.textContent=n==="dark"?"☀️":"🌙";});
+FernandesConfig.load().then(function(c){document.getElementById("footer-text").textContent=c.branding.footer_text;});
+document.getElementById("btn-go").addEventListener("click",function(){
+  var fc=parseFloat(document.getElementById("fixed").value)||0;var p=parseFloat(document.getElementById("price").value)||0;var vc=parseFloat(document.getElementById("varcost").value)||0;
+  var cm=p-vc;var units=cm>0?Math.ceil(fc/cm):0;
+  document.getElementById("result").innerHTML="<p>Contribution margin: <strong>$"+cm.toFixed(2)+"</strong></p><p>Break-even point: <strong>"+units+" units</strong></p><p>Break-even revenue: <strong>$"+(units*p).toFixed(2)+"</strong></p>"});
+
+</script>
+</body>
+</html>

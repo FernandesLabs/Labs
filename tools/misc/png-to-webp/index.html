@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PNG → WebP — Fernandes Labs</title>
+  <meta name="description" content="Convert PNG images to WebP format. Runs entirely in your browser — no data sent to servers.">
+  <link rel="canonical" href="https://fernandeslabs.com/tools/misc/png-to-webp/">
+  <meta property="og:title" content="PNG → WebP — Fernandes Labs">
+  <meta property="og:description" content="Convert PNG images to WebP format.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="PNG → WebP — Fernandes Labs">
+  <meta name="twitter:description" content="Convert PNG images to WebP format.">
+  <link rel="icon" href="../../../assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../../assets/styles.css">
+  <script src="../../../assets/config-loader.js"></script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebApplication","name":"PNG → WebP","description":"Convert PNG images to WebP format.","applicationCategory":"Utilities","operatingSystem":"All","url":"https://fernandeslabs.com/tools/misc/png-to-webp/"}
+  </script>
+</head>
+<body>
+<header class="fl-header">
+  <div class="fl-container fl-header-inner">
+    <a href="../../../" class="fl-brand"><img src="../../../assets/logo.svg" alt="Fernandes Labs" class="fl-brand-logo"><span>Fernandes Labs</span></a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+  </div>
+</header>
+<main>
+  <section class="fl-hero fl-container">
+    <h1>PNG → WebP</h1>
+    <p>Convert PNG images to WebP format.</p>
+  </section>
+  <section class="fl-container fl-section">
+    <div class="ad-placeholder">Advertisement</div>
+    <div class="card">
+<label for="file">Select PNG</label>
+      <input class="input" id="file" type="file" accept="image/png">
+      <button class="btn btn-primary" id="btn-go" style="margin-top:var(--space-3);">Convert</button>
+      <div id="result" style="margin-top:var(--space-4);"></div>
+    </div>
+    <div class="ad-placeholder">Advertisement</div>
+  </section>
+</main>
+<footer class="fl-footer">
+  <div class="fl-container fl-footer-inner">
+    <a href="../../../">← Back to Tools</a>
+    <p id="footer-text">Built by Fernandes Labs</p>
+  </div>
+</footer>
+<script>
+var t=document.getElementById("theme-toggle"),s=localStorage.getItem("fl-theme")||"light";
+document.documentElement.setAttribute("data-theme",s);
+t.textContent=s==="dark"?"☀️":"🌙";
+t.addEventListener("click",function(){var n=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);localStorage.setItem("fl-theme",n);t.textContent=n==="dark"?"☀️":"🌙";});
+FernandesConfig.load().then(function(c){document.getElementById("footer-text").textContent=c.branding.footer_text;});
+var img=new Image();document.getElementById("file").addEventListener("change",function(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(e){img.src=e.target.result};r.readAsDataURL(f)});
+document.getElementById("btn-go").addEventListener("click",function(){
+  if(!img.src)return;var canvas=document.createElement("canvas");canvas.width=img.width;canvas.height=img.height;var ctx=canvas.getContext("2d");ctx.drawImage(img,0,0);
+  canvas.toBlob(function(blob){var url=URL.createObjectURL(blob);document.getElementById("result").innerHTML="<img src='"+url+"' alt='WebP result' style='max-width:100%;border-radius:var(--radius);'><p style='margin-top:var(--space-2);'><a href='"+url+"' download='converted.webp' class='btn btn-secondary'>Download WebP</a></p>"},"image/webp",0.9)});
+
+</script>
+</body>
+</html>

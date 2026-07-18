@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loan Calculator — Fernandes Labs</title>
+  <meta name="description" content="Calculate monthly loan payments. Runs entirely in your browser — no data sent to servers.">
+  <link rel="canonical" href="https://fernandeslabs.com/tools/finance/loan-calculator/">
+  <meta property="og:title" content="Loan Calculator — Fernandes Labs">
+  <meta property="og:description" content="Calculate monthly loan payments.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Loan Calculator — Fernandes Labs">
+  <meta name="twitter:description" content="Calculate monthly loan payments.">
+  <link rel="icon" href="../../../assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../../assets/styles.css">
+  <script src="../../../assets/config-loader.js"></script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebApplication","name":"Loan Calculator","description":"Calculate monthly loan payments.","applicationCategory":"Utilities","operatingSystem":"All","url":"https://fernandeslabs.com/tools/finance/loan-calculator/"}
+  </script>
+</head>
+<body>
+<header class="fl-header">
+  <div class="fl-container fl-header-inner">
+    <a href="../../../" class="fl-brand"><img src="../../../assets/logo.svg" alt="Fernandes Labs" class="fl-brand-logo"><span>Fernandes Labs</span></a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+  </div>
+</header>
+<main>
+  <section class="fl-hero fl-container">
+    <h1>Loan Calculator</h1>
+    <p>Calculate monthly loan payments.</p>
+  </section>
+  <section class="fl-container fl-section">
+    <div class="ad-placeholder">Advertisement</div>
+    <div class="card">
+<div style="display:grid;gap:var(--space-3);max-width:300px;">
+      <div><label for="amount">Loan Amount</label><input class="input" id="amount" type="number" value="10000"></div>
+      <div><label for="rate">Annual Rate (%)</label><input class="input" id="rate" type="number" value="5"></div>
+      <div><label for="years">Years</label><input class="input" id="years" type="number" value="5"></div>
+    </div>
+      <button class="btn btn-primary" id="btn-go" style="margin-top:var(--space-4);">Calculate</button>
+      <div id="result" style="margin-top:var(--space-4);"></div>
+    </div>
+    <div class="ad-placeholder">Advertisement</div>
+  </section>
+</main>
+<footer class="fl-footer">
+  <div class="fl-container fl-footer-inner">
+    <a href="../../../">← Back to Tools</a>
+    <p id="footer-text">Built by Fernandes Labs</p>
+  </div>
+</footer>
+<script>
+var t=document.getElementById("theme-toggle"),s=localStorage.getItem("fl-theme")||"light";
+document.documentElement.setAttribute("data-theme",s);
+t.textContent=s==="dark"?"☀️":"🌙";
+t.addEventListener("click",function(){var n=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);localStorage.setItem("fl-theme",n);t.textContent=n==="dark"?"☀️":"🌙";});
+FernandesConfig.load().then(function(c){document.getElementById("footer-text").textContent=c.branding.footer_text;});
+document.getElementById("btn-go").addEventListener("click",function(){
+  var p=parseFloat(document.getElementById("amount").value)||0;var r=parseFloat(document.getElementById("rate").value)/100/12;var n=parseInt(document.getElementById("years").value,10)*12;
+  var monthly=r>0?p*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1):p/n;var total=monthly*n;var interest=total-p;
+  document.getElementById("result").innerHTML="<p>Monthly payment: <strong>$"+monthly.toFixed(2)+"</strong></p><p>Total paid: <strong>$"+total.toFixed(2)+"</strong></p><p>Interest: <strong>$"+interest.toFixed(2)+"</strong></p>"});
+
+</script>
+</body>
+</html>

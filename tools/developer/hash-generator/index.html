@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hash Generator — Fernandes Labs</title>
+  <meta name="description" content="Generate MD5, SHA-1, SHA-256, and SHA-512 hashes. Runs entirely in your browser — no data sent to servers.">
+  <link rel="canonical" href="https://fernandeslabs.com/tools/developer/hash-generator/">
+  <meta property="og:title" content="Hash Generator — Fernandes Labs">
+  <meta property="og:description" content="Generate MD5, SHA-1, SHA-256, and SHA-512 hashes.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Hash Generator — Fernandes Labs">
+  <meta name="twitter:description" content="Generate MD5, SHA-1, SHA-256, and SHA-512 hashes.">
+  <link rel="icon" href="../../../assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../../assets/styles.css">
+  <script src="../../../assets/config-loader.js"></script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebApplication","name":"Hash Generator","description":"Generate MD5, SHA-1, SHA-256, and SHA-512 hashes.","applicationCategory":"Utilities","operatingSystem":"All","url":"https://fernandeslabs.com/tools/developer/hash-generator/"}
+  </script>
+</head>
+<body>
+<header class="fl-header">
+  <div class="fl-container fl-header-inner">
+    <a href="../../../" class="fl-brand"><img src="../../../assets/logo.svg" alt="Fernandes Labs" class="fl-brand-logo"><span>Fernandes Labs</span></a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+  </div>
+</header>
+<main>
+  <section class="fl-hero fl-container">
+    <h1>Hash Generator</h1>
+    <p>Generate MD5, SHA-1, SHA-256, and SHA-512 hashes.</p>
+  </section>
+  <section class="fl-container fl-section">
+    <div class="ad-placeholder">Advertisement</div>
+    <div class="card">
+<label for="input">Text to hash</label>
+      <textarea class="textarea" id="input"></textarea>
+      <button class="btn btn-primary" id="btn-go" style="margin-top:var(--space-3);">Generate Hashes</button>
+      <div style="margin-top:var(--space-4);display:grid;gap:var(--space-3);">
+        <div><label>SHA-256</label><input class="input" id="sha256" readonly></div>
+        <div><label>SHA-1</label><input class="input" id="sha1" readonly></div>
+        <div><label>SHA-512</label><input class="input" id="sha512" readonly></div>
+      </div>
+    </div>
+    <div class="ad-placeholder">Advertisement</div>
+  </section>
+</main>
+<footer class="fl-footer">
+  <div class="fl-container fl-footer-inner">
+    <a href="../../../">← Back to Tools</a>
+    <p id="footer-text">Built by Fernandes Labs</p>
+  </div>
+</footer>
+<script>
+var t=document.getElementById("theme-toggle"),s=localStorage.getItem("fl-theme")||"light";
+document.documentElement.setAttribute("data-theme",s);
+t.textContent=s==="dark"?"☀️":"🌙";
+t.addEventListener("click",function(){var n=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);localStorage.setItem("fl-theme",n);t.textContent=n==="dark"?"☀️":"🌙";});
+FernandesConfig.load().then(function(c){document.getElementById("footer-text").textContent=c.branding.footer_text;});
+async function digest(algo,text){var buf=await crypto.subtle.digest(algo,new TextEncoder().encode(text));return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,"0")}).join("")}
+document.getElementById("btn-go").addEventListener("click",async function(){
+  var t=document.getElementById("input").value;if(!t)return;
+  document.getElementById("sha256").value=await digest("SHA-256",t);
+  document.getElementById("sha1").value=await digest("SHA-1",t);
+  document.getElementById("sha512").value=await digest("SHA-512",t)});
+
+</script>
+</body>
+</html>

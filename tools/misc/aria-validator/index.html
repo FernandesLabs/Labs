@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ARIA Validator — Fernandes Labs</title>
+  <meta name="description" content="Validate ARIA attributes in HTML. Runs entirely in your browser — no data sent to servers.">
+  <link rel="canonical" href="https://fernandeslabs.com/tools/misc/aria-validator/">
+  <meta property="og:title" content="ARIA Validator — Fernandes Labs">
+  <meta property="og:description" content="Validate ARIA attributes in HTML.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="ARIA Validator — Fernandes Labs">
+  <meta name="twitter:description" content="Validate ARIA attributes in HTML.">
+  <link rel="icon" href="../../../assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../../assets/styles.css">
+  <script src="../../../assets/config-loader.js"></script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebApplication","name":"ARIA Validator","description":"Validate ARIA attributes in HTML.","applicationCategory":"Utilities","operatingSystem":"All","url":"https://fernandeslabs.com/tools/misc/aria-validator/"}
+  </script>
+</head>
+<body>
+<header class="fl-header">
+  <div class="fl-container fl-header-inner">
+    <a href="../../../" class="fl-brand"><img src="../../../assets/logo.svg" alt="Fernandes Labs" class="fl-brand-logo"><span>Fernandes Labs</span></a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+  </div>
+</header>
+<main>
+  <section class="fl-hero fl-container">
+    <h1>ARIA Validator</h1>
+    <p>Validate ARIA attributes in HTML.</p>
+  </section>
+  <section class="fl-container fl-section">
+    <div class="ad-placeholder">Advertisement</div>
+    <div class="card">
+<label for="input">HTML</label>
+      <textarea class="textarea" id="input" placeholder="<button aria-label='Close'>×</button>"></textarea>
+      <button class="btn btn-primary" id="btn-go" style="margin-top:var(--space-3);">Validate</button>
+      <div id="result" style="margin-top:var(--space-4);"></div>
+    </div>
+    <div class="ad-placeholder">Advertisement</div>
+  </section>
+</main>
+<footer class="fl-footer">
+  <div class="fl-container fl-footer-inner">
+    <a href="../../../">← Back to Tools</a>
+    <p id="footer-text">Built by Fernandes Labs</p>
+  </div>
+</footer>
+<script>
+var t=document.getElementById("theme-toggle"),s=localStorage.getItem("fl-theme")||"light";
+document.documentElement.setAttribute("data-theme",s);
+t.textContent=s==="dark"?"☀️":"🌙";
+t.addEventListener("click",function(){var n=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);localStorage.setItem("fl-theme",n);t.textContent=n==="dark"?"☀️":"🌙";});
+FernandesConfig.load().then(function(c){document.getElementById("footer-text").textContent=c.branding.footer_text;});
+document.getElementById("btn-go").addEventListener("click",function(){
+  var html=document.getElementById("input").value;var issues=[];
+  var interactive=(html.match(/<(button|a|input|select|textarea)/gi)||[]).length;
+  var ariaLabels=(html.match(/aria-label=/gi)||[]).length;
+  var roleAttrs=(html.match(/role=/gi)||[]).length;
+  if(html.match(/<img[^>]+(?<!alt="[^"]*")>/i))issues.push("Warning: Some images may be missing alt attributes");
+  if(html.match(/onclick=["']/i)&&!html.match(/role=/i))issues.push("Warning: Elements with onclick should have a role attribute");
+  if(html.match(/<div[^>]*role="button"/i)&&!html.match(/tabindex/i))issues.push("Warning: div[role=button] needs tabindex for keyboard access");
+  var ok=issues.length===0;
+  document.getElementById("result").innerHTML=(ok?"<p style='color:var(--color-success)'>✓ No obvious ARIA issues found</p>":"<p style='color:var(--color-warning)'>Found "+issues.length+" potential issue(s):</p>")+"<ul>"+issues.map(function(i){return"<li>"+i+"</li>"}).join("")+"</ul><p style='color:var(--color-text-muted);font-size:var(--font-size-sm);'>Interactive elements: "+interactive+" · aria-labels: "+ariaLabels+" · roles: "+roleAttrs+"</p>"});
+
+</script>
+</body>
+</html>

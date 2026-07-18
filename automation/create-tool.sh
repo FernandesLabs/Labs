@@ -89,15 +89,15 @@ cat > "$TOOL_FILE" << EOF
   <meta property="og:title" content="${ESC_NAME} — Fernandes Labs">
   <meta property="og:description" content="${ESC_DESC}">
   <meta property="og:type" content="website">
-  <link rel="icon" href="/assets/logo.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/assets/styles.css">
-  <script src="/assets/config-loader.js"></script>
+  <link rel="icon" href="../../../assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../../assets/styles.css">
+  <script src="../../../assets/config-loader.js"></script>
 </head>
 <body>
 
 <header class="fl-header">
   <div class="fl-container fl-header-inner">
-    <a href="/" class="fl-brand"><img src="/assets/logo.svg" alt="Fernandes Labs" class="fl-brand-logo"><span>Fernandes Labs</span></a>
+    <a href="../../../" class="fl-brand"><img src="../../../assets/logo.svg" alt="Fernandes Labs" class="fl-brand-logo"><span>Fernandes Labs</span></a>
     <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">🌙</button>
   </div>
 </header>
@@ -118,7 +118,7 @@ cat > "$TOOL_FILE" << EOF
 
 <footer class="fl-footer">
   <div class="fl-container fl-footer-inner">
-    <a href="/">← Back to Tools</a>
+    <a href="../../../">← Back to Tools</a>
     <p id="footer-text">Built by Fernandes Labs</p>
   </div>
 </footer>
