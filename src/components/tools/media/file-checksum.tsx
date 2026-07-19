@@ -188,8 +188,9 @@ export default function FileChecksum() {
       // fall back if the browser throws.
       try {
         const m0 = performance.now()
-        // @ts-expect-error — MD5 is not in the TS lib's AlgorithmIdentifier
-        // union but some non-spec browsers historically exposed it.
+        // MD5 is not in the TS lib's AlgorithmIdentifier union but some
+        // non-spec browsers historically exposed it; the try/catch handles
+        // environments where it throws.
         const md5Buf = await crypto.subtle.digest('MD5', buffer)
         const m1 = performance.now()
         next.MD5 = {

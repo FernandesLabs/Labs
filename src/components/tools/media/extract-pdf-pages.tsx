@@ -122,7 +122,7 @@ export default function ExtractPdfPages() {
       for (const page of pages) out.addPage(page)
       const saved = await out.save()
       downloadBlob(
-        new Blob([saved], { type: 'application/pdf' }),
+        new Blob([saved as BlobPart], { type: 'application/pdf' }),
         `${baseName(file.name)}-extracted.pdf`
       )
       setExtractedCount(indices.length)

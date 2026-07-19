@@ -148,7 +148,7 @@ export default function RotatePdf() {
       }
       const saved = await pdf.save()
       downloadBlob(
-        new Blob([saved], { type: 'application/pdf' }),
+        new Blob([saved as BlobPart], { type: 'application/pdf' }),
         `${baseName(file.name)}-rotated-${angle}.pdf`
       )
       toast.success(`Rotated ${rotated} page${rotated === 1 ? '' : 's'} by ${angle}°`)

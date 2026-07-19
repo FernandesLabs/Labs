@@ -684,6 +684,7 @@ const componentMap: Record<string, React.ComponentType> = {
 // ──────────────────────────────────────────────────────────────
 export const tools: Tool[] = toolMetadata.map((meta) => ({
   ...meta,
+  category: meta.category as Tool['category'],
   Component: componentMap[meta.slug],
 }))
 export const toolsBySlug = new Map(tools.map((t) => [t.slug, t]))

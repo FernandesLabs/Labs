@@ -193,7 +193,7 @@ export default function SplitPdf() {
       toast.error('Chunk not ready yet')
       return
     }
-    downloadBlob(new Blob([chunk.bytes], { type: 'application/pdf' }), chunk.name)
+    downloadBlob(new Blob([chunk.bytes as BlobPart], { type: 'application/pdf' }), chunk.name)
   }
   const downloadAll = (): void => {
     const ready = chunks.filter((c) => c.bytes)
@@ -202,7 +202,7 @@ export default function SplitPdf() {
       return
     }
     for (const c of ready) {
-      downloadBlob(new Blob([c.bytes as Uint8Array], { type: 'application/pdf' }), c.name)
+      downloadBlob(new Blob([c.bytes as BlobPart], { type: 'application/pdf' }), c.name)
     }
     toast.success(`Downloading ${ready.length} file${ready.length === 1 ? '' : 's'}`)
   }
