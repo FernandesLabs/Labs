@@ -12,6 +12,7 @@ import {
   Command as CommandIcon,
   Wand2,
 } from 'lucide-react'
+import Link from 'next/link'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import {
@@ -99,15 +100,25 @@ export function HubView({
   onSelect,
   searchRef,
   onOpenPalette,
+  initialCategory = 'all',
 }: {
   tools: Tool[]
   toolsBySlug: Map<string, Tool>
   onSelect: (slug: string) => void
   searchRef: React.RefObject<HTMLInputElement | null>
   onOpenPalette: () => void
+  initialCategory?: ToolCategory | 'all'
 }) {
   const [query, setQuery] = React.useState('')
-  const [activeCat, setActiveCat] = React.useState<ToolCategory | 'all'>('all')
+  const [activeCat, setActiveCat] = React.useState<ToolCategory | 'all'>(
+    initialCategory
+  )
+
+  // If the parent passes a new initialCategory (e.g. from a `#cat=` hash),
+  // apply it. This lets BreadcrumbList JSON-LD links land on the right filter.
+  React.useEffect(() => {
+    if (initialCategory !== 'all') setActiveCat(initialCategory)
+  }, [initialCategory])
   const { recent, favorites, clearRecent } = useToolHistory()
 
   const isFiltering = query.trim() !== '' || activeCat !== 'all'
@@ -374,6 +385,17 @@ export function HubView({
                       query={query}
                     />
                   ))}
+                  {/* Category footer link — internal-linking for SEO (Priority 8).
+                      Links to the JSON-LD BreadcrumbList `cat` hash, which the
+                      hub interprets as a category filter. */}
+                  <div className="col-span-full mt-1 flex justify-end">
+                    <Link
+                      href={`/#cat=${category}`}
+                      className="text-[11px] font-medium text-muted-foreground transition hover:text-foreground"
+                    >
+                      View all {CATEGORY_META[category].label.toLowerCase()} tools →
+                    </Link>
+                  </div>
                 </div>
               </div>
             ))}

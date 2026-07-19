@@ -1,0 +1,1704 @@
+[
+  {
+    "slug": "json-formatter",
+    "category": "developer",
+    "name": "JSON Formatter",
+    "description": "Format, validate, and minify JSON with inline error reporting.",
+    "keywords": [
+      "json",
+      "format",
+      "beautify",
+      "minify",
+      "validate"
+    ]
+  },
+  {
+    "slug": "json-yaml-converter",
+    "category": "developer",
+    "name": "JSON ↔ YAML Converter",
+    "description": "Convert between JSON and YAML formats bidirectionally.",
+    "keywords": [
+      "json",
+      "yaml",
+      "convert",
+      "config"
+    ]
+  },
+  {
+    "slug": "xml-formatter",
+    "category": "developer",
+    "name": "XML Formatter",
+    "description": "Pretty-print and minify XML with validation.",
+    "keywords": [
+      "xml",
+      "format",
+      "beautify",
+      "minify"
+    ]
+  },
+  {
+    "slug": "base64-encoder-decoder",
+    "category": "developer",
+    "name": "Base64 Encoder / Decoder",
+    "description": "Encode text to Base64 or decode Base64 to text with UTF-8 support.",
+    "keywords": [
+      "base64",
+      "encode",
+      "decode",
+      "utf8"
+    ]
+  },
+  {
+    "slug": "uuid-generator",
+    "category": "developer",
+    "name": "UUID Generator",
+    "description": "Generate RFC 4122 v4 UUIDs in bulk using the Web Crypto API.",
+    "keywords": [
+      "uuid",
+      "guid",
+      "crypto",
+      "random"
+    ]
+  },
+  {
+    "slug": "hash-generator",
+    "category": "developer",
+    "name": "Hash Generator",
+    "description": "Generate SHA-1, SHA-256, SHA-384, SHA-512 hashes via Web Crypto.",
+    "keywords": [
+      "hash",
+      "sha",
+      "sha256",
+      "sha512",
+      "digest"
+    ]
+  },
+  {
+    "slug": "hmac-generator",
+    "category": "developer",
+    "name": "HMAC Generator",
+    "description": "Generate HMAC signatures (SHA-256/384/512) for a message and secret.",
+    "keywords": [
+      "hmac",
+      "signature",
+      "sha256",
+      "secret"
+    ]
+  },
+  {
+    "slug": "jwt-decoder",
+    "category": "developer",
+    "name": "JWT Decoder",
+    "description": "Decode and inspect JSON Web Token header and payload.",
+    "keywords": [
+      "jwt",
+      "token",
+      "decode",
+      "auth"
+    ]
+  },
+  {
+    "slug": "jwt-generator",
+    "category": "developer",
+    "name": "JWT Generator",
+    "description": "Generate signed JSON Web Tokens (HS256) with custom claims.",
+    "keywords": [
+      "jwt",
+      "token",
+      "generate",
+      "sign",
+      "hs256"
+    ]
+  },
+  {
+    "slug": "regex-tester",
+    "category": "developer",
+    "name": "Regex Tester",
+    "description": "Test regular expressions with live match highlighting and flags.",
+    "keywords": [
+      "regex",
+      "regexp",
+      "test",
+      "match",
+      "pattern"
+    ]
+  },
+  {
+    "slug": "url-encoder-decoder",
+    "category": "developer",
+    "name": "URL Encoder / Decoder",
+    "description": "Encode or decode URL components and full URLs.",
+    "keywords": [
+      "url",
+      "encode",
+      "decode",
+      "uri",
+      "percent"
+    ]
+  },
+  {
+    "slug": "unix-timestamp-converter",
+    "category": "developer",
+    "name": "Unix Timestamp Converter",
+    "description": "Convert between Unix timestamps and human-readable dates.",
+    "keywords": [
+      "unix",
+      "timestamp",
+      "epoch",
+      "date",
+      "time"
+    ]
+  },
+  {
+    "slug": "color-converter",
+    "category": "developer",
+    "name": "Color Converter",
+    "description": "Convert colors between HEX, RGB, HSL with a live preview.",
+    "keywords": [
+      "color",
+      "hex",
+      "rgb",
+      "hsl",
+      "convert"
+    ]
+  },
+  {
+    "slug": "html-entity-encoder",
+    "category": "developer",
+    "name": "HTML Entity Encoder",
+    "description": "Encode or decode HTML entities in text.",
+    "keywords": [
+      "html",
+      "entity",
+      "encode",
+      "decode",
+      "escape"
+    ]
+  },
+  {
+    "slug": "sql-formatter",
+    "category": "developer",
+    "name": "SQL Formatter",
+    "description": "Pretty-print and format SQL queries with keyword casing.",
+    "keywords": [
+      "sql",
+      "format",
+      "query",
+      "pretty",
+      "database"
+    ]
+  },
+  {
+    "slug": "markdown-to-html",
+    "category": "developer",
+    "name": "Markdown to HTML",
+    "description": "Convert markdown to raw HTML source for emails and static sites.",
+    "keywords": [
+      "markdown",
+      "html",
+      "convert",
+      "gfm",
+      "static"
+    ]
+  },
+  {
+    "slug": "text-compare-diff",
+    "category": "developer",
+    "name": "Text Diff",
+    "description": "Compare text at line, word, or character level with unified diff output.",
+    "keywords": [
+      "diff",
+      "compare",
+      "line",
+      "word",
+      "character",
+      "unified"
+    ]
+  },
+  {
+    "slug": "cron-expression-generator",
+    "category": "developer",
+    "name": "Cron Expression Generator",
+    "description": "Build cron schedules visually and preview next run times.",
+    "keywords": [
+      "cron",
+      "schedule",
+      "crontab",
+      "job",
+      "timer"
+    ]
+  },
+  {
+    "slug": "diff-checker",
+    "category": "developer",
+    "name": "Diff Checker",
+    "description": "Compare two texts line-by-line with a color-coded LCS diff.",
+    "keywords": [
+      "diff",
+      "compare",
+      "text",
+      "lcs",
+      "changes"
+    ]
+  },
+  {
+    "slug": "markdown-preview",
+    "category": "developer",
+    "name": "Markdown Preview",
+    "description": "Write Markdown and see a live rendered HTML preview.",
+    "keywords": [
+      "markdown",
+      "md",
+      "preview",
+      "render",
+      "html"
+    ]
+  },
+  {
+    "slug": "css-minifier",
+    "category": "developer",
+    "name": "CSS Minifier",
+    "description": "Minify CSS by removing comments, whitespace, and empty rules.",
+    "keywords": [
+      "css",
+      "minify",
+      "compress",
+      "optimize",
+      "styles"
+    ]
+  },
+  {
+    "slug": "js-minifier",
+    "category": "developer",
+    "name": "JS Minifier",
+    "description": "Minify JavaScript by removing comments and unnecessary whitespace.",
+    "keywords": [
+      "javascript",
+      "js",
+      "minify",
+      "compress",
+      "optimize"
+    ]
+  },
+  {
+    "slug": "html-minifier",
+    "category": "developer",
+    "name": "HTML Minifier",
+    "description": "Minify HTML by removing comments, whitespace, and empty attributes.",
+    "keywords": [
+      "html",
+      "minify",
+      "compress",
+      "optimize",
+      "markup"
+    ]
+  },
+  {
+    "slug": "word-counter",
+    "category": "text",
+    "name": "Word Counter",
+    "description": "Count words, characters, sentences, and reading time.",
+    "keywords": [
+      "word",
+      "count",
+      "character",
+      "reading",
+      "time"
+    ]
+  },
+  {
+    "slug": "character-counter",
+    "category": "text",
+    "name": "Character Counter",
+    "description": "Count characters with and without spaces, lines, and bytes.",
+    "keywords": [
+      "character",
+      "count",
+      "bytes",
+      "lines",
+      "twitter"
+    ]
+  },
+  {
+    "slug": "case-converter",
+    "category": "text",
+    "name": "Case Converter",
+    "description": "Convert text to UPPER, lower, Title, camelCase, snake_case, kebab-case.",
+    "keywords": [
+      "case",
+      "uppercase",
+      "lowercase",
+      "camel",
+      "snake",
+      "kebab"
+    ]
+  },
+  {
+    "slug": "slug-generator",
+    "category": "text",
+    "name": "Slug Generator",
+    "description": "Generate URL-safe slugs from any text.",
+    "keywords": [
+      "slug",
+      "url",
+      "permalink",
+      "seo"
+    ]
+  },
+  {
+    "slug": "lorem-ipsum-generator",
+    "category": "text",
+    "name": "Lorem Ipsum Generator",
+    "description": "Generate placeholder Lorem Ipsum paragraphs, sentences, or words.",
+    "keywords": [
+      "lorem",
+      "ipsum",
+      "placeholder",
+      "dummy",
+      "text"
+    ]
+  },
+  {
+    "slug": "text-sorter",
+    "category": "text",
+    "name": "Text Sorter",
+    "description": "Sort lines alphabetically, numerically, or by length.",
+    "keywords": [
+      "sort",
+      "lines",
+      "order",
+      "alphabetical"
+    ]
+  },
+  {
+    "slug": "remove-blank-lines",
+    "category": "text",
+    "name": "Remove Blank Lines",
+    "description": "Strip empty lines and optionally trim whitespace from text.",
+    "keywords": [
+      "blank",
+      "empty",
+      "lines",
+      "trim",
+      "clean"
+    ]
+  },
+  {
+    "slug": "duplicate-line-remover",
+    "category": "text",
+    "name": "Duplicate Line Remover",
+    "description": "Remove duplicate lines, optionally case-insensitive.",
+    "keywords": [
+      "duplicate",
+      "lines",
+      "unique",
+      "dedupe"
+    ]
+  },
+  {
+    "slug": "reading-time-calculator",
+    "category": "text",
+    "name": "Reading Time Calculator",
+    "description": "Estimate reading and speaking time at multiple speeds.",
+    "keywords": [
+      "reading",
+      "time",
+      "speaking",
+      "words",
+      "wpm"
+    ]
+  },
+  {
+    "slug": "unicode-inspector",
+    "category": "text",
+    "name": "Unicode Inspector",
+    "description": "Inspect every character: code point, name, UTF-8 bytes, category.",
+    "keywords": [
+      "unicode",
+      "character",
+      "codepoint",
+      "utf8",
+      "inspect"
+    ]
+  },
+  {
+    "slug": "capitalization-tool",
+    "category": "text",
+    "name": "Capitalization Tool",
+    "description": "Capitalize words, sentences, and titles with AP-style rules.",
+    "keywords": [
+      "capitalize",
+      "capitalization",
+      "title",
+      "case",
+      "sentence"
+    ]
+  },
+  {
+    "slug": "text-compare",
+    "category": "text",
+    "name": "Text Compare",
+    "description": "Compare two texts word-by-word with a color-coded inline diff.",
+    "keywords": [
+      "text",
+      "compare",
+      "diff",
+      "words",
+      "changes"
+    ]
+  },
+  {
+    "slug": "remove-duplicate-words",
+    "category": "text",
+    "name": "Remove Duplicate Words",
+    "description": "Remove duplicate words from text while preserving order.",
+    "keywords": [
+      "duplicate",
+      "words",
+      "unique",
+      "dedupe",
+      "text"
+    ]
+  },
+  {
+    "slug": "percentage-calculator",
+    "category": "finance",
+    "name": "Percentage Calculator",
+    "description": "Calculate percentages, increases, decreases, and ratios.",
+    "keywords": [
+      "percentage",
+      "percent",
+      "increase",
+      "decrease"
+    ]
+  },
+  {
+    "slug": "bmi-calculator",
+    "category": "finance",
+    "name": "BMI Calculator",
+    "description": "Calculate Body Mass Index with metric and imperial units.",
+    "keywords": [
+      "bmi",
+      "body",
+      "mass",
+      "health",
+      "weight"
+    ]
+  },
+  {
+    "slug": "vat-calculator",
+    "category": "finance",
+    "name": "VAT Calculator",
+    "description": "Add or remove VAT from a price at any rate, with live results.",
+    "keywords": [
+      "vat",
+      "tax",
+      "price",
+      "sales"
+    ]
+  },
+  {
+    "slug": "loan-calculator",
+    "category": "finance",
+    "name": "Loan Calculator",
+    "description": "Calculate monthly payments, total interest, and amortization.",
+    "keywords": [
+      "loan",
+      "payment",
+      "interest",
+      "amortization"
+    ]
+  },
+  {
+    "slug": "mortgage-calculator",
+    "category": "finance",
+    "name": "Mortgage Calculator",
+    "description": "Estimate monthly mortgage payments with taxes and insurance.",
+    "keywords": [
+      "mortgage",
+      "home",
+      "payment",
+      "piti"
+    ]
+  },
+  {
+    "slug": "compound-interest-calculator",
+    "category": "finance",
+    "name": "Compound Interest Calculator",
+    "description": "Project compound interest growth over time.",
+    "keywords": [
+      "compound",
+      "interest",
+      "investment",
+      "growth"
+    ]
+  },
+  {
+    "slug": "gpa-calculator",
+    "category": "finance",
+    "name": "GPA Calculator",
+    "description": "Calculate grade point average across courses with weight.",
+    "keywords": [
+      "gpa",
+      "grade",
+      "school",
+      "college",
+      "courses"
+    ]
+  },
+  {
+    "slug": "currency-converter",
+    "category": "finance",
+    "name": "Currency Converter",
+    "description": "Convert between currencies using bundled static reference rates.",
+    "keywords": [
+      "currency",
+      "convert",
+      "exchange",
+      "money"
+    ]
+  },
+  {
+    "slug": "body-fat-calculator",
+    "category": "finance",
+    "name": "Body Fat Calculator",
+    "description": "Estimate body fat percentage via the U.S. Navy method.",
+    "keywords": [
+      "body",
+      "fat",
+      "navy",
+      "health",
+      "fitness"
+    ]
+  },
+  {
+    "slug": "unit-converter",
+    "category": "finance",
+    "name": "Unit Converter",
+    "description": "Convert length, weight, temperature, and data units.",
+    "keywords": [
+      "unit",
+      "convert",
+      "length",
+      "weight",
+      "temperature"
+    ]
+  },
+  {
+    "slug": "invoice-generator",
+    "category": "finance",
+    "name": "Invoice Generator",
+    "description": "Build a printable invoice with line items, tax, and totals.",
+    "keywords": [
+      "invoice",
+      "billing",
+      "printable",
+      "pdf",
+      "business"
+    ]
+  },
+  {
+    "slug": "bmr-calculator",
+    "category": "finance",
+    "name": "BMR Calculator",
+    "description": "Calculate Basal Metabolic Rate with the Mifflin-St Jeor formula.",
+    "keywords": [
+      "bmr",
+      "metabolism",
+      "calories",
+      "health",
+      "fitness"
+    ]
+  },
+  {
+    "slug": "tdee-calculator",
+    "category": "finance",
+    "name": "TDEE Calculator",
+    "description": "Estimate Total Daily Energy Expenditure from BMR and activity.",
+    "keywords": [
+      "tdee",
+      "calories",
+      "energy",
+      "activity",
+      "fitness"
+    ]
+  },
+  {
+    "slug": "calorie-calculator",
+    "category": "finance",
+    "name": "Calorie Calculator",
+    "description": "Compute daily calorie needs and macro targets for any goal.",
+    "keywords": [
+      "calorie",
+      "diet",
+      "macros",
+      "weight",
+      "nutrition"
+    ]
+  },
+  {
+    "slug": "macro-calculator",
+    "category": "finance",
+    "name": "Macro Calculator",
+    "description": "Split daily calories into protein, carbs, and fat by diet type.",
+    "keywords": [
+      "macro",
+      "protein",
+      "carbs",
+      "fat",
+      "diet"
+    ]
+  },
+  {
+    "slug": "water-intake-calculator",
+    "category": "finance",
+    "name": "Water Intake Calculator",
+    "description": "Estimate daily water needs based on weight, activity, and climate.",
+    "keywords": [
+      "water",
+      "hydration",
+      "intake",
+      "health"
+    ]
+  },
+  {
+    "slug": "retirement-calculator",
+    "category": "finance",
+    "name": "Retirement Calculator",
+    "description": "Project retirement savings growth with contributions and inflation.",
+    "keywords": [
+      "retirement",
+      "savings",
+      "investment",
+      "pension",
+      "future"
+    ]
+  },
+  {
+    "slug": "roi-calculator",
+    "category": "finance",
+    "name": "ROI Calculator",
+    "description": "Calculate return on investment, annualized ROI, and CAGR.",
+    "keywords": [
+      "roi",
+      "return",
+      "investment",
+      "cagr",
+      "profit"
+    ]
+  },
+  {
+    "slug": "savings-calculator",
+    "category": "finance",
+    "name": "Savings Calculator",
+    "description": "Project savings growth with regular contributions and compounding.",
+    "keywords": [
+      "savings",
+      "interest",
+      "compound",
+      "growth",
+      "money"
+    ]
+  },
+  {
+    "slug": "break-even-calculator",
+    "category": "finance",
+    "name": "Break-Even Calculator",
+    "description": "Find the break-even point in units and revenue for a product.",
+    "keywords": [
+      "break-even",
+      "business",
+      "margin",
+      "units",
+      "revenue"
+    ]
+  },
+  {
+    "slug": "profit-margin-calculator",
+    "category": "finance",
+    "name": "Profit Margin Calculator",
+    "description": "Calculate profit margin, markup, and reverse-engineer costs.",
+    "keywords": [
+      "profit",
+      "margin",
+      "markup",
+      "revenue",
+      "business"
+    ]
+  },
+  {
+    "slug": "inflation-calculator",
+    "category": "finance",
+    "name": "Inflation Calculator",
+    "description": "See how inflation erodes purchasing power over time.",
+    "keywords": [
+      "inflation",
+      "purchasing",
+      "power",
+      "money",
+      "economics"
+    ]
+  },
+  {
+    "slug": "grade-calculator",
+    "category": "finance",
+    "name": "Grade Calculator",
+    "description": "Compute weighted final grades from assignments and weights.",
+    "keywords": [
+      "grade",
+      "calculator",
+      "school",
+      "assignment",
+      "weighted"
+    ]
+  },
+  {
+    "slug": "quote-generator",
+    "category": "finance",
+    "name": "Quote Generator",
+    "description": "Generate inspirational quotes and download them as shareable images.",
+    "keywords": [
+      "quote",
+      "inspiration",
+      "motivation",
+      "image",
+      "share"
+    ]
+  },
+  {
+    "slug": "flashcard-generator",
+    "category": "finance",
+    "name": "Flashcard Generator",
+    "description": "Build, study, and export flashcard decks with a flip mode.",
+    "keywords": [
+      "flashcard",
+      "study",
+      "learn",
+      "memory",
+      "cards"
+    ]
+  },
+  {
+    "slug": "citation-generator",
+    "category": "finance",
+    "name": "Citation Generator",
+    "description": "Generate APA, MLA, and Chicago citations for books and sites.",
+    "keywords": [
+      "citation",
+      "apa",
+      "mla",
+      "chicago",
+      "reference"
+    ]
+  },
+  {
+    "slug": "invoice-number-generator",
+    "category": "finance",
+    "name": "Invoice Number Generator",
+    "description": "Generate sequential, padded invoice numbers with optional date prefix.",
+    "keywords": [
+      "invoice",
+      "number",
+      "sequential",
+      "business",
+      "billing"
+    ]
+  },
+  {
+    "slug": "study-planner",
+    "category": "finance",
+    "name": "Study Planner",
+    "description": "Plan a study schedule across subjects before an exam date.",
+    "keywords": [
+      "study",
+      "planner",
+      "schedule",
+      "exam",
+      "time"
+    ]
+  },
+  {
+    "slug": "tip-calculator",
+    "category": "finance",
+    "name": "Tip Calculator",
+    "description": "Calculate tips and split bills with quick-percentage presets.",
+    "keywords": [
+      "tip",
+      "calculator",
+      "bill",
+      "split",
+      "restaurant"
+    ]
+  },
+  {
+    "slug": "meta-tag-generator",
+    "category": "seo",
+    "name": "Meta Tag Generator",
+    "description": "Generate SEO meta tags, Open Graph, and Twitter cards.",
+    "keywords": [
+      "meta",
+      "tags",
+      "og",
+      "twitter",
+      "seo"
+    ]
+  },
+  {
+    "slug": "title-generator",
+    "category": "seo",
+    "name": "Title Generator",
+    "description": "Generate SEO-optimized page titles from keywords.",
+    "keywords": [
+      "title",
+      "seo",
+      "headline",
+      "page"
+    ]
+  },
+  {
+    "slug": "cta-generator",
+    "category": "seo",
+    "name": "CTA Generator",
+    "description": "Generate call-to-action button copy and variations.",
+    "keywords": [
+      "cta",
+      "call",
+      "action",
+      "copy",
+      "button"
+    ]
+  },
+  {
+    "slug": "robots-txt-generator",
+    "category": "seo",
+    "name": "Robots.txt Generator",
+    "description": "Build a robots.txt with rules for bots and sitemaps.",
+    "keywords": [
+      "robots",
+      "txt",
+      "crawler",
+      "spider",
+      "seo"
+    ]
+  },
+  {
+    "slug": "sitemap-generator",
+    "category": "seo",
+    "name": "Sitemap Generator",
+    "description": "Generate an XML sitemap from a list of URLs.",
+    "keywords": [
+      "sitemap",
+      "xml",
+      "urls",
+      "seo"
+    ]
+  },
+  {
+    "slug": "json-ld-generator",
+    "category": "seo",
+    "name": "JSON-LD Generator",
+    "description": "Generate JSON-LD structured data (Article, Product, FAQ, etc.).",
+    "keywords": [
+      "json-ld",
+      "schema",
+      "structured",
+      "data",
+      "rich"
+    ]
+  },
+  {
+    "slug": "open-graph-preview",
+    "category": "seo",
+    "name": "Open Graph Preview",
+    "description": "Preview how a page renders as an Open Graph social card.",
+    "keywords": [
+      "open",
+      "graph",
+      "og",
+      "preview",
+      "social"
+    ]
+  },
+  {
+    "slug": "headline-analyzer",
+    "category": "seo",
+    "name": "Headline Analyzer",
+    "description": "Score a headline for length, power words, and sentiment.",
+    "keywords": [
+      "headline",
+      "analyzer",
+      "score",
+      "seo",
+      "title"
+    ]
+  },
+  {
+    "slug": "keyword-density-checker",
+    "category": "seo",
+    "name": "Keyword Density Checker",
+    "description": "Analyze keyword frequency and density in body text.",
+    "keywords": [
+      "keyword",
+      "density",
+      "frequency",
+      "seo",
+      "content"
+    ]
+  },
+  {
+    "slug": "email-signature-generator",
+    "category": "seo",
+    "name": "Email Signature Generator",
+    "description": "Design professional HTML email signatures with live preview.",
+    "keywords": [
+      "email",
+      "signature",
+      "html",
+      "outlook",
+      "gmail"
+    ]
+  },
+  {
+    "slug": "campaign-url-builder",
+    "category": "seo",
+    "name": "Campaign URL Builder",
+    "description": "Build tagged campaign URLs with custom parameters and presets.",
+    "keywords": [
+      "campaign",
+      "url",
+      "utm",
+      "tracking",
+      "marketing"
+    ]
+  },
+  {
+    "slug": "qr-campaign-generator",
+    "category": "seo",
+    "name": "QR Campaign Generator",
+    "description": "Generate QR codes with UTM tracking for offline campaigns.",
+    "keywords": [
+      "qr",
+      "campaign",
+      "utm",
+      "offline",
+      "marketing"
+    ]
+  },
+  {
+    "slug": "utm-builder",
+    "category": "seo",
+    "name": "UTM Builder",
+    "description": "Build UTM-tagged campaign URLs with live preview and presets.",
+    "keywords": [
+      "utm",
+      "campaign",
+      "url",
+      "tracking",
+      "marketing"
+    ]
+  },
+  {
+    "slug": "faq-generator",
+    "category": "seo",
+    "name": "FAQ Generator",
+    "description": "Build FAQ sections with HTML markup and FAQPage JSON-LD schema.",
+    "keywords": [
+      "faq",
+      "questions",
+      "schema",
+      "json-ld",
+      "seo"
+    ]
+  },
+  {
+    "slug": "twitter-card-preview",
+    "category": "seo",
+    "name": "Twitter Card Preview",
+    "description": "Preview how a page renders as a Twitter/X card with meta tags.",
+    "keywords": [
+      "twitter",
+      "card",
+      "preview",
+      "social",
+      "x"
+    ]
+  },
+  {
+    "slug": "breadcrumb-schema-generator",
+    "category": "seo",
+    "name": "Breadcrumb Schema Generator",
+    "description": "Generate BreadcrumbList JSON-LD for navigation trails.",
+    "keywords": [
+      "breadcrumb",
+      "schema",
+      "json-ld",
+      "navigation",
+      "seo"
+    ]
+  },
+  {
+    "slug": "organization-schema-generator",
+    "category": "seo",
+    "name": "Organization Schema Generator",
+    "description": "Generate Organization JSON-LD with address and social profiles.",
+    "keywords": [
+      "organization",
+      "schema",
+      "json-ld",
+      "business",
+      "seo"
+    ]
+  },
+  {
+    "slug": "canonical-url-checker",
+    "category": "seo",
+    "name": "Canonical URL Checker",
+    "description": "Normalize URLs and generate the canonical link tag.",
+    "keywords": [
+      "canonical",
+      "url",
+      "normalize",
+      "seo",
+      "duplicate"
+    ]
+  },
+  {
+    "slug": "blog-outline-generator",
+    "category": "seo",
+    "name": "Blog Outline Generator",
+    "description": "Generate structured blog outlines with sections and word budgets.",
+    "keywords": [
+      "blog",
+      "outline",
+      "content",
+      "writing",
+      "structure"
+    ]
+  },
+  {
+    "slug": "password-generator",
+    "category": "security",
+    "name": "Password Generator",
+    "description": "Generate strong passwords with Web Crypto and a strength meter.",
+    "keywords": [
+      "password",
+      "generate",
+      "crypto",
+      "secure",
+      "random"
+    ]
+  },
+  {
+    "slug": "secure-passphrase-generator",
+    "category": "security",
+    "name": "Secure Passphrase Generator",
+    "description": "Generate cryptographically secure passphrases from a word list.",
+    "keywords": [
+      "passphrase",
+      "diceware",
+      "secure",
+      "words"
+    ]
+  },
+  {
+    "slug": "password-strength-checker",
+    "category": "security",
+    "name": "Password Strength Checker",
+    "description": "Estimate password entropy and crack time honestly.",
+    "keywords": [
+      "password",
+      "strength",
+      "entropy",
+      "crack",
+      "check"
+    ]
+  },
+  {
+    "slug": "csp-generator",
+    "category": "security",
+    "name": "CSP Generator",
+    "description": "Build a Content-Security-Policy header with toggles per directive.",
+    "keywords": [
+      "csp",
+      "content",
+      "security",
+      "policy",
+      "header"
+    ]
+  },
+  {
+    "slug": "dns-lookup",
+    "category": "network",
+    "name": "DNS Lookup",
+    "description": "Query DNS records (A, AAAA, MX, TXT, NS, and more) for any domain.",
+    "keywords": [
+      "dns",
+      "lookup",
+      "domain",
+      "records",
+      "network"
+    ]
+  },
+  {
+    "slug": "ip-lookup",
+    "category": "network",
+    "name": "IP Lookup",
+    "description": "Geolocate an IP address with city, region, country, and ISP.",
+    "keywords": [
+      "ip",
+      "lookup",
+      "geolocation",
+      "network",
+      "isp"
+    ]
+  },
+  {
+    "slug": "http-header-checker",
+    "category": "network",
+    "name": "HTTP Header Checker",
+    "description": "Inspect HTTP response headers and spot security headers.",
+    "keywords": [
+      "http",
+      "headers",
+      "response",
+      "security",
+      "network"
+    ]
+  },
+  {
+    "slug": "ssl-checker",
+    "category": "network",
+    "name": "SSL Checker",
+    "description": "Inspect a site\\u2019s TLS certificate: issuer, validity, expiry days.",
+    "keywords": [
+      "ssl",
+      "tls",
+      "certificate",
+      "https",
+      "security"
+    ]
+  },
+  {
+    "slug": "ping-tool",
+    "category": "network",
+    "name": "Ping Tool",
+    "description": "Measure HTTP latency (TTFB) to any URL with 1 or 3 pings.",
+    "keywords": [
+      "ping",
+      "latency",
+      "ttfb",
+      "network",
+      "speed"
+    ]
+  },
+  {
+    "slug": "redirect-checker",
+    "category": "network",
+    "name": "Redirect Checker",
+    "description": "Trace the full HTTP redirect chain for any URL.",
+    "keywords": [
+      "redirect",
+      "chain",
+      "http",
+      "301",
+      "302",
+      "network"
+    ]
+  },
+  {
+    "slug": "user-agent-parser",
+    "category": "network",
+    "name": "User-Agent Parser",
+    "description": "Parse a user-agent string into browser, OS, and device.",
+    "keywords": [
+      "user",
+      "agent",
+      "ua",
+      "browser",
+      "os",
+      "device"
+    ]
+  },
+  {
+    "slug": "qr-generator",
+    "category": "media",
+    "name": "QR Generator",
+    "description": "Generate downloadable QR codes for any text or URL.",
+    "keywords": [
+      "qr",
+      "code",
+      "barcode",
+      "url"
+    ]
+  },
+  {
+    "slug": "color-palette-extractor",
+    "category": "media",
+    "name": "Color Palette Extractor",
+    "description": "Extract a dominant color palette from an uploaded image.",
+    "keywords": [
+      "color",
+      "palette",
+      "extract",
+      "image",
+      "swatches"
+    ]
+  },
+  {
+    "slug": "color-contrast-checker",
+    "category": "media",
+    "name": "Color Contrast Checker",
+    "description": "Check WCAG color contrast ratios between two colors.",
+    "keywords": [
+      "color",
+      "contrast",
+      "wcag",
+      "accessibility",
+      "ratio"
+    ]
+  },
+  {
+    "slug": "image-compressor",
+    "category": "media",
+    "name": "Image Compressor",
+    "description": "Compress images client-side with an adjustable quality slider.",
+    "keywords": [
+      "image",
+      "compress",
+      "optimize",
+      "jpeg",
+      "webp"
+    ]
+  },
+  {
+    "slug": "image-resizer",
+    "category": "media",
+    "name": "Image Resizer",
+    "description": "Resize images to custom dimensions and download.",
+    "keywords": [
+      "image",
+      "resize",
+      "scale",
+      "dimensions"
+    ]
+  },
+  {
+    "slug": "favicon-generator",
+    "category": "media",
+    "name": "Favicon Generator",
+    "description": "Generate favicon PNGs in multiple sizes from an image or text.",
+    "keywords": [
+      "favicon",
+      "icon",
+      "logo",
+      "browser"
+    ]
+  },
+  {
+    "slug": "social-image-generator",
+    "category": "media",
+    "name": "Social Image Generator",
+    "description": "Design and export social share images on a canvas.",
+    "keywords": [
+      "social",
+      "image",
+      "og",
+      "share",
+      "canvas"
+    ]
+  },
+  {
+    "slug": "css-gradient-generator",
+    "category": "media",
+    "name": "CSS Gradient Generator",
+    "description": "Design multi-stop CSS gradients with live preview and copy CSS.",
+    "keywords": [
+      "css",
+      "gradient",
+      "linear",
+      "radial",
+      "design"
+    ]
+  },
+  {
+    "slug": "svg-viewer",
+    "category": "media",
+    "name": "SVG Viewer",
+    "description": "Preview SVG markup with stats, zoom, and background options.",
+    "keywords": [
+      "svg",
+      "viewer",
+      "preview",
+      "vector",
+      "image"
+    ]
+  },
+  {
+    "slug": "file-size-converter",
+    "category": "media",
+    "name": "File Size Converter",
+    "description": "Convert between bytes, KB, MB, GB, TB, and PB (1024-base).",
+    "keywords": [
+      "file",
+      "size",
+      "convert",
+      "bytes",
+      "kb",
+      "mb"
+    ]
+  },
+  {
+    "slug": "alt-text-generator",
+    "category": "media",
+    "name": "Alt Text Generator",
+    "description": "Generate accessible alt text suggestions with WCAG guidance.",
+    "keywords": [
+      "alt",
+      "text",
+      "accessibility",
+      "wcag",
+      "image"
+    ]
+  },
+  {
+    "slug": "svg-optimizer",
+    "category": "media",
+    "name": "SVG Optimizer",
+    "description": "Optimize SVG markup by removing comments, metadata, and whitespace.",
+    "keywords": [
+      "svg",
+      "optimize",
+      "minify",
+      "clean",
+      "vector"
+    ]
+  },
+  {
+    "slug": "mime-detector",
+    "category": "media",
+    "name": "MIME Type Detector",
+    "description": "Detect MIME types from file extensions or uploaded files.",
+    "keywords": [
+      "mime",
+      "type",
+      "file",
+      "extension",
+      "detect"
+    ]
+  },
+  {
+    "slug": "file-hash",
+    "category": "media",
+    "name": "File Hash Calculator",
+    "description": "Compute SHA-1, SHA-256, SHA-384, SHA-512 hashes of any file.",
+    "keywords": [
+      "file",
+      "hash",
+      "sha256",
+      "sha512",
+      "checksum"
+    ]
+  },
+  {
+    "slug": "aria-validator",
+    "category": "media",
+    "name": "ARIA Validator",
+    "description": "Check HTML for accessibility and ARIA issues with fix suggestions.",
+    "keywords": [
+      "aria",
+      "accessibility",
+      "html",
+      "wcag",
+      "validate"
+    ]
+  },
+  {
+    "slug": "merge-pdfs",
+    "category": "media",
+    "name": "Merge PDFs",
+    "description": "Combine multiple PDF files into one with reordering.",
+    "keywords": [
+      "pdf",
+      "merge",
+      "combine",
+      "join",
+      "documents"
+    ]
+  },
+  {
+    "slug": "split-pdf",
+    "category": "media",
+    "name": "Split PDF",
+    "description": "Split a PDF into individual pages, ranges, or fixed-size chunks.",
+    "keywords": [
+      "pdf",
+      "split",
+      "divide",
+      "pages",
+      "extract"
+    ]
+  },
+  {
+    "slug": "rotate-pdf",
+    "category": "media",
+    "name": "Rotate PDF",
+    "description": "Rotate all or specific pages of a PDF by 90, 180, or 270 degrees.",
+    "keywords": [
+      "pdf",
+      "rotate",
+      "orientation",
+      "pages",
+      "degrees"
+    ]
+  },
+  {
+    "slug": "extract-pdf-pages",
+    "category": "media",
+    "name": "Extract PDF Pages",
+    "description": "Extract specific pages from a PDF into a new document.",
+    "keywords": [
+      "pdf",
+      "extract",
+      "pages",
+      "select",
+      "subset"
+    ]
+  },
+  {
+    "slug": "compress-pdf",
+    "category": "media",
+    "name": "Compress PDF",
+    "description": "Reduce PDF size by stripping metadata and optimizing object streams.",
+    "keywords": [
+      "pdf",
+      "compress",
+      "optimize",
+      "reduce",
+      "size"
+    ]
+  },
+  {
+    "slug": "pdf-to-images",
+    "category": "media",
+    "name": "PDF to Images",
+    "description": "Render PDF pages to PNG images and inspect PDF structure.",
+    "keywords": [
+      "pdf",
+      "images",
+      "render",
+      "png",
+      "convert"
+    ]
+  },
+  {
+    "slug": "images-to-pdf",
+    "category": "media",
+    "name": "Images to PDF",
+    "description": "Convert PNG and JPEG images into a single PDF document.",
+    "keywords": [
+      "images",
+      "pdf",
+      "convert",
+      "png",
+      "jpeg"
+    ]
+  },
+  {
+    "slug": "pdf-metadata-viewer",
+    "category": "media",
+    "name": "PDF Metadata Viewer",
+    "description": "View PDF metadata, page sizes, and document properties.",
+    "keywords": [
+      "pdf",
+      "metadata",
+      "properties",
+      "info",
+      "inspect"
+    ]
+  },
+  {
+    "slug": "file-checksum",
+    "category": "media",
+    "name": "File Checksum",
+    "description": "Compute CRC32, MD5, SHA-1, SHA-256, SHA-512 checksums of any file.",
+    "keywords": [
+      "checksum",
+      "crc32",
+      "md5",
+      "sha256",
+      "hash",
+      "file"
+    ]
+  },
+  {
+    "slug": "file-signature-inspector",
+    "category": "media",
+    "name": "File Signature Inspector",
+    "description": "Identify file types by their magic bytes (hex signatures).",
+    "keywords": [
+      "file",
+      "signature",
+      "magic",
+      "bytes",
+      "identify"
+    ]
+  },
+  {
+    "slug": "image-metadata-viewer",
+    "category": "media",
+    "name": "Image Metadata Viewer",
+    "description": "Extract and view EXIF metadata from JPEG and TIFF images.",
+    "keywords": [
+      "image",
+      "exif",
+      "metadata",
+      "camera",
+      "gps"
+    ]
+  },
+  {
+    "slug": "font-accessibility-checker",
+    "category": "media",
+    "name": "Font Accessibility Checker",
+    "description": "Check font sizes, line height, and spacing against WCAG guidelines.",
+    "keywords": [
+      "font",
+      "accessibility",
+      "wcag",
+      "typography",
+      "readable"
+    ]
+  },
+  {
+    "slug": "png-to-webp",
+    "category": "media",
+    "name": "PNG to WebP",
+    "description": "Convert PNG images to WebP with adjustable quality and savings.",
+    "keywords": [
+      "png",
+      "webp",
+      "convert",
+      "image",
+      "compress"
+    ]
+  },
+  {
+    "slug": "token-counter",
+    "category": "misc",
+    "name": "Token Counter",
+    "description": "Estimate token counts for text (rough LLM tokenizer heuristic).",
+    "keywords": [
+      "token",
+      "count",
+      "llm",
+      "gpt",
+      "ai",
+      "cost"
+    ]
+  },
+  {
+    "slug": "ai-cost-calculator",
+    "category": "misc",
+    "name": "AI Cost Calculator",
+    "description": "Estimate LLM API costs across models for any usage volume.",
+    "keywords": [
+      "ai",
+      "cost",
+      "llm",
+      "api",
+      "gpt",
+      "pricing"
+    ]
+  },
+  {
+    "slug": "prompt-optimizer",
+    "category": "misc",
+    "name": "Prompt Optimizer",
+    "description": "Score and improve LLM prompts with actionable suggestions.",
+    "keywords": [
+      "prompt",
+      "optimize",
+      "llm",
+      "ai",
+      "improve"
+    ]
+  },
+  {
+    "slug": "prompt-variable-replacer",
+    "category": "misc",
+    "name": "Prompt Variable Replacer",
+    "description": "Fill {{variables}} in prompt templates with live preview.",
+    "keywords": [
+      "prompt",
+      "variable",
+      "template",
+      "replace",
+      "llm"
+    ]
+  },
+  {
+    "slug": "system-prompt-generator",
+    "category": "misc",
+    "name": "System Prompt Generator",
+    "description": "Build structured system prompts for LLMs with presets.",
+    "keywords": [
+      "system",
+      "prompt",
+      "llm",
+      "ai",
+      "generator"
+    ]
+  },
+  {
+    "slug": "ai-persona-generator",
+    "category": "misc",
+    "name": "AI Persona Generator",
+    "description": "Design detailed AI personas with traits and system prompts.",
+    "keywords": [
+      "ai",
+      "persona",
+      "character",
+      "llm",
+      "profile"
+    ]
+  },
+  {
+    "slug": "prompt-library",
+    "category": "misc",
+    "name": "Prompt Library",
+    "description": "Browse, save, and manage curated LLM prompts with import/export.",
+    "keywords": [
+      "prompt",
+      "library",
+      "collection",
+      "llm",
+      "save"
+    ]
+  },
+  {
+    "slug": "prompt-version-manager",
+    "category": "misc",
+    "name": "Prompt Version Manager",
+    "description": "Track prompt versions with diff, restore, and export.",
+    "keywords": [
+      "prompt",
+      "version",
+      "history",
+      "diff",
+      "restore"
+    ]
+  },
+  {
+    "slug": "ai-workflow-builder",
+    "category": "misc",
+    "name": "AI Workflow Builder",
+    "description": "Design multi-step AI workflows with a visual flow diagram.",
+    "keywords": [
+      "ai",
+      "workflow",
+      "pipeline",
+      "steps",
+      "design"
+    ]
+  }
+]

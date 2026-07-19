@@ -17,6 +17,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "https://fernandeslabs.com"
+  ),
   title: "Fernandes Labs — Free Online Tools",
   description:
     "A growing collection of fast, privacy-first tools for developers, designers, and marketers. JSON formatter, QR generator, password generator, and more. No sign-up. No tracking. Works offline.",
@@ -51,12 +54,35 @@ export const metadata: Metadata = {
       "Fast, privacy-first tools for developers, designers, and marketers. No sign-up. No tracking.",
     siteName: "Fernandes Labs",
     type: "website",
+    images: [
+      {
+        url: "/api/og",
+        width: 1200,
+        height: 630,
+        alt: "Fernandes Labs — Free Online Tools",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Fernandes Labs — Free Online Tools",
     description:
       "Fast, privacy-first tools for developers, designers, and marketers.",
+    images: ["/api/og"],
+  },
+  alternates: {
+    // Canonical for the hub — prevents duplicate-content issues.
+    canonical: "/",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
 };
 

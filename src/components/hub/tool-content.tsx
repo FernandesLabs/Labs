@@ -1,134 +1,40 @@
 'use client'
 
 import * as React from 'react'
-import { ChevronDown } from 'lucide-react'
+import Link from 'next/link'
+import { ChevronDown, Sparkles, Wrench, CheckCircle2 } from 'lucide-react'
 import type { Tool } from '@/lib/tools/types'
 import { CATEGORY_META } from '@/lib/tools/types'
+import {
+  generateToolFaq,
+  generateToolHowTo,
+  generateToolIntro,
+  generateToolTips,
+  generateToolUseCases,
+} from '@/app/tools/[slug]/tool-seo'
 
 /**
- * Generates SEO content for a tool page: an intro paragraph, a "how to use"
- * section, and an FAQ accordion. This text content is what Google needs to
- * rank the page — tools without body text rarely rank well.
+ * Generates SEO content for a tool page: an intro paragraph, "how to use"
+ * steps, "common use cases", "tips", and an FAQ accordion.
  *
- * Content is generated from the tool's metadata (name, description, category,
- * keywords) using templates, so every tool gets unique, relevant content
- * without manual writing.
+ * The same generators are used by the server component at
+ * `app/tools/[slug]/page.tsx` to produce FAQPage + HowTo JSON-LD, so the
+ * visible text and the structured data stay in sync.
  */
 
-interface FaqItem {
-  q: string
-  a: string
-}
-
-function generateIntro(tool: Tool): string {
-  const cat = CATEGORY_META[tool.category]
-  const kws = tool.keywords?.slice(0, 3).join(', ') || tool.name.toLowerCase()
-  return `The ${tool.name} is a free online ${cat.label.toLowerCase()} tool that ${tool.description.toLowerCase().replace(/\.$/, '')}. It runs entirely in your browser — no data is sent to any server, no sign-up is required, and it works offline once loaded. Whether you need to ${kws}, or related tasks, this tool provides a fast, privacy-first solution.`
-}
-
-function generateHowTo(tool: Tool): string[] {
-  const cat = tool.category
-  const steps: string[] = []
-
-  // Generic steps that apply to most tools
-  steps.push(
-    `Locate the primary input area at the top of the tool card. This is where you enter your data — text, a file, a URL, or numbers depending on the tool.`
-  )
-
-  if (cat === 'finance' || cat === 'developer' || cat === 'text') {
-    steps.push(
-      `Adjust any options below the input. Most tools offer toggles, sliders, or dropdowns to customize the output — try different settings to see live results update instantly.`
-    )
-  } else if (cat === 'media' || cat === 'network') {
-    steps.push(
-      `If the tool requires a file, click the upload area or drag-and-drop your file. For URL-based tools, paste a valid URL into the input field.`
-    )
-  } else {
-    steps.push(
-      `Configure the available options to customize the output. Most settings update the result live as you change them.`
-    )
-  }
-
-  steps.push(
-    `View the result in the output area below. Use the Copy button to copy the result to your clipboard, or the Download/Save button to save it as a file.`
-  )
-
-  steps.push(
-    `All processing happens client-side in your browser. Your data never leaves your device, making this tool safe for sensitive inputs like passwords, private keys, or personal documents.`
-  )
-
-  return steps
-}
-
-function generateFaq(tool: Tool): FaqItem[] {
-  const cat = CATEGORY_META[tool.category]
-  const kws = tool.keywords || []
-
-  const faqs: FaqItem[] = [
-    {
-      q: `Is the ${tool.name} free to use?`,
-      a: `Yes, completely free. There are no sign-ups, no hidden costs, and no usage limits. The tool is supported by ads (shown above and below the tool card).`,
-    },
-    {
-      q: `Is my data safe when using this tool?`,
-      a: `Absolutely. All processing happens entirely in your browser. Your input is never sent to any server, stored, or tracked. You can safely use this tool with sensitive data like passwords, private documents, or personal information. You can even use it offline once the page is loaded.`,
-    },
-    {
-      q: `Does the ${tool.name} work offline?`,
-      a: `Yes. Once the page has loaded, the tool runs entirely client-side. You can disconnect from the internet and continue using it. The site is also installable as a Progressive Web App (PWA) for offline access from your home screen.`,
-    },
-  ]
-
-  // Add tool-specific FAQs based on category
-  if (cat.label === 'Developer') {
-    faqs.push({
-      q: `Can I use the output in my code or production project?`,
-      a: `Yes. The output is standard ${kws[0] || 'code'} that you can copy directly into your projects. There are no restrictions on how you use the results.`,
-    })
-  } else if (cat.label === 'Finance') {
-    faqs.push({
-      q: `Are the calculations accurate?`,
-      a: `Yes, the calculations use standard, well-established formulas. However, this tool is for informational purposes only and should not replace professional financial advice for important decisions.`,
-    })
-  } else if (cat.label === 'Media') {
-    faqs.push({
-      q: `What file formats and sizes are supported?`,
-      a: `The tool supports common file formats related to ${kws[0] || 'the tool\'s purpose'}. There are no hard file size limits, but very large files (>100MB) may be slow to process depending on your device. All processing happens in your browser.`,
-    })
-  } else if (cat.label === 'SEO') {
-    faqs.push({
-      q: `Will using this tool improve my SEO?`,
-      a: `The tool helps you create or analyze ${kws[0] || 'SEO elements'} that can improve your search rankings. However, SEO depends on many factors — content quality, backlinks, site speed, and more. Use this tool as part of a broader SEO strategy.`,
-    })
-  } else if (cat.label === 'Security') {
-    faqs.push({
-      q: `Is it safe to generate passwords and security tokens here?`,
-      a: `Yes. All randomness is generated using the Web Crypto API (cryptographically secure), never Math.random(). Your generated values never leave your browser. This is safer than most online generators that may log or transmit your data.`,
-    })
-  } else if (cat.label === 'Network') {
-    faqs.push({
-      q: `Why do some network lookups fail?`,
-      a: `Network tools query external services (like DNS resolvers or IP databases). If a service is temporarily unavailable or rate-limits requests, the lookup may fail. Try again in a few moments. The tool itself is working correctly.`,
-    })
-  }
-
-  faqs.push({
-    q: `Can I use this tool on mobile?`,
-    a: `Yes. The tool is fully responsive and works on phones, tablets, and desktops. The layout adapts to your screen size, and all features are available on every device.`,
-  })
-
-  return faqs
-}
-
 export function ToolContent({ tool }: { tool: Tool }) {
-  const intro = React.useMemo(() => generateIntro(tool), [tool])
-  const howTo = React.useMemo(() => generateHowTo(tool), [tool])
-  const faqs = React.useMemo(() => generateFaq(tool), [tool])
+  const intro = React.useMemo(() => generateToolIntro(tool), [tool])
+  const howTo = React.useMemo(() => generateToolHowTo(tool), [tool])
+  const faqs = React.useMemo(() => generateToolFaq(tool), [tool])
+  const useCases = React.useMemo(() => generateToolUseCases(tool), [tool])
+  const tips = React.useMemo(() => generateToolTips(tool), [tool])
   const [openFaq, setOpenFaq] = React.useState<number | null>(0)
+
+  const cat = CATEGORY_META[tool.category]
 
   return (
     <div className="mt-12 space-y-8">
-      {/* Intro */}
+      {/* Intro (Priority 7 — longer, more specific) */}
       <section>
         <h2 className="mb-2 text-xl font-bold tracking-tight text-foreground">
           About the {tool.name}
@@ -155,6 +61,47 @@ export function ToolContent({ tool }: { tool: Tool }) {
             </li>
           ))}
         </ol>
+      </section>
+
+      {/* Common use cases (Priority 7) */}
+      <section>
+        <h2 className="mb-3 flex items-center gap-2 text-xl font-bold tracking-tight text-foreground">
+          <Sparkles className="size-5 text-primary" />
+          Common use cases
+        </h2>
+        <ul className="grid gap-2 sm:grid-cols-2">
+          {useCases.map((u, i) => (
+            <li
+              key={i}
+              className="flex items-start gap-2 rounded-lg border border-border/60 bg-card p-3 text-sm leading-relaxed text-muted-foreground"
+            >
+              <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-primary/80" />
+              <span>{u}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* Tips (Priority 7) */}
+      <section>
+        <h2 className="mb-3 flex items-center gap-2 text-xl font-bold tracking-tight text-foreground">
+          <Wrench className="size-5 text-primary" />
+          Tips
+        </h2>
+        <ul className="space-y-2">
+          {tips.map((t, i) => (
+            <li
+              key={i}
+              className="flex items-start gap-2 text-sm leading-relaxed text-muted-foreground"
+            >
+              <span
+                className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary/70"
+                aria-hidden="true"
+              />
+              <span>{t}</span>
+            </li>
+          ))}
+        </ul>
       </section>
 
       {/* FAQ */}
@@ -190,6 +137,35 @@ export function ToolContent({ tool }: { tool: Tool }) {
               ) : null}
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Internal linking footer (Priority 8) */}
+      <section className="rounded-xl border border-border/60 bg-muted/20 p-4">
+        <h2 className="mb-2 text-sm font-bold tracking-tight text-foreground">
+          Explore more {cat.label.toLowerCase()} tools
+        </h2>
+        <p className="mb-3 text-xs text-muted-foreground">
+          Browse the full collection of {cat.label.toLowerCase()} tools on the hub,
+          or jump back to all categories.
+        </p>
+        <div className="flex flex-wrap gap-2 text-xs">
+          <Link
+            href={`/#cat=${tool.category}`}
+            className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-background px-3 py-1 font-medium text-foreground transition hover:border-primary hover:text-primary"
+          >
+            <span
+              className="size-2 rounded-full"
+              style={{ backgroundColor: cat.color }}
+            />
+            All {cat.label} tools
+          </Link>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-background px-3 py-1 font-medium text-foreground transition hover:border-primary hover:text-primary"
+          >
+            All categories
+          </Link>
         </div>
       </section>
     </div>

@@ -1,66 +1,59 @@
 'use client'
 
 import * as React from 'react'
+import { useRouter } from 'next/navigation'
 import { SiteHeader } from '@/components/hub/site-header'
 import { SiteFooter } from '@/components/hub/site-footer'
 import { HubView } from '@/components/hub/hub-view'
-import { ToolView } from '@/components/hub/tool-view'
 import { CommandPalette } from '@/components/hub/command-palette'
 import { ShortcutsHelp } from '@/components/hub/shortcuts-help'
 import { BackToTop } from '@/components/hub/back-to-top'
-import { tools, toolsBySlug } from '@/lib/tools/registry'
-import { useToolHistory } from '@/lib/tools/use-tool-history'
+import { tools } from '@/lib/tools/registry'
 
-function parseHash(): string | null {
-  if (typeof window === 'undefined') return null
-  const h = window.location.hash.replace(/^#/, '')
-  const params = new URLSearchParams(h)
-  return params.get('tool')
-}
-
-function buildHash(slug: string): string {
-  return `#tool=${slug}`
-}
-
+/**
+ * Home page (the hub).
+ *
+ * After the path-based-routing migration (SEO Priority 1), the hub lives at
+ * `/` and individual tools live at `/tools/<slug>`. This component:
+ *   - Renders the hub with search, category filter, favorites, etc.
+ *   - Listens for legacy `#tool=<slug>` hash links (from old bookmarks /
+ *     search-console indexes) and 301-redirects them to `/tools/<slug>`.
+ *   - Listens for `#cat=<category>` (used by BreadcrumbList JSON-LD and the
+ *     related-tools section) and activates that category filter on the hub.
+ */
 export default function Home() {
-  const [activeSlug, setActiveSlug] = React.useState<string | null>(null)
+  const router = useRouter()
   const [paletteOpen, setPaletteOpen] = React.useState(false)
   const [helpOpen, setHelpOpen] = React.useState(false)
+  const [initialCategory, setInitialCategory] =
+    React.useState<`all` | `developer` | `text` | `finance` | `seo` | `security` | `network` | `media` | `misc` | null>(null)
   const searchRef = React.useRef<HTMLInputElement | null>(null)
-  const { recordUse, recent } = useToolHistory()
 
-  // Sync state with URL hash
+  // On mount, check for legacy `#tool=<slug>` and redirect to `/tools/<slug>`.
   React.useEffect(() => {
-    const sync = () => {
-      const slug = parseHash()
-      const next = slug && toolsBySlug.has(slug) ? slug : null
-      setActiveSlug(next)
-      if (next) recordUse(next)
-      window.scrollTo({ top: 0, behavior: 'auto' })
+    if (typeof window === 'undefined') return
+    const h = window.location.hash.replace(/^#/, '')
+    if (!h) return
+    const params = new URLSearchParams(h)
+    const toolSlug = params.get('tool')
+    if (toolSlug) {
+      // Legacy hash route → path route. Replace the URL so the back button
+      // doesn't bounce back to the hash.
+      router.replace(`/tools/${toolSlug}`)
+      return
     }
-    sync()
-    window.addEventListener('hashchange', sync)
-    return () => window.removeEventListener('hashchange', sync)
-  }, [recordUse])
-
-  const openTool = React.useCallback((slug: string) => {
-    window.location.hash = buildHash(slug)
-  }, [])
-
-  const goHome = React.useCallback(() => {
-    if (window.location.hash) {
-      history.pushState(
-        null,
-        '',
-        window.location.pathname + window.location.search
-      )
-      setActiveSlug(null)
-      window.scrollTo({ top: 0, behavior: 'auto' })
-    } else {
-      setActiveSlug(null)
-      window.scrollTo({ top: 0, behavior: 'auto' })
+    const cat = params.get('cat')
+    if (cat) {
+      setInitialCategory(cat as typeof initialCategory)
     }
-  }, [])
+  }, [router])
+
+  const openTool = React.useCallback(
+    (slug: string) => {
+      router.push(`/tools/${slug}`)
+    },
+    [router]
+  )
 
   // Global keyboard shortcuts
   React.useEffect(() => {
@@ -73,67 +66,50 @@ export default function Home() {
         tag === 'select' ||
         target?.isContentEditable
 
-      // Cmd/Ctrl+K — always open palette
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault()
         setPaletteOpen((v) => !v)
         return
       }
 
-      // ? — show help (when not typing)
       if (e.key === '?' && !isTyping) {
         e.preventDefault()
         setHelpOpen(true)
         return
       }
 
-      // Esc — close palette/help, or go home from a tool
       if (e.key === 'Escape') {
-        if (paletteOpen || helpOpen) return // dialog handles its own esc
-        if (activeSlug) {
-          e.preventDefault()
-          goHome()
+        if (paletteOpen || helpOpen) return
+        // On the hub, Esc clears focus (no back navigation needed)
+        if (document.activeElement instanceof HTMLElement) {
+          document.activeElement.blur()
         }
-        return
       }
 
-      // / — focus search (when not typing and on hub)
-      if (e.key === '/' && !isTyping && !activeSlug) {
+      if (e.key === '/' && !isTyping) {
         e.preventDefault()
         searchRef.current?.focus()
       }
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [activeSlug, paletteOpen, helpOpen, goHome])
-
-  const activeTool = activeSlug ? toolsBySlug.get(activeSlug) ?? null : null
+  }, [paletteOpen, helpOpen])
 
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader
-        onHome={goHome}
+        onHome={() => router.push('/')}
         toolCount={tools.length}
         onOpenPalette={() => setPaletteOpen(true)}
       />
-      {activeTool ? (
-        <ToolView
-          tool={activeTool}
-          tools={tools}
-          toolsBySlug={toolsBySlug}
-          recent={recent}
-          onBack={goHome}
-          onSelect={openTool}
-        />
-      ) : (
-        <HubView
-          tools={tools}
-          toolsBySlug={toolsBySlug}
-          onSelect={openTool}
-          searchRef={searchRef}
-          onOpenPalette={() => setPaletteOpen(true)}
-        />
-      )}
+      <HubView
+        tools={tools}
+        toolsBySlug={new Map(tools.map((t) => [t.slug, t]))}
+        onSelect={openTool}
+        searchRef={searchRef}
+        onOpenPalette={() => setPaletteOpen(true)}
+        initialCategory={initialCategory}
+      />
       <SiteFooter />
 
       <CommandPalette

@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import Link from 'next/link'
 import {
   ArrowLeft,
   ChevronRight,
@@ -11,16 +12,29 @@ import {
   Share2,
   Check,
   Link2,
+  Sparkles,
+  Wrench,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { AdPlaceholder } from '@/lib/tools/tool-ui'
 import { CATEGORY_META, type Tool } from '@/lib/tools/types'
 import { FavoriteButton } from './favorite-button'
-import { ToolJsonLd } from './tool-json-ld'
 import { FeedbackWidget } from './feedback-widget'
 import { ToolContent } from './tool-content'
 import { AffiliateLinks } from '@/components/ads/affiliate-links'
 
+/**
+ * Per-tool view (client-side).
+ *
+ * After the path-based-routing migration, this component is mounted by the
+ * server component at `app/tools/[slug]/page.tsx`. The server component
+ * handles metadata + JSON-LD; this component handles the interactive UI.
+ *
+ * Navigation:
+ *   - `onBack()` — go back to the hub (router.push('/'))
+ *   - `onSelect(slug)` — navigate to another tool (router.push('/tools/<slug>'))
+ *   - All "related tools" cards use Next.js `<Link>` (Priority 8 — internal linking)
+ */
 export function ToolView({
   tool,
   tools,
@@ -28,6 +42,7 @@ export function ToolView({
   recent,
   onBack,
   onSelect,
+  relatedTools,
 }: {
   tool: Tool
   tools: Tool[]
@@ -35,14 +50,16 @@ export function ToolView({
   recent: string[]
   onBack: () => void
   onSelect: (slug: string) => void
+  relatedTools?: Tool[]
 }) {
   const Component = tool.Component
   const cat = CATEGORY_META[tool.category]
 
-  // Related = same category, excluding current, excluding already-in-recent, max 4.
-  // Prefer tools not recently viewed for variety.
+  // Related tools passed in from the server (same category, excluding current).
+  // Falls back to a local computation if not provided (legacy callers).
   const recentSet = new Set(recent)
   const related = React.useMemo(() => {
+    if (relatedTools && relatedTools.length > 0) return relatedTools.slice(0, 6)
     return tools
       .filter(
         (t) =>
@@ -50,13 +67,13 @@ export function ToolView({
           t.slug !== tool.slug &&
           !recentSet.has(t.slug)
       )
-      .slice(0, 4)
-  }, [tools, tool.category, tool.slug, recentSet])
+      .slice(0, 6)
+  }, [tools, tool.category, tool.slug, recentSet, relatedTools])
 
   const [shareCopied, setShareCopied] = React.useState(false)
   const shareUrl = React.useMemo(() => {
     if (typeof window === 'undefined') return ''
-    return `${window.location.origin}/#tool=${tool.slug}`
+    return `${window.location.origin}/tools/${tool.slug}`
   }, [tool.slug])
 
   const handleShare = React.useCallback(async () => {
@@ -79,28 +96,31 @@ export function ToolView({
 
   return (
     <main className="flex-1">
-      {/* Breadcrumb */}
+      {/* Breadcrumb — visible HTML mirrors the BreadcrumbList JSON-LD (Priority 4). */}
       <div className="border-b border-border/60 bg-muted/20">
-        <div className="mx-auto flex max-w-4xl items-center gap-1.5 px-4 py-2.5 text-xs text-muted-foreground">
-          <button
-            type="button"
-            onClick={onBack}
+        <nav
+          aria-label="Breadcrumb"
+          className="mx-auto flex max-w-4xl items-center gap-1.5 px-4 py-2.5 text-xs text-muted-foreground"
+        >
+          <Link
+            href="/"
             className="inline-flex items-center gap-1 transition hover:text-foreground"
           >
             <Home className="size-3.5" />
             <span>Tools</span>
-          </button>
+          </Link>
           <ChevronRight className="size-3.5 text-muted-foreground/50" />
-          <button
-            type="button"
-            onClick={onBack}
+          <Link
+            href={`/#cat=${tool.category}`}
             className="capitalize transition hover:text-foreground"
           >
             {cat.label}
-          </button>
+          </Link>
           <ChevronRight className="size-3.5 text-muted-foreground/50" />
-          <span className="font-medium text-foreground">{tool.name}</span>
-        </div>
+          <span className="font-medium text-foreground" aria-current="page">
+            {tool.name}
+          </span>
+        </nav>
       </div>
 
       {/* Hero */}
@@ -188,7 +208,7 @@ export function ToolView({
           <AdPlaceholder slot="bottom" />
         </div>
 
-        {/* Related tools */}
+        {/* Related tools — internal linking (Priority 8). Uses <Link> for SEO. */}
         {related.length > 0 ? (
           <div className="mt-10 fl-fade-in">
             <div className="mb-3 flex items-center gap-2">
@@ -199,12 +219,12 @@ export function ToolView({
                 More in {cat.label}
               </h2>
             </div>
-            <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
               {related.map((t) => (
-                <button
+                <Link
                   key={t.slug}
-                  type="button"
-                  onClick={() => onSelect(t.slug)}
+                  href={`/tools/${t.slug}`}
+                  prefetch={false}
                   className="group flex flex-col gap-1 rounded-xl border border-border/80 bg-card p-3 text-left fl-card-hover"
                 >
                   <div className="flex items-center gap-2">
@@ -222,7 +242,7 @@ export function ToolView({
                   <p className="line-clamp-1 text-[11px] text-muted-foreground">
                     {t.description}
                   </p>
-                </button>
+                </Link>
               ))}
             </div>
           </div>
@@ -234,9 +254,6 @@ export function ToolView({
 
         <FeedbackWidget slug={tool.slug} />
       </section>
-
-      {/* SEO structured data */}
-      <ToolJsonLd tool={tool} />
     </main>
   )
 }
