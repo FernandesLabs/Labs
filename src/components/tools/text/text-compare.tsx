@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { CheckCircle2, Eraser } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -9,17 +8,14 @@ import { Label } from '@/components/ui/label'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 interface DiffToken {
   type: 'common' | 'removed' | 'added'
   value: string
 }
-
 interface CompareOptions {
   ignoreCase: boolean
   ignoreWhitespace: boolean
 }
-
 function tokenize(text: string, ignoreWhitespace: boolean): string[] {
   const normalized = text.replace(/\r\n?/g, '\n')
   if (ignoreWhitespace) {
@@ -40,11 +36,9 @@ function tokenize(text: string, ignoreWhitespace: boolean): string[] {
   }
   return tokens
 }
-
 function normalizeForCompare(token: string, opts: CompareOptions): string {
   return opts.ignoreCase ? token.toLowerCase() : token
 }
-
 function buildLcsTable(a: string[], b: string[]): number[][] {
   const m = a.length
   const n = b.length
@@ -60,7 +54,6 @@ function buildLcsTable(a: string[], b: string[]): number[][] {
   }
   return dp
 }
-
 function diffTokens(
   aOrig: string[],
   bOrig: string[],
@@ -97,11 +90,9 @@ function diffTokens(
   }
   return result
 }
-
 function isWhitespaceToken(t: string): boolean {
   return t === '\n'
 }
-
 export default function TextCompare(): React.JSX.Element {
   const [textA, setTextA] = React.useState<string>(
     'The quick brown fox\njumps over the lazy dog.\nA classic pangram.'
@@ -111,9 +102,7 @@ export default function TextCompare(): React.JSX.Element {
   )
   const [ignoreCase, setIgnoreCase] = React.useState<boolean>(false)
   const [ignoreWhitespace, setIgnoreWhitespace] = React.useState<boolean>(false)
-
   const opts: CompareOptions = { ignoreCase, ignoreWhitespace }
-
   const { diff, stats } = React.useMemo(() => {
     const aTokens = tokenize(textA, ignoreWhitespace)
     const bTokens = tokenize(textB, ignoreWhitespace)
@@ -137,10 +126,8 @@ export default function TextCompare(): React.JSX.Element {
       },
     }
   }, [textA, textB, ignoreCase, ignoreWhitespace])
-
   const identical =
     stats.added === 0 && stats.removed === 0 && textA !== '' && textB !== ''
-
   return (
     <div className="space-y-5">
       <div className="grid gap-4 lg:grid-cols-2">
@@ -163,7 +150,6 @@ export default function TextCompare(): React.JSX.Element {
           />
         </Field>
       </div>
-
       <div className="flex flex-wrap items-center gap-6 rounded-lg border border-border bg-muted/20 p-3">
         <div className="flex items-center gap-2">
           <Switch
@@ -199,7 +185,6 @@ export default function TextCompare(): React.JSX.Element {
           Clear
         </Button>
       </div>
-
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         <Stat label="Words in A" value={stats.aCount} />
         <Stat label="Words in B" value={stats.bCount} />
@@ -207,7 +192,6 @@ export default function TextCompare(): React.JSX.Element {
         <Stat label="Added" value={stats.added} accent="oklch(0.6 0.17 150)" />
         <Stat label="Removed" value={stats.removed} accent="oklch(0.6 0.2 25)" />
       </div>
-
       {identical ? (
         <div
           role="status"
@@ -219,7 +203,6 @@ export default function TextCompare(): React.JSX.Element {
           {ignoreWhitespace ? ' (whitespace ignored)' : ''}.
         </div>
       ) : null}
-
       <div>
         <div className="mb-2 flex items-center justify-between">
           <h3 className="text-sm font-medium text-foreground">Word-level diff</h3>

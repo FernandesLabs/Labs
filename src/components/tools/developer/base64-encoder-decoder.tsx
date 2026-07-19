@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Eraser, ArrowDownUp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -15,7 +14,6 @@ import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Field, ResultBox, Stat } from '@/lib/tools/tool-ui'
 import { toast } from 'sonner'
-
 /** UTF-8 safe base64 encode. */
 function encodeBase64(text: string): string {
   const bytes = new TextEncoder().encode(text)
@@ -26,7 +24,6 @@ function encodeBase64(text: string): string {
   }
   return btoa(binary)
 }
-
 /** UTF-8 safe base64 decode. Validates alphabet + padding. */
 function decodeBase64(b64: string): string {
   const cleaned = b64.replace(/\s+/g, '')
@@ -41,7 +38,6 @@ function decodeBase64(b64: string): string {
   for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i)
   return new TextDecoder('utf-8', { fatal: false }).decode(bytes)
 }
-
 export default function Base64EncoderDecoder() {
   const [mode, setMode] = React.useState<'encode' | 'decode'>('encode')
   const [encodeIn, setEncodeIn] = React.useState('Hello, Fernandes Labs! 🚀')
@@ -49,7 +45,6 @@ export default function Base64EncoderDecoder() {
   const [output, setOutput] = React.useState('')
   const [error, setError] = React.useState<string | null>(null)
   const [urlSafe, setUrlSafe] = React.useState(false)
-
   React.useEffect(() => {
     setError(null)
     setOutput('')
@@ -76,7 +71,6 @@ export default function Base64EncoderDecoder() {
       if (mode === 'decode') toast.error('Invalid Base64 input')
     }
   }, [mode, encodeIn, decodeIn, urlSafe])
-
   const swap = () => {
     if (mode === 'encode') {
       if (output) {
@@ -90,7 +84,6 @@ export default function Base64EncoderDecoder() {
       }
     }
   }
-
   return (
     <div className="space-y-5">
       <Tabs value={mode} onValueChange={(v) => setMode(v as 'encode' | 'decode')}>
@@ -98,7 +91,6 @@ export default function Base64EncoderDecoder() {
           <TabsTrigger value="encode">Encode</TabsTrigger>
           <TabsTrigger value="decode">Decode</TabsTrigger>
         </TabsList>
-
         <TabsContent value="encode" className="space-y-5">
           <Field label="Plain text input" htmlFor="enc-input" hint="UTF-8 supported">
             <Textarea
@@ -118,7 +110,6 @@ export default function Base64EncoderDecoder() {
             </Button>
           </div>
         </TabsContent>
-
         <TabsContent value="decode" className="space-y-5">
           <Field label="Base64 input" htmlFor="dec-input" hint="Standard or URL-safe">
             <Textarea
@@ -139,7 +130,6 @@ export default function Base64EncoderDecoder() {
           </div>
         </TabsContent>
       </Tabs>
-
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-muted/30 p-3">
         <div className="flex items-center gap-2">
           <Switch
@@ -164,7 +154,6 @@ export default function Base64EncoderDecoder() {
           Use output as input
         </Button>
       </div>
-
       {error ? (
         <Alert variant="destructive">
           <AlertDescription className="font-mono text-xs">
@@ -172,7 +161,6 @@ export default function Base64EncoderDecoder() {
           </AlertDescription>
         </Alert>
       ) : null}
-
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         <Stat
           label="Mode"
@@ -186,7 +174,6 @@ export default function Base64EncoderDecoder() {
         />
         <Stat label="Output bytes" value={new Blob([output]).size} />
       </div>
-
       <ResultBox
         value={output}
         label={mode === 'encode' ? 'Base64 output' : 'Decoded text'}

@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import {
   Dialog,
@@ -8,7 +7,6 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog'
-
 const SHORTCUTS: { keys: string[]; label: string }[] = [
   { keys: ['⌘', 'K'], label: 'Open command palette' },
   { keys: ['/'], label: 'Focus tool search' },
@@ -16,7 +14,6 @@ const SHORTCUTS: { keys: string[]; label: string }[] = [
   { keys: ['G'], label: 'Regenerate (in password tools)' },
   { keys: ['?'], label: 'Show this help' },
 ]
-
 export function ShortcutsHelp({
   open,
   onOpenChange,

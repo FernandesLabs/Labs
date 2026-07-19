@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { RefreshCw, Copy, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -15,15 +14,12 @@ import { Badge } from '@/components/ui/badge'
 import { Field, randomInt, downloadBlob } from '@/lib/tools/tool-ui'
 import { useCopy } from '@/lib/tools/use-copy'
 import { toast } from 'sonner'
-
 type Category = 'motivation' | 'wisdom' | 'success' | 'life'
-
 interface Quote {
   text: string
   author: string
   category: Category
 }
-
 const QUOTES: Quote[] = [
   { text: 'The only way to do great work is to love what you do.', author: 'Steve Jobs', category: 'motivation' },
   { text: 'Success is not final, failure is not fatal: it is the courage to continue that counts.', author: 'Winston Churchill', category: 'motivation' },
@@ -57,7 +53,6 @@ const QUOTES: Quote[] = [
   { text: 'You only live once, but if you do it right, once is enough.', author: 'Mae West', category: 'life' },
   { text: 'Life is 10% what happens to me and 90% how I react to it.', author: 'Charles R. Swindoll', category: 'life' },
 ]
-
 const CATEGORY_FILTERS: { value: Category | 'all'; label: string }[] = [
   { value: 'all', label: 'All categories' },
   { value: 'motivation', label: 'Motivation' },
@@ -65,14 +60,12 @@ const CATEGORY_FILTERS: { value: Category | 'all'; label: string }[] = [
   { value: 'success', label: 'Success' },
   { value: 'life', label: 'Life' },
 ]
-
 const CATEGORY_LABEL: Record<Category, string> = {
   motivation: 'Motivation',
   wisdom: 'Wisdom',
   success: 'Success',
   life: 'Life',
 }
-
 /** Strip HTML entities that we used to keep the source readable as JSX text. */
 function cleanText(s: string): string {
   return s
@@ -81,7 +74,6 @@ function cleanText(s: string): string {
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
 }
-
 function wrapText(
   ctx: CanvasRenderingContext2D,
   text: string,
@@ -102,7 +94,6 @@ function wrapText(
   if (line) lines.push(line)
   return lines
 }
-
 /**
  * Quote Generator
  * Hardcoded ~30 inspirational quotes across four categories. Generate picks
@@ -113,20 +104,16 @@ export default function QuoteGenerator() {
   const [category, setCategory] = React.useState<Category | 'all'>('all')
   const [index, setIndex] = React.useState(0)
   const { copy } = useCopy()
-
   const pool = React.useMemo(() => {
     if (category === 'all') return QUOTES
     return QUOTES.filter((q) => q.category === category)
   }, [category])
-
   // Keep index in range when the pool changes.
   React.useEffect(() => {
     if (pool.length === 0) return
     setIndex((prev) => prev % pool.length)
   }, [pool.length])
-
   const quote = pool.length > 0 ? pool[index % pool.length] : null
-
   const generate = () => {
     if (pool.length === 0) {
       toast.error('No quotes available in this category')
@@ -146,12 +133,10 @@ export default function QuoteGenerator() {
     }
     setIndex(next)
   }
-
   const copyQuote = () => {
     if (!quote) return
     copy(`"${cleanText(quote.text)}" — ${quote.author}`, 'Quote copied')
   }
-
   const downloadImage = () => {
     if (!quote) return
     const canvas = document.createElement('canvas')
@@ -162,7 +147,6 @@ export default function QuoteGenerator() {
       toast.error('Canvas not supported in this browser')
       return
     }
-
     // Warm gradient — no blue/indigo per project styling rules.
     const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height)
     grad.addColorStop(0, '#134e4a')
@@ -170,13 +154,11 @@ export default function QuoteGenerator() {
     grad.addColorStop(1, '#7c2d12')
     ctx.fillStyle = grad
     ctx.fillRect(0, 0, canvas.width, canvas.height)
-
     // Decorative quote mark.
     ctx.fillStyle = 'rgba(255,255,255,0.18)'
     ctx.font = 'bold 280px Georgia, serif'
     ctx.textBaseline = 'top'
     ctx.fillText('\u201C', 90, 60)
-
     // Quote text.
     const text = cleanText(quote.text)
     const maxWidth = canvas.width - 200
@@ -190,14 +172,12 @@ export default function QuoteGenerator() {
     lines.forEach((ln, i) => {
       ctx.fillText(ln, 100, startY + i * lineHeight)
     })
-
     // Author.
     ctx.font = 'italic 34px Georgia, serif'
     ctx.fillStyle = 'rgba(255,255,255,0.85)'
     ctx.textAlign = 'right'
     ctx.fillText(`— ${quote.author}`, canvas.width - 100, startY + totalHeight + 60)
     ctx.textAlign = 'left'
-
     canvas.toBlob((blob) => {
       if (!blob) {
         toast.error('Could not render quote image')
@@ -207,7 +187,6 @@ export default function QuoteGenerator() {
       toast.success('Quote image downloaded')
     }, 'image/png')
   }
-
   return (
     <div className="space-y-5">
       <Card>
@@ -229,7 +208,6 @@ export default function QuoteGenerator() {
               </SelectContent>
             </Select>
           </Field>
-
           {quote ? (
             <div
               className="relative overflow-hidden rounded-xl border border-border p-8 sm:p-12"
@@ -264,7 +242,6 @@ export default function QuoteGenerator() {
               No quotes match this filter.
             </div>
           )}
-
           <div className="flex flex-wrap gap-2">
             <Button
               onClick={generate}
@@ -293,7 +270,6 @@ export default function QuoteGenerator() {
           </div>
         </CardContent>
       </Card>
-
       <p className="text-xs text-muted-foreground">
         Showing quote{' '}
         <span className="font-mono">{quote ? index % pool.length + 1 : 0}</span>{' '}

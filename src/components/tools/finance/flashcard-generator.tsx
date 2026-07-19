@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import {
   Plus,
@@ -18,19 +17,16 @@ import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Field, downloadBlob } from '@/lib/tools/tool-ui'
 import { toast } from 'sonner'
-
 interface Flashcard {
   id: number
   front: string
   back: string
 }
-
 let _nextId = 3
 function nextId(): number {
   _nextId += 1
   return _nextId
 }
-
 /**
  * Flashcard Generator
  * Dynamic card list (front / back). Two tabs: Editor (manage cards) and
@@ -46,39 +42,31 @@ export default function FlashcardGenerator() {
   const [studyIndex, setStudyIndex] = React.useState(0)
   const [flipped, setFlipped] = React.useState(false)
   const fileInputRef = React.useRef<HTMLInputElement>(null)
-
   const add = () =>
     setCards((prev) => [...prev, { id: nextId(), front: '', back: '' }])
-
   const remove = (id: number) =>
     setCards((prev) => prev.filter((c) => c.id !== id))
-
   const update = (id: number, patch: Partial<Flashcard>) =>
     setCards((prev) =>
       prev.map((c) => (c.id === id ? { ...c, ...patch } : c)),
     )
-
   const safeStudyIndex =
     cards.length === 0 ? 0 : Math.min(studyIndex, cards.length - 1)
   const current = cards.length > 0 ? cards[safeStudyIndex] : null
-
   const goNext = () => {
     if (cards.length === 0) return
     setFlipped(false)
     setStudyIndex((i) => (i + 1) % cards.length)
   }
-
   const goPrev = () => {
     if (cards.length === 0) return
     setFlipped(false)
     setStudyIndex((i) => (i - 1 + cards.length) % cards.length)
   }
-
   const flip = () => {
     if (cards.length === 0) return
     setFlipped((f) => !f)
   }
-
   const exportJson = () => {
     if (cards.length === 0) {
       toast.error('Nothing to export — your deck is empty')
@@ -95,7 +83,6 @@ export default function FlashcardGenerator() {
     )
     toast.success(`Exported ${cards.length} card${cards.length === 1 ? '' : 's'}`)
   }
-
   const importJson = (file: File) => {
     const reader = new FileReader()
     reader.onload = () => {
@@ -133,7 +120,6 @@ export default function FlashcardGenerator() {
     reader.onerror = () => toast.error('Could not read file')
     reader.readAsText(file)
   }
-
   return (
     <div className="space-y-5">
       <Tabs
@@ -144,7 +130,6 @@ export default function FlashcardGenerator() {
           <TabsTrigger value="editor">Editor</TabsTrigger>
           <TabsTrigger value="study">Study</TabsTrigger>
         </TabsList>
-
         <TabsContent value="editor" className="space-y-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between gap-3">
@@ -247,7 +232,6 @@ export default function FlashcardGenerator() {
             </CardContent>
           </Card>
         </TabsContent>
-
         <TabsContent value="study" className="space-y-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between gap-3">
@@ -285,7 +269,6 @@ export default function FlashcardGenerator() {
                   import a JSON file.
                 </div>
               )}
-
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <Button
                   variant="outline"

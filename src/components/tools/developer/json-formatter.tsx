@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Eraser, Maximize2, Minimize2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -20,9 +19,7 @@ import {
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Field, ResultBox, Stat } from '@/lib/tools/tool-ui'
 import { toast } from 'sonner'
-
 const SAMPLE = `{"name":"Fernandes Labs","tools":["json","yaml","xml"],"version":1,"open":true,"nested":{"a":1,"b":2,"list":[1,2,3]}}`
-
 export default function JsonFormatter() {
   const [input, setInput] = React.useState(SAMPLE)
   const [indent, setIndent] = React.useState<string>('2')
@@ -31,12 +28,10 @@ export default function JsonFormatter() {
   const [error, setError] = React.useState<string | null>(null)
   const [inBytes, setInBytes] = React.useState(0)
   const [outBytes, setOutBytes] = React.useState(0)
-
   const indentArg = React.useMemo<string | number>(() => {
     if (indent === 'tab') return '\t'
     return Number(indent)
   }, [indent])
-
   React.useEffect(() => {
     if (!input.trim()) {
       setError(null)
@@ -63,11 +58,9 @@ export default function JsonFormatter() {
       setOutBytes(0)
     }
   }, [input, indentArg, tab])
-
   const onCopy = () => {
     if (output) toast.success('Formatted JSON copied')
   }
-
   return (
     <div className="space-y-5">
       <Tabs value={tab} onValueChange={(v) => setTab(v as 'format' | 'minify')}>
@@ -81,7 +74,6 @@ export default function JsonFormatter() {
             Minify
           </TabsTrigger>
         </TabsList>
-
         <TabsContent value="format" className="space-y-5">
           <Field
             label="Indentation"
@@ -100,14 +92,12 @@ export default function JsonFormatter() {
             </Select>
           </Field>
         </TabsContent>
-
         <TabsContent value="minify" className="space-y-5">
           <p className="text-xs text-muted-foreground">
             All whitespace will be collapsed and the JSON packed into a single line.
           </p>
         </TabsContent>
       </Tabs>
-
       <Field label="Input JSON" htmlFor="json-input" hint={`${inBytes} bytes`}>
         <Textarea
           id="json-input"
@@ -119,7 +109,6 @@ export default function JsonFormatter() {
           placeholder='{"key": "value"}'
         />
       </Field>
-
       <div className="flex flex-wrap items-center gap-2">
         <Button
           variant="outline"
@@ -149,7 +138,6 @@ export default function JsonFormatter() {
           Copy result
         </Button>
       </div>
-
       {error ? (
         <Alert variant="destructive">
           <AlertDescription className="font-mono text-xs">
@@ -157,7 +145,6 @@ export default function JsonFormatter() {
           </AlertDescription>
         </Alert>
       ) : null}
-
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat label="Input size" value={`${inBytes} B`} />
         <Stat label="Output size" value={`${outBytes} B`} />
@@ -170,7 +157,6 @@ export default function JsonFormatter() {
           value={inBytes > 0 ? `${Math.round((1 - outBytes / inBytes) * 100)}%` : '—'}
         />
       </div>
-
       <ResultBox
         value={output}
         label={tab === 'format' ? 'Formatted JSON' : 'Minified JSON'}

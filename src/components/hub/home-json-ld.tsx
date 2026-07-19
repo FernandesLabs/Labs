@@ -1,7 +1,6 @@
 import { siteConfig } from '@/lib/site-config'
 import { toolMetaList } from '@/lib/tools/tool-meta'
 import { CATEGORY_META, CATEGORY_ORDER } from '@/lib/tools/types'
-
 /**
  * Home-page structured data (Server Component).
  *
@@ -14,7 +13,6 @@ import { CATEGORY_META, CATEGORY_ORDER } from '@/lib/tools/types'
 export function HomeJsonLd() {
   const baseUrl = siteConfig.site.url
   const logoUrl = `${baseUrl}/fl-logo.svg`
-
   const jsonLd = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -73,7 +71,6 @@ export function HomeJsonLd() {
       },
     ],
   }
-
   return (
     <script
       type="application/ld+json"

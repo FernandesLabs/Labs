@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { ImageOff, Globe, ExternalLink } from 'lucide-react'
 import { Input } from '@/components/ui/input'
@@ -14,7 +13,6 @@ import {
 } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Field, ResultBox, Stat } from '@/lib/tools/tool-ui'
-
 function esc(value: string): string {
   return value
     .replace(/&/g, '&amp;')
@@ -22,7 +20,6 @@ function esc(value: string): string {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
 }
-
 function hostOf(url: string): string {
   if (!url) return ''
   try {
@@ -31,7 +28,6 @@ function hostOf(url: string): string {
     return url.trim()
   }
 }
-
 function SocialCard({
   title,
   description,
@@ -49,7 +45,6 @@ function SocialCard({
   React.useEffect(() => {
     setImgError(false)
   }, [image])
-
   const hostname = hostOf(url) || siteName || 'example.com'
   return (
     <div className="overflow-hidden rounded-lg border border-border bg-background shadow-sm">
@@ -87,14 +82,12 @@ function SocialCard({
     </div>
   )
 }
-
 export default function OpenGraphPreview(): React.JSX.Element {
   const [title, setTitle] = React.useState('')
   const [description, setDescription] = React.useState('')
   const [image, setImage] = React.useState('')
   const [siteName, setSiteName] = React.useState('')
   const [url, setUrl] = React.useState('')
-
   const ogTags = React.useMemo(() => {
     const lines: string[] = ['<!-- Open Graph meta tags -->']
     if (title) lines.push(`<meta property="og:title" content="${esc(title)}" />`)
@@ -111,10 +104,8 @@ export default function OpenGraphPreview(): React.JSX.Element {
     lines.push('<meta property="og:type" content="website" />')
     return lines.join('\n')
   }, [title, description, image, url, siteName])
-
   const titlePx = title.length * 11
   const descLen = description.length
-
   return (
     <div className="space-y-5">
       <Card>
@@ -180,7 +171,6 @@ export default function OpenGraphPreview(): React.JSX.Element {
           </div>
         </CardContent>
       </Card>
-
       <div>
         <h3 className="mb-2 text-sm font-medium text-foreground">
           Social card preview
@@ -200,7 +190,6 @@ export default function OpenGraphPreview(): React.JSX.Element {
           Renders at 1.91:1 (1200×630 recommended) for most platforms.
         </p>
       </div>
-
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat label="Title length" value={title.length} />
         <Stat label="Title ~px" value={titlePx} />
@@ -211,7 +200,6 @@ export default function OpenGraphPreview(): React.JSX.Element {
           accent={image ? 'oklch(0.6 0.17 150)' : 'oklch(0.6 0.2 25)'}
         />
       </div>
-
       <ResultBox
         value={ogTags}
         label="OG meta tags"

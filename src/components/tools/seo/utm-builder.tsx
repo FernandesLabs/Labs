@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { ExternalLink, Wand2, AlertTriangle, CheckCircle2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -14,7 +13,6 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'
 import { Field, ResultBox, Stat } from '@/lib/tools/tool-ui'
-
 interface UtmState {
   baseUrl: string
   source: string
@@ -23,7 +21,6 @@ interface UtmState {
   term: string
   content: string
 }
-
 const EMPTY: UtmState = {
   baseUrl: 'https://example.com/blog/summer-sale',
   source: '',
@@ -32,12 +29,10 @@ const EMPTY: UtmState = {
   term: '',
   content: '',
 }
-
 interface Preset {
   label: string
   values: Pick<UtmState, 'source' | 'medium' | 'campaign'>
 }
-
 const PRESETS: Preset[] = [
   {
     label: 'Newsletter / email / summer2024',
@@ -60,7 +55,6 @@ const PRESETS: Preset[] = [
     values: { source: 'github', medium: 'referral', campaign: 'oss_boost' },
   },
 ]
-
 function isValidUrl(url: string): boolean {
   if (!url) return false
   try {
@@ -70,7 +64,6 @@ function isValidUrl(url: string): boolean {
     return false
   }
 }
-
 function buildTaggedUrl(state: UtmState): string {
   const base = state.baseUrl.trim()
   if (!isValidUrl(base)) return ''
@@ -96,14 +89,11 @@ function buildTaggedUrl(state: UtmState): string {
     return `${base}${base.includes('?') ? '&' : '?'}${qs}`
   }
 }
-
 export default function UtmBuilder(): React.JSX.Element {
   const [state, setState] = React.useState<UtmState>(EMPTY)
-
   const update = <K extends keyof UtmState>(key: K, value: string): void => {
     setState((prev) => ({ ...prev, [key]: value }))
   }
-
   const taggedUrl = React.useMemo(() => buildTaggedUrl(state), [state])
   const baseUrlValid = isValidUrl(state.baseUrl.trim())
   const requiredMissing =
@@ -115,17 +105,14 @@ export default function UtmBuilder(): React.JSX.Element {
     state.term,
     state.content,
   ].filter((v) => v.trim().length > 0).length
-
   const applyPreset = (preset: Preset): void => {
     setState((prev) => ({ ...prev, ...preset.values }))
     toast.success(`Preset applied: ${preset.label}`)
   }
-
   const reset = (): void => {
     setState(EMPTY)
     toast.success('Cleared all fields')
   }
-
   return (
     <div className="space-y-5">
       <Card>
@@ -156,7 +143,6 @@ export default function UtmBuilder(): React.JSX.Element {
               className={!baseUrlValid ? 'border-rose-500/60' : ''}
             />
           </Field>
-
           <div className="grid gap-4 sm:grid-cols-2">
             <Field
               label="utm_source *"
@@ -234,7 +220,6 @@ export default function UtmBuilder(): React.JSX.Element {
               />
             </Field>
           </div>
-
           <div className="space-y-2">
             <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
               Quick presets
@@ -264,7 +249,6 @@ export default function UtmBuilder(): React.JSX.Element {
           </div>
         </CardContent>
       </Card>
-
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat label="Tags applied" value={tagCount} />
         <Stat
@@ -279,7 +263,6 @@ export default function UtmBuilder(): React.JSX.Element {
         />
         <Stat label="Final URL length" value={taggedUrl.length} />
       </div>
-
       {!baseUrlValid ? (
         <div className="flex items-center gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-amber-700 dark:text-amber-400">
           <AlertTriangle className="size-4" />
@@ -305,7 +288,6 @@ export default function UtmBuilder(): React.JSX.Element {
           Tagged URL is ready to use.
         </div>
       )}
-
       <ResultBox
         value={taggedUrl}
         label="Tagged URL"
@@ -313,7 +295,6 @@ export default function UtmBuilder(): React.JSX.Element {
         downloadName="tagged-url.txt"
         empty="Fill in the base URL and required UTM parameters to generate the tagged URL."
       />
-
       {taggedUrl ? (
         <div className="flex flex-wrap gap-2">
           <Button asChild type="button" variant="outline" size="sm">

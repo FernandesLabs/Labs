@@ -1,8 +1,6 @@
 'use client'
-
 import * as React from 'react'
 import { ThumbsUp, ThumbsDown, Check } from 'lucide-react'
-
 /**
  * A lightweight "Did this tool help?" feedback widget.
  * Stores feedback in localStorage (per-tool, one vote per tool).
@@ -11,7 +9,6 @@ import { ThumbsUp, ThumbsDown, Check } from 'lucide-react'
 export function FeedbackWidget({ slug }: { slug: string }) {
   const [vote, setVote] = React.useState<'up' | 'down' | null>(null)
   const storageKey = `fl-feedback-${slug}`
-
   React.useEffect(() => {
     try {
       const stored = localStorage.getItem(storageKey)
@@ -20,7 +17,6 @@ export function FeedbackWidget({ slug }: { slug: string }) {
       /* private mode */
     }
   }, [storageKey])
-
   const record = (v: 'up' | 'down') => {
     const next = vote === v ? null : v
     setVote(next)
@@ -31,7 +27,6 @@ export function FeedbackWidget({ slug }: { slug: string }) {
       /* ignore */
     }
   }
-
   return (
     <div className="mt-8 flex flex-col items-center gap-2 rounded-xl border border-border/60 bg-muted/20 p-4 text-center">
       <p className="text-xs font-medium text-muted-foreground">

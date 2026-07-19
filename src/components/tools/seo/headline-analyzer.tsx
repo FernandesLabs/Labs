@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { CheckCircle2, AlertTriangle, Lightbulb } from 'lucide-react'
 import { Input } from '@/components/ui/input'
@@ -14,7 +13,6 @@ import { Progress } from '@/components/ui/progress'
 import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 const POWER_WORDS = new Set<string>([
   'you',
   'free',
@@ -48,7 +46,6 @@ const POWER_WORDS = new Set<string>([
   'avoid',
   'mistakes',
 ])
-
 const EMOTIONAL_WORDS = new Set<string>([
   'amazing',
   'incredible',
@@ -71,7 +68,6 @@ const EMOTIONAL_WORDS = new Set<string>([
   'devastated',
   'passionate',
 ])
-
 interface Analysis {
   score: number
   length: number
@@ -83,7 +79,6 @@ interface Analysis {
   emotionalWords: string[]
   suggestions: string[]
 }
-
 function analyze(headline: string): Analysis {
   const length = headline.length
   const words = headline
@@ -101,31 +96,25 @@ function analyze(headline: string): Analysis {
     }
   }
   const hasNumber = /\d/.test(headline)
-
   // Length score (ideal 50-60)
   let lengthScore = 0
   if (length >= 50 && length <= 60) lengthScore = 25
   else if (length >= 40 && length <= 70) lengthScore = 18
   else if (length >= 30 && length <= 80) lengthScore = 12
   else if (length > 0) lengthScore = 6
-
   // Word count score (ideal 6-12)
   let wordScore = 0
   if (wordCount >= 6 && wordCount <= 12) wordScore = 25
   else if (wordCount >= 4 && wordCount <= 14) wordScore = 18
   else if (wordCount > 0) wordScore = 10
-
   // Power words (max 25)
   const powerScore = Math.min(25, powerWords.length * 8)
-
   // Emotional + number (max 25)
   let extraScore = 0
   if (emotionalWords.length > 0) extraScore += 10
   if (hasNumber) extraScore += 15
   extraScore = Math.min(25, extraScore)
-
   const score = lengthScore + wordScore + powerScore + extraScore
-
   const suggestions: string[] = []
   if (length === 0) suggestions.push('Enter a headline to analyze.')
   if (length > 0 && length < 50) {
@@ -152,7 +141,6 @@ function analyze(headline: string): Analysis {
   if (suggestions.length === 0 && wordCount > 0) {
     suggestions.push('Great headline — all key signals are present.')
   }
-
   return {
     score: wordCount === 0 ? 0 : score,
     length,
@@ -165,24 +153,19 @@ function analyze(headline: string): Analysis {
     suggestions,
   }
 }
-
 function scoreColor(score: number): string {
   if (score >= 70) return 'oklch(0.6 0.17 150)'
   if (score >= 40) return 'oklch(0.72 0.16 75)'
   return 'oklch(0.6 0.2 25)'
 }
-
 function scoreLabel(score: number): string {
   if (score >= 70) return 'Strong'
   if (score >= 40) return 'OK'
   return 'Weak'
 }
-
 export default function HeadlineAnalyzer(): React.JSX.Element {
   const [headline, setHeadline] = React.useState('')
-
   const a = React.useMemo(() => analyze(headline), [headline])
-
   return (
     <div className="space-y-5">
       <Card>
@@ -204,7 +187,6 @@ export default function HeadlineAnalyzer(): React.JSX.Element {
           </Field>
         </CardContent>
       </Card>
-
       <Card>
         <CardContent className="space-y-4 p-4">
           <div className="flex items-baseline justify-between gap-2">
@@ -280,7 +262,6 @@ export default function HeadlineAnalyzer(): React.JSX.Element {
           )}
         </CardContent>
       </Card>
-
       <div>
         <h3 className="mb-2 flex items-center gap-1.5 text-sm font-medium text-foreground">
           <Lightbulb className="size-4" />

@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -14,16 +13,13 @@ import {
 } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { Field, ResultBox, Stat } from '@/lib/tools/tool-ui'
-
 type Separator = 'dash' | 'slash' | 'underscore' | 'none'
-
 const SEP_CHAR: Record<Separator, string> = {
   dash: '-',
   slash: '/',
   underscore: '_',
   none: '',
 }
-
 function parseNum(value: string): number {
   if (value == null) return NaN
   const trimmed = value.trim()
@@ -31,7 +27,6 @@ function parseNum(value: string): number {
   const n = Number(trimmed)
   return Number.isFinite(n) ? n : NaN
 }
-
 function todayStamp(): string {
   const d = new Date()
   const y = d.getFullYear()
@@ -39,12 +34,10 @@ function todayStamp(): string {
   const day = String(d.getDate()).padStart(2, '0')
   return `${y}${m}${day}`
 }
-
 const MIN_COUNT = 1
 const MAX_COUNT = 1000
 const MIN_PAD = 1
 const MAX_PAD = 10
-
 /**
  * Invoice Number Generator
  * Inputs: prefix, starting number, count, padding (digits), separator,
@@ -58,22 +51,18 @@ export default function InvoiceNumberGenerator() {
   const [padding, setPadding] = React.useState('4')
   const [sep, setSep] = React.useState<Separator>('dash')
   const [useDate, setUseDate] = React.useState(false)
-
   const startNum = parseNum(start)
   const countNum = parseNum(count)
   const padNum = parseNum(padding)
-
   const safeCount = Number.isFinite(countNum)
     ? Math.min(MAX_COUNT, Math.max(MIN_COUNT, Math.floor(countNum)))
     : MIN_COUNT
   const safePad = Number.isFinite(padNum)
     ? Math.min(MAX_PAD, Math.max(MIN_PAD, Math.floor(padNum)))
     : MIN_PAD
-
   const sepChar = SEP_CHAR[sep]
   const datePart = useDate ? todayStamp() : ''
   const trimmedPrefix = prefix.trim()
-
   const lines = React.useMemo(() => {
     if (!Number.isFinite(startNum) || startNum < 0) return []
     const out: string[] = []
@@ -88,13 +77,10 @@ export default function InvoiceNumberGenerator() {
     }
     return out
   }, [startNum, safeCount, safePad, sepChar, trimmedPrefix, datePart])
-
   const output = lines.join('\n')
-
   const countClamped = Number.isFinite(countNum) && (countNum < MIN_COUNT || countNum > MAX_COUNT)
   const padClamped = Number.isFinite(padNum) && (padNum < MIN_PAD || padNum > MAX_PAD)
   const startInvalid = !Number.isFinite(startNum) || startNum < 0
-
   return (
     <div className="space-y-5">
       <Card>
@@ -180,7 +166,6 @@ export default function InvoiceNumberGenerator() {
               </div>
             </div>
           </div>
-
           {startInvalid ? (
             <p className="text-sm text-destructive">
               Starting number must be a non-negative integer.
@@ -198,7 +183,6 @@ export default function InvoiceNumberGenerator() {
           ) : null}
         </CardContent>
       </Card>
-
       <Card>
         <CardContent className="space-y-4 pt-6">
           <div className="grid gap-3 sm:grid-cols-3">
@@ -206,7 +190,6 @@ export default function InvoiceNumberGenerator() {
             <Stat label="Sample first" value={lines[0] ?? '—'} />
             <Stat label="Sample last" value={lines[lines.length - 1] ?? '—'} />
           </div>
-
           <div className="flex items-center gap-2">
             <Badge variant="outline">
               {trimmedPrefix || '∅'}{sepChar || ''}
@@ -218,7 +201,6 @@ export default function InvoiceNumberGenerator() {
               <Badge variant="outline">Date: {datePart}</Badge>
             ) : null}
           </div>
-
           <ResultBox
             value={output}
             label="Invoice numbers"
@@ -227,7 +209,6 @@ export default function InvoiceNumberGenerator() {
             downloadName="invoice-numbers.txt"
             empty="Adjust the settings above to generate invoice numbers."
           />
-
           <p className="text-xs text-muted-foreground">
             Numbers are zero-padded to {safePad} digit{safePad === 1 ? '' : 's'} and
             joined with the chosen separator. Updates live as you edit.

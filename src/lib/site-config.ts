@@ -11,21 +11,17 @@
  *
  * See .env.example for a complete list of variables to set.
  */
-
 function str(value: string | undefined, fallback = ''): string {
   return value && value.trim() ? value.trim() : fallback
 }
-
 function bool(value: string | undefined, fallback = false): boolean {
   if (value === undefined || value === null) return fallback
   return value === 'true' || value === '1' || value === 'yes'
 }
-
 function nullableStr(value: string | undefined): string | null {
   const v = value?.trim()
   return v ? v : null
 }
-
 export const siteConfig = {
   site: {
     name: str(process.env.NEXT_PUBLIC_SITE_NAME, 'Fernandes Labs'),
@@ -43,7 +39,6 @@ export const siteConfig = {
       'fernandeslabssupport@gmail.com'
     ),
   },
-
   /** Google AdSense — apply at https://adsense.google.com */
   adsense: {
     enabled: bool(process.env.NEXT_PUBLIC_ADSENSE_ENABLED, false),
@@ -54,19 +49,16 @@ export const siteConfig = {
       footer: nullableStr(process.env.NEXT_PUBLIC_ADSENSE_SLOT_FOOTER),
     },
   },
-
   /** Google Analytics 4 — create at https://analytics.google.com */
   analytics: {
     googleAnalyticsId: nullableStr(process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID),
   },
-
   /** Google Search Console — verify at https://search.google.com/search-console */
   searchConsole: {
     verificationToken: nullableStr(
       process.env.NEXT_PUBLIC_SEARCH_CONSOLE_TOKEN
     ),
   },
-
   /** Crypto donations */
   crypto: {
     enabled: bool(process.env.NEXT_PUBLIC_CRYPTO_ENABLED, true),
@@ -78,7 +70,6 @@ export const siteConfig = {
     },
     donationAmounts: [1, 5, 10, 25, 50],
   },
-
   /** Affiliate links */
   affiliate: {
     enabled: bool(process.env.NEXT_PUBLIC_AFFILIATE_ENABLED, true),
@@ -90,7 +81,6 @@ export const siteConfig = {
       seoTool: nullableStr(process.env.NEXT_PUBLIC_AFF_SEO_TOOL),
     },
   },
-
   /** Social/profile links */
   social: {
     github: str(
@@ -100,12 +90,10 @@ export const siteConfig = {
     twitter: nullableStr(process.env.NEXT_PUBLIC_SOCIAL_TWITTER),
   },
 }
-
 /** Helper: is AdSense fully configured and ready to show real ads? */
 export function isAdsenseConfigured(): boolean {
   return Boolean(siteConfig.adsense.enabled && siteConfig.adsense.clientId)
 }
-
 /** Helper: is crypto donation enabled with at least one wallet? */
 export function isCryptoConfigured(): boolean {
   return (

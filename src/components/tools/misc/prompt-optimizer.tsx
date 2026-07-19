@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { CheckCircle2, XCircle, Lightbulb, ArrowRight } from 'lucide-react'
 import { Textarea } from '@/components/ui/textarea'
@@ -16,7 +15,6 @@ import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Field, ResultBox } from '@/lib/tools/tool-ui'
 import { useCopy } from '@/lib/tools/use-copy'
-
 interface Check {
   key: string
   label: string
@@ -24,7 +22,6 @@ interface Check {
   weight: number
   hint: string
 }
-
 interface Analysis {
   score: number
   checks: Check[]
@@ -32,44 +29,36 @@ interface Analysis {
   lengthOk: boolean
   wordCount: number
 }
-
 function hasRole(text: string): boolean {
   return /\b(you are|you're|act as|as an?|your role|behave as|imagine you're)\b/i.test(
     text
   )
 }
-
 function hasContext(text: string): boolean {
   return /\b(context|background|given that|assuming|situation|scenario|previously|here is|the user is|our product|our team)\b/i.test(
     text
   )
 }
-
 function hasInstructions(text: string): boolean {
   return /\b(write|create|generate|list|analyze|summarize|explain|describe|translate|convert|extract|compare|evaluate|design|draft|review|outline|identify|provide|return)\b/i.test(
     text
   )
 }
-
 function hasOutputFormat(text: string): boolean {
   return /\b(format|json|markdown|bullet|numbered list|table|step[- ]by[- ]step|output (in|as|the)|respond (in|with|using)|paragraph|heading)\b/i.test(
     text
   )
 }
-
 function hasExamples(text: string): boolean {
   return /\b(example|e\.g\.|for instance|such as|e\.g\.,|for example|sample)\b/i.test(
     text
   )
 }
-
 function analyze(prompt: string): Analysis {
   const trimmed = prompt.trim()
   const wordCount = trimmed === '' ? 0 : trimmed.split(/\s+/).length
   const len = trimmed.length
-
   const lengthOk = len >= 40 && len <= 4000
-
   const checks: Check[] = [
     {
       key: 'role',
@@ -114,12 +103,10 @@ function analyze(prompt: string): Analysis {
       hint: 'Aim for 40–4000 chars. Too short lacks detail; too long dilutes focus.',
     },
   ]
-
   let score = 0
   for (const c of checks) {
     if (c.present) score += c.weight
   }
-
   const suggestions: string[] = []
   if (!checks[0].present)
     suggestions.push(
@@ -153,40 +140,29 @@ function analyze(prompt: string): Analysis {
     suggestions.push(
       'Strong prompt. Consider edge-case instructions ("If unsure, ask clarifying questions").'
     )
-
   return { score, checks, suggestions, lengthOk, wordCount }
 }
-
 const WEAK_EXAMPLE =
   'Write a blog intro about SEO.'
 const STRONG_EXAMPLE = `You are a senior SEO content strategist with 10 years of experience.
-
 Context: We are launching a new blog post targeting the keyword "technical SEO audit" for an audience of junior-to-mid SEO specialists.
-
 Task: Write an engaging 150-word blog introduction that hooks the reader and previews the article's value.
-
 Format: Plain text, no headings. Use a question or statistic in the opening line.
-
 Example: "Did you know that 91% of pages never get organic traffic from Google? A technical SEO audit is how you avoid joining them."`
-
 function scoreColor(score: number): string {
   if (score >= 80) return '#16a34a'
   if (score >= 50) return '#f59e0b'
   return '#dc2626'
 }
-
 function scoreLabel(score: number): string {
   if (score >= 80) return 'Strong'
   if (score >= 50) return 'Needs work'
   return 'Weak'
 }
-
 export default function PromptOptimizer() {
   const { copy } = useCopy()
   const [prompt, setPrompt] = React.useState(WEAK_EXAMPLE)
-
   const analysis = React.useMemo(() => analyze(prompt), [prompt])
-
   return (
     <div className="space-y-5">
       <Card>
@@ -241,7 +217,6 @@ export default function PromptOptimizer() {
           </div>
         </CardContent>
       </Card>
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Score</CardTitle>
@@ -267,9 +242,7 @@ export default function PromptOptimizer() {
               </div>
             </div>
           </div>
-
           <Separator />
-
           <div className="grid gap-2 sm:grid-cols-2" role="status" aria-live="polite">
             {analysis.checks.map((c) => (
               <div
@@ -295,7 +268,6 @@ export default function PromptOptimizer() {
           </div>
         </CardContent>
       </Card>
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Suggestions</CardTitle>
@@ -318,7 +290,6 @@ export default function PromptOptimizer() {
           </ul>
         </CardContent>
       </Card>
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Before / after</CardTitle>
@@ -365,7 +336,6 @@ export default function PromptOptimizer() {
           </div>
         </CardContent>
       </Card>
-
       <ResultBox
         value={analysis.suggestions.map((s, i) => `${i + 1}. ${s}`).join('\n')}
         label="Suggestions (plain text)"

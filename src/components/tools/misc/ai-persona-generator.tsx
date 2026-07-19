@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Shuffle, UserCircle, Sparkles } from 'lucide-react'
 import { Input } from '@/components/ui/input'
@@ -24,7 +23,6 @@ import {
   TabsTrigger,
 } from '@/components/ui/tabs'
 import { Field, ResultBox, randomInt } from '@/lib/tools/tool-ui'
-
 const ALL_TRAITS = [
   'analytical',
   'creative',
@@ -35,9 +33,7 @@ const ALL_TRAITS = [
   'optimistic',
   'pragmatic',
 ] as const
-
 type Trait = (typeof ALL_TRAITS)[number]
-
 interface PersonaState {
   name: string
   role: string
@@ -46,7 +42,6 @@ interface PersonaState {
   background: string
   speakingStyle: string
 }
-
 const DEFAULT_STATE: PersonaState = {
   name: 'Maya Chen',
   role: 'Senior Product Designer',
@@ -57,7 +52,6 @@ const DEFAULT_STATE: PersonaState = {
   speakingStyle:
     'Calm and structured. Uses concrete examples, references user research, and asks clarifying questions before committing to a direction.',
 }
-
 const SAMPLE_NAMES = [
   'Maya Chen',
   'Idris Okafor',
@@ -70,7 +64,6 @@ const SAMPLE_NAMES = [
   'Nora Lindqvist',
   'Tariq Hassan',
 ]
-
 const SAMPLE_ROLES = [
   'Senior Product Designer',
   'Staff Engineer',
@@ -83,28 +76,24 @@ const SAMPLE_ROLES = [
   'Security Analyst',
   'Financial Planner',
 ]
-
 const SAMPLE_BACKGROUNDS = [
   'Fifteen years across startups and enterprise, with deep experience leading cross-functional teams through ambiguity.',
   'Background in research academia, transitioned to industry six years ago and now bridges theory and shipping.',
   'Self-taught, then formalised via a CS degree. Built and sold two small SaaS products before joining the team.',
   'Spent a decade in agency land before moving in-house. Loves the craft of shipping, hates theatre-of-work.',
 ]
-
 const SAMPLE_STYLES = [
   'Calm and structured. Uses concrete examples, references user research, and asks clarifying questions before committing.',
   'Energetic and direct. Speaks in metaphors, pushes for decisions, and owns the outcome publicly.',
   'Quiet and analytical. Pauses before answering, cites sources, and prefers written follow-ups.',
   'Warm and story-driven. Weaves anecdotes into explanations, celebrates small wins, and coaches through questions.',
 ]
-
 function expertiseLabel(level: number): string {
   if (level <= 3) return 'Beginner'
   if (level <= 6) return 'Intermediate'
   if (level <= 8) return 'Advanced'
   return 'Expert'
 }
-
 function buildProfile(s: PersonaState): string {
   const traits =
     s.traits.length > 0 ? s.traits.join(', ') : 'no dominant traits specified'
@@ -122,7 +111,6 @@ function buildProfile(s: PersonaState): string {
     s.speakingStyle.trim() || '—',
   ].join('\n')
 }
-
 function buildSystemPrompt(s: PersonaState): string {
   const traits =
     s.traits.length > 0 ? s.traits.join(', ') : 'neutral and balanced'
@@ -147,17 +135,14 @@ function buildSystemPrompt(s: PersonaState): string {
   )
   return lines.join('\n')
 }
-
 export default function AiPersonaGenerator() {
   const [state, setState] = React.useState<PersonaState>(DEFAULT_STATE)
-
   const update = <K extends keyof PersonaState>(
     key: K,
     value: PersonaState[K]
   ): void => {
     setState((prev) => ({ ...prev, [key]: value }))
   }
-
   const toggleTrait = (trait: Trait): void => {
     setState((prev) => {
       const has = prev.traits.includes(trait)
@@ -169,13 +154,11 @@ export default function AiPersonaGenerator() {
       }
     })
   }
-
   const randomize = (): void => {
     const name = SAMPLE_NAMES[randomInt(SAMPLE_NAMES.length)]
     const role = SAMPLE_ROLES[randomInt(SAMPLE_ROLES.length)]
     const background = SAMPLE_BACKGROUNDS[randomInt(SAMPLE_BACKGROUNDS.length)]
     const speakingStyle = SAMPLE_STYLES[randomInt(SAMPLE_STYLES.length)]
-
     // Pick 2-4 random traits.
     const targetCount = 2 + randomInt(3)
     const pool = [...ALL_TRAITS]
@@ -184,7 +167,6 @@ export default function AiPersonaGenerator() {
       const idx = randomInt(pool.length)
       picked.push(pool.splice(idx, 1)[0])
     }
-
     setState({
       name,
       role,
@@ -194,10 +176,8 @@ export default function AiPersonaGenerator() {
       speakingStyle,
     })
   }
-
   const profile = React.useMemo(() => buildProfile(state), [state])
   const systemPrompt = React.useMemo(() => buildSystemPrompt(state), [state])
-
   return (
     <div className="space-y-5">
       <Card>
@@ -216,7 +196,6 @@ export default function AiPersonaGenerator() {
           </Button>
         </CardContent>
       </Card>
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Identity</CardTitle>
@@ -240,7 +219,6 @@ export default function AiPersonaGenerator() {
               />
             </Field>
           </div>
-
           <Field
             label="Expertise level"
             htmlFor="ap-expertise"
@@ -256,7 +234,6 @@ export default function AiPersonaGenerator() {
               aria-label="Expertise level from 1 to 10"
             />
           </Field>
-
           <div>
             <div className="mb-2 flex items-baseline justify-between">
               <span className="text-sm font-medium text-foreground">
@@ -292,7 +269,6 @@ export default function AiPersonaGenerator() {
               })}
             </div>
           </div>
-
           <Field label="Background" htmlFor="ap-background" hint="free-form">
             <Textarea
               id="ap-background"
@@ -302,7 +278,6 @@ export default function AiPersonaGenerator() {
               rows={4}
             />
           </Field>
-
           <Field label="Speaking style" htmlFor="ap-style" hint="free-form">
             <Textarea
               id="ap-style"
@@ -314,7 +289,6 @@ export default function AiPersonaGenerator() {
           </Field>
         </CardContent>
       </Card>
-
       <div className="flex flex-wrap items-center gap-2" role="status" aria-live="polite">
         <Badge variant="outline">
           <UserCircle className="size-3" />
@@ -328,9 +302,7 @@ export default function AiPersonaGenerator() {
           </Badge>
         ))}
       </div>
-
       <Separator />
-
       <Tabs defaultValue="profile">
         <TabsList>
           <TabsTrigger value="profile">

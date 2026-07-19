@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import {
   AlertTriangle,
@@ -32,13 +31,11 @@ import {
 import { Field, ResultBox, Stat, randomInt } from '@/lib/tools/tool-ui'
 import { useCopy } from '@/lib/tools/use-copy'
 import { toast } from 'sonner'
-
 interface CustomParam {
   id: string
   key: string
   value: string
 }
-
 interface CampaignState {
   baseUrl: string
   source: string
@@ -48,12 +45,10 @@ interface CampaignState {
   content: string
   customs: CustomParam[]
 }
-
 interface Preset {
   label: string
   values: Pick<CampaignState, 'source' | 'medium' | 'campaign' | 'term' | 'content'>
 }
-
 const PRESETS: Preset[] = [
   {
     label: 'Email newsletter',
@@ -96,7 +91,6 @@ const PRESETS: Preset[] = [
     },
   },
 ]
-
 function isValidUrl(url: string): boolean {
   if (!url) return false
   try {
@@ -106,19 +100,16 @@ function isValidUrl(url: string): boolean {
     return false
   }
 }
-
 function makeId(): string {
   // Lightweight unique id for list keys (uses secure RNG, no Math.random).
   return `${Date.now().toString(36)}-${randomInt(1_000_000).toString(36)}`
 }
-
 interface BuiltUrl {
   final: string
   queryString: string
   params: { key: string; value: string }[]
   displayShort: string
 }
-
 function buildUrl(state: CampaignState): BuiltUrl {
   const base = state.baseUrl.trim()
   if (!isValidUrl(base)) {
@@ -135,7 +126,6 @@ function buildUrl(state: CampaignState): BuiltUrl {
     const v = c.value.trim()
     if (k && v) pairs.push({ key: k, value: v })
   }
-
   try {
     const u = new URL(base)
     for (const p of pairs) {
@@ -155,7 +145,6 @@ function buildUrl(state: CampaignState): BuiltUrl {
     return { final: '', queryString: '', params: [], displayShort: '' }
   }
 }
-
 const INITIAL: CampaignState = {
   baseUrl: 'https://example.com/landing',
   source: '',
@@ -165,56 +154,46 @@ const INITIAL: CampaignState = {
   content: '',
   customs: [],
 }
-
 export default function CampaignUrlBuilder(): React.JSX.Element {
   const [state, setState] = React.useState<CampaignState>(INITIAL)
   const { copy } = useCopy()
-
   const update = <K extends keyof CampaignState>(
     key: K,
     value: CampaignState[K]
   ): void => {
     setState((prev) => ({ ...prev, [key]: value }))
   }
-
   const built = React.useMemo(() => buildUrl(state), [state])
-
   const baseUrlValid = isValidUrl(state.baseUrl.trim())
   const requiredMissing =
     !state.source.trim() || !state.medium.trim() || !state.campaign.trim()
   const totalParams = built.params.length
-
   const applyPreset = (preset: Preset): void => {
     setState((prev) => ({ ...prev, ...preset.values }))
     toast.success(`Preset applied: ${preset.label}`)
   }
-
   const reset = (): void => {
     setState(INITIAL)
     toast.success('Cleared all fields')
   }
-
   const addCustom = (): void => {
     setState((prev) => ({
       ...prev,
       customs: [...prev.customs, { id: makeId(), key: '', value: '' }],
     }))
   }
-
   const updateCustom = (id: string, field: 'key' | 'value', value: string): void => {
     setState((prev) => ({
       ...prev,
       customs: prev.customs.map((c) => (c.id === id ? { ...c, [field]: value } : c)),
     }))
   }
-
   const removeCustom = (id: string): void => {
     setState((prev) => ({
       ...prev,
       customs: prev.customs.filter((c) => c.id !== id),
     }))
   }
-
   return (
     <div className="space-y-5">
       <Card>
@@ -244,7 +223,6 @@ export default function CampaignUrlBuilder(): React.JSX.Element {
               className={!baseUrlValid ? 'border-rose-500/60' : ''}
             />
           </Field>
-
           <div className="grid gap-4 sm:grid-cols-2">
             <Field
               label="utm_source *"
@@ -322,7 +300,6 @@ export default function CampaignUrlBuilder(): React.JSX.Element {
               />
             </Field>
           </div>
-
           {/* Custom parameters */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
@@ -385,7 +362,6 @@ export default function CampaignUrlBuilder(): React.JSX.Element {
               </div>
             )}
           </div>
-
           {/* Presets */}
           <div className="space-y-2">
             <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
@@ -412,7 +388,6 @@ export default function CampaignUrlBuilder(): React.JSX.Element {
           </div>
         </CardContent>
       </Card>
-
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat label="Parameters" value={totalParams} />
         <Stat
@@ -427,7 +402,6 @@ export default function CampaignUrlBuilder(): React.JSX.Element {
         />
         <Stat label="URL length" value={built.final.length} />
       </div>
-
       {!baseUrlValid ? (
         <div className="flex items-center gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-amber-700 dark:text-amber-400">
           <AlertTriangle className="size-4" />
@@ -449,7 +423,6 @@ export default function CampaignUrlBuilder(): React.JSX.Element {
           Campaign URL is ready.
         </div>
       )}
-
       <ResultBox
         value={built.final}
         label="Campaign URL"
@@ -457,7 +430,6 @@ export default function CampaignUrlBuilder(): React.JSX.Element {
         downloadName="campaign-url.txt"
         empty="Fill in the base URL and required UTM parameters to generate the tagged URL."
       />
-
       {built.final ? (
         <div className="flex flex-wrap items-center gap-2">
           <Button
@@ -479,7 +451,6 @@ export default function CampaignUrlBuilder(): React.JSX.Element {
           </Badge>
         </div>
       ) : null}
-
       <div className="grid gap-4 lg:grid-cols-2">
         <Field label="Shortened display" htmlFor="cub-short">
           <Input
@@ -498,7 +469,6 @@ export default function CampaignUrlBuilder(): React.JSX.Element {
           />
         </Field>
       </div>
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Parameter breakdown</CardTitle>

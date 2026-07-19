@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Clock, Mic, BookOpen, Eraser, FileText } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -20,21 +19,18 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 interface ReadingSpeed {
   label: string
   wpm: number
   kind: 'reading' | 'speaking'
   icon: React.ReactNode
 }
-
 const SPEEDS: ReadingSpeed[] = [
   { label: 'Slow reader', wpm: 150, kind: 'reading', icon: <BookOpen className="size-3.5" /> },
   { label: 'Average reader', wpm: 250, kind: 'reading', icon: <BookOpen className="size-3.5" /> },
   { label: 'Fast reader', wpm: 400, kind: 'reading', icon: <BookOpen className="size-3.5" /> },
   { label: 'Speaking pace', wpm: 130, kind: 'speaking', icon: <Mic className="size-3.5" /> },
 ]
-
 interface Stats {
   words: number
   characters: number
@@ -43,7 +39,6 @@ interface Stats {
   paragraphs: number
   avgWordsPerSentence: number
 }
-
 function computeStats(text: string): Stats {
   if (!text || text.trim() === '') {
     return {
@@ -73,7 +68,6 @@ function computeStats(text: string): Stats {
     avgWordsPerSentence: sentences > 0 ? words / sentences : 0,
   }
 }
-
 function formatDuration(minutes: number): string {
   if (minutes <= 0) return '0s'
   const totalSeconds = Math.round(minutes * 60)
@@ -86,23 +80,18 @@ function formatDuration(minutes: number): string {
   }
   return s === 0 ? `${m}m` : `${m}m ${s}s`
 }
-
 const SAMPLE_TEXT = `Reading speed varies widely between individuals. The average adult
 reads non-technical prose at roughly 250 words per minute, while a
 fast reader can skim at 400 words per minute. Public speakers, on
 the other hand, deliver at around 130 words per minute — much slower
 than silent reading, because spoken delivery needs pauses, emphasis,
 and breath.
-
 This tool estimates how long it would take to read or speak the text
 you provide at four common speeds. Paste in a blog post, a script,
 or your next speech, and the stats update live as you type.`
-
 export default function ReadingTimeCalculator() {
   const [text, setText] = React.useState(SAMPLE_TEXT)
-
   const stats = React.useMemo(() => computeStats(text), [text])
-
   const readings = React.useMemo(
     () =>
       SPEEDS.map((s) => ({
@@ -112,10 +101,8 @@ export default function ReadingTimeCalculator() {
       })),
     [stats.words]
   )
-
   const avgReading = readings.find((r) => r.label === 'Average reader')
   const speaking = readings.find((r) => r.kind === 'speaking')
-
   return (
     <div className="space-y-5">
       <Card>
@@ -166,7 +153,6 @@ export default function ReadingTimeCalculator() {
           </div>
         </CardContent>
       </Card>
-
       <div
         id="rt-stats"
         className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5"
@@ -182,7 +168,6 @@ export default function ReadingTimeCalculator() {
         <Stat label="Sentences" value={stats.sentences.toLocaleString()} />
         <Stat label="Paragraphs" value={stats.paragraphs.toLocaleString()} />
       </div>
-
       <div className="grid gap-4 sm:grid-cols-2">
         <Card>
           <CardContent className="space-y-2 pt-6">
@@ -213,7 +198,6 @@ export default function ReadingTimeCalculator() {
           </CardContent>
         </Card>
       </div>
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Speed breakdown</CardTitle>

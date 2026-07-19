@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Download, Loader2, Upload, X } from 'lucide-react'
 import { toast } from 'sonner'
@@ -16,27 +15,22 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Field, Stat, downloadBlob } from '@/lib/tools/tool-ui'
-
 function formatBytes(b: number): string {
   if (b < 1024) return `${b} B`
   if (b < 1024 * 1024) return `${(b / 1024).toFixed(1)} KB`
   return `${(b / 1024 / 1024).toFixed(2)} MB`
 }
-
 type Status = 'pending' | 'loading' | 'done' | 'error'
-
 interface Result {
   webpBlob: Blob | null
   webpUrl: string | null
   dims: { w: number; h: number } | null
   status: Status
 }
-
 interface FileEntry {
   id: number
   file: File
 }
-
 function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image()
@@ -45,7 +39,6 @@ function loadImage(src: string): Promise<HTMLImageElement> {
     img.src = src
   })
 }
-
 function canvasToBlob(
   canvas: HTMLCanvasElement,
   type: string,
@@ -55,14 +48,12 @@ function canvasToBlob(
     canvas.toBlob(resolve, type, quality)
   })
 }
-
 export default function PngToWebp() {
   const [entries, setEntries] = React.useState<FileEntry[]>([])
   const [results, setResults] = React.useState<Record<number, Result>>({})
   const [quality, setQuality] = React.useState(0.8)
   const fileRef = React.useRef<HTMLInputElement | null>(null)
   const nextId = React.useRef(1)
-
   const addFiles = React.useCallback((fileList: FileList | null) => {
     if (!fileList || fileList.length === 0) return
     const pngs = Array.from(fileList).filter(
@@ -81,7 +72,6 @@ export default function PngToWebp() {
     })
     toast.success(`Added ${pngs.length} PNG ${pngs.length === 1 ? 'file' : 'files'}`)
   }, [])
-
   const removeEntry = (id: number) => {
     setEntries((prev) => prev.filter((e) => e.id !== id))
     setResults((prev) => {
@@ -92,7 +82,6 @@ export default function PngToWebp() {
       return next
     })
   }
-
   // Re-convert every loaded file whenever the file set or quality changes.
   React.useEffect(() => {
     if (entries.length === 0) {
@@ -100,7 +89,6 @@ export default function PngToWebp() {
       return
     }
     let cancelled = false
-
     // Initialize result slots.
     setResults((prev) => {
       const next: Record<number, Result> = {}
@@ -126,7 +114,6 @@ export default function PngToWebp() {
       }
       return next
     })
-
     const run = async () => {
       for (const entry of entries) {
         if (cancelled) return
@@ -188,7 +175,6 @@ export default function PngToWebp() {
       cancelled = true
     }
   }, [entries, quality])
-
   // Revoke all object URLs on unmount.
   React.useEffect(() => {
     return () => {
@@ -201,7 +187,6 @@ export default function PngToWebp() {
       })
     }
   }, [])
-
   const doneEntries = entries.filter((e) => results[e.id]?.status === 'done')
   const totalOriginal = doneEntries.reduce(
     (sum, e) => sum + e.file.size,
@@ -213,7 +198,6 @@ export default function PngToWebp() {
   )
   const totalSavings =
     totalOriginal > 0 ? Math.max(0, 1 - totalWebp / totalOriginal) : 0
-
   const downloadOne = (entry: FileEntry) => {
     const r = results[entry.id]
     if (!r?.webpBlob) {
@@ -223,7 +207,6 @@ export default function PngToWebp() {
     const base = entry.file.name.replace(/\.[^.]+$/, '')
     downloadBlob(r.webpBlob, `${base}.webp`)
   }
-
   const downloadAll = () => {
     if (doneEntries.length === 0) {
       toast.error('No converted files to download')
@@ -238,7 +221,6 @@ export default function PngToWebp() {
     }
     toast.success(`Downloaded ${doneEntries.length} WebP ${doneEntries.length === 1 ? 'file' : 'files'}`)
   }
-
   return (
     <div className="space-y-5">
       <Field label="PNG files" htmlFor="ptw-file">
@@ -277,7 +259,6 @@ export default function PngToWebp() {
           </p>
         </div>
       </Field>
-
       <Field
         label="Quality"
         htmlFor="ptw-quality"
@@ -292,14 +273,12 @@ export default function PngToWebp() {
           onValueChange={(v) => setQuality(v[0] ?? quality)}
         />
       </Field>
-
       <Alert>
         <AlertDescription>
           WebP is lossy at quality &lt; 1.0; quality 1.0 is near-lossless.
           Files re-convert automatically when you change the quality.
         </AlertDescription>
       </Alert>
-
       {entries.length > 0 ? (
         <>
           <div
@@ -330,7 +309,6 @@ export default function PngToWebp() {
               }
             />
           </div>
-
           <div className="max-h-96 overflow-auto rounded-lg border border-border fl-scroll">
             <Table>
               <TableHeader>
@@ -427,7 +405,6 @@ export default function PngToWebp() {
               </TableBody>
             </Table>
           </div>
-
           <div className="flex flex-wrap items-center justify-between gap-2">
             <Button
               variant="ghost"

@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Eraser, FileCode2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -9,13 +8,11 @@ import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Field, ResultBox, Stat } from '@/lib/tools/tool-ui'
 import { toast } from 'sonner'
-
 // ---------------------------------------------------------------------------
 // Tokenizer — state machine that distinguishes regex literals from division
 // by inspecting the previous significant token, and preserves the content of
 // strings, template literals, and regexes verbatim.
 // ---------------------------------------------------------------------------
-
 type JsToken =
   | { type: 'ws'; value: string }
   | { type: 'comment-line'; value: string }
@@ -27,52 +24,41 @@ type JsToken =
   | { type: 'number'; value: string }
   | { type: 'punct'; value: string }
   | { type: 'op'; value: string }
-
 // Keywords after which a leading `/` must be a regex, not division.
 const REGEX_AFTER_KEYWORDS = new Set<string>([
   'return', 'typeof', 'instanceof', 'in', 'of', 'new', 'delete', 'void',
   'throw', 'case', 'do', 'else', 'yield', 'await', 'if', 'while', 'for',
   'switch', 'catch',
 ])
-
 // Keywords where a following newline can trigger ASI — preserve the newline so
 // we don't silently change `return\n[1,2,3]` into `return [1,2,3]`.
 const ASI_KEYWORDS = new Set<string>([
   'return', 'throw', 'yield', 'break', 'continue',
 ])
-
 const MULTI_CHAR_OPS = new Set<string>([
   '==', '!=', '<=', '>=', '=>', '&&', '||', '++', '--', '+=', '-=', '*=',
   '/=', '%=', '**', '<<', '>>', '??', '?.', '&=', '|=', '^=', '<<=', '>>=',
 ])
-
 const THREE_CHAR_OPS = new Set<string>([
   '...', '===', '!==', '**=', '>>>',
 ])
-
 const PUNCT = '()[]{};,?:.'
-
 function isWs(c: string): boolean {
   return c === ' ' || c === '\t' || c === '\n' || c === '\r' || c === '\f' || c === '\v'
 }
-
 function isIdentStart(c: string): boolean {
   return /[A-Za-z_$]/.test(c)
 }
-
 function isIdentPart(c: string): boolean {
   return /[A-Za-z0-9_$]/.test(c)
 }
-
 function isDigit(c: string): boolean {
   return c >= '0' && c <= '9'
 }
-
 function tokenizeJs(input: string): JsToken[] {
   const tokens: JsToken[] = []
   const n = input.length
   let i = 0
-
   const lastSignificant = (): JsToken | null => {
     for (let k = tokens.length - 1; k >= 0; k--) {
       const t = tokens[k]
@@ -86,7 +72,6 @@ function tokenizeJs(input: string): JsToken[] {
     }
     return null
   }
-
   const regexAllowed = (): boolean => {
     const last = lastSignificant()
     if (!last) return true
@@ -104,11 +89,9 @@ function tokenizeJs(input: string): JsToken[] {
     // After string / template / number / regex / `)` / `]` / `}` → division.
     return false
   }
-
   while (i < n) {
     const ch = input[i]
     const next = input[i + 1]
-
     // Whitespace
     if (isWs(ch)) {
       let j = i
@@ -117,7 +100,6 @@ function tokenizeJs(input: string): JsToken[] {
       i = j
       continue
     }
-
     // Line comment //...
     if (ch === '/' && next === '/') {
       let j = i + 2
@@ -126,7 +108,6 @@ function tokenizeJs(input: string): JsToken[] {
       i = j
       continue
     }
-
     // Block comment /* ... */
     if (ch === '/' && next === '*') {
       let j = i + 2
@@ -136,7 +117,6 @@ function tokenizeJs(input: string): JsToken[] {
       i = j
       continue
     }
-
     // String literal "..." or '...'
     if (ch === '"' || ch === "'") {
       const quote = ch
@@ -160,7 +140,6 @@ function tokenizeJs(input: string): JsToken[] {
       i = j
       continue
     }
-
     // Template literal `...` — track ${ } nesting and nested templates.
     if (ch === '`') {
       let j = i + 1
@@ -247,7 +226,6 @@ function tokenizeJs(input: string): JsToken[] {
       i = j
       continue
     }
-
     // Regex literal /.../flags — only when the context allows it.
     if (ch === '/' && regexAllowed()) {
       let j = i + 1
@@ -280,7 +258,6 @@ function tokenizeJs(input: string): JsToken[] {
       i = j
       continue
     }
-
     // Number literal
     if (isDigit(ch) || (ch === '.' && isDigit(next))) {
       let j = i
@@ -300,7 +277,6 @@ function tokenizeJs(input: string): JsToken[] {
       i = j
       continue
     }
-
     // Identifier / keyword
     if (isIdentStart(ch)) {
       let j = i
@@ -309,7 +285,6 @@ function tokenizeJs(input: string): JsToken[] {
       i = j
       continue
     }
-
     // 3-char operators
     const three = input.slice(i, i + 3)
     if (THREE_CHAR_OPS.has(three)) {
@@ -317,7 +292,6 @@ function tokenizeJs(input: string): JsToken[] {
       i += 3
       continue
     }
-
     // 2-char operators
     const two = input.slice(i, i + 2)
     if (MULTI_CHAR_OPS.has(two)) {
@@ -325,36 +299,29 @@ function tokenizeJs(input: string): JsToken[] {
       i += 2
       continue
     }
-
     // Punctuation
     if (PUNCT.includes(ch)) {
       tokens.push({ type: 'punct', value: ch })
       i++
       continue
     }
-
     // Single-char operator
     tokens.push({ type: 'op', value: ch })
     i++
   }
-
   return tokens
 }
-
 // ---------------------------------------------------------------------------
 // Minifier
 // ---------------------------------------------------------------------------
-
 type JsOptions = {
   removeComments: boolean
   collapseWhitespace: boolean
   removeSemicolonsBeforeBrace: boolean
 }
-
 function isWordLike(t: JsToken): boolean {
   return t.type === 'word' || t.type === 'number'
 }
-
 function minifyJs(input: string, opts: JsOptions): string {
   if (!input.trim()) return ''
   const tokens = tokenizeJs(input)
@@ -362,10 +329,8 @@ function minifyJs(input: string, opts: JsOptions): string {
   let prevSig: JsToken | null = null
   let pendingGap = false
   let pendingGapHasNewline = false
-
   for (let k = 0; k < tokens.length; k++) {
     const tok = tokens[k]
-
     if (tok.type === 'comment-line' || tok.type === 'comment-block') {
       if (opts.removeComments) {
         pendingGap = true
@@ -379,7 +344,6 @@ function minifyJs(input: string, opts: JsOptions): string {
       }
       continue
     }
-
     if (tok.type === 'ws') {
       if (!opts.collapseWhitespace) {
         out.push(tok.value)
@@ -389,7 +353,6 @@ function minifyJs(input: string, opts: JsOptions): string {
       }
       continue
     }
-
     // Significant token — maybe insert a separator first.
     if (opts.collapseWhitespace && pendingGap && prevSig) {
       if (
@@ -407,22 +370,16 @@ function minifyJs(input: string, opts: JsOptions): string {
     }
     pendingGap = false
     pendingGapHasNewline = false
-
     out.push(tok.value)
     prevSig = tok
   }
-
   let result = out.join('')
-
   if (opts.removeSemicolonsBeforeBrace) {
     result = result.replace(/;\s*\}/g, '}')
   }
-
   return result.trim()
 }
-
 // ---------------------------------------------------------------------------
-
 const SAMPLE = `// Calculate the nth Fibonacci number.
 function fib(n) {
   if (n < 2) {
@@ -431,23 +388,19 @@ function fib(n) {
   // Recursive case — small inputs only!
   return fib(n - 1) + fib(n - 2);
 }
-
 /* Demo constants */
 const greeting = "Hello, world!";
 const pattern = /\\d+/g;
 const template = \`Result: \${fib(10)}\`;
 const arr = [1, 2, 3];
 const obj = { a: 1, b: 2 };
-
 const isBig = (x) => x >= 100;
 const double = (x) => x * 2;`
-
 export default function JsMinifier() {
   const [input, setInput] = React.useState('')
   const [removeComments, setRemoveComments] = React.useState(true)
   const [collapseWhitespace, setCollapseWhitespace] = React.useState(true)
   const [removeSemicolonsBeforeBrace, setRemoveSemicolonsBeforeBrace] = React.useState(true)
-
   const output = React.useMemo(
     () =>
       minifyJs(input, {
@@ -457,7 +410,6 @@ export default function JsMinifier() {
       }),
     [input, removeComments, collapseWhitespace, removeSemicolonsBeforeBrace],
   )
-
   const stats = React.useMemo(() => {
     const inBytes = new Blob([input]).size
     const outBytes = new Blob([output]).size
@@ -465,17 +417,14 @@ export default function JsMinifier() {
     const pct = inBytes > 0 ? Math.round((1 - outBytes / inBytes) * 100) : 0
     return { inBytes, outBytes, saved, pct }
   }, [input, output])
-
   const handleLoadSample = () => {
     setInput(SAMPLE)
     toast.success('Sample JavaScript loaded')
   }
-
   const handleClear = () => {
     setInput('')
     toast.success('Input cleared')
   }
-
   return (
     <div className="space-y-5">
       <Alert>
@@ -489,7 +438,6 @@ export default function JsMinifier() {
           collapsed where it is safe.
         </AlertDescription>
       </Alert>
-
       <Field label="JavaScript input" htmlFor="js-input" hint={`${stats.inBytes} bytes`}>
         <Textarea
           id="js-input"
@@ -501,7 +449,6 @@ export default function JsMinifier() {
           placeholder="Paste your JavaScript here…"
         />
       </Field>
-
       <div
         className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-lg border border-border bg-card p-4"
         role="group"
@@ -539,7 +486,6 @@ export default function JsMinifier() {
           </Label>
         </div>
       </div>
-
       <div className="flex flex-wrap items-center gap-2">
         <Button variant="outline" size="sm" onClick={handleLoadSample}>
           <FileCode2 className="size-4" />
@@ -550,7 +496,6 @@ export default function JsMinifier() {
           Clear
         </Button>
       </div>
-
       <div
         className="grid grid-cols-2 gap-3 sm:grid-cols-4"
         role="status"
@@ -569,7 +514,6 @@ export default function JsMinifier() {
           accent={stats.pct > 0 ? '#16a34a' : undefined}
         />
       </div>
-
       <ResultBox
         value={output}
         label="Minified JavaScript"

@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Eye, EyeOff, ShieldAlert, ShieldCheck, AlertTriangle } from 'lucide-react'
 import { Input } from '@/components/ui/input'
@@ -23,12 +22,10 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Stat } from '@/lib/tools/tool-ui'
-
 const LOWER = 'abcdefghijklmnopqrstuvwxyz'
 const UPPER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 const DIGITS = '0123456789'
 const SYMBOLS = '!@#$%^&*()-_=+[]{};:,.<>?/|~`'
-
 const COMMON_PASSWORDS: string[] = [
   'password', '123456', 'qwerty', '12345678', 'abc123', '123456789',
   'letmein', 'monkey', 'dragon', 'iloveyou', 'trustno1', 'sunshine',
@@ -36,29 +33,24 @@ const COMMON_PASSWORDS: string[] = [
   'nike', 'charlie', 'andrew', 'jones', 'qazwsx', '12345', '1234',
   'password1', 'admin', 'login', 'master', 'hello',
 ]
-
 const KEYBOARD_ROWS = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm']
-
 interface AttackModel {
   name: string
   rate: number // guesses per second
   description: string
 }
-
 const ATTACK_MODELS: AttackModel[] = [
   { name: 'Online attack', rate: 1e10, description: '10¹⁰/s · throttled service' },
   { name: 'Offline fast', rate: 1e12, description: '10¹²/s · single CPU' },
   { name: 'GPU cluster', rate: 1e14, description: '10¹⁴/s · GPU rig' },
   { name: 'Massive', rate: 1e16, description: '10¹⁶/s · state actor' },
 ]
-
 type Grade = {
   level: 0 | 1 | 2 | 3 | 4
   label: string
   tone: string
   bar: string
 }
-
 function gradeForEntropy(bits: number): Grade {
   if (bits < 28)
     return { level: 0, label: 'Very Weak', tone: 'text-red-600', bar: 'bg-red-500' }
@@ -90,7 +82,6 @@ function gradeForEntropy(bits: number): Grade {
     bar: 'bg-emerald-600',
   }
 }
-
 function formatDuration(seconds: number): string {
   if (!isFinite(seconds) || seconds <= 0) return 'instant'
   if (seconds < 1) return 'instant'
@@ -111,7 +102,6 @@ function formatDuration(seconds: number): string {
   if (years < 1e12) return `${(years / 1e9).toExponential(1)} Bn years`
   return 'longer than the universe'
 }
-
 function analyze(password: string) {
   const length = password.length
   let lower = 0
@@ -130,14 +120,12 @@ function analyze(password: string) {
   if (digits > 0) pool += 10
   if (symbols > 0) pool += SYMBOLS.length
   const entropy = pool > 0 && length > 0 ? Math.log2(pool) * length : 0
-
   const lowercased = password.toLowerCase()
   const isCommon = length > 0 && COMMON_PASSWORDS.includes(lowercased)
   const isCommonSubstring =
     length > 0 &&
     !isCommon &&
     COMMON_PASSWORDS.some((p) => p.length >= 4 && lowercased.includes(p))
-
   // Repeated-character runs (aaa, 111, !!!)
   const repeatedRuns: string[] = []
   let runChar = ''
@@ -152,7 +140,6 @@ function analyze(password: string) {
     }
   }
   if (runLen >= 3 && runChar) repeatedRuns.push(runChar.repeat(runLen))
-
   // Sequential runs (abc, 123, cba, 321)
   const sequentialRuns: string[] = []
   let seqStart = 0
@@ -167,7 +154,6 @@ function analyze(password: string) {
       seqStart = i
     }
   }
-
   // Keyboard sequences (qwerty, asdf)
   const keyboardRuns: string[] = []
   for (const row of KEYBOARD_ROWS) {
@@ -178,7 +164,6 @@ function analyze(password: string) {
       if (lowercased.includes(reversed)) keyboardRuns.push(reversed)
     }
   }
-
   return {
     length,
     lower,
@@ -194,14 +179,11 @@ function analyze(password: string) {
     keyboardRuns,
   }
 }
-
 export default function PasswordStrengthChecker() {
   const [password, setPassword] = React.useState('')
   const [show, setShow] = React.useState(false)
-
   const a = analyze(password)
   const grade = gradeForEntropy(a.entropy)
-
   // Warnings
   const warnings: { type: 'danger' | 'warn' | 'info'; text: string }[] = []
   if (a.length === 0) {
@@ -248,16 +230,13 @@ export default function PasswordStrengthChecker() {
         text: 'Excellent length and character variety.',
       })
   }
-
   const crackTime = (rate: number): string => {
     if (a.length === 0) return '—'
     const guesses = Math.pow(2, a.entropy)
     const seconds = guesses / 2 / rate
     return formatDuration(seconds)
   }
-
   const progressValue = Math.min(100, (a.entropy / 256) * 100)
-
   return (
     <div className="space-y-5">
       <Card>
@@ -298,7 +277,6 @@ export default function PasswordStrengthChecker() {
               </Button>
             </div>
           </div>
-
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
               <span className="font-medium">Strength</span>
@@ -315,7 +293,6 @@ export default function PasswordStrengthChecker() {
           </div>
         </CardContent>
       </Card>
-
       {a.length > 0 && (
         <div className="grid gap-5 lg:grid-cols-2">
           <Card>
@@ -351,7 +328,6 @@ export default function PasswordStrengthChecker() {
               </Table>
             </CardContent>
           </Card>
-
           <Card>
             <CardHeader>
               <CardTitle>Composition</CardTitle>
@@ -383,7 +359,6 @@ export default function PasswordStrengthChecker() {
           </Card>
         </div>
       )}
-
       {warnings.length > 0 && (
         <Card>
           <CardHeader>

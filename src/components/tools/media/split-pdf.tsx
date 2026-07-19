@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { PDFDocument } from 'pdf-lib'
 import { toast } from 'sonner'
@@ -23,27 +22,22 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
 import { Field, Stat, downloadBlob } from '@/lib/tools/tool-ui'
-
 type SplitMode = 'every' | 'range' | 'count'
-
 interface SplitChunk {
   name: string
   label: string
   bytes: Uint8Array | null
   status: 'pending' | 'ready' | 'error'
 }
-
 function formatBytes(b: number): string {
   if (!Number.isFinite(b) || b < 0) return '—'
   if (b < 1024) return `${b} B`
   if (b < 1024 * 1024) return `${(b / 1024).toFixed(1)} KB`
   return `${(b / 1024 / 1024).toFixed(2)} MB`
 }
-
 function baseName(name: string): string {
   return name.replace(/\.[^.]+$/, '') || 'document'
 }
-
 export default function SplitPdf() {
   const [file, setFile] = React.useState<File | null>(null)
   const [pageCount, setPageCount] = React.useState(0)
@@ -56,7 +50,6 @@ export default function SplitPdf() {
   const [splitting, setSplitting] = React.useState(false)
   const inputRef = React.useRef<HTMLInputElement | null>(null)
   const fileBytesRef = React.useRef<ArrayBuffer | null>(null)
-
   const loadFile = async (f: File): Promise<void> => {
     setLoading(true)
     setChunks([])
@@ -83,13 +76,11 @@ export default function SplitPdf() {
       setLoading(false)
     }
   }
-
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const f = e.target.files?.[0]
     if (f) void loadFile(f)
     e.target.value = ''
   }
-
   const planChunks = (): { name: string; label: string; indices: number[] }[] => {
     if (!file) return []
     const base = baseName(file.name)
@@ -139,9 +130,7 @@ export default function SplitPdf() {
     }
     return out
   }
-
   const plan = planChunks()
-
   const runSplit = async (): Promise<void> => {
     if (!file || !fileBytesRef.current) {
       toast.error('Load a PDF first')
@@ -199,7 +188,6 @@ export default function SplitPdf() {
       setSplitting(false)
     }
   }
-
   const downloadOne = (chunk: SplitChunk): void => {
     if (!chunk.bytes) {
       toast.error('Chunk not ready yet')
@@ -207,7 +195,6 @@ export default function SplitPdf() {
     }
     downloadBlob(new Blob([chunk.bytes], { type: 'application/pdf' }), chunk.name)
   }
-
   const downloadAll = (): void => {
     const ready = chunks.filter((c) => c.bytes)
     if (ready.length === 0) {
@@ -219,7 +206,6 @@ export default function SplitPdf() {
     }
     toast.success(`Downloading ${ready.length} file${ready.length === 1 ? '' : 's'}`)
   }
-
   return (
     <div className="space-y-5">
       <Field label="Source PDF">
@@ -259,7 +245,6 @@ export default function SplitPdf() {
           </p>
         </div>
       </Field>
-
       {file ? (
         <div className="grid gap-5 sm:grid-cols-2">
           <Field label="Split mode" htmlFor="sp-mode">
@@ -277,7 +262,6 @@ export default function SplitPdf() {
               </SelectContent>
             </Select>
           </Field>
-
           {mode === 'range' ? (
             <div className="grid grid-cols-2 gap-3">
               <Field label="Start page" htmlFor="sp-start">
@@ -302,7 +286,6 @@ export default function SplitPdf() {
               </Field>
             </div>
           ) : null}
-
           {mode === 'count' ? (
             <Field
               label="Pages per chunk"
@@ -321,7 +304,6 @@ export default function SplitPdf() {
           ) : null}
         </div>
       ) : null}
-
       {file && plan.length > 0 ? (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           <Stat label="Source pages" value={pageCount} />
@@ -332,7 +314,6 @@ export default function SplitPdf() {
           />
         </div>
       ) : null}
-
       {file ? (
         <Card>
           <CardHeader>
@@ -362,7 +343,6 @@ export default function SplitPdf() {
           </CardContent>
         </Card>
       ) : null}
-
       {chunks.length > 0 ? (
         <Card>
           <CardHeader>
@@ -415,7 +395,6 @@ export default function SplitPdf() {
           </CardContent>
         </Card>
       ) : null}
-
       <Button
         type="button"
         onClick={() => void runSplit()}

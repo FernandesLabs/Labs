@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Eraser } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -11,13 +10,11 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Field, Stat } from '@/lib/tools/tool-ui'
 import { useCopy } from '@/lib/tools/use-copy'
 import { toast } from 'sonner'
-
 interface MatchInfo {
   index: number
   value: string
   groups: string[]
 }
-
 const FLAGS: { id: string; label: string; desc: string }[] = [
   { id: 'g', label: 'g', desc: 'Global — all matches' },
   { id: 'i', label: 'i', desc: 'Case-insensitive' },
@@ -25,13 +22,11 @@ const FLAGS: { id: string; label: string; desc: string }[] = [
   { id: 's', label: 's', desc: 'Dot matches newline' },
   { id: 'u', label: 'u', desc: 'Unicode' },
 ]
-
 const SAMPLE_PATTERN = '\\b\\w+@\\w+\\.\\w+\\b'
 const SAMPLE_TEXT = `Contact us at hello@fernandeslabs.com
 or sales@fernandeslabs.io for details.
 No email here: not-an-email
 Backup: support@fernandeslabs.dev`
-
 function findAllMatches(
   pattern: string,
   flags: string,
@@ -61,13 +56,11 @@ function findAllMatches(
   }
   return { matches, error: null }
 }
-
 interface HighlightPiece {
   type: 'text' | 'match'
   value: string
   key: string
 }
-
 function buildHighlightPieces(
   text: string,
   matches: MatchInfo[]
@@ -103,18 +96,15 @@ function buildHighlightPieces(
   }
   return pieces
 }
-
 export default function RegexTester() {
   const [pattern, setPattern] = React.useState(SAMPLE_PATTERN)
   const [flagSet, setFlagSet] = React.useState<Set<string>>(new Set(['g', 'i']))
   const [text, setText] = React.useState(SAMPLE_TEXT)
   const { copy } = useCopy()
-
   const flags = React.useMemo(
     () => ['g', 'i', 'm', 's', 'u'].filter((f) => flagSet.has(f)).join(''),
     [flagSet]
   )
-
   // Detect /pattern/flags literal form so we can strip the slashes
   // before constructing the RegExp and sync the inline flags.
   const { src, inlineFlags } = React.useMemo(() => {
@@ -131,28 +121,23 @@ export default function RegexTester() {
     }
     return { src: pattern, inlineFlags: '' }
   }, [pattern])
-
   // If user typed /pattern/flags form, sync flags from the trailing part.
   React.useEffect(() => {
     if (inlineFlags) {
       setFlagSet(new Set<string>(inlineFlags.split('')))
     }
   }, [inlineFlags])
-
   const { matches, error } = React.useMemo(
     () => findAllMatches(src, flags, text),
     [src, flags, text]
   )
-
   React.useEffect(() => {
     if (error) toast.error('Invalid regex: ' + error)
   }, [error])
-
   const pieces = React.useMemo(
     () => buildHighlightPieces(text, matches),
     [text, matches]
   )
-
   const toggleFlag = (f: string) => {
     setFlagSet((prev) => {
       const next = new Set(prev)
@@ -161,7 +146,6 @@ export default function RegexTester() {
       return next
     })
   }
-
   return (
     <div className="space-y-5">
       <Field
@@ -178,7 +162,6 @@ export default function RegexTester() {
           placeholder="\\b\\w+\\b"
         />
       </Field>
-
       <Field label="Flags" hint="Toggle standard RegExp flags">
         <div className="flex flex-wrap items-center gap-4">
           {FLAGS.map((f) => (
@@ -202,7 +185,6 @@ export default function RegexTester() {
           </span>
         </div>
       </Field>
-
       <Field label="Test text" htmlFor="rx-text">
         <Textarea
           id="rx-text"
@@ -214,7 +196,6 @@ export default function RegexTester() {
           placeholder="Type or paste text to test against…"
         />
       </Field>
-
       <div className="flex items-center gap-2">
         <Button variant="outline" size="sm" onClick={() => setText('')}>
           <Eraser className="size-4" />
@@ -229,7 +210,6 @@ export default function RegexTester() {
           Copy matches
         </Button>
       </div>
-
       {error ? (
         <Alert variant="destructive">
           <AlertDescription className="font-mono text-xs">
@@ -237,7 +217,6 @@ export default function RegexTester() {
           </AlertDescription>
         </Alert>
       ) : null}
-
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat label="Match count" value={matches.length} accent="oklch(0.6 0.2 262.6)" />
         <Stat label="Flags" value={flags || '—'} />
@@ -247,7 +226,6 @@ export default function RegexTester() {
           value={matches.reduce((n, m) => n + m.value.length, 0)}
         />
       </div>
-
       <Field label="Highlighted matches" hint={`${matches.length} found`}>
         <pre
           className="fl-scroll max-h-72 overflow-auto rounded-lg border border-border bg-muted/30 p-3 font-mono text-sm whitespace-pre-wrap break-words"
@@ -273,7 +251,6 @@ export default function RegexTester() {
           )}
         </pre>
       </Field>
-
       <Field label="Match list" hint="Index · value · groups">
         <div className="fl-scroll max-h-64 overflow-auto rounded-lg border border-border bg-muted/20">
           {matches.length === 0 ? (

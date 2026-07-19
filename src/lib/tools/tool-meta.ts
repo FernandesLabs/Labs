@@ -14,20 +14,15 @@
  */
 import type { ToolMeta } from './types'
 import toolMeta from './tool-meta.json'
-
 export const toolMetaList: ToolMeta[] = toolMeta as ToolMeta[]
-
 export const toolMetaBySlug: Map<string, ToolMeta> = new Map(
   toolMetaList.map((t) => [t.slug, t])
 )
-
 export const toolSlugs: string[] = toolMetaList.map((t) => t.slug)
-
 /** Get a tool's metadata by slug, or `undefined` if not found. */
 export function getToolMeta(slug: string): ToolMeta | undefined {
   return toolMetaBySlug.get(slug)
 }
-
 /** All tools in a given category. */
 export function toolsByCategory(category: string): ToolMeta[] {
   return toolMetaList.filter((t) => t.category === category)

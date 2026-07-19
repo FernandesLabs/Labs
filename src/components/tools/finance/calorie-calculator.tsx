@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import {
   Card,
@@ -19,7 +18,6 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 function parseNum(value: string): number {
   if (value == null) return NaN
   const trimmed = value.trim()
@@ -27,7 +25,6 @@ function parseNum(value: string): number {
   const n = Number(trimmed)
   return Number.isFinite(n) ? n : NaN
 }
-
 function fmt(n: number, digits = 0): string {
   if (!Number.isFinite(n)) return '—'
   return n.toLocaleString(undefined, {
@@ -35,9 +32,7 @@ function fmt(n: number, digits = 0): string {
     minimumFractionDigits: digits,
   })
 }
-
 type Gender = 'male' | 'female'
-
 interface GoalPreset {
   value: string
   label: string
@@ -47,7 +42,6 @@ interface GoalPreset {
   carbs: number
   fat: number
 }
-
 const GOAL_PRESETS: GoalPreset[] = [
   {
     value: 'lose1',
@@ -90,7 +84,6 @@ const GOAL_PRESETS: GoalPreset[] = [
     fat: 20,
   },
 ]
-
 const ACTIVITY_LEVELS = [
   { value: '1.2', label: 'Sedentary' },
   { value: '1.375', label: 'Light' },
@@ -98,7 +91,6 @@ const ACTIVITY_LEVELS = [
   { value: '1.725', label: 'Active' },
   { value: '1.9', label: 'Very Active' },
 ] as const
-
 /**
  * Calorie Calculator
  * BMR (Mifflin-St Jeor) × activity → daily calories. Includes macro
@@ -111,11 +103,9 @@ export default function CalorieCalculator() {
   const [height, setHeight] = React.useState('175')
   const [activity, setActivity] = React.useState<string>('1.55')
   const [goalValue, setGoalValue] = React.useState<string>('maintain')
-
   const ageN = parseNum(age)
   const kg = parseNum(weight)
   const cm = parseNum(height)
-
   const valid =
     Number.isFinite(ageN) &&
     ageN > 0 &&
@@ -123,22 +113,18 @@ export default function CalorieCalculator() {
     kg > 0 &&
     Number.isFinite(cm) &&
     cm > 0
-
   let bmr = NaN
   if (valid) {
     const base = 10 * kg + 6.25 * cm - 5 * ageN
     bmr = gender === 'male' ? base + 5 : base - 161
   }
-
   const multiplier = Number(activity)
   const tdee =
     Number.isFinite(bmr) && Number.isFinite(multiplier) && multiplier > 0
       ? bmr * multiplier
       : NaN
-
   const goal = GOAL_PRESETS.find((g) => g.value === goalValue) ?? GOAL_PRESETS[2]
   const target = Number.isFinite(tdee) ? tdee + goal.delta : NaN
-
   // Macro grams: protein/carbs = 4 cal/g, fat = 9 cal/g
   const proteinG =
     Number.isFinite(target) && target > 0 ? (target * goal.protein) / 100 / 4 : NaN
@@ -146,7 +132,6 @@ export default function CalorieCalculator() {
     Number.isFinite(target) && target > 0 ? (target * goal.carbs) / 100 / 4 : NaN
   const fatG =
     Number.isFinite(target) && target > 0 ? (target * goal.fat) / 100 / 9 : NaN
-
   return (
     <div className="space-y-5">
       <Card>
@@ -169,7 +154,6 @@ export default function CalorieCalculator() {
               </TabsList>
             </Tabs>
           </Field>
-
           <div className="grid gap-4 sm:grid-cols-3">
             <Field label="Age" htmlFor="cal-age" hint="years">
               <Input
@@ -202,7 +186,6 @@ export default function CalorieCalculator() {
               />
             </Field>
           </div>
-
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Activity level" htmlFor="cal-activity">
               <Select value={activity} onValueChange={setActivity}>
@@ -235,7 +218,6 @@ export default function CalorieCalculator() {
           </div>
         </CardContent>
       </Card>
-
       <div className="grid gap-3 sm:grid-cols-3">
         <Stat
           label="BMR"
@@ -253,7 +235,6 @@ export default function CalorieCalculator() {
           accent="#d97706"
         />
       </div>
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Macro breakdown</CardTitle>
@@ -282,7 +263,6 @@ export default function CalorieCalculator() {
               accent="#0ea5e9"
             />
           </div>
-
           <div className="space-y-2">
             <MacroBar
               label="Protein"
@@ -310,7 +290,6 @@ export default function CalorieCalculator() {
           </p>
         </CardContent>
       </Card>
-
       <Card>
         <CardContent>
           <Button
@@ -333,7 +312,6 @@ export default function CalorieCalculator() {
     </div>
   )
 }
-
 function MacroBar({
   label,
   pct,

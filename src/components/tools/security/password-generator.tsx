@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { RefreshCw, Copy, Check, KeyRound, Keyboard } from 'lucide-react'
 import { toast } from 'sonner'
@@ -20,19 +19,16 @@ import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Field, Stat, randomInt } from '@/lib/tools/tool-ui'
 import { useCopy } from '@/lib/tools/use-copy'
-
 const LOWER = 'abcdefghijklmnopqrstuvwxyz'
 const UPPER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 const DIGITS = '0123456789'
 const SYMBOLS = '!@#$%^&*()-_=+[]{};:,.<>?/'
 const AMBIGUOUS = 'Il1O0'
-
 type Grade = {
   level: 0 | 1 | 2 | 3 | 4
   label: string
   tone: string
 }
-
 function gradeForEntropy(bits: number): Grade {
   if (bits < 28)
     return { level: 0, label: 'Very Weak', tone: 'text-red-600' }
@@ -44,7 +40,6 @@ function gradeForEntropy(bits: number): Grade {
     return { level: 3, label: 'Strong', tone: 'text-emerald-600' }
   return { level: 4, label: 'Very Strong', tone: 'text-emerald-700' }
 }
-
 function buildAlphabet(opts: {
   lower: boolean
   upper: boolean
@@ -65,12 +60,10 @@ function buildAlphabet(opts: {
   }
   return alphabet
 }
-
 function pickFrom(set: string): string {
   if (set.length === 0) return ''
   return set[randomInt(set.length)]!
 }
-
 function shuffle<T>(arr: T[]): T[] {
   const out = arr.slice()
   for (let i = out.length - 1; i > 0; i--) {
@@ -81,7 +74,6 @@ function shuffle<T>(arr: T[]): T[] {
   }
   return out
 }
-
 function generatePassword(
   length: number,
   opts: {
@@ -94,7 +86,6 @@ function generatePassword(
 ): string {
   const alphabet = buildAlphabet(opts)
   if (alphabet.length === 0 || length <= 0) return ''
-
   const sets: string[] = []
   const filter = (s: string) =>
     opts.excludeAmbiguous
@@ -107,7 +98,6 @@ function generatePassword(
   if (opts.upper && filter(UPPER).length > 0) sets.push(filter(UPPER))
   if (opts.digits && filter(DIGITS).length > 0) sets.push(filter(DIGITS))
   if (opts.symbols && filter(SYMBOLS).length > 0) sets.push(filter(SYMBOLS))
-
   const chars: string[] = []
   // Guarantee at least one from each enabled set (if length allows).
   const guaranteeCount = Math.min(sets.length, length)
@@ -120,7 +110,6 @@ function generatePassword(
   }
   return shuffle(chars).join('')
 }
-
 function composition(pw: string) {
   let lower = 0
   let upper = 0
@@ -134,7 +123,6 @@ function composition(pw: string) {
   }
   return { lower, upper, digits, symbols }
 }
-
 export default function PasswordGenerator() {
   const [length, setLength] = React.useState(16)
   const [lower, setLower] = React.useState(true)
@@ -144,14 +132,12 @@ export default function PasswordGenerator() {
   const [excludeAmbiguous, setExcludeAmbiguous] = React.useState(false)
   const [password, setPassword] = React.useState('')
   const { copied, copy } = useCopy()
-
   const opts = { lower, upper, digits, symbols, excludeAmbiguous }
   const alphabet = buildAlphabet(opts)
   const poolSize = alphabet.length
   const entropy = poolSize > 0 ? Math.log2(poolSize) * length : 0
   const grade = gradeForEntropy(entropy)
   const comp = composition(password)
-
   const regenerate = () => {
     if (poolSize === 0) {
       toast.error('Select at least one character set')
@@ -164,7 +150,6 @@ export default function PasswordGenerator() {
     }
     setPassword(pw)
   }
-
   // Generate on mount and whenever options change.
   React.useEffect(() => {
     if (poolSize > 0) {
@@ -173,13 +158,11 @@ export default function PasswordGenerator() {
       setPassword('')
     }
   }, [length, lower, upper, digits, symbols, excludeAmbiguous])
-
   // Keep latest regenerate in a ref so the keyboard listener registers once.
   const regenerateRef = React.useRef(regenerate)
   React.useEffect(() => {
     regenerateRef.current = regenerate
   })
-
   // Keyboard shortcut: press G to regenerate.
   React.useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -202,9 +185,7 @@ export default function PasswordGenerator() {
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
   }, [])
-
   const progressValue = Math.min(100, (entropy / 256) * 100)
-
   return (
     <div className="space-y-5">
       <Card>
@@ -266,7 +247,6 @@ export default function PasswordGenerator() {
               </Badge>
             </div>
           </div>
-
           {/* Strength meter */}
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
@@ -284,7 +264,6 @@ export default function PasswordGenerator() {
           </div>
         </CardContent>
       </Card>
-
       <div className="grid gap-5 lg:grid-cols-2">
         <Card>
           <CardHeader>
@@ -307,9 +286,7 @@ export default function PasswordGenerator() {
                 aria-label="Password length"
               />
             </Field>
-
             <Separator />
-
             <div className="space-y-3">
               <span className="text-sm font-medium">Character sets</span>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -334,9 +311,7 @@ export default function PasswordGenerator() {
                 ))}
               </div>
             </div>
-
             <Separator />
-
             <div className="flex items-center justify-between gap-3">
               <div className="space-y-0.5">
                 <Label htmlFor="pw-ambig" className="cursor-pointer">
@@ -355,7 +330,6 @@ export default function PasswordGenerator() {
             </div>
           </CardContent>
         </Card>
-
         <Card>
           <CardHeader>
             <CardTitle>Composition</CardTitle>

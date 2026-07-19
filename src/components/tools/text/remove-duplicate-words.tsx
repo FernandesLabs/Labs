@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Eraser } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -19,23 +18,19 @@ import {
   RadioGroupItem,
 } from '@/components/ui/radio-group'
 import { Field, ResultBox, Stat } from '@/lib/tools/tool-ui'
-
 type Scope = 'line' | 'all'
 type Delimiter = 'space' | 'comma' | 'newline'
-
 const DELIMITER_CHAR: Record<Delimiter, string> = {
   space: ' ',
   comma: ', ',
   newline: '\n',
 }
-
 interface DedupeResult {
   output: string
   total: number
   unique: number
   removed: number
 }
-
 function dedupeWords(
   input: string,
   caseSensitive: boolean,
@@ -44,7 +39,6 @@ function dedupeWords(
 ): DedupeResult {
   const joiner = DELIMITER_CHAR[delim]
   const keyOf = (w: string) => (caseSensitive ? w : w.toLowerCase())
-
   if (scope === 'all') {
     const words = input.split(/\s+/).filter(Boolean)
     if (words.length === 0) {
@@ -65,7 +59,6 @@ function dedupeWords(
       removed: words.length - out.length,
     }
   }
-
   // within each line
   const lines = input.split('\n')
   const outLines: string[] = []
@@ -96,18 +89,15 @@ function dedupeWords(
     removed: total - unique,
   }
 }
-
 export default function RemoveDuplicateWords() {
   const [text, setText] = React.useState('')
   const [caseSensitive, setCaseSensitive] = React.useState(false)
   const [scope, setScope] = React.useState<Scope>('line')
   const [delim, setDelim] = React.useState<Delimiter>('space')
-
   const result = React.useMemo(
     () => dedupeWords(text, caseSensitive, scope, delim),
     [text, caseSensitive, scope, delim]
   )
-
   return (
     <div className="space-y-5">
       <Field
@@ -125,7 +115,6 @@ export default function RemoveDuplicateWords() {
           className="min-h-32 font-mono text-sm"
         />
       </Field>
-
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="flex items-center justify-between rounded-lg border border-border bg-card p-3">
           <Label
@@ -144,7 +133,6 @@ export default function RemoveDuplicateWords() {
             aria-label="Toggle case-sensitive comparison"
           />
         </div>
-
         <Field label="Output delimiter" htmlFor="rdw-delim">
           <Select
             value={delim}
@@ -161,7 +149,6 @@ export default function RemoveDuplicateWords() {
           </Select>
         </Field>
       </div>
-
       <Field label="Scope" htmlFor="rdw-scope">
         <RadioGroup
           id="rdw-scope"
@@ -185,7 +172,6 @@ export default function RemoveDuplicateWords() {
           </Label>
         </RadioGroup>
       </Field>
-
       <div
         className="grid grid-cols-3 gap-3"
         role="status"
@@ -205,7 +191,6 @@ export default function RemoveDuplicateWords() {
           accent={result.removed > 0 ? 'oklch(0.6 0.2 20)' : undefined}
         />
       </div>
-
       <div className="flex flex-wrap items-center justify-between gap-2">
         <Button
           variant="ghost"
@@ -227,7 +212,6 @@ export default function RemoveDuplicateWords() {
           </div>
         ) : null}
       </div>
-
       <ResultBox
         value={result.output}
         label="Unique words"

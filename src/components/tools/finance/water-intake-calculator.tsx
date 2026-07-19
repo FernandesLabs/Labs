@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import {
   Card,
@@ -18,7 +17,6 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 function parseNum(value: string): number {
   if (value == null) return NaN
   const trimmed = value.trim()
@@ -26,7 +24,6 @@ function parseNum(value: string): number {
   const n = Number(trimmed)
   return Number.isFinite(n) ? n : NaN
 }
-
 function fmt(n: number, digits = 0): string {
   if (!Number.isFinite(n)) return '—'
   return n.toLocaleString(undefined, {
@@ -34,10 +31,8 @@ function fmt(n: number, digits = 0): string {
     minimumFractionDigits: digits,
   })
 }
-
 type WeightUnit = 'kg' | 'lb'
 type Climate = 'temperate' | 'hot' | 'cold'
-
 const LB_TO_KG = 0.45359237
 const ML_PER_KG = 35
 const ML_PER_30MIN = 350
@@ -51,7 +46,6 @@ const CLIMATE_OPTIONS: { value: Climate; label: string }[] = [
   { value: 'hot', label: 'Hot / Humid' },
   { value: 'cold', label: 'Cold' },
 ]
-
 /**
  * Water Intake Calculator
  * Daily water need = 35 ml/kg + 350 ml per 30 min activity + climate adj.
@@ -62,15 +56,12 @@ export default function WaterIntakeCalculator() {
   const [weight, setWeight] = React.useState('70')
   const [activityMin, setActivityMin] = React.useState('30')
   const [climate, setClimate] = React.useState<Climate>('temperate')
-
   const wRaw = parseNum(weight)
   const kg = weightUnit === 'lb' ? wRaw * LB_TO_KG : wRaw
   const min = parseNum(activityMin)
   const climateAdj = CLIMATE_ADJUST[climate]
-
   const valid = Number.isFinite(kg) && kg > 0
   const validMin = Number.isFinite(min) && min >= 0
-
   let ml = NaN
   if (valid && validMin) {
     const base = kg * ML_PER_KG
@@ -78,10 +69,8 @@ export default function WaterIntakeCalculator() {
     ml = base + activityAdd + climateAdj
     if (ml < 0) ml = 0
   }
-
   const liters = Number.isFinite(ml) ? ml / 1000 : NaN
   const cups = Number.isFinite(ml) ? ml / 250 : NaN
-
   return (
     <div className="space-y-5">
       <Card>
@@ -156,7 +145,6 @@ export default function WaterIntakeCalculator() {
           </div>
         </CardContent>
       </Card>
-
       <div className="grid gap-3 sm:grid-cols-3">
         <Stat
           label="Daily water need"
@@ -174,7 +162,6 @@ export default function WaterIntakeCalculator() {
           accent="#0ea5e9"
         />
       </div>
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">How this is calculated</CardTitle>
@@ -209,7 +196,6 @@ export default function WaterIntakeCalculator() {
           </p>
         </CardContent>
       </Card>
-
       <Card>
         <CardContent>
           <Button

@@ -12,7 +12,6 @@ import {
   type ToolCategory,
 } from '@/lib/tools/types'
 import { CategoryPageClient } from './category-page-client'
-
 /**
  * Category landing page — `/category/<category>` (e.g. `/category/developer`).
  *
@@ -28,17 +27,13 @@ import { CategoryPageClient } from './category-page-client'
  *   2. Emits BreadcrumbList + ItemList JSON-LD structured data
  *   3. Mounts the client-side `<CategoryPageClient>` for interactive search/filter
  */
-
 interface PageProps {
   params: Promise<{ category: string }>
 }
-
 const VALID_CATEGORIES = new Set<string>(CATEGORY_ORDER)
-
 export async function generateStaticParams() {
   return CATEGORY_ORDER.map((category) => ({ category }))
 }
-
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
@@ -56,7 +51,6 @@ export async function generateMetadata({
   const tools = toolsByCategory(cat)
   const title = `${meta.label} Tools — ${tools.length} Free Online Tools | Fernandes Labs`
   const description = `${meta.blurb} Browse ${tools.length} free ${meta.label.toLowerCase()} tools — all privacy-first, client-side, no sign-up. ${meta.label === 'Developer' ? 'JSON, encoders, hashes, regex, and code utilities.' : meta.label === 'Finance' ? 'Calculators for money, health, and school.' : ''}`
-
   return {
     title,
     description,
@@ -93,7 +87,6 @@ export async function generateMetadata({
     },
   }
 }
-
 export default async function CategoryPage({ params }: PageProps) {
   const { category: rawCat } = await params
   if (!VALID_CATEGORIES.has(rawCat)) {
@@ -104,14 +97,12 @@ export default async function CategoryPage({ params }: PageProps) {
   const baseUrl = siteConfig.site.url
   const categoryUrl = `${baseUrl}/category/${cat}`
   const tools = toolsByCategory(cat)
-
   // Other categories for the sidebar / cross-linking.
   const otherCategories = CATEGORY_ORDER.filter((c) => c !== cat).map((c) => ({
     category: c,
     meta: CATEGORY_META[c],
     count: toolMetaList.filter((t) => t.category === c).length,
   }))
-
   // Structured data: BreadcrumbList + ItemList (the list of tools in this category).
   const structuredData = {
     '@context': 'https://schema.org',
@@ -147,7 +138,6 @@ export default async function CategoryPage({ params }: PageProps) {
       },
     ],
   }
-
   return (
     <>
       <script

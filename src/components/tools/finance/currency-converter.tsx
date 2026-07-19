@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { ArrowLeftRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -13,7 +12,6 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 function parseNum(value: string): number {
   if (value == null) return NaN
   const trimmed = value.trim()
@@ -21,7 +19,6 @@ function parseNum(value: string): number {
   const n = Number(trimmed)
   return Number.isFinite(n) ? n : NaN
 }
-
 /**
  * Hardcoded reference exchange rates relative to USD (1 USD = rate <currency>).
  * Reference rates, not live. For estimation only.
@@ -40,7 +37,6 @@ const REF_RATES: Record<string, number> = {
   MXN: 17.1,
   ZAR: 18.6,
 }
-
 const CURRENCY_NAMES: Record<string, string> = {
   USD: 'US Dollar',
   EUR: 'Euro',
@@ -55,7 +51,6 @@ const CURRENCY_NAMES: Record<string, string> = {
   MXN: 'Mexican Peso',
   ZAR: 'South African Rand',
 }
-
 function formatAmount(amount: number, currency: string): string {
   if (!Number.isFinite(amount)) return '—'
   const minDigits = currency === 'JPY' ? 0 : 2
@@ -71,7 +66,6 @@ function formatAmount(amount: number, currency: string): string {
     return `${amount.toFixed(maxDigits)} ${currency}`
   }
 }
-
 /**
  * Currency Converter
  * Uses BUNDLED static reference rates relative to USD (no external calls).
@@ -81,23 +75,19 @@ export default function CurrencyConverter() {
   const [amount, setAmount] = React.useState('100')
   const [from, setFrom] = React.useState<string>('USD')
   const [to, setTo] = React.useState<string>('EUR')
-
   const a = parseNum(amount)
   const fromRate = REF_RATES[from]
   const toRate = REF_RATES[to]
-
   // amount in USD = a / fromRate; then to target = usd * toRate
   const converted =
     Number.isFinite(a) && fromRate > 0 && toRate > 0
       ? (a / fromRate) * toRate
       : NaN
   const unitRate = fromRate > 0 && toRate > 0 ? toRate / fromRate : NaN
-
   const swap = () => {
     setFrom(to)
     setTo(from)
   }
-
   return (
     <div className="space-y-5">
       <Card>
@@ -114,7 +104,6 @@ export default function CurrencyConverter() {
               aria-label="Amount to convert"
             />
           </Field>
-
           <div className="grid items-end gap-3 sm:grid-cols-[1fr_auto_1fr]">
             <Field label="From" htmlFor="cc-from">
               <Select value={from} onValueChange={setFrom}>
@@ -130,7 +119,6 @@ export default function CurrencyConverter() {
                 </SelectContent>
               </Select>
             </Field>
-
             <Button
               type="button"
               variant="outline"
@@ -141,7 +129,6 @@ export default function CurrencyConverter() {
             >
               <ArrowLeftRight className="size-4" />
             </Button>
-
             <Field label="To" htmlFor="cc-to">
               <Select value={to} onValueChange={setTo}>
                 <SelectTrigger id="cc-to" className="w-full" aria-label="To currency">
@@ -157,13 +144,11 @@ export default function CurrencyConverter() {
               </Select>
             </Field>
           </div>
-
           {Number.isFinite(a) && a < 0 ? (
             <p className="text-sm text-destructive">Amount must be non-negative.</p>
           ) : null}
         </CardContent>
       </Card>
-
       <Card>
         <CardContent className="space-y-4 pt-6">
           <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">

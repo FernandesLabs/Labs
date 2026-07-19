@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -13,10 +12,8 @@ import {
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { Field, ResultBox } from '@/lib/tools/tool-ui'
-
 type SourceType = 'book' | 'website' | 'journal' | 'newspaper'
 type Style = 'APA' | 'MLA' | 'Chicago'
-
 interface Fields {
   title: string
   authors: string
@@ -31,7 +28,6 @@ interface Fields {
   issue: string
   pages: string
 }
-
 const EMPTY: Fields = {
   title: '',
   authors: '',
@@ -46,14 +42,12 @@ const EMPTY: Fields = {
   issue: '',
   pages: '',
 }
-
 function splitAuthors(s: string): string[] {
   return s
     .split(/[;\n]/)
     .map((a) => a.trim())
     .filter(Boolean)
 }
-
 function initials(name: string): string {
   return name
     .trim()
@@ -62,7 +56,6 @@ function initials(name: string): string {
     .map((p) => `${p[0]?.toUpperCase() ?? ''}.`)
     .join(' ')
 }
-
 function apaFirstAuthor(name: string): string {
   const trimmed = name.trim()
   if (trimmed.includes(',')) {
@@ -75,7 +68,6 @@ function apaFirstAuthor(name: string): string {
   const last = parts.pop() as string
   return `${last}, ${initials(parts.join(' '))}`
 }
-
 function apaAuthors(authors: string[]): string {
   if (authors.length === 0) return ''
   const formatted = authors.map(apaFirstAuthor)
@@ -83,7 +75,6 @@ function apaAuthors(authors: string[]): string {
   if (formatted.length === 2) return `${formatted[0]} & ${formatted[1]}`
   return `${formatted.slice(0, -1).join(', ')}, & ${formatted[formatted.length - 1]}`
 }
-
 function mlaFirstAuthor(name: string): string {
   const trimmed = name.trim()
   if (trimmed.includes(',')) return trimmed
@@ -93,14 +84,12 @@ function mlaFirstAuthor(name: string): string {
   const last = parts.pop() as string
   return `${last}, ${parts.join(' ')}`
 }
-
 function mlaAuthors(authors: string[]): string {
   if (authors.length === 0) return ''
   if (authors.length === 1) return mlaFirstAuthor(authors[0])
   if (authors.length === 2) return `${mlaFirstAuthor(authors[0])}, and ${authors[1]}`
   return `${mlaFirstAuthor(authors[0])}, et al.`
 }
-
 function chicagoFirstAuthor(name: string): string {
   const trimmed = name.trim()
   if (trimmed.includes(',')) {
@@ -109,7 +98,6 @@ function chicagoFirstAuthor(name: string): string {
   }
   return trimmed
 }
-
 function chicagoAuthors(authors: string[]): string {
   if (authors.length === 0) return ''
   const first = chicagoFirstAuthor(authors[0])
@@ -117,7 +105,6 @@ function chicagoAuthors(authors: string[]): string {
   if (authors.length === 2) return `${first} and ${chicagoFirstAuthor(authors[1])}`
   return `${first} et al.`
 }
-
 function buildCitation(type: SourceType, style: Style, f: Fields): string {
   const authors = splitAuthors(f.authors)
   const year = f.year.trim()
@@ -131,9 +118,7 @@ function buildCitation(type: SourceType, style: Style, f: Fields): string {
   const vol = f.volume.trim()
   const iss = f.issue.trim()
   const pages = f.pages.trim()
-
   const parts: string[] = []
-
   const a =
     style === 'APA'
       ? apaAuthors(authors)
@@ -141,7 +126,6 @@ function buildCitation(type: SourceType, style: Style, f: Fields): string {
         ? mlaAuthors(authors)
         : chicagoAuthors(authors)
   if (a) parts.push(`${a}.`)
-
   if (style === 'APA') {
     if (year) parts.push(`(${year}).`)
     if (type === 'book') {
@@ -211,7 +195,6 @@ function buildCitation(type: SourceType, style: Style, f: Fields): string {
       if (year) parts.push(`${year}.`)
     }
   }
-
   let result = parts
     .join(' ')
     .replace(/\s{2,}/g, ' ')
@@ -222,14 +205,12 @@ function buildCitation(type: SourceType, style: Style, f: Fields): string {
   if (result && !/[.!?)]$/.test(result)) result += '.'
   return result
 }
-
 const SOURCE_TYPES: { value: SourceType; label: string }[] = [
   { value: 'book', label: 'Book' },
   { value: 'website', label: 'Website' },
   { value: 'journal', label: 'Journal article' },
   { value: 'newspaper', label: 'Newspaper article' },
 ]
-
 /**
  * Citation Generator
  * Pick a source type and fill in the relevant fields. Generates a citation in
@@ -240,17 +221,13 @@ export default function CitationGenerator() {
   const [type, setType] = React.useState<SourceType>('book')
   const [style, setStyle] = React.useState<Style>('APA')
   const [fields, setFields] = React.useState<Fields>(EMPTY)
-
   const update = (patch: Partial<Fields>) =>
     setFields((prev) => ({ ...prev, ...patch }))
-
   const citation = React.useMemo(
     () => buildCitation(type, style, fields),
     [type, style, fields],
   )
-
   const downloadName = `citation-${type}-${style.toLowerCase()}.txt`
-
   return (
     <div className="space-y-5">
       <Card>
@@ -272,7 +249,6 @@ export default function CitationGenerator() {
               </SelectContent>
             </Select>
           </Field>
-
           <div className="grid gap-4 sm:grid-cols-2">
             <Field
               label="Title"
@@ -316,7 +292,6 @@ export default function CitationGenerator() {
                 aria-label="Publication year"
               />
             </Field>
-
             {type === 'book' ? (
               <>
                 <Field label="Publisher" htmlFor="cite-publisher">
@@ -339,7 +314,6 @@ export default function CitationGenerator() {
                 </Field>
               </>
             ) : null}
-
             {type === 'website' || type === 'newspaper' ? (
               <>
                 <Field label="URL" htmlFor="cite-url">
@@ -379,7 +353,6 @@ export default function CitationGenerator() {
                 ) : null}
               </>
             ) : null}
-
             {type === 'journal' || type === 'newspaper' ? (
               <Field
                 label={type === 'journal' ? 'Journal name' : 'Newspaper name'}
@@ -394,7 +367,6 @@ export default function CitationGenerator() {
                 />
               </Field>
             ) : null}
-
             {type === 'journal' ? (
               <>
                 <Field label="Volume" htmlFor="cite-vol">
@@ -431,7 +403,6 @@ export default function CitationGenerator() {
           </div>
         </CardContent>
       </Card>
-
       <Card>
         <CardContent className="space-y-4 pt-6">
           <Tabs value={style} onValueChange={(v) => setStyle(v as Style)}>
@@ -441,12 +412,10 @@ export default function CitationGenerator() {
               <TabsTrigger value="Chicago">Chicago</TabsTrigger>
             </TabsList>
           </Tabs>
-
           <div className="flex items-center gap-2">
             <Badge variant="outline">{style}</Badge>
             <Badge variant="outline" className="capitalize">{type}</Badge>
           </div>
-
           <ResultBox
             value={citation}
             label={`${style} citation`}
@@ -455,7 +424,6 @@ export default function CitationGenerator() {
             downloadName={downloadName}
             empty="Fill in the fields above to generate a citation."
           />
-
           <p className="text-xs text-muted-foreground">
             Citations are built from whatever fields you provide. Author names
             accept “First Last” or “Last, First” — separate multiple authors

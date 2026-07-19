@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { Home, Search } from 'lucide-react'
 import { toolMetaList } from '@/lib/tools/tool-meta'
 import { CATEGORY_META, CATEGORY_ORDER, type ToolCategory } from '@/lib/tools/types'
-
 /**
  * Root-level not-found page (for any unmatched URL not under /tools/).
  * Mirrors the /tools/[slug]/not-found design for consistency.
@@ -13,7 +12,6 @@ export const metadata = {
     'The page you were looking for could not be found. Browse all 132 free online tools on Fernandes Labs.',
   robots: { index: false, follow: true },
 }
-
 export default function NotFound() {
   const popular = [
     'json-formatter',
@@ -24,7 +22,6 @@ export default function NotFound() {
     .map((s) => toolMetaList.find((t) => t.slug === s))
     .filter(Boolean)
     .slice(0, 4)
-
   return (
     <main className="flex-1">
       <section className="relative overflow-hidden border-b border-border/60">
@@ -54,7 +51,6 @@ export default function NotFound() {
           </div>
         </div>
       </section>
-
       <section className="mx-auto max-w-5xl px-4 py-10">
         <h2 className="mb-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">
           Popular tools
@@ -85,7 +81,6 @@ export default function NotFound() {
             )
           })}
         </div>
-
         <h2 className="mb-4 mt-10 text-sm font-bold uppercase tracking-wider text-muted-foreground">
           Browse by category
         </h2>

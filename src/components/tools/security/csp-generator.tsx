@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { ShieldCheck, FileCode2 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
@@ -23,7 +22,6 @@ import {
 import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
 import { ResultBox } from '@/lib/tools/tool-ui'
-
 type DirectiveKey =
   | 'default-src'
   | 'script-src'
@@ -34,7 +32,6 @@ type DirectiveKey =
   | 'media-src'
   | 'frame-src'
   | 'object-src'
-
 const DIRECTIVES: { key: DirectiveKey; label: string; hint: string }[] = [
   { key: 'default-src', label: 'default-src', hint: 'Fallback for any directive not set below' },
   { key: 'script-src', label: 'script-src', hint: 'JavaScript sources' },
@@ -46,16 +43,13 @@ const DIRECTIVES: { key: DirectiveKey; label: string; hint: string }[] = [
   { key: 'frame-src', label: 'frame-src', hint: 'iframe and frame sources' },
   { key: 'object-src', label: 'object-src', hint: 'Plugin objects (Flash, Java)' },
 ]
-
 type Preset = 'none' | 'self' | 'https' | 'all' | 'custom'
-
 const PRESET_VALUES: Record<Exclude<Preset, 'custom'>, string> = {
   none: "'none'",
   self: "'self'",
   https: 'https:',
   all: '*',
 }
-
 const PRESET_LABELS: Record<Preset, string> = {
   none: "None ('none')",
   self: "Same origin ('self')",
@@ -63,13 +57,11 @@ const PRESET_LABELS: Record<Preset, string> = {
   all: 'All (*)',
   custom: 'Custom only',
 }
-
 interface DirectiveState {
   enabled: boolean
   preset: Preset
   custom: string
 }
-
 const INITIAL_STATE: Record<DirectiveKey, DirectiveState> = {
   'default-src': { enabled: true, preset: 'self', custom: '' },
   'script-src': { enabled: true, preset: 'self', custom: '' },
@@ -81,7 +73,6 @@ const INITIAL_STATE: Record<DirectiveKey, DirectiveState> = {
   'frame-src': { enabled: false, preset: 'self', custom: '' },
   'object-src': { enabled: true, preset: 'none', custom: '' },
 }
-
 function buildDirectiveValue(state: DirectiveState): string {
   if (!state.enabled) return ''
   if (state.preset === 'none') return "'none'"
@@ -93,7 +84,6 @@ function buildDirectiveValue(state: DirectiveState): string {
   if (custom.length > 0) parts.push(custom)
   return parts.join(' ')
 }
-
 function buildCSP(
   states: Record<DirectiveKey, DirectiveState>,
   reportUri: string
@@ -107,24 +97,19 @@ function buildCSP(
   if (uri.length > 0) parts.push(`report-uri ${uri}`)
   return parts.join('; ')
 }
-
 export default function CspGenerator() {
   const [states, setStates] = React.useState(INITIAL_STATE)
   const [reportUri, setReportUri] = React.useState('')
-
   const csp = React.useMemo(
     () => buildCSP(states, reportUri),
     [states, reportUri]
   )
-
   const activeCount = DIRECTIVES.filter(
     (d) => buildDirectiveValue(states[d.key]).length > 0
   ).length
-
   const updateDirective = (key: DirectiveKey, patch: Partial<DirectiveState>) => {
     setStates((prev) => ({ ...prev, [key]: { ...prev[key], ...patch } }))
   }
-
   return (
     <div className="space-y-5">
       <Card>
@@ -156,7 +141,6 @@ export default function CspGenerator() {
           </div>
         </CardContent>
       </Card>
-
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -262,9 +246,7 @@ export default function CspGenerator() {
               )
             })}
           </div>
-
           <Separator />
-
           <div className="grid gap-3 lg:grid-cols-[1fr_auto] lg:items-end">
             <div className="space-y-1.5">
               <Label htmlFor="csp-report-uri">report-uri</Label>

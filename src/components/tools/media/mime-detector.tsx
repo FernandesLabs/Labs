@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Upload, FileText, Search } from 'lucide-react'
 import { Input } from '@/components/ui/input'
@@ -24,14 +23,12 @@ import {
 } from '@/components/ui/table'
 import { Field, Stat } from '@/lib/tools/tool-ui'
 import { toast } from 'sonner'
-
 interface MimeEntry {
   ext: string
   mime: string
   category: 'image' | 'video' | 'audio' | 'text' | 'application'
   uses: string
 }
-
 const MIME_MAP: MimeEntry[] = [
   // Images
   { ext: 'png', mime: 'image/png', category: 'image', uses: 'Lossless web images, screenshots, transparency.' },
@@ -45,7 +42,6 @@ const MIME_MAP: MimeEntry[] = [
   { ext: 'tiff', mime: 'image/tiff', category: 'image', uses: 'Print, archival images.' },
   { ext: 'avif', mime: 'image/avif', category: 'image', uses: 'Next-gen compressed images.' },
   { ext: 'heic', mime: 'image/heic', category: 'image', uses: 'Apple photos.' },
-
   // Video
   { ext: 'mp4', mime: 'video/mp4', category: 'video', uses: 'Web video, streaming.' },
   { ext: 'webm', mime: 'video/webm', category: 'video', uses: 'Open web video format.' },
@@ -57,7 +53,6 @@ const MIME_MAP: MimeEntry[] = [
   { ext: 'm4v', mime: 'video/x-m4v', category: 'video', uses: 'iTunes video.' },
   { ext: 'ogv', mime: 'video/ogg', category: 'video', uses: 'Open-source video.' },
   { ext: '3gp', mime: 'video/3gpp', category: 'video', uses: 'Mobile video.' },
-
   // Audio
   { ext: 'mp3', mime: 'audio/mpeg', category: 'audio', uses: 'Music, podcasts.' },
   { ext: 'wav', mime: 'audio/wav', category: 'audio', uses: 'Uncompressed audio.' },
@@ -68,7 +63,6 @@ const MIME_MAP: MimeEntry[] = [
   { ext: 'opus', mime: 'audio/opus', category: 'audio', uses: 'Voice, low-bitrate streaming.' },
   { ext: 'wma', mime: 'audio/x-ms-wma', category: 'audio', uses: 'Windows Media audio.' },
   { ext: 'aiff', mime: 'audio/aiff', category: 'audio', uses: 'Apple uncompressed audio.' },
-
   // Text
   { ext: 'txt', mime: 'text/plain', category: 'text', uses: 'Plain text documents.' },
   { ext: 'html', mime: 'text/html', category: 'text', uses: 'Web pages.' },
@@ -94,7 +88,6 @@ const MIME_MAP: MimeEntry[] = [
   { ext: 'php', mime: 'application/x-httpd-php', category: 'text', uses: 'PHP source.' },
   { ext: 'sh', mime: 'application/x-sh', category: 'text', uses: 'Shell scripts.' },
   { ext: 'sql', mime: 'application/sql', category: 'text', uses: 'SQL scripts.' },
-
   // Application
   { ext: 'pdf', mime: 'application/pdf', category: 'application', uses: 'Portable documents.' },
   { ext: 'zip', mime: 'application/zip', category: 'application', uses: 'Compressed archives.' },
@@ -123,7 +116,6 @@ const MIME_MAP: MimeEntry[] = [
   { ext: 'epub', mime: 'application/epub+zip', category: 'application', uses: 'E-books.' },
   { ext: 'swf', mime: 'application/x-shockwave-flash', category: 'application', uses: 'Legacy Flash.' },
 ]
-
 const CATEGORY_COLORS: Record<MimeEntry['category'], string> = {
   image: '#16a34a',
   video: '#dc2626',
@@ -131,19 +123,16 @@ const CATEGORY_COLORS: Record<MimeEntry['category'], string> = {
   text: '#0891b2',
   application: '#f59e0b',
 }
-
 function extractExt(name: string): string {
   const clean = name.trim().toLowerCase()
   const dot = clean.lastIndexOf('.')
   if (dot < 0 || dot === clean.length - 1) return ''
   return clean.slice(dot + 1)
 }
-
 function lookup(ext: string): MimeEntry | null {
   if (!ext) return null
   return MIME_MAP.find((m) => m.ext === ext) ?? null
 }
-
 function formatBytes(bytes: number): string {
   if (!Number.isFinite(bytes) || bytes < 0) return '—'
   if (bytes === 0) return '0 B'
@@ -153,21 +142,18 @@ function formatBytes(bytes: number): string {
   const v = bytes / Math.pow(1024, safe)
   return `${v.toFixed(safe === 0 ? 0 : 1)} ${units[safe]}`
 }
-
 interface FileMeta {
   name: string
   size: number
   lastModified: number
   type: string
 }
-
 export default function MimeDetector() {
   const [extension, setExtension] = React.useState('')
   const [file, setFile] = React.useState<FileMeta | null>(null)
   const [dragOver, setDragOver] = React.useState(false)
   const [search, setSearch] = React.useState('')
   const inputRef = React.useRef<HTMLInputElement>(null)
-
   const handleFile = (f: File | null | undefined): void => {
     if (!f) return
     if (f.size > 200 * 1024 * 1024) {
@@ -183,20 +169,16 @@ export default function MimeDetector() {
     const ext = extractExt(f.name)
     if (ext) setExtension(ext)
   }
-
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     handleFile(e.target.files?.[0])
   }
-
   const onDrop = (e: React.DragEvent): void => {
     e.preventDefault()
     setDragOver(false)
     handleFile(e.dataTransfer.files?.[0])
   }
-
   const detectedExt = extension.trim().toLowerCase().replace(/^\./, '')
   const entry = lookup(detectedExt)
-
   const filteredTable = React.useMemo(() => {
     const q = search.trim().toLowerCase()
     if (!q) return MIME_MAP
@@ -207,10 +189,8 @@ export default function MimeDetector() {
         m.category.includes(q)
     )
   }, [search])
-
   const matchesFileType =
     file && entry ? file.type === entry.mime || file.type === '' : true
-
   return (
     <div className="space-y-5">
       <Card>
@@ -236,7 +216,6 @@ export default function MimeDetector() {
               aria-label="File extension"
             />
           </Field>
-
           <div
             onDragOver={(e) => {
               e.preventDefault()
@@ -278,7 +257,6 @@ export default function MimeDetector() {
           </div>
         </CardContent>
       </Card>
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Detection result</CardTitle>
@@ -311,7 +289,6 @@ export default function MimeDetector() {
                   accent={CATEGORY_COLORS[entry.category]}
                 />
               </div>
-
               <div className="rounded-lg border border-border bg-muted/20 p-3">
                 <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
                   Common uses
@@ -320,7 +297,6 @@ export default function MimeDetector() {
               </div>
             </div>
           )}
-
           {file ? (
             <>
               <Separator />
@@ -362,7 +338,6 @@ export default function MimeDetector() {
           ) : null}
         </CardContent>
       </Card>
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Extension reference</CardTitle>

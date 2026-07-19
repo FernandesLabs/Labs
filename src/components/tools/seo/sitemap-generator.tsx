@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { CheckCircle2, AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -21,7 +20,6 @@ import {
 import { Slider } from '@/components/ui/slider'
 import { toast } from 'sonner'
 import { Field, ResultBox, Stat } from '@/lib/tools/tool-ui'
-
 type ChangeFreq =
   | 'always'
   | 'hourly'
@@ -30,7 +28,6 @@ type ChangeFreq =
   | 'monthly'
   | 'yearly'
   | 'never'
-
 const FREQS: ChangeFreq[] = [
   'always',
   'hourly',
@@ -40,7 +37,6 @@ const FREQS: ChangeFreq[] = [
   'yearly',
   'never',
 ]
-
 function isValidUrl(url: string): boolean {
   if (!url) return false
   try {
@@ -50,7 +46,6 @@ function isValidUrl(url: string): boolean {
     return false
   }
 }
-
 function escXml(value: string): string {
   return value
     .replace(/&/g, '&amp;')
@@ -59,12 +54,10 @@ function escXml(value: string): string {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&apos;')
 }
-
 interface ParsedUrl {
   url: string
   valid: boolean
 }
-
 function parseUrls(raw: string): ParsedUrl[] {
   return raw
     .split('\n')
@@ -72,7 +65,6 @@ function parseUrls(raw: string): ParsedUrl[] {
     .filter((line) => line.length > 0)
     .map((url) => ({ url, valid: isValidUrl(url) }))
 }
-
 function buildSitemap(
   urls: ParsedUrl[],
   changefreq: ChangeFreq,
@@ -100,12 +92,10 @@ function buildSitemap(
     '\n</urlset>\n'
   )
 }
-
 export default function SitemapGenerator(): React.JSX.Element {
   const [raw, setRaw] = React.useState('')
   const [changefreq, setChangefreq] = React.useState<ChangeFreq>('weekly')
   const [priority, setPriority] = React.useState(0.8)
-
   const parsed = React.useMemo(() => parseUrls(raw), [raw])
   const validCount = parsed.filter((p) => p.valid).length
   const invalidCount = parsed.length - validCount
@@ -113,7 +103,6 @@ export default function SitemapGenerator(): React.JSX.Element {
     () => buildSitemap(parsed, changefreq, priority),
     [parsed, changefreq, priority]
   )
-
   const loadSample = (): void => {
     setRaw(
       [
@@ -126,12 +115,10 @@ export default function SitemapGenerator(): React.JSX.Element {
     )
     toast.success('Sample URLs loaded')
   }
-
   const clearAll = (): void => {
     setRaw('')
     toast.success('Cleared')
   }
-
   return (
     <div className="space-y-5">
       <Card>
@@ -208,7 +195,6 @@ export default function SitemapGenerator(): React.JSX.Element {
           </div>
         </CardContent>
       </Card>
-
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat label="Total URLs" value={parsed.length} />
         <Stat
@@ -223,7 +209,6 @@ export default function SitemapGenerator(): React.JSX.Element {
         />
         <Stat label="Priority" value={priority.toFixed(1)} />
       </div>
-
       {invalidCount > 0 ? (
         <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm">
           <div className="flex items-center gap-2 font-medium text-amber-700 dark:text-amber-400">
@@ -249,7 +234,6 @@ export default function SitemapGenerator(): React.JSX.Element {
           All URLs valid and ready for the sitemap.
         </div>
       ) : null}
-
       <ResultBox
         value={output}
         label="sitemap.xml"

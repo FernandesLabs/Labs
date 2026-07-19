@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Download } from 'lucide-react'
 import {
@@ -29,7 +28,6 @@ import {
 } from '@/components/ui/table'
 import { Field, Stat, downloadBlob } from '@/lib/tools/tool-ui'
 import { toast } from 'sonner'
-
 function parseNum(value: string): number {
   if (value == null) return NaN
   const trimmed = value.trim()
@@ -37,7 +35,6 @@ function parseNum(value: string): number {
   const n = Number(trimmed)
   return Number.isFinite(n) ? n : NaN
 }
-
 function fmtCurrency(n: number): string {
   if (!Number.isFinite(n)) return '—'
   return new Intl.NumberFormat('en-US', {
@@ -46,13 +43,11 @@ function fmtCurrency(n: number): string {
     maximumFractionDigits: 2,
   }).format(n)
 }
-
 interface FreqOption {
   value: string
   label: string
   periodsPerYear: number
 }
-
 const FREQ_OPTIONS: FreqOption[] = [
   { value: '1', label: 'Annually', periodsPerYear: 1 },
   { value: '2', label: 'Semiannually', periodsPerYear: 2 },
@@ -61,14 +56,12 @@ const FREQ_OPTIONS: FreqOption[] = [
   { value: '52', label: 'Weekly', periodsPerYear: 52 },
   { value: '365', label: 'Daily', periodsPerYear: 365 },
 ]
-
 interface YearRow {
   year: number
   balance: number
   contributions: number
   interest: number
 }
-
 /**
  * Savings Calculator
  * Compound interest with regular monthly contributions.
@@ -81,16 +74,13 @@ export default function SavingsCalculator() {
   const [rate, setRate] = React.useState('5')
   const [years, setYears] = React.useState('10')
   const [freqValue, setFreqValue] = React.useState<string>('12')
-
   const initialN = parseNum(initial)
   const monthlyN = parseNum(monthly)
   const rateN = parseNum(rate)
   const yearsN = parseNum(years)
-
   const freq =
     FREQ_OPTIONS.find((f) => f.value === freqValue) ?? FREQ_OPTIONS[3]
   const periodsPerYear = freq.periodsPerYear
-
   const valid =
     Number.isFinite(initialN) &&
     initialN >= 0 &&
@@ -100,11 +90,9 @@ export default function SavingsCalculator() {
     Number.isFinite(yearsN) &&
     yearsN > 0 &&
     periodsPerYear > 0
-
   const ratePerPeriod = valid ? rateN / 100 / periodsPerYear : 0
   // Convert monthly contribution to per-period contribution
   const contribPerPeriod = valid ? (monthlyN * 12) / periodsPerYear : 0
-
   const rows: YearRow[] = React.useMemo(() => {
     if (!valid) return []
     const out: YearRow[] = []
@@ -137,12 +125,10 @@ export default function SavingsCalculator() {
     ratePerPeriod,
     contribPerPeriod,
   ])
-
   const finalRow = rows.length > 0 ? rows[rows.length - 1] : null
   const finalBalance = finalRow ? finalRow.balance : NaN
   const totalContrib = finalRow ? finalRow.contributions : NaN
   const totalInterest = finalRow ? finalRow.interest : NaN
-
   const downloadCsv = () => {
     if (rows.length === 0) {
       toast.error('Nothing to export — enter valid inputs first')
@@ -158,7 +144,6 @@ export default function SavingsCalculator() {
     downloadBlob(new Blob([csv], { type: 'text/csv;charset=utf-8' }), 'savings-growth.csv')
     toast.success('Growth table exported as CSV')
   }
-
   return (
     <div className="space-y-5">
       <Card>
@@ -231,7 +216,6 @@ export default function SavingsCalculator() {
           </div>
         </CardContent>
       </Card>
-
       <div className="grid gap-3 sm:grid-cols-3">
         <Stat
           label="Final balance"
@@ -245,7 +229,6 @@ export default function SavingsCalculator() {
           accent="#0ea5e9"
         />
       </div>
-
       <Card>
         <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0">
           <div>

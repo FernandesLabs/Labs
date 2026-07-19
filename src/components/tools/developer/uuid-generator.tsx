@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { RefreshCw, Copy } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -11,7 +10,6 @@ import { Badge } from '@/components/ui/badge'
 import { Field, ResultBox, Stat, randomBytes } from '@/lib/tools/tool-ui'
 import { useCopy } from '@/lib/tools/use-copy'
 import { toast } from 'sonner'
-
 /** Generate a single RFC 4122 v4 UUID using Web Crypto. */
 function uuidV4(): string {
   const b = randomBytes(16)
@@ -32,7 +30,6 @@ function uuidV4(): string {
     hex.slice(10, 16).join('')
   )
 }
-
 function formatUuid(
   raw: string,
   opts: { uppercase: boolean; hyphens: boolean; braces: boolean }
@@ -42,7 +39,6 @@ function formatUuid(
   if (opts.braces) s = `{${s}}`
   return s
 }
-
 export default function UuidGenerator() {
   const [count, setCount] = React.useState(5)
   const [uppercase, setUppercase] = React.useState(false)
@@ -50,7 +46,6 @@ export default function UuidGenerator() {
   const [braces, setBraces] = React.useState(false)
   const [uuids, setUuids] = React.useState<string[]>([])
   const { copy } = useCopy()
-
   const generate = React.useCallback(() => {
     const safeCount = Math.max(1, Math.min(500, Math.floor(count) || 1))
     const list: string[] = []
@@ -62,19 +57,15 @@ export default function UuidGenerator() {
     setUuids(list)
     toast.success(`Generated ${safeCount} UUID${safeCount === 1 ? '' : 's'}`)
   }, [count, uppercase, hyphens, braces])
-
   // Generate on first mount.
   React.useEffect(() => {
     generate()
   }, [])
-
   const output = uuids.join('\n')
-
   const onCountChange = (v: number) => {
     const clamped = Math.max(1, Math.min(500, Math.floor(v) || 1))
     setCount(clamped)
   }
-
   return (
     <div className="space-y-5">
       <Field label="How many UUIDs?" htmlFor="count" hint="1–500">
@@ -99,7 +90,6 @@ export default function UuidGenerator() {
           />
         </div>
       </Field>
-
       <div className="flex flex-wrap items-center gap-5 rounded-lg border border-border bg-muted/30 p-4">
         <div className="flex items-center gap-2">
           <Switch id="up" checked={uppercase} onCheckedChange={setUppercase} />
@@ -114,7 +104,6 @@ export default function UuidGenerator() {
           <Label htmlFor="br" className="text-sm">Braces</Label>
         </div>
       </div>
-
       <div className="flex flex-wrap items-center gap-2">
         <Button
           onClick={generate}
@@ -132,13 +121,11 @@ export default function UuidGenerator() {
           Copy all
         </Button>
       </div>
-
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         <Stat label="Count" value={uuids.length} />
         <Stat label="Version" value="v4" accent="oklch(0.6 0.2 262.6)" />
         <Stat label="Randomness" value="Web Crypto" />
       </div>
-
       <ResultBox
         value={output}
         label="Generated UUIDs"
@@ -146,7 +133,6 @@ export default function UuidGenerator() {
         downloadName="uuids.txt"
         empty="No UUIDs yet — click Generate."
       />
-
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           <Badge variant="secondary">Sample</Badge>

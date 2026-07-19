@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Eye, EyeOff, KeyRound, Eraser } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -8,7 +7,6 @@ import { Textarea } from '@/components/ui/textarea'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Field, ResultBox, Stat } from '@/lib/tools/tool-ui'
 import { toast } from 'sonner'
-
 const DEFAULT_HEADER = `{"alg":"HS256","typ":"JWT"}`
 const DEFAULT_PAYLOAD = `{
   "sub": "1234567890",
@@ -16,7 +14,6 @@ const DEFAULT_PAYLOAD = `{
   "iat": 1700000000,
   "exp": 1800000000
 }`
-
 function bytesToBase64Url(bytes: Uint8Array): string {
   let binary = ''
   const chunk = 0x8000
@@ -26,7 +23,6 @@ function bytesToBase64Url(bytes: Uint8Array): string {
   const b64 = btoa(binary)
   return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
 }
-
 function parseJsonOrThrow(text: string, label: string): unknown {
   try {
     return JSON.parse(text)
@@ -35,7 +31,6 @@ function parseJsonOrThrow(text: string, label: string): unknown {
     throw new Error(`Invalid ${label} JSON: ${msg}`)
   }
 }
-
 async function signHmacSha256(
   data: string,
   secret: string
@@ -51,7 +46,6 @@ async function signHmacSha256(
   const sig = await crypto.subtle.sign('HMAC', key, enc.encode(data))
   return new Uint8Array(sig)
 }
-
 async function generateJwt(
   headerJson: string,
   payloadJson: string,
@@ -72,7 +66,6 @@ async function generateJwt(
   const sigB64 = bytesToBase64Url(sig)
   return `${signingInput}.${sigB64}`
 }
-
 export default function JwtGenerator() {
   const [secret, setSecret] = React.useState('your-256-bit-secret')
   const [showSecret, setShowSecret] = React.useState(false)
@@ -81,7 +74,6 @@ export default function JwtGenerator() {
   const [token, setToken] = React.useState('')
   const [error, setError] = React.useState<string | null>(null)
   const [busy, setBusy] = React.useState(false)
-
   const generate = React.useCallback(async () => {
     if (!secret) {
       setError('Secret is required to sign the JWT.')
@@ -104,12 +96,10 @@ export default function JwtGenerator() {
       setBusy(false)
     }
   }, [header, payload, secret])
-
   // Generate on first mount.
   React.useEffect(() => {
     void generate()
   }, [])
-
   return (
     <div className="space-y-5">
       <Field label="Secret key" htmlFor="jwt-secret" hint="Used for HMAC-SHA256 signing">
@@ -134,7 +124,6 @@ export default function JwtGenerator() {
           </Button>
         </div>
       </Field>
-
       <Field label="Header JSON" htmlFor="jwt-header" hint='Default: HS256'>
         <Textarea
           id="jwt-header"
@@ -145,7 +134,6 @@ export default function JwtGenerator() {
           spellCheck={false}
         />
       </Field>
-
       <Field label="Payload JSON" htmlFor="jwt-payload" hint="Claims to encode">
         <Textarea
           id="jwt-payload"
@@ -156,7 +144,6 @@ export default function JwtGenerator() {
           spellCheck={false}
         />
       </Field>
-
       <div className="flex flex-wrap items-center gap-2">
         <Button
           onClick={generate}
@@ -181,7 +168,6 @@ export default function JwtGenerator() {
           Reset
         </Button>
       </div>
-
       {error ? (
         <Alert variant="destructive">
           <AlertDescription className="font-mono text-xs">
@@ -189,14 +175,12 @@ export default function JwtGenerator() {
           </AlertDescription>
         </Alert>
       ) : null}
-
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat label="Algorithm" value="HS256" />
         <Stat label="Secret bytes" value={new Blob([secret]).size} />
         <Stat label="Header bytes" value={new Blob([header]).size} />
         <Stat label="Token bytes" value={new Blob([token]).size} />
       </div>
-
       <ResultBox
         value={token}
         label="JWT token"

@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Eraser, FileCode2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -8,25 +7,21 @@ import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { Field, ResultBox, Stat } from '@/lib/tools/tool-ui'
 import { toast } from 'sonner'
-
 // Elements whose content is "raw text" — whitespace and inner markup must be
 // preserved verbatim until the matching close tag.
 const RAW_TEXT_ELEMENTS = new Set<string>([
   'pre', 'code', 'textarea', 'script', 'style',
 ])
-
 // Void elements that never have a close tag.
 const VOID_ELEMENTS = new Set<string>([
   'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link',
   'meta', 'param', 'source', 'track', 'wbr',
 ])
-
 type HtmlOptions = {
   removeComments: boolean
   collapseWhitespace: boolean
   removeEmptyAttributes: boolean
 }
-
 function tagNameOf(tagText: string): { name: string; selfClosing: boolean } {
   // tagText begins with `<` (opening) — extract the element name.
   const m = tagText.match(/^<\s*([a-zA-Z][a-zA-Z0-9-]*)/)
@@ -34,7 +29,6 @@ function tagNameOf(tagText: string): { name: string; selfClosing: boolean } {
   const selfClosing = tagText.trimEnd().endsWith('/>') || VOID_ELEMENTS.has(name)
   return { name, selfClosing }
 }
-
 function removeEmptyAttributes(tagText: string): string {
   // Match ` attr=""` or ` attr=''` (with leading whitespace, empty value).
   // The backreference ensures the closing quote matches the opening one.
@@ -43,7 +37,6 @@ function removeEmptyAttributes(tagText: string): string {
     '',
   )
 }
-
 function minifyHtml(input: string, opts: HtmlOptions): string {
   if (!input.trim()) return ''
   const n = input.length
@@ -53,7 +46,6 @@ function minifyHtml(input: string, opts: HtmlOptions): string {
   // True when the last emitted chunk ended with `>` (closing tag, opening tag,
   // or doctype). Used to trim leading whitespace of the following text node.
   let prevEndedWithTag = false
-
   const pushText = (text: string) => {
     if (!text) return
     if (opts.collapseWhitespace) {
@@ -67,7 +59,6 @@ function minifyHtml(input: string, opts: HtmlOptions): string {
       out.push(text)
     }
   }
-
   while (i < n) {
     // Raw text element mode — copy content verbatim until the close tag.
     if (rawTextTag) {
@@ -84,9 +75,7 @@ function minifyHtml(input: string, opts: HtmlOptions): string {
       rawTextTag = null
       // Fall through so the close tag itself is processed normally.
     }
-
     const ch = input[i]
-
     // HTML comment <!-- ... -->
     if (input.startsWith('<!--', i)) {
       const endIdx = input.indexOf('-->', i + 4)
@@ -98,7 +87,6 @@ function minifyHtml(input: string, opts: HtmlOptions): string {
       i = end
       continue
     }
-
     // Doctype / declaration / processing instruction (<!...> or <?...>)
     if (input.startsWith('<!', i) || input.startsWith('<?', i)) {
       const endIdx = input.indexOf('>', i)
@@ -108,7 +96,6 @@ function minifyHtml(input: string, opts: HtmlOptions): string {
       prevEndedWithTag = true
       continue
     }
-
     // Closing tag </tag>
     if (input.startsWith('</', i)) {
       const endIdx = input.indexOf('>', i)
@@ -118,7 +105,6 @@ function minifyHtml(input: string, opts: HtmlOptions): string {
       prevEndedWithTag = true
       continue
     }
-
     // Opening tag <tag ...> — must be followed by a letter, otherwise treat
     // the lone `<` as text (e.g. `< 5` or `<` at EOF).
     if (ch === '<' && /[a-zA-Z]/.test(input[i + 1] ?? '')) {
@@ -126,22 +112,18 @@ function minifyHtml(input: string, opts: HtmlOptions): string {
       const end = endIdx === -1 ? n : endIdx + 1
       let tagText = input.slice(i, end)
       const { name, selfClosing } = tagNameOf(tagText)
-
       if (opts.removeEmptyAttributes) {
         tagText = removeEmptyAttributes(tagText)
       }
-
       out.push(tagText)
       i = end
       prevEndedWithTag = true
-
       // Enter raw-text mode for pre/code/textarea/script/style.
       if (!selfClosing && RAW_TEXT_ELEMENTS.has(name)) {
         rawTextTag = name
       }
       continue
     }
-
     // Text node — copy until the next `<` (lone `<` becomes part of the text).
     let j = i
     while (j < n && input[j] !== '<') j++
@@ -149,16 +131,13 @@ function minifyHtml(input: string, opts: HtmlOptions): string {
     i = j
     prevEndedWithTag = false
   }
-
   let result = out.join('')
   if (opts.collapseWhitespace) {
     result = result.trim()
   }
   return result
 }
-
 // ---------------------------------------------------------------------------
-
 const SAMPLE = `<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -187,13 +166,11 @@ function greet(name) {
     </script>
   </body>
 </html>`
-
 export default function HtmlMinifier() {
   const [input, setInput] = React.useState('')
   const [removeComments, setRemoveComments] = React.useState(true)
   const [collapseWhitespace, setCollapseWhitespace] = React.useState(true)
   const [removeEmptyAttributes, setRemoveEmptyAttributes] = React.useState(true)
-
   const output = React.useMemo(
     () =>
       minifyHtml(input, {
@@ -203,7 +180,6 @@ export default function HtmlMinifier() {
       }),
     [input, removeComments, collapseWhitespace, removeEmptyAttributes],
   )
-
   const stats = React.useMemo(() => {
     const inBytes = new Blob([input]).size
     const outBytes = new Blob([output]).size
@@ -211,17 +187,14 @@ export default function HtmlMinifier() {
     const pct = inBytes > 0 ? Math.round((1 - outBytes / inBytes) * 100) : 0
     return { inBytes, outBytes, saved, pct }
   }, [input, output])
-
   const handleLoadSample = () => {
     setInput(SAMPLE)
     toast.success('Sample HTML loaded')
   }
-
   const handleClear = () => {
     setInput('')
     toast.success('Input cleared')
   }
-
   return (
     <div className="space-y-5">
       <Field label="HTML input" htmlFor="html-input" hint={`${stats.inBytes} bytes`}>
@@ -235,7 +208,6 @@ export default function HtmlMinifier() {
           placeholder="Paste your HTML here…"
         />
       </Field>
-
       <div
         className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-lg border border-border bg-card p-4"
         role="group"
@@ -272,7 +244,6 @@ export default function HtmlMinifier() {
           </Label>
         </div>
       </div>
-
       <div className="flex flex-wrap items-center gap-2">
         <Button variant="outline" size="sm" onClick={handleLoadSample}>
           <FileCode2 className="size-4" />
@@ -283,7 +254,6 @@ export default function HtmlMinifier() {
           Clear
         </Button>
       </div>
-
       <div
         className="grid grid-cols-2 gap-3 sm:grid-cols-4"
         role="status"
@@ -302,7 +272,6 @@ export default function HtmlMinifier() {
           accent={stats.pct > 0 ? '#16a34a' : undefined}
         />
       </div>
-
       <ResultBox
         value={output}
         label="Minified HTML"

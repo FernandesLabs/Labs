@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-
 /**
  * Network tools API proxy.
  *
@@ -15,26 +14,20 @@ import { NextRequest, NextResponse } from 'next/server'
  *  - ping     ?url=https://example.com   (measures TTFB via fetch)
  *  - redirect ?url=https://example.com   (follows redirect chain)
  */
-
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
-
 const UA = 'FernandesLabs-ToolNetwork/1.0 (+https://fernandeslabs.com)'
-
 function bad(message: string, status = 400) {
   return NextResponse.json({ ok: false, error: message }, { status })
 }
-
 function isValidDomain(d: string): boolean {
   return /^(?=.{1,253}$)([a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/.test(
     d
   )
 }
-
 function isValidHost(h: string): boolean {
   return isValidDomain(h) || /^\d{1,3}(\.\d{1,3}){3}$/.test(h)
 }
-
 function isValidHttpUrl(u: string): boolean {
   try {
     const url = new URL(u)
@@ -43,7 +36,6 @@ function isValidHttpUrl(u: string): boolean {
     return false
   }
 }
-
 /** DNS lookup via Google DoH JSON API. */
 async function opDns(req: NextRequest) {
   const domain = req.nextUrl.searchParams.get('domain')?.trim() ?? ''
@@ -52,7 +44,6 @@ async function opDns(req: NextRequest) {
   if (!isValidDomain(domain)) return bad('Invalid domain')
   const allowed = ['A', 'AAAA', 'MX', 'TXT', 'NS', 'CNAME', 'SOA', 'CAA']
   if (!allowed.includes(type)) return bad(`Type must be one of: ${allowed.join(', ')}`)
-
   const dohUrl = `https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=${type}`
   const res = await fetch(dohUrl, {
     headers: { accept: 'application/dns-json', 'user-agent': UA },
@@ -62,7 +53,6 @@ async function opDns(req: NextRequest) {
   const data = await res.json()
   return NextResponse.json({ ok: true, ...data })
 }
-
 /** IP geolocation via ipapi.co (server-side, no CORS issue). */
 async function opIp(req: NextRequest) {
   const ip = req.nextUrl.searchParams.get('ip')?.trim() ?? ''
@@ -79,7 +69,6 @@ async function opIp(req: NextRequest) {
   const data = await res.json()
   return NextResponse.json({ ok: true, ...data })
 }
-
 /** HTTP response headers for a URL. */
 async function opHeaders(req: NextRequest) {
   const url = req.nextUrl.searchParams.get('url')?.trim() ?? ''
@@ -104,13 +93,11 @@ async function opHeaders(req: NextRequest) {
     finalUrl: res.url || url,
   })
 }
-
 /** SSL/TLS certificate info via the tls module. */
 async function opSsl(req: NextRequest) {
   const host = req.nextUrl.searchParams.get('host')?.trim() ?? ''
   if (!host) return bad('Missing "host" parameter')
   if (!isValidDomain(host)) return bad('Invalid host (must be a domain)')
-
   const tls = await import('tls')
   return new Promise<Response>((resolve) => {
     const socket = tls.connect(
@@ -158,7 +145,6 @@ async function opSsl(req: NextRequest) {
     })
   })
 }
-
 /** "Ping" via fetch — measures TTFB (time to first byte). */
 async function opPing(req: NextRequest) {
   const url = req.nextUrl.searchParams.get('url')?.trim() ?? ''
@@ -184,13 +170,11 @@ async function opPing(req: NextRequest) {
     return bad(`Fetch failed: ${e instanceof Error ? e.message : 'unknown'}`, 502)
   }
 }
-
 /** Follow a redirect chain and report each hop. */
 async function opRedirect(req: NextRequest) {
   const url = req.nextUrl.searchParams.get('url')?.trim() ?? ''
   if (!url) return bad('Missing "url" parameter')
   if (!isValidHttpUrl(url)) return bad('Invalid URL')
-
   const chain: { url: string; status: number; location?: string; ttfbMs: number }[] =
     []
   let current = url
@@ -228,7 +212,6 @@ async function opRedirect(req: NextRequest) {
   }
   return NextResponse.json({ ok: true, chain, hops: chain.length })
 }
-
 export async function GET(req: NextRequest) {
   const op = req.nextUrl.searchParams.get('op')?.trim() ?? ''
   try {

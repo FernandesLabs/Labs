@@ -1,14 +1,11 @@
 'use client'
-
 import * as React from 'react'
 import { Eraser } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Progress } from '@/components/ui/progress'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 const TWEET_MAX = 280
-
 interface CharStats {
   characters: number
   charactersNoSpaces: number
@@ -18,7 +15,6 @@ interface CharStats {
   lines: number
   bytes: number
 }
-
 function computeStats(text: string): CharStats {
   if (!text) {
     return {
@@ -53,15 +49,12 @@ function computeStats(text: string): CharStats {
     bytes,
   }
 }
-
 export default function CharacterCounter() {
   const [text, setText] = React.useState('')
   const stats = React.useMemo(() => computeStats(text), [text])
-
   const tweetPct = Math.min(100, (stats.characters / TWEET_MAX) * 100)
   const tweetRemaining = TWEET_MAX - stats.characters
   const tweetOver = stats.characters > TWEET_MAX
-
   return (
     <div className="space-y-5">
       <Field
@@ -78,7 +71,6 @@ export default function CharacterCounter() {
           aria-describedby="cc-stats"
         />
       </Field>
-
       <div
         id="cc-stats"
         className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4"
@@ -112,7 +104,6 @@ export default function CharacterCounter() {
           }
         />
       </div>
-
       <div className="rounded-lg border border-border bg-card p-4">
         <div className="mb-2 flex items-baseline justify-between gap-2">
           <h3 className="text-sm font-semibold text-foreground">
@@ -147,7 +138,6 @@ export default function CharacterCounter() {
             : `${tweetRemaining.toLocaleString()} characters remaining.`}
         </p>
       </div>
-
       <div className="flex justify-end">
         <Button
           variant="ghost"

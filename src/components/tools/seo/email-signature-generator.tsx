@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Mail, Phone, Globe, MapPin, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -21,9 +20,7 @@ import {
 } from '@/components/ui/tabs'
 import { Field, ResultBox, downloadBlob } from '@/lib/tools/tool-ui'
 import { useCopy } from '@/lib/tools/use-copy'
-
 type Template = 'minimal' | 'classic' | 'modern'
-
 interface SignatureData {
   name: string
   title: string
@@ -38,7 +35,6 @@ interface SignatureData {
   twitter: string
   github: string
 }
-
 const DEFAULT_DATA: SignatureData = {
   name: 'Jordan Rivera',
   title: 'Product Designer',
@@ -53,7 +49,6 @@ const DEFAULT_DATA: SignatureData = {
   twitter: 'twitter.com/jordanrivera',
   github: 'github.com/jordanrivera',
 }
-
 function esc(s: string): string {
   return s
     .replace(/&/g, '&amp;')
@@ -61,17 +56,14 @@ function esc(s: string): string {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
 }
-
 function escMultiline(s: string): string {
   return esc(s).replace(/\n/g, '<br />')
 }
-
 function normalizeUrl(url: string): string {
   if (!url) return ''
   if (/^https?:\/\//i.test(url)) return url
   return `https://${url}`
 }
-
 function buildSocialLinks(data: SignatureData, color: string): string {
   const links: string[] = []
   if (data.linkedin) {
@@ -93,7 +85,6 @@ function buildSocialLinks(data: SignatureData, color: string): string {
     ` <span style="color:#cbd5e1;margin:0 4px;">·</span> `
   )
 }
-
 function buildMinimal(data: SignatureData): string {
   const color = data.brandColor || '#0ea5e9'
   const rows: string[] = []
@@ -139,7 +130,6 @@ function buildMinimal(data: SignatureData): string {
     ''
   )}</table>`
 }
-
 function buildClassic(data: SignatureData): string {
   const color = data.brandColor || '#0ea5e9'
   const photoCell = data.photoUrl
@@ -194,7 +184,6 @@ function buildClassic(data: SignatureData): string {
     ''
   )}</table></td></tr></table>`
 }
-
 function buildModern(data: SignatureData): string {
   const color = data.brandColor || '#0ea5e9'
   const photoCell = data.photoUrl
@@ -249,28 +238,23 @@ function buildModern(data: SignatureData): string {
     ''
   )}</table></td></tr></table>`
 }
-
 function buildSignature(template: Template, data: SignatureData): string {
   if (template === 'minimal') return buildMinimal(data)
   if (template === 'classic') return buildClassic(data)
   return buildModern(data)
 }
-
 export default function EmailSignatureGenerator() {
   const [data, setData] = React.useState<SignatureData>(DEFAULT_DATA)
   const [template, setTemplate] = React.useState<Template>('modern')
   const { copied, copy } = useCopy()
-
   const update = <K extends keyof SignatureData>(
     key: K,
     value: SignatureData[K]
   ) => setData((prev) => ({ ...prev, [key]: value }))
-
   const html = React.useMemo(
     () => buildSignature(template, data),
     [template, data]
   )
-
   const handleDownload = () => {
     const doc = `<!doctype html>
 <html lang="en">
@@ -290,7 +274,6 @@ ${html}
       `email-signature.html`
     )
   }
-
   return (
     <div className="space-y-5">
       <Card>
@@ -372,7 +355,6 @@ ${html}
               />
             </Field>
           </div>
-
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Brand color" htmlFor="sig-color">
               <div className="flex items-center gap-2">
@@ -393,7 +375,6 @@ ${html}
               </div>
             </Field>
           </div>
-
           <div>
             <Label className="mb-2 block text-sm font-medium">
               Social links
@@ -427,7 +408,6 @@ ${html}
           </div>
         </CardContent>
       </Card>
-
       <Tabs
         value={template}
         onValueChange={(v) => setTemplate(v as Template)}
@@ -453,7 +433,6 @@ ${html}
             </span>
           </div>
         </div>
-
         <TabsContent value="minimal" className="mt-4">
           <Card>
             <CardHeader>
@@ -486,7 +465,6 @@ ${html}
           </Card>
         </TabsContent>
       </Tabs>
-
       <Card>
         <CardHeader className="flex-row items-center justify-between space-y-0">
           <div>
@@ -520,7 +498,6 @@ ${html}
           />
         </CardContent>
       </Card>
-
       <ResultBox
         value={html}
         label="Signature HTML"

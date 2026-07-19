@@ -1,16 +1,13 @@
 'use client'
-
 import * as React from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Field, ResultBox, Stat } from '@/lib/tools/tool-ui'
-
 // ---------------------------------------------------------------------------
 // Tokenizer
 // ---------------------------------------------------------------------------
-
 type SqlToken =
   | { type: 'word'; value: string }
   | { type: 'string'; value: string }
@@ -18,17 +15,14 @@ type SqlToken =
   | { type: 'paren'; value: '(' | ')'; attached: boolean }
   | { type: 'punct'; value: string }
   | { type: 'other'; value: string }
-
 const WORD_RE = /[A-Za-z0-9_$]/
 const WS_RE = /\s/
-
 function tokenizeSql(input: string): SqlToken[] {
   const tokens: SqlToken[] = []
   const n = input.length
   let i = 0
   let prevType: string | null = null
   let spaceBefore = false
-
   const push = (t: SqlToken) => {
     if (t.type === 'paren' && t.value === '(') {
       t.attached = prevType === 'word' && !spaceBefore
@@ -37,16 +31,13 @@ function tokenizeSql(input: string): SqlToken[] {
     prevType = t.type
     spaceBefore = false
   }
-
   while (i < n) {
     const ch = input[i]
-
     if (WS_RE.test(ch)) {
       i++
       spaceBefore = true
       continue
     }
-
     // line comment -- ...
     if (ch === '-' && input[i + 1] === '-') {
       let j = i + 2
@@ -55,7 +46,6 @@ function tokenizeSql(input: string): SqlToken[] {
       i = j
       continue
     }
-
     // block comment /* ... */
     if (ch === '/' && input[i + 1] === '*') {
       let j = i + 2
@@ -65,7 +55,6 @@ function tokenizeSql(input: string): SqlToken[] {
       i = j
       continue
     }
-
     // string literal (single quote, double quote, backtick)
     if (ch === "'" || ch === '"' || ch === '`') {
       const quote = ch
@@ -91,21 +80,18 @@ function tokenizeSql(input: string): SqlToken[] {
       i = j
       continue
     }
-
     // parentheses
     if (ch === '(' || ch === ')') {
       push({ type: 'paren', value: ch, attached: false })
       i++
       continue
     }
-
     // punctuation
     if (ch === ',' || ch === ';' || ch === '.') {
       push({ type: 'punct', value: ch })
       i++
       continue
     }
-
     // multi-char operators
     const two = input.slice(i, i + 2)
     if (two === '<>' || two === '!=' || two === '<=' || two === '>=' || two === '||' || two === ':=' || two === '::') {
@@ -113,7 +99,6 @@ function tokenizeSql(input: string): SqlToken[] {
       i += 2
       continue
     }
-
     // word
     if (WORD_RE.test(ch)) {
       let j = i
@@ -126,19 +111,15 @@ function tokenizeSql(input: string): SqlToken[] {
       i = j
       continue
     }
-
     // single-char other
     push({ type: 'other', value: ch })
     i++
   }
-
   return tokens
 }
-
 // ---------------------------------------------------------------------------
 // Multi-word keyword merger
 // ---------------------------------------------------------------------------
-
 function nextWordIndex(tokens: SqlToken[], from: number): number {
   for (let j = from; j < tokens.length; j++) {
     // The tokenizer discards whitespace, so the first token after a word is
@@ -148,7 +129,6 @@ function nextWordIndex(tokens: SqlToken[], from: number): number {
   }
   return -1
 }
-
 function mergeMultiWord(tokens: SqlToken[]): SqlToken[] {
   const out: SqlToken[] = []
   let i = 0
@@ -198,11 +178,9 @@ function mergeMultiWord(tokens: SqlToken[]): SqlToken[] {
   }
   return out
 }
-
 // ---------------------------------------------------------------------------
 // Keyword sets
 // ---------------------------------------------------------------------------
-
 const NEWLINE_KEYWORDS = new Set<string>([
   'SELECT', 'FROM', 'WHERE', 'JOIN', 'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN',
   'FULL JOIN', 'CROSS JOIN', 'LEFT OUTER JOIN', 'RIGHT OUTER JOIN', 'FULL OUTER JOIN',
@@ -212,7 +190,6 @@ const NEWLINE_KEYWORDS = new Set<string>([
   'DROP', 'WITH', 'RETURNING', 'AND', 'OR', 'ON', 'USING', 'CONNECT BY',
   'START WITH', 'QUALIFY', 'WINDOW',
 ])
-
 const KEYWORDS = new Set<string>([
   // clause keywords
   ...NEWLINE_KEYWORDS,
@@ -232,30 +209,24 @@ const KEYWORDS = new Set<string>([
   'UPPER', 'REPLACE', 'POSITION', 'EXTRACT', 'DATE', 'TIME', 'TIMESTAMP',
   'INTERVAL', 'CURRENT_DATE', 'CURRENT_TIME', 'CURRENT_TIMESTAMP', 'NOW',
 ])
-
 function isKeyword(word: string): boolean {
   return KEYWORDS.has(word.toUpperCase())
 }
-
 // Words that, when preceding `(`, indicate a grouping/subquery rather than a function call
 const PAREN_CONTEXT_WORDS = new Set<string>([
   'IN', 'EXISTS', 'VALUES', 'ANY', 'SOME', 'WHERE', 'ON', 'HAVING', 'AND',
   'OR', 'NOT', 'CASE', 'WHEN', 'THEN', 'ELSE', 'BY', 'JOIN',
 ])
-
 // ---------------------------------------------------------------------------
 // Formatter
 // ---------------------------------------------------------------------------
-
 type FormatOptions = {
   indent: number
 }
-
 function formatSql(input: string, opts: FormatOptions): string {
   if (!input.trim()) return ''
   const raw = tokenizeSql(input)
   const tokens = mergeMultiWord(raw)
-
   const indentUnit = ' '.repeat(opts.indent)
   let out = ''
   let depth = 0
@@ -263,7 +234,6 @@ function formatSql(input: string, opts: FormatOptions): string {
   let firstToken = true
   let lastMeaningful: SqlToken | null = null
   const parenStack: boolean[] = [] // true = attached/function-call paren
-
   const indentStr = () => indentUnit.repeat(Math.max(0, depth))
   const newline = () => {
     if (!atLineStart) {
@@ -285,7 +255,6 @@ function formatSql(input: string, opts: FormatOptions): string {
     if (prev.type === 'punct' && prev.value === '.') return false
     return true
   }
-
   for (const tok of tokens) {
     if (tok.type === 'comment') {
       newline()
@@ -297,7 +266,6 @@ function formatSql(input: string, opts: FormatOptions): string {
       lastMeaningful = tok
       continue
     }
-
     if (tok.type === 'string') {
       startLine()
       if (!atLineStart && needsSpace(lastMeaningful, tok)) out += ' '
@@ -307,7 +275,6 @@ function formatSql(input: string, opts: FormatOptions): string {
       lastMeaningful = tok
       continue
     }
-
     if (tok.type === 'paren') {
       if (tok.value === '(') {
         const prevWord =
@@ -346,7 +313,6 @@ function formatSql(input: string, opts: FormatOptions): string {
       lastMeaningful = tok
       continue
     }
-
     if (tok.type === 'punct') {
       if (tok.value === ',') {
         out += ','
@@ -366,7 +332,6 @@ function formatSql(input: string, opts: FormatOptions): string {
       lastMeaningful = tok
       continue
     }
-
     if (tok.type === 'word') {
       const up = tok.value.toUpperCase()
       const isClause = NEWLINE_KEYWORDS.has(up)
@@ -385,7 +350,6 @@ function formatSql(input: string, opts: FormatOptions): string {
       lastMeaningful = tok
       continue
     }
-
     // other (operators)
     startLine()
     if (!atLineStart && needsSpace(lastMeaningful, tok)) out += ' '
@@ -394,14 +358,11 @@ function formatSql(input: string, opts: FormatOptions): string {
     firstToken = false
     lastMeaningful = tok
   }
-
   return out.replace(/\n{3,}/g, '\n\n').trim()
 }
-
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
-
 const SAMPLE = `select u.id, u.name, count(o.id) as order_count, sum(o.total) as spent
 from users u
 left join orders o on o.user_id = u.id and o.status = 'paid'
@@ -410,11 +371,9 @@ group by u.id, u.name
 having count(o.id) > 0
 order by spent desc
 limit 10 offset 20;`
-
 export default function SqlFormatter() {
   const [input, setInput] = React.useState('')
   const [indent, setIndent] = React.useState('2')
-
   const output = React.useMemo(() => {
     if (!input.trim()) return ''
     try {
@@ -423,7 +382,6 @@ export default function SqlFormatter() {
       return ''
     }
   }, [input, indent])
-
   const handleCopyError = () => {
     if (input.trim() && !output) {
       toast.error('Could not format SQL', {
@@ -431,7 +389,6 @@ export default function SqlFormatter() {
       })
     }
   }
-
   const stats = React.useMemo(() => {
     const lines = output ? output.split('\n').length : 0
     const keywords = output
@@ -439,7 +396,6 @@ export default function SqlFormatter() {
       : 0
     return { lines, keywords }
   }, [output])
-
   return (
     <div className="space-y-5">
       <Field
@@ -458,7 +414,6 @@ export default function SqlFormatter() {
           spellCheck={false}
         />
       </Field>
-
       <div className="flex flex-wrap items-end gap-3">
         <Field label="Indent size" htmlFor="sql-indent" className="w-32">
           <Select value={indent} onValueChange={setIndent}>
@@ -489,7 +444,6 @@ export default function SqlFormatter() {
           Clear
         </Button>
       </div>
-
       {output ? (
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           <Stat label="Lines" value={stats.lines} />
@@ -497,7 +451,6 @@ export default function SqlFormatter() {
           <Stat label="Indent" value={`${indent} sp`} />
         </div>
       ) : null}
-
       <ResultBox
         label="Formatted SQL"
         value={output}

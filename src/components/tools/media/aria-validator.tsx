@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import {
   AlertCircle,
@@ -22,16 +21,13 @@ import { Separator } from '@/components/ui/separator'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Field, Stat } from '@/lib/tools/tool-ui'
 import { toast } from 'sonner'
-
 type Level = 'error' | 'warning'
-
 interface Issue {
   level: Level
   rule: string
   element: string
   suggestion: string
 }
-
 const SAMPLE_HTML = `<div>
   <img src="/hero.jpg" />
   <button onClick="submit()"></button>
@@ -46,23 +42,18 @@ const SAMPLE_HTML = `<div>
   <div onClick="toggle()" class="card">Click me</div>
   <svg width="20" height="20"><path d="M0 0"/></svg>
 </div>`
-
 function visibleText(el: Element): string {
   return (el.textContent || '').trim()
 }
-
 function getAttr(el: Element, name: string): string | null {
   return el.getAttribute(name)
 }
-
 function isInteractive(el: Element): boolean {
   const tag = el.tagName.toLowerCase()
   return ['a', 'button', 'input', 'select', 'textarea', 'summary'].includes(tag)
 }
-
 function analyse(doc: Document): Issue[] {
   const issues: Issue[] = []
-
   // 1. Missing lang on <html>
   const html = doc.documentElement
   if (!html || !html.getAttribute('lang')) {
@@ -74,7 +65,6 @@ function analyse(doc: Document): Issue[] {
         'Add a lang attribute (e.g. <html lang="en">) so screen readers pronounce content correctly.',
     })
   }
-
   // 2. Images without alt
   const imgs = Array.from(doc.querySelectorAll('img'))
   for (const img of imgs) {
@@ -98,7 +88,6 @@ function analyse(doc: Document): Issue[] {
       }
     }
   }
-
   // 3. Form inputs without an associated <label for>
   const labelsByFor = new Set(
     Array.from(doc.querySelectorAll('label[for]')).map((l) =>
@@ -111,13 +100,11 @@ function analyse(doc: Document): Issue[] {
   for (const input of labelable) {
     const type = (input.getAttribute('type') || '').toLowerCase()
     if (type === 'hidden' || type === 'submit' || type === 'button') continue
-
     const id = input.getAttribute('id')
     const hasLabel = id ? labelsByFor.has(id) : false
     const ariaLabel = input.getAttribute('aria-label')
     const ariaLabelledBy = input.getAttribute('aria-labelledby')
     const wrapped = input.closest('label')
-
     if (!hasLabel && !ariaLabel && !ariaLabelledBy && !wrapped) {
       const name = input.getAttribute('name') || input.tagName.toLowerCase()
       issues.push({
@@ -129,7 +116,6 @@ function analyse(doc: Document): Issue[] {
       })
     }
   }
-
   // 4. Buttons without accessible text
   const buttons = Array.from(doc.querySelectorAll('button'))
   for (const btn of buttons) {
@@ -150,7 +136,6 @@ function analyse(doc: Document): Issue[] {
       })
     }
   }
-
   // 5. Links without text or accessible name
   const links = Array.from(doc.querySelectorAll('a'))
   for (const link of links) {
@@ -172,7 +157,6 @@ function analyse(doc: Document): Issue[] {
       })
     }
   }
-
   // 6. Heading hierarchy
   const headings = Array.from(
     doc.querySelectorAll('h1, h2, h3, h4, h5, h6')
@@ -211,7 +195,6 @@ function analyse(doc: Document): Issue[] {
       suggestion: `${h1Count} h1 elements found. Use exactly one h1 per page for the main topic.`,
     })
   }
-
   // 7. role="button" on non-interactive elements
   const roleButtons = Array.from(
     doc.querySelectorAll('[role="button"]')
@@ -229,7 +212,6 @@ function analyse(doc: Document): Issue[] {
       })
     }
   }
-
   // 8. Interactive elements missing aria-label where there is no visible text
   const interactives = Array.from(
     doc.querySelectorAll('a, button, [role="button"]')
@@ -251,7 +233,6 @@ function analyse(doc: Document): Issue[] {
         'Interactive element has no accessible name. Add aria-label or visible text.',
     })
   }
-
   // 9. SVG without role or aria-label
   const svgs = Array.from(doc.querySelectorAll('svg'))
   for (const svg of svgs) {
@@ -268,7 +249,6 @@ function analyse(doc: Document): Issue[] {
       })
     }
   }
-
   // Deduplicate by element+suggestion
   const seen = new Set<string>()
   return issues.filter((i) => {
@@ -278,7 +258,6 @@ function analyse(doc: Document): Issue[] {
     return true
   })
 }
-
 function levelStyles(level: Level): {
   border: string
   bg: string
@@ -300,10 +279,8 @@ function levelStyles(level: Level): {
     icon: <AlertTriangle className="mt-0.5 size-4 shrink-0" />,
   }
 }
-
 export default function AriaValidator() {
   const [markup, setMarkup] = React.useState(SAMPLE_HTML)
-
   const { issues, parseError, totalElements } = React.useMemo(() => {
     if (markup.trim() === '') {
       return { issues: [] as Issue[], parseError: null, totalElements: 0 }
@@ -333,15 +310,12 @@ export default function AriaValidator() {
       }
     }
   }, [markup])
-
   const errorCount = issues.filter((i) => i.level === 'error').length
   const warningCount = issues.filter((i) => i.level === 'warning').length
-
   const loadSample = (): void => {
     setMarkup(SAMPLE_HTML)
     toast.success('Sample HTML with intentional issues loaded.')
   }
-
   return (
     <div className="space-y-5">
       <Card>
@@ -385,7 +359,6 @@ export default function AriaValidator() {
           </div>
         </CardContent>
       </Card>
-
       <div
         className="grid gap-3 sm:grid-cols-3"
         role="status"
@@ -395,7 +368,6 @@ export default function AriaValidator() {
         <Stat label="Warnings" value={warningCount} accent="#f59e0b" />
         <Stat label="Total issues" value={issues.length} />
       </div>
-
       {parseError ? (
         <div
           role="alert"
@@ -412,7 +384,6 @@ export default function AriaValidator() {
           </div>
         </div>
       ) : null}
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Issues found</CardTitle>
@@ -479,9 +450,7 @@ export default function AriaValidator() {
           )}
         </CardContent>
       </Card>
-
       <Separator />
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Rules checked</CardTitle>

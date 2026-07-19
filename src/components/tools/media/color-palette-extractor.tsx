@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Copy, Upload } from 'lucide-react'
 import { toast } from 'sonner'
@@ -8,15 +7,12 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent } from '@/components/ui/card'
 import { Field } from '@/lib/tools/tool-ui'
 import { useCopy } from '@/lib/tools/use-copy'
-
 interface Palette {
   hex: string
   count: number
   pct: number
 }
-
 const TOP_N = 6
-
 function rgbToHex(r: number, g: number, b: number): string {
   return (
     '#' +
@@ -25,7 +21,6 @@ function rgbToHex(r: number, g: number, b: number): string {
       .join('')
   ).toUpperCase()
 }
-
 function extractPalette(img: HTMLImageElement): Palette[] {
   const target = 100
   const ratio = img.width / img.height || 1
@@ -76,14 +71,12 @@ function extractPalette(img: HTMLImageElement): Palette[] {
     }
   })
 }
-
 export default function ColorPaletteExtractor() {
   const [palette, setPalette] = React.useState<Palette[]>([])
   const [imgUrl, setImgUrl] = React.useState<string | null>(null)
   const [fileName, setFileName] = React.useState<string | null>(null)
   const { copy } = useCopy()
   const fileRef = React.useRef<HTMLInputElement | null>(null)
-
   const onFile = (file: File) => {
     if (!file.type.startsWith('image/')) {
       toast.error('Please choose an image file')
@@ -111,13 +104,11 @@ export default function ColorPaletteExtractor() {
     img.onerror = () => toast.error('Failed to load image')
     img.src = url
   }
-
   React.useEffect(() => {
     return () => {
       if (imgUrl) URL.revokeObjectURL(imgUrl)
     }
   }, [imgUrl])
-
   return (
     <div className="space-y-5">
       <Field label="Image">
@@ -155,7 +146,6 @@ export default function ColorPaletteExtractor() {
           </p>
         </div>
       </Field>
-
       {imgUrl ? (
         <Card>
           <CardContent className="pt-6">
@@ -167,7 +157,6 @@ export default function ColorPaletteExtractor() {
           </CardContent>
         </Card>
       ) : null}
-
       {palette.length > 0 ? (
         <div className="space-y-3">
           <Label className="text-sm font-medium">Extracted palette</Label>

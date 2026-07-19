@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import {
   Card,
@@ -11,7 +10,6 @@ import {
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 function parseNum(value: string): number {
   if (value == null) return NaN
   const trimmed = value.trim()
@@ -19,7 +17,6 @@ function parseNum(value: string): number {
   const n = Number(trimmed)
   return Number.isFinite(n) ? n : NaN
 }
-
 function fmtCurrency(n: number): string {
   if (!Number.isFinite(n)) return '—'
   return new Intl.NumberFormat('en-US', {
@@ -28,17 +25,14 @@ function fmtCurrency(n: number): string {
     maximumFractionDigits: 2,
   }).format(n)
 }
-
 function fmtPct(n: number, digits = 2): string {
   if (!Number.isFinite(n)) return '—'
   return `${n.toFixed(digits)}%`
 }
-
 function fmtNum(n: number, digits = 2): string {
   if (!Number.isFinite(n)) return '—'
   return `${n.toFixed(digits)}×`
 }
-
 /**
  * ROI Calculator
  * Computes total ROI %, annualized ROI (CAGR), total profit, and the
@@ -49,11 +43,9 @@ export default function RoiCalculator() {
   const [initial, setInitial] = React.useState('10000')
   const [finalValue, setFinalValue] = React.useState('18000')
   const [years, setYears] = React.useState('5')
-
   const initialN = parseNum(initial)
   const finalN = parseNum(finalValue)
   const yearsN = parseNum(years)
-
   const valid =
     Number.isFinite(initialN) &&
     initialN > 0 &&
@@ -61,7 +53,6 @@ export default function RoiCalculator() {
     finalN >= 0 &&
     Number.isFinite(yearsN) &&
     yearsN > 0
-
   const profit = valid ? finalN - initialN : NaN
   const roiPct = valid ? (profit / initialN) * 100 : NaN
   const multiple = valid && initialN > 0 ? finalN / initialN : NaN
@@ -69,9 +60,7 @@ export default function RoiCalculator() {
     valid && finalN > 0
       ? (Math.pow(finalN / initialN, 1 / yearsN) - 1) * 100
       : NaN
-
   const isProfit = Number.isFinite(profit) && profit >= 0
-
   return (
     <div className="space-y-5">
       <Card>
@@ -119,7 +108,6 @@ export default function RoiCalculator() {
           </div>
         </CardContent>
       </Card>
-
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Stat
           label="ROI (total)"
@@ -138,7 +126,6 @@ export default function RoiCalculator() {
         />
         <Stat label="Multiple" value={fmtNum(multiple)} accent="#0ea5e9" />
       </div>
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Formulas</CardTitle>
@@ -173,7 +160,6 @@ export default function RoiCalculator() {
           />
         </CardContent>
       </Card>
-
       <Card>
         <CardContent>
           <Button
@@ -193,7 +179,6 @@ export default function RoiCalculator() {
     </div>
   )
 }
-
 function FormulaRow({
   title,
   formula,

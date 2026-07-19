@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Calendar, Clock, Copy, Check, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -24,10 +23,8 @@ import { Separator } from '@/components/ui/separator'
 import { toast } from 'sonner'
 import { Field, ResultBox, Stat } from '@/lib/tools/tool-ui'
 import { useCopy } from '@/lib/tools/use-copy'
-
 type CronField = 'minute' | 'hour' | 'dom' | 'month' | 'dow'
 type FieldMode = 'every' | 'specific' | 'range' | 'step' | 'list'
-
 interface FieldState {
   mode: FieldMode
   specific: string
@@ -36,9 +33,7 @@ interface FieldState {
   step: string
   list: string
 }
-
 type CronState = Record<CronField, FieldState>
-
 const FIELDS_META: Record<
   CronField,
   { label: string; short: string; min: number; max: number; hint: string; names?: string[] }
@@ -63,9 +58,7 @@ const FIELDS_META: Record<
     names: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
   },
 }
-
 const FIELD_ORDER: CronField[] = ['minute', 'hour', 'dom', 'month', 'dow']
-
 const MODE_OPTIONS: { value: FieldMode; label: string }[] = [
   { value: 'every', label: 'Every (*)' },
   { value: 'specific', label: 'Specific' },
@@ -73,7 +66,6 @@ const MODE_OPTIONS: { value: FieldMode; label: string }[] = [
   { value: 'step', label: 'Step (*/n)' },
   { value: 'list', label: 'List (a,b,c)' },
 ]
-
 function makeDefaultFieldState(field: CronField): FieldState {
   const { min, max } = FIELDS_META[field]
   return {
@@ -85,13 +77,11 @@ function makeDefaultFieldState(field: CronField): FieldState {
     list: `${min},${Math.min(min + 1, max)}`,
   }
 }
-
 function makeDefaultState(): CronState {
   const result = {} as CronState
   for (const f of FIELD_ORDER) result[f] = makeDefaultFieldState(f)
   return result
 }
-
 function makePreset(
   overrides: Partial<Record<CronField, Partial<FieldState>>>
 ): CronState {
@@ -101,7 +91,6 @@ function makePreset(
   }
   return result
 }
-
 function renderField(field: CronField, s: FieldState): string {
   const { min, max } = FIELDS_META[field]
   switch (s.mode) {
@@ -147,7 +136,6 @@ function renderField(field: CronField, s: FieldState): string {
       return ''
   }
 }
-
 function buildCron(state: CronState): { cron: string; valid: boolean } {
   const parts: string[] = []
   let valid = true
@@ -158,7 +146,6 @@ function buildCron(state: CronState): { cron: string; valid: boolean } {
   }
   return { cron: parts.join(' '), valid }
 }
-
 function parseField(expr: string, min: number, max: number): Set<number> | null {
   const result = new Set<number>()
   const parts = expr.split(',')
@@ -198,7 +185,6 @@ function parseField(expr: string, min: number, max: number): Set<number> | null 
   }
   return result.size > 0 ? result : null
 }
-
 function computeNextRuns(
   cron: string,
   count: number,
@@ -207,33 +193,25 @@ function computeNextRuns(
   const parts = cron.trim().split(/\s+/)
   if (parts.length !== 5) return null
   const [minE, hourE, domE, monE, dowE] = parts
-
   const minutes = parseField(minE, 0, 59)
   const hours = parseField(hourE, 0, 23)
   const doms = parseField(domE, 1, 31)
   const months = parseField(monE, 1, 12)
   const dows = parseField(dowE, 0, 6)
-
   if (!minutes || !hours || !doms || !months || !dows) return null
-
   const domStar = domE === '*' || domE === '*/1'
   const dowStar = dowE === '*' || dowE === '*/1'
-
   const result: Date[] = []
   const start = new Date(from.getTime())
   start.setSeconds(0, 0)
   start.setMinutes(start.getMinutes() + 1)
-
   // 1-year cap to avoid runaway loops
   const limit = new Date(start.getTime() + 366 * 24 * 60 * 60 * 1000)
-
   let cur = new Date(start.getTime())
   let iterations = 0
   const MAX_ITER = 200000
-
   while (result.length < count && cur.getTime() < limit.getTime()) {
     if (++iterations > MAX_ITER) break
-
     const mon = cur.getMonth() + 1
     if (!months.has(mon)) {
       cur = new Date(cur.getFullYear(), cur.getMonth() + 1, 1, 0, 0, 0, 0)
@@ -302,13 +280,11 @@ function computeNextRuns(
   }
   return result
 }
-
 interface Preset {
   label: string
   cron: string
   state: CronState
 }
-
 const PRESETS: Preset[] = [
   {
     label: 'Every minute',
@@ -383,7 +359,6 @@ const PRESETS: Preset[] = [
     }),
   },
 ]
-
 function formatNextRun(d: Date): string {
   const dateStr = d.toLocaleString(undefined, {
     weekday: 'short',
@@ -395,7 +370,6 @@ function formatNextRun(d: Date): string {
   })
   return dateStr
 }
-
 function describeField(field: CronField, s: FieldState): string {
   const meta = FIELDS_META[field]
   switch (s.mode) {
@@ -415,7 +389,6 @@ function describeField(field: CronField, s: FieldState): string {
       return ''
   }
 }
-
 function FieldValueInput({
   field,
   state,
@@ -426,7 +399,6 @@ function FieldValueInput({
   onChange: (next: FieldState) => void
 }) {
   const { min, max, names } = FIELDS_META[field]
-
   if (state.mode === 'every') {
     return (
       <div className="flex h-9 items-center rounded-md border border-dashed border-border/70 bg-muted/20 px-3 text-xs text-muted-foreground">
@@ -434,7 +406,6 @@ function FieldValueInput({
       </div>
     )
   }
-
   if (state.mode === 'specific') {
     const v = parseInt(state.specific, 10)
     const valid = Number.isFinite(v) && v >= min && v <= max
@@ -457,7 +428,6 @@ function FieldValueInput({
       </div>
     )
   }
-
   if (state.mode === 'range') {
     return (
       <div className="flex items-center gap-2">
@@ -483,7 +453,6 @@ function FieldValueInput({
       </div>
     )
   }
-
   if (state.mode === 'step') {
     return (
       <div className="flex items-center gap-2">
@@ -504,7 +473,6 @@ function FieldValueInput({
       </div>
     )
   }
-
   // list
   return (
     <Input
@@ -516,7 +484,6 @@ function FieldValueInput({
     />
   )
 }
-
 export default function CronExpressionGenerator() {
   const [state, setState] = React.useState<CronState>(() => {
     // Default: daily at midnight
@@ -525,29 +492,23 @@ export default function CronExpressionGenerator() {
       hour: { mode: 'specific', specific: '0' } as FieldState,
     })
   })
-
   const { cron, valid } = React.useMemo(() => buildCron(state), [state])
   const { copied, copy } = useCopy()
-
   const nextRuns = React.useMemo(() => {
     if (!valid) return null
     return computeNextRuns(cron, 5, new Date())
   }, [cron, valid])
-
   const applyPreset = (p: Preset) => {
     setState(p.state)
     toast.success(`Preset applied: ${p.label}`)
   }
-
   const updateField = (field: CronField, next: FieldState) => {
     setState((prev) => ({ ...prev, [field]: next }))
   }
-
   const descriptions = React.useMemo(
     () => FIELD_ORDER.map((f) => describeField(f, state[f])),
     [state]
   )
-
   return (
     <div className="space-y-5">
       <Card>
@@ -577,9 +538,7 @@ export default function CronExpressionGenerator() {
               </Button>
             ))}
           </div>
-
           <Separator />
-
           <div className="space-y-3">
             {FIELD_ORDER.map((f) => (
               <div
@@ -624,7 +583,6 @@ export default function CronExpressionGenerator() {
           </div>
         </CardContent>
       </Card>
-
       <Card>
         <CardContent className="space-y-3 pt-6">
           <div className="flex items-baseline justify-between">
@@ -670,7 +628,6 @@ export default function CronExpressionGenerator() {
           </p>
         </CardContent>
       </Card>
-
       {!valid ? (
         <ResultBox
           value=""
@@ -686,7 +643,6 @@ export default function CronExpressionGenerator() {
           rows={2}
         />
       )}
-
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
@@ -727,13 +683,11 @@ export default function CronExpressionGenerator() {
           )}
         </CardContent>
       </Card>
-
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         <Stat label="Fields" value="5" />
         <Stat label="Status" value={valid ? 'Valid' : 'Invalid'} accent={valid ? '#16a34a' : '#dc2626'} />
         <Stat label="Next runs shown" value={valid && nextRuns ? nextRuns.length : 0} />
       </div>
-
       <Field label="Quick reference" htmlFor="cron-ref">
         <div id="cron-ref" className="rounded-lg border border-border bg-muted/20 p-3 text-xs text-muted-foreground">
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">

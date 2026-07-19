@@ -1,7 +1,6 @@
 import { getToolMeta } from '@/lib/tools/tool-meta'
 import { CATEGORY_META, type ToolCategory } from '@/lib/tools/types'
 import { siteConfig } from '@/lib/site-config'
-
 /**
  * Dynamic Open Graph image per tool — Priority 9.
  *
@@ -22,19 +21,15 @@ import { siteConfig } from '@/lib/site-config'
  */
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
-
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const slug = searchParams.get('slug')
   const tool = slug ? getToolMeta(slug) : undefined
-
   const siteName = siteConfig.site.name || 'Fernandes Labs'
   const fallbackTagline =
     'Free online tools for developers, designers, and marketers.'
-
   // Lazy-load `next/og` only when this route is actually hit.
   const { ImageResponse } = await import('next/og')
-
   if (!tool) {
     return new ImageResponse(
       (
@@ -100,10 +95,8 @@ export async function GET(request: Request) {
       { width: 1200, height: 630 }
     )
   }
-
   const cat = CATEGORY_META[tool.category as ToolCategory]
   const keywordText = (tool.keywords ?? []).slice(0, 4).join(' · ')
-
   return new ImageResponse(
     (
       <div
@@ -164,7 +157,6 @@ export async function GET(request: Request) {
             {cat.label}
           </div>
         </div>
-
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <div
             style={{
@@ -187,7 +179,6 @@ export async function GET(request: Request) {
             {tool.description}
           </div>
         </div>
-
         <div
           style={{
             display: 'flex',

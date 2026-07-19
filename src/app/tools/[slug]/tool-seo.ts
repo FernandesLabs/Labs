@@ -1,6 +1,5 @@
 import type { ToolMeta } from '@/lib/tools/types'
 import { CATEGORY_META } from '@/lib/tools/types'
-
 /**
  * SEO content generators shared by:
  *   - The server component `app/tools/[slug]/page.tsx` (for JSON-LD)
@@ -10,18 +9,15 @@ import { CATEGORY_META } from '@/lib/tools/types'
  * stay in sync — Google sees the same Q&A in the rendered HTML and in the
  * FAQPage JSON-LD.
  */
-
 export interface FaqItem {
   q: string
   a: string
 }
-
 /** Longer, more specific intro paragraph (Priority 7 — improve content). */
 export function generateToolIntro(tool: ToolMeta): string {
   const cat = CATEGORY_META[tool.category]
   const kws = tool.keywords?.slice(0, 3).join(', ') || tool.name.toLowerCase()
   const kwsList = tool.keywords?.slice(0, 3).join(', ') || 'this task'
-
   return (
     `The ${tool.name} is a free online ${cat.label.toLowerCase()} tool that ${tool.description.toLowerCase().replace(/\.$/, '')}. ` +
     `It runs entirely in your browser — no data is sent to any server, no sign-up is required, and it works offline once the page has loaded. ` +
@@ -30,12 +26,10 @@ export function generateToolIntro(tool: ToolMeta): string {
     `The tool is fully responsive and works on phones, tablets, and desktops. It is also installable as a Progressive Web App (PWA), so you can add it to your home screen and launch it like a native app, even when you're offline.`
   )
 }
-
 /** "Common use cases" bullets — Priority 7. */
 export function generateToolUseCases(tool: ToolMeta): string[] {
   const kws = tool.keywords ?? []
   const base: string[] = []
-
   if (kws.length > 0) {
     base.push(
       `Quick, ad-hoc ${kws[0]} work without installing software or signing up.`
@@ -50,7 +44,6 @@ export function generateToolUseCases(tool: ToolMeta): string[] {
   base.push(
     `Cross-platform access from any modern browser on desktop, tablet, or mobile.`
   )
-
   if (tool.category === 'developer') {
     base.push(
       `Pasting into your editor or CI scripts — copy the output straight into your codebase.`
@@ -68,17 +61,14 @@ export function generateToolUseCases(tool: ToolMeta): string[] {
       `Auditing your site's metadata, schema, and link structure before publishing.`
     )
   }
-
   return base.slice(0, 5)
 }
-
 /** "Tips" — Priority 7. */
 export function generateToolTips(tool: ToolMeta): string[] {
   const tips: string[] = [
     `Press the Copy button (or ⌘C / Ctrl+C in the result area) to grab the output without selecting it manually.`,
     `Use the command palette (⌘K / Ctrl+K) to jump between tools instantly — no need to scroll back to the hub.`,
   ]
-
   if (tool.category === 'developer') {
     tips.push(
       `Pin frequently-used tools with the star icon — they appear at the top of the hub and in your Favorites list.`
@@ -100,19 +90,15 @@ export function generateToolTips(tool: ToolMeta): string[] {
       `Pin this tool with the star icon so you can come back to it from your Favorites list.`
     )
   }
-
   return tips
 }
-
 /** How-to steps (Priority 6 — HowTo JSON-LD). */
 export function generateToolHowTo(tool: ToolMeta): string[] {
   const cat = tool.category
   const steps: string[] = []
-
   steps.push(
     `Locate the primary input area at the top of the tool card. This is where you enter your data — text, a file, a URL, or numbers depending on the tool.`
   )
-
   if (cat === 'finance' || cat === 'developer' || cat === 'text') {
     steps.push(
       `Adjust any options below the input. Most tools offer toggles, sliders, or dropdowns to customize the output — try different settings to see live results update instantly.`
@@ -126,23 +112,18 @@ export function generateToolHowTo(tool: ToolMeta): string[] {
       `Configure the available options to customize the output. Most settings update the result live as you change them.`
     )
   }
-
   steps.push(
     `View the result in the output area below. Use the Copy button to copy the result to your clipboard, or the Download/Save button to save it as a file.`
   )
-
   steps.push(
     `All processing happens client-side in your browser. Your data never leaves your device, making this tool safe for sensitive inputs like passwords, private keys, or personal documents.`
   )
-
   return steps
 }
-
 /** FAQs (Priority 5 — FAQPage JSON-LD). */
 export function generateToolFaq(tool: ToolMeta): FaqItem[] {
   const cat = CATEGORY_META[tool.category]
   const kws = tool.keywords || []
-
   const faqs: FaqItem[] = [
     {
       q: `Is the ${tool.name} free to use?`,
@@ -157,7 +138,6 @@ export function generateToolFaq(tool: ToolMeta): FaqItem[] {
       a: `Yes. Once the page has loaded, the tool runs entirely client-side. You can disconnect from the internet and continue using it. The site is also installable as a Progressive Web App (PWA) for offline access from your home screen.`,
     },
   ]
-
   if (cat.label === 'Developer') {
     faqs.push({
       q: `Can I use the output in my code or production project?`,
@@ -189,11 +169,9 @@ export function generateToolFaq(tool: ToolMeta): FaqItem[] {
       a: `Network tools query external services (like DNS resolvers or IP databases). If a service is temporarily unavailable or rate-limits requests, the lookup may fail. Try again in a few moments. The tool itself is working correctly.`,
     })
   }
-
   faqs.push({
     q: `Can I use this tool on mobile?`,
     a: `Yes. The tool is fully responsive and works on phones, tablets, and desktops. The layout adapts to your screen size, and all features are available on every device.`,
   })
-
   return faqs
 }

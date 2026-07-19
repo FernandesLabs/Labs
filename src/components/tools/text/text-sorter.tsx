@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { ArrowDownUp, Eraser } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -20,15 +19,12 @@ import {
 } from '@/components/ui/radio-group'
 import { Field, ResultBox } from '@/lib/tools/tool-ui'
 import { toast } from 'sonner'
-
 type SortBy = 'alphabetical' | 'numerical' | 'length' | 'natural'
 type Direction = 'asc' | 'desc'
-
 const NATIVE_COLLATOR = new Intl.Collator(undefined, {
   numeric: true,
   sensitivity: 'base',
 })
-
 function sortLines(
   input: string,
   by: SortBy,
@@ -49,7 +45,6 @@ function sortLines(
       return true
     })
   }
-
   const cmp = (a: string, b: string): number => {
     let result = 0
     switch (by) {
@@ -81,13 +76,11 @@ function sortLines(
     }
     return result
   }
-
   lines.sort(cmp)
   if (direction === 'desc') lines.reverse()
   if (reverse) lines.reverse()
   return lines
 }
-
 export default function TextSorter() {
   const [text, setText] = React.useState('')
   const [sortBy, setSortBy] = React.useState<SortBy>('alphabetical')
@@ -96,7 +89,6 @@ export default function TextSorter() {
   const [removeDuplicates, setRemoveDuplicates] = React.useState(false)
   const [reverse, setReverse] = React.useState(false)
   const [output, setOutput] = React.useState('')
-
   const handleSort = () => {
     if (!text) {
       toast.error('Enter lines to sort')
@@ -112,10 +104,8 @@ export default function TextSorter() {
     )
     setOutput(sorted.join('\n'))
   }
-
   const inputCount = text ? text.split('\n').length : 0
   const outputCount = output ? output.split('\n').length : 0
-
   return (
     <div className="space-y-5">
       <Field
@@ -131,7 +121,6 @@ export default function TextSorter() {
           className="min-h-32 font-mono text-sm"
         />
       </Field>
-
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Sort by" htmlFor="ts-by">
           <Select
@@ -149,7 +138,6 @@ export default function TextSorter() {
             </SelectContent>
           </Select>
         </Field>
-
         <Field label="Direction" htmlFor="ts-dir">
           <RadioGroup
             id="ts-dir"
@@ -174,7 +162,6 @@ export default function TextSorter() {
           </RadioGroup>
         </Field>
       </div>
-
       <div className="grid gap-3 sm:grid-cols-3">
         <div className="flex items-center justify-between rounded-lg border border-border bg-card p-3">
           <Label
@@ -216,7 +203,6 @@ export default function TextSorter() {
           />
         </div>
       </div>
-
       <div className="flex flex-wrap items-center justify-between gap-2">
         <Button
           variant="ghost"
@@ -240,7 +226,6 @@ export default function TextSorter() {
           Sort lines
         </Button>
       </div>
-
       {output ? (
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <Badge variant="secondary">{inputCount.toLocaleString()} in</Badge>
@@ -255,7 +240,6 @@ export default function TextSorter() {
           )}
         </div>
       ) : null}
-
       <ResultBox
         value={output}
         label="Sorted output"

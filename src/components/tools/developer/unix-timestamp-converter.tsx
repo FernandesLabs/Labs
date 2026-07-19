@@ -1,12 +1,10 @@
 'use client'
-
 import * as React from 'react'
 import { Clock, ArrowLeftRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 type UnixResult = {
   local: string
   utc: string
@@ -15,23 +13,19 @@ type UnixResult = {
   seconds: number
   valid: boolean
 }
-
 type DtResult = {
   seconds: number
   ms: number
   valid: boolean
 }
-
 function pad(n: number): string {
   return String(n).padStart(2, '0')
 }
-
 function toLocalDatetimeInput(d: Date): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(
     d.getHours()
   )}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
 }
-
 function interpretUnix(raw: string): UnixResult {
   const trimmed = raw.trim()
   if (!trimmed) return emptyUnix()
@@ -50,38 +44,31 @@ function interpretUnix(raw: string): UnixResult {
     valid: true,
   }
 }
-
 function emptyUnix(): UnixResult {
   return { local: '', utc: '', iso: '', ms: 0, seconds: 0, valid: false }
 }
-
 function interpretDt(raw: string): DtResult {
   if (!raw) return { seconds: 0, ms: 0, valid: false }
   const d = new Date(raw)
   if (Number.isNaN(d.getTime())) return { seconds: 0, ms: 0, valid: false }
   return { seconds: Math.floor(d.getTime() / 1000), ms: d.getTime(), valid: true }
 }
-
 export default function UnixTimestampConverter() {
   const [unixInput, setUnixInput] = React.useState('')
   const [dtInput, setDtInput] = React.useState('')
-
   // Initialise both sides to "now" once on mount.
   React.useEffect(() => {
     const now = new Date()
     setUnixInput(String(Math.floor(now.getTime() / 1000)))
     setDtInput(toLocalDatetimeInput(now))
   }, [])
-
   const setNow = () => {
     const now = new Date()
     setUnixInput(String(Math.floor(now.getTime() / 1000)))
     setDtInput(toLocalDatetimeInput(now))
   }
-
   const unix = React.useMemo(() => interpretUnix(unixInput), [unixInput])
   const dt = React.useMemo(() => interpretDt(dtInput), [dtInput])
-
   const copyToUnix = () => {
     if (dt.valid) setUnixInput(String(dt.seconds))
   }
@@ -91,7 +78,6 @@ export default function UnixTimestampConverter() {
       setDtInput(toLocalDatetimeInput(d))
     }
   }
-
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -108,7 +94,6 @@ export default function UnixTimestampConverter() {
           Now
         </Button>
       </div>
-
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader>
@@ -132,7 +117,6 @@ export default function UnixTimestampConverter() {
                 className="font-mono"
               />
             </Field>
-
             {unix.valid ? (
               <div className="space-y-2">
                 <Stat label="Local time" value={unix.local} />
@@ -146,7 +130,6 @@ export default function UnixTimestampConverter() {
                 {unixInput ? 'Enter a valid numeric timestamp.' : 'Awaiting input.'}
               </p>
             )}
-
             <Button
               type="button"
               variant="outline"
@@ -159,7 +142,6 @@ export default function UnixTimestampConverter() {
             </Button>
           </CardContent>
         </Card>
-
         <Card>
           <CardHeader>
             <CardTitle>Date → Timestamp</CardTitle>
@@ -177,7 +159,6 @@ export default function UnixTimestampConverter() {
                 step={1}
               />
             </Field>
-
             {dt.valid ? (
               <div className="space-y-2">
                 <Stat label="Unix (seconds)" value={dt.seconds} />
@@ -188,7 +169,6 @@ export default function UnixTimestampConverter() {
                 {dtInput ? 'Select a valid date and time.' : 'Awaiting input.'}
               </p>
             )}
-
             <Button
               type="button"
               variant="outline"

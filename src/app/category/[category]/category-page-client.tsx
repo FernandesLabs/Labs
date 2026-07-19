@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -7,13 +6,13 @@ import { Search, X, ArrowRight, ChevronRight, Home, Layers } from 'lucide-react'
 import { SiteHeader } from '@/components/hub/site-header'
 import { SiteFooter } from '@/components/hub/site-footer'
 import { BackToTop } from '@/components/hub/back-to-top'
+import { SkipToContent } from '@/components/hub/skip-to-content'
 import { FavoriteButton } from '@/components/hub/favorite-button'
 import { Input } from '@/components/ui/input'
 import { fuzzyMatch } from '@/lib/tools/fuzzy-search'
 import { usePreloadOnHover } from '@/lib/tools/preload'
 import type { ToolMeta, ToolCategory } from '@/lib/tools/types'
 import { CATEGORY_META } from '@/lib/tools/types'
-
 /**
  * Client component for the category landing page.
  * Renders the category hero + a searchable grid of tools in that category
@@ -32,12 +31,10 @@ export function CategoryPageClient({
   const cat = CATEGORY_META[category]
   const [query, setQuery] = React.useState('')
   const searchRef = React.useRef<HTMLInputElement | null>(null)
-
   const filtered = React.useMemo(() => {
     if (!query.trim()) return tools
     return tools.filter((t) => fuzzyMatch(t as never, query))
   }, [tools, query])
-
   // ⌘K → back to hub command palette; / → focus search
   React.useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -58,16 +55,15 @@ export function CategoryPageClient({
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
   }, [router])
-
   return (
     <div className="flex min-h-screen flex-col">
+      <SkipToContent />
       <SiteHeader
         onHome={() => router.push('/')}
         toolCount={132}
         onOpenPalette={() => router.push('/')}
       />
-
-      <main className="flex-1">
+      <main id="main-content" className="flex-1">
         {/* Breadcrumb */}
         <div className="border-b border-border/60 bg-muted/20">
           <nav
@@ -84,7 +80,6 @@ export function CategoryPageClient({
             </span>
           </nav>
         </div>
-
         {/* Category hero */}
         <section className="relative overflow-hidden border-b border-border/60">
           <div
@@ -123,7 +118,6 @@ export function CategoryPageClient({
                 </div>
               </div>
             </div>
-
             {/* Search within category */}
             <div className="relative mx-auto mt-6 max-w-xl">
               <div className="pointer-events-none absolute left-3.5 top-1/2 z-10 -translate-y-1/2 text-foreground/40">
@@ -153,7 +147,6 @@ export function CategoryPageClient({
             </div>
           </div>
         </section>
-
         {/* Tools grid */}
         <section className="mx-auto max-w-6xl px-4 py-10">
           {filtered.length === 0 ? (
@@ -193,7 +186,6 @@ export function CategoryPageClient({
             </>
           )}
         </section>
-
         {/* Other categories */}
         <section className="mx-auto max-w-6xl px-4 pb-12">
           <h2 className="mb-3 text-sm font-bold uppercase tracking-wider text-muted-foreground">
@@ -219,13 +211,11 @@ export function CategoryPageClient({
           </div>
         </section>
       </main>
-
       <SiteFooter />
       <BackToTop />
     </div>
   )
 }
-
 function CategoryToolCard({
   tool,
   catColor,
@@ -240,12 +230,21 @@ function CategoryToolCard({
       prefetch={false}
       onMouseEnter={preload.onMouseEnter}
       onFocus={preload.onFocus}
-      className="group relative flex h-full cursor-pointer flex-col items-start gap-2 rounded-xl border border-border/80 bg-card p-4 text-left fl-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      className="group relative flex h-full cursor-pointer flex-col items-start gap-2 overflow-hidden rounded-xl border border-border/80 bg-card p-4 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
     >
+      {/* Category color accent strip */}
+      <span
+        className="absolute inset-x-0 top-0 h-0.5 opacity-50 transition-opacity group-hover:opacity-100"
+        style={{ backgroundColor: catColor }}
+        aria-hidden
+      />
       <div className="flex w-full items-start justify-between gap-2">
         <span
-          className="grid size-9 shrink-0 place-items-center rounded-lg text-xs font-bold text-primary-foreground"
-          style={{ backgroundColor: catColor }}
+          className="grid size-9 shrink-0 place-items-center rounded-lg text-xs font-bold transition-transform duration-200 group-hover:scale-105"
+          style={{
+            backgroundColor: `color-mix(in oklch, ${catColor} 16%, transparent)`,
+            color: catColor,
+          }}
         >
           {tool.name.slice(0, 2).toUpperCase()}
         </span>
@@ -255,7 +254,7 @@ function CategoryToolCard({
         </div>
       </div>
       <div className="mt-1">
-        <h3 className="text-sm font-semibold leading-tight text-foreground">
+        <h3 className="text-sm font-semibold leading-tight text-foreground transition-colors group-hover:text-primary">
           {tool.name}
         </h3>
         <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
@@ -267,7 +266,7 @@ function CategoryToolCard({
           {tool.keywords.slice(0, 3).map((k) => (
             <span
               key={k}
-              className="rounded-full bg-muted/50 px-1.5 py-0.5 text-[9px] font-medium text-muted-foreground"
+              className="rounded-full bg-muted/60 px-1.5 py-0.5 text-[9px] font-medium text-muted-foreground transition-colors group-hover:bg-primary/10 group-hover:text-primary/80"
             >
               {k}
             </span>

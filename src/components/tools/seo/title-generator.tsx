@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -24,11 +23,8 @@ import { Separator } from '@/components/ui/separator'
 import { toast } from 'sonner'
 import { Field, randomInt } from '@/lib/tools/tool-ui'
 import { useCopy } from '@/lib/tools/use-copy'
-
 type Tone = 'Professional' | 'Catchy' | 'How-to' | 'Number' | 'Listicle'
-
 const TONES: Tone[] = ['Professional', 'Catchy', 'How-to', 'Number', 'Listicle']
-
 const POWER_WORDS = [
   'Proven',
   'Ultimate',
@@ -41,9 +37,7 @@ const POWER_WORDS = [
   'Actionable',
   'Surprising',
 ]
-
 const CURRENT_YEAR = new Date().getFullYear()
-
 /** Rough pixel-width estimate for the Google SERP (~10px per char average). */
 function pixelWidth(text: string): number {
   let width = 0
@@ -57,11 +51,9 @@ function pixelWidth(text: string): number {
   }
   return width
 }
-
 interface TitleVariant {
   text: string
 }
-
 function buildTemplates(keyword: string, brand: string, tone: Tone): string[] {
   const k = keyword.trim() || 'Your Topic'
   const b = brand.trim() || 'Your Brand'
@@ -116,7 +108,6 @@ function buildTemplates(keyword: string, brand: string, tone: Tone): string[] {
   }
   return templates
 }
-
 function pickNumbers(templates: string[]): TitleVariant[] {
   // Replace numeric placeholders with randomInt-derived numbers, keep variety
   return templates.map((t) => {
@@ -132,7 +123,6 @@ function pickNumbers(templates: string[]): TitleVariant[] {
     return { text: out }
   })
 }
-
 function TitleRow({
   variant,
   index,
@@ -174,19 +164,16 @@ function TitleRow({
     </li>
   )
 }
-
 export default function TitleGenerator(): React.JSX.Element {
   const [keyword, setKeyword] = React.useState('')
   const [brand, setBrand] = React.useState('')
   const [tone, setTone] = React.useState<Tone>('Professional')
   const [seed, setSeed] = React.useState(0)
-
   const variants = React.useMemo<TitleVariant[]>(() => {
     void seed // re-roll when regenerate clicked
     const templates = buildTemplates(keyword, brand, tone)
     return pickNumbers(templates)
   }, [keyword, brand, tone, seed])
-
   const regenerate = (): void => {
     if (!keyword.trim()) {
       toast.error('Enter a primary keyword first')
@@ -195,7 +182,6 @@ export default function TitleGenerator(): React.JSX.Element {
     setSeed((s) => s + 1)
     toast.success('New variations generated')
   }
-
   return (
     <div className="space-y-5">
       <Card>
@@ -255,7 +241,6 @@ export default function TitleGenerator(): React.JSX.Element {
           </div>
         </CardContent>
       </Card>
-
       <div>
         <div className="mb-2 flex items-center justify-between">
           <h3 className="text-sm font-medium text-foreground">

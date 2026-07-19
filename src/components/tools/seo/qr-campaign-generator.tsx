@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { toCanvas as qrToCanvas } from 'qrcode'
 import { Download, QrCode, AlertTriangle, CheckCircle2 } from 'lucide-react'
@@ -24,16 +23,13 @@ import {
 } from '@/components/ui/select'
 import { Field, Stat, downloadBlob } from '@/lib/tools/tool-ui'
 import { useCopy } from '@/lib/tools/use-copy'
-
 type ECLevel = 'L' | 'M' | 'Q' | 'H'
-
 interface QrState {
   destination: string
   source: string
   medium: string
   campaign: string
 }
-
 function isValidUrl(url: string): boolean {
   if (!url) return false
   try {
@@ -43,7 +39,6 @@ function isValidUrl(url: string): boolean {
     return false
   }
 }
-
 function buildTaggedUrl(state: QrState): string {
   const base = state.destination.trim()
   if (!isValidUrl(base)) return ''
@@ -63,7 +58,6 @@ function buildTaggedUrl(state: QrState): string {
     return ''
   }
 }
-
 export default function QrCampaignGenerator(): React.JSX.Element {
   const [state, setState] = React.useState<QrState>({
     destination: 'https://fernandeslabs.com/launch',
@@ -76,19 +70,15 @@ export default function QrCampaignGenerator(): React.JSX.Element {
   const [fg, setFg] = React.useState<string>('#0f172a')
   const [bg, setBg] = React.useState<string>('#ffffff')
   const [ready, setReady] = React.useState<boolean>(false)
-
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null)
   const { copy } = useCopy()
-
   const update = <K extends keyof QrState>(key: K, value: string): void => {
     setState((prev) => ({ ...prev, [key]: value }))
   }
-
   const taggedUrl = React.useMemo(() => buildTaggedUrl(state), [state])
   const urlValid = isValidUrl(state.destination.trim())
   const requiredMissing =
     !state.source.trim() || !state.medium.trim() || !state.campaign.trim()
-
   const generate = React.useCallback(async () => {
     const canvas = canvasRef.current
     if (!canvas) return
@@ -111,11 +101,9 @@ export default function QrCampaignGenerator(): React.JSX.Element {
       setReady(false)
     }
   }, [taggedUrl, size, ecLevel, fg, bg])
-
   React.useEffect(() => {
     void generate()
   }, [generate])
-
   const handleDownload = (): void => {
     const canvas = canvasRef.current
     if (!canvas || !ready) {
@@ -131,7 +119,6 @@ export default function QrCampaignGenerator(): React.JSX.Element {
       toast.success('QR code downloaded')
     }, 'image/png')
   }
-
   return (
     <div className="space-y-5">
       <Card>
@@ -168,7 +155,6 @@ export default function QrCampaignGenerator(): React.JSX.Element {
               className={!urlValid ? 'border-rose-500/60' : ''}
             />
           </Field>
-
           <div className="grid gap-4 sm:grid-cols-3">
             <Field
               label="utm_source *"
@@ -218,7 +204,6 @@ export default function QrCampaignGenerator(): React.JSX.Element {
           </div>
         </CardContent>
       </Card>
-
       <div className="grid gap-5 md:grid-cols-2">
         <Card>
           <CardHeader>
@@ -239,7 +224,6 @@ export default function QrCampaignGenerator(): React.JSX.Element {
                 onValueChange={(v) => setSize(v[0] ?? size)}
               />
             </Field>
-
             <Field label="Error correction" htmlFor="qr-ec">
               <Select value={ecLevel} onValueChange={(v) => setEcLevel(v as ECLevel)}>
                 <SelectTrigger id="qr-ec" className="w-full">
@@ -253,7 +237,6 @@ export default function QrCampaignGenerator(): React.JSX.Element {
                 </SelectContent>
               </Select>
             </Field>
-
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Foreground" htmlFor="qr-fg">
                 <div className="flex items-center gap-3">
@@ -273,7 +256,6 @@ export default function QrCampaignGenerator(): React.JSX.Element {
                   />
                 </div>
               </Field>
-
               <Field label="Background" htmlFor="qr-bg">
                 <div className="flex items-center gap-3">
                   <input
@@ -295,7 +277,6 @@ export default function QrCampaignGenerator(): React.JSX.Element {
             </div>
           </CardContent>
         </Card>
-
         <Card>
           <CardHeader>
             <CardTitle className="text-base">QR preview</CardTitle>
@@ -331,7 +312,6 @@ export default function QrCampaignGenerator(): React.JSX.Element {
           </CardContent>
         </Card>
       </div>
-
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat
           label="Destination"
@@ -346,7 +326,6 @@ export default function QrCampaignGenerator(): React.JSX.Element {
         <Stat label="QR size" value={`${size}px`} />
         <Stat label="URL length" value={taggedUrl.length} />
       </div>
-
       {!urlValid ? (
         <div className="flex items-center gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-amber-700 dark:text-amber-400">
           <AlertTriangle className="size-4" />
@@ -368,7 +347,6 @@ export default function QrCampaignGenerator(): React.JSX.Element {
           Tagged URL ready — QR code updates live.
         </div>
       )}
-
       <div className="space-y-2">
         <div className="flex items-baseline justify-between gap-2">
           <Label htmlFor="qr-tagged" className="text-sm font-medium">

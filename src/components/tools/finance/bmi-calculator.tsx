@@ -1,12 +1,10 @@
 'use client'
-
 import * as React from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 function parseNum(value: string): number {
   if (value == null) return NaN
   const trimmed = value.trim()
@@ -14,7 +12,6 @@ function parseNum(value: string): number {
   const n = Number(trimmed)
   return Number.isFinite(n) ? n : NaN
 }
-
 function fmt(n: number, digits = 1): string {
   if (!Number.isFinite(n)) return '—'
   return n.toLocaleString(undefined, {
@@ -22,13 +19,11 @@ function fmt(n: number, digits = 1): string {
     minimumFractionDigits: digits,
   })
 }
-
 interface Category {
   label: string
   color: string
   bg: string
 }
-
 function categorize(bmi: number): Category | null {
   if (!Number.isFinite(bmi) || bmi <= 0) return null
   if (bmi < 18.5)
@@ -55,7 +50,6 @@ function categorize(bmi: number): Category | null {
     bg: 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300',
   }
 }
-
 /**
  * BMI Calculator
  * Metric (cm / kg) or Imperial (ft + in / lb) via Tabs.
@@ -63,19 +57,15 @@ function categorize(bmi: number): Category | null {
  */
 export default function BmiCalculator() {
   const [unit, setUnit] = React.useState<'metric' | 'imperial'>('metric')
-
   // Metric
   const [cm, setCm] = React.useState('170')
   const [kg, setKg] = React.useState('65')
-
   // Imperial
   const [ft, setFt] = React.useState('5')
   const [inch, setInch] = React.useState('7')
   const [lb, setLb] = React.useState('145')
-
   let bmi = NaN
   let heightM = NaN
-
   if (unit === 'metric') {
     const h = parseNum(cm)
     const w = parseNum(kg)
@@ -93,13 +83,11 @@ export default function BmiCalculator() {
       heightM = totalIn * 0.0254
     }
   }
-
   const cat = categorize(bmi)
   const healthyLow =
     Number.isFinite(heightM) && heightM > 0 ? 18.5 * heightM * heightM : NaN
   const healthyHigh =
     Number.isFinite(heightM) && heightM > 0 ? 24.9 * heightM * heightM : NaN
-
   return (
     <div className="space-y-5">
       <Tabs value={unit} onValueChange={(v) => setUnit(v as typeof unit)}>
@@ -107,7 +95,6 @@ export default function BmiCalculator() {
           <TabsTrigger value="metric">Metric (cm / kg)</TabsTrigger>
           <TabsTrigger value="imperial">Imperial (ft / lb)</TabsTrigger>
         </TabsList>
-
         <TabsContent value="metric">
           <Card>
             <CardHeader>
@@ -137,7 +124,6 @@ export default function BmiCalculator() {
             </CardContent>
           </Card>
         </TabsContent>
-
         <TabsContent value="imperial">
           <Card>
             <CardHeader>
@@ -177,7 +163,6 @@ export default function BmiCalculator() {
           </Card>
         </TabsContent>
       </Tabs>
-
       <Card>
         <CardContent className="space-y-4 pt-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -202,7 +187,6 @@ export default function BmiCalculator() {
               </Badge>
             )}
           </div>
-
           <div className="grid gap-3 sm:grid-cols-3">
             <Stat
               label="BMI"
@@ -218,7 +202,6 @@ export default function BmiCalculator() {
               value={Number.isFinite(healthyHigh) ? `${fmt(healthyHigh, 1)} kg` : '—'}
             />
           </div>
-
           <p className="text-xs text-muted-foreground">
             Healthy BMI range is 18.5 – 24.9. BMI is a screening tool and does
             not directly measure body fat; consult a healthcare professional for

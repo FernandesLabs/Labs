@@ -1,23 +1,15 @@
 import type { MetadataRoute } from 'next'
 import { siteConfig } from '@/lib/site-config'
-import { toolSlugs } from '@/lib/tools/tool-meta'
+// IMPORTANT: use the server-safe `toolMetadata` array, NOT the `tools` export
+// from `@/lib/tools/registry`. The registry is a 'use client' module — its
+// top-level `tools` array is not usable inside a server route handler and
+// throws `tools.map is not a function`.
+import { toolMetadata } from '@/lib/tools/tool-metadata'
 import { CATEGORY_ORDER } from '@/lib/tools/types'
 
-/**
- * Auto-generated sitemap.xml at /sitemap.xml.
- *
- * Lists:
- *   - the hub (`/`)
- *   - 8 category landing pages (`/category/<cat>`)
- *   - 132 tool pages (`/tools/<slug>`)
- *   - privacy + terms
- *
- * Total: 143 URLs. Submit to Google Search Console after deployment.
- */
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = siteConfig.site.url
+  const baseUrl = `https://${siteConfig.site.domain}`
   const now = new Date()
-
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: `${baseUrl}/`,
@@ -38,21 +30,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.3,
     },
   ]
-
-  // Category landing pages — high priority for category-level SEO queries.
   const categoryPages: MetadataRoute.Sitemap = CATEGORY_ORDER.map((cat) => ({
     url: `${baseUrl}/category/${cat}`,
     lastModified: now,
     changeFrequency: 'weekly' as const,
-    priority: 0.9,
+    priority: 0.7,
   }))
-
-  const toolPages: MetadataRoute.Sitemap = toolSlugs.map((slug) => ({
-    url: `${baseUrl}/tools/${slug}`,
+  const toolPages: MetadataRoute.Sitemap = toolMetadata.map((tool) => ({
+    url: `${baseUrl}/tools/${tool.slug}`,
     lastModified: now,
     changeFrequency: 'monthly' as const,
     priority: 0.8,
   }))
-
   return [...staticPages, ...categoryPages, ...toolPages]
 }

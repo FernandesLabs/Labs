@@ -1,9 +1,7 @@
 'use client'
-
 import { Github, Sparkles, Search } from 'lucide-react'
 import { ThemeToggle } from './theme-toggle'
 import { Button } from '@/components/ui/button'
-
 export function SiteHeader({
   onHome,
   toolCount = 0,
@@ -48,7 +46,6 @@ export function SiteHeader({
             </span>
           </span>
         </button>
-
         <div className="flex items-center gap-1.5">
           <Button
             variant="outline"

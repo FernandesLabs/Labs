@@ -7,6 +7,5 @@
 // tool works. Importing through this shim centralises the dependency so only
 // one file triggers the warning.
 import { dump, load, YAMLException } from 'js-yaml'
-
 export { dump, load, YAMLException }
 export type { ParseOptions, DumpOptions } from 'js-yaml'

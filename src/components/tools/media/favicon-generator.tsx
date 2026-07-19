@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Download, Upload } from 'lucide-react'
 import { toast } from 'sonner'
@@ -10,9 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Field, downloadBlob } from '@/lib/tools/tool-ui'
-
 const SIZES = [16, 32, 48, 64, 180]
-
 function drawImageFavicon(
   size: number,
   img: HTMLImageElement
@@ -33,7 +30,6 @@ function drawImageFavicon(
   ctx.drawImage(img, x, y, w, h)
   return canvas
 }
-
 function drawTextFavicon(
   size: number,
   text: string,
@@ -56,7 +52,6 @@ function drawTextFavicon(
   ctx.fillText(text, size / 2, size / 2 + size * 0.02)
   return canvas
 }
-
 export default function FaviconGenerator() {
   const [mode, setMode] = React.useState<'image' | 'text'>('text')
   const [text, setText] = React.useState('FL')
@@ -67,9 +62,7 @@ export default function FaviconGenerator() {
   const [imgUrl, setImgUrl] = React.useState<string | null>(null)
   const [imgName, setImgName] = React.useState<string | null>(null)
   const fileRef = React.useRef<HTMLInputElement | null>(null)
-
   const cleaned = text.trim().slice(0, 2)
-
   const loadFile = (f: File) => {
     if (!f.type.startsWith('image/')) {
       toast.error('Please choose an image file')
@@ -88,13 +81,11 @@ export default function FaviconGenerator() {
     }
     image.src = url
   }
-
   React.useEffect(() => {
     return () => {
       if (imgUrl) URL.revokeObjectURL(imgUrl)
     }
   }, [imgUrl])
-
   const previews = React.useMemo<{ size: number; url: string; canvas: HTMLCanvasElement }[]>(() => {
     return SIZES.map((size) => {
       let canvas: HTMLCanvasElement
@@ -115,7 +106,6 @@ export default function FaviconGenerator() {
       return { size, url: canvas.toDataURL('image/png'), canvas }
     })
   }, [mode, img, cleaned, bg, fg, fontSize])
-
   const handleDownload = (size: number) => {
     const entry = previews.find((p) => p.size === size)
     if (!entry) return
@@ -128,15 +118,12 @@ export default function FaviconGenerator() {
       toast.success(`Downloaded ${size}×${size}`)
     }, 'image/png')
   }
-
   const handleDownloadAll = () => {
     previews.forEach((p, i) => {
       window.setTimeout(() => handleDownload(p.size), i * 200)
     })
   }
-
   const disabled = mode === 'text' ? cleaned.length === 0 : !img
-
   return (
     <div className="space-y-5">
       <Tabs value={mode} onValueChange={(v) => setMode(v as 'image' | 'text')}>
@@ -144,7 +131,6 @@ export default function FaviconGenerator() {
           <TabsTrigger value="text">From Text</TabsTrigger>
           <TabsTrigger value="image">From Image</TabsTrigger>
         </TabsList>
-
         <TabsContent value="text" className="space-y-5 pt-4">
           <div className="grid gap-5 sm:grid-cols-2">
             <Field label="Text" htmlFor="fav-text" hint="1–2 characters">
@@ -208,7 +194,6 @@ export default function FaviconGenerator() {
             </Field>
           </div>
         </TabsContent>
-
         <TabsContent value="image" className="space-y-5 pt-4">
           <Field label="Source image">
             <div
@@ -256,7 +241,6 @@ export default function FaviconGenerator() {
           ) : null}
         </TabsContent>
       </Tabs>
-
       <Separator />
       <Label className="text-sm font-medium">Generated favicons</Label>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
@@ -289,7 +273,6 @@ export default function FaviconGenerator() {
           </div>
         ))}
       </div>
-
       <Button
         type="button"
         variant="outline"

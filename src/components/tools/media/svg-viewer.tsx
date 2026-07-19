@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Download, FileCode2, AlertTriangle, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -20,10 +19,8 @@ import {
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { Field, Stat, downloadBlob } from '@/lib/tools/tool-ui'
-
 type BgMode = 'checker' | 'white' | 'dark'
 type Zoom = '50' | '100' | '200'
-
 const SAMPLE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Sample">
   <defs>
     <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
@@ -35,7 +32,6 @@ const SAMPLE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200
   <circle cx="100" cy="100" r="48" fill="white" opacity="0.9" />
   <path d="M80 100 L100 80 L120 100 L100 120 Z" fill="#0f172a" />
 </svg>`
-
 interface SvgStats {
   width: number | null
   height: number | null
@@ -43,7 +39,6 @@ interface SvgStats {
   elementCount: number
   fileSize: number
 }
-
 function parseDimensions(svgText: string): { width: number | null; height: number | null; hasViewBox: boolean } {
   let width: number | null = null
   let height: number | null = null
@@ -81,7 +76,6 @@ function parseDimensions(svgText: string): { width: number | null; height: numbe
   }
   return { width, height, hasViewBox }
 }
-
 function countElements(svgText: string): number {
   try {
     const parser = new DOMParser()
@@ -92,7 +86,6 @@ function countElements(svgText: string): number {
     return 0
   }
 }
-
 function validateSvg(svgText: string): { ok: boolean; error?: string } {
   if (!svgText.trim()) return { ok: false, error: 'Empty input' }
   try {
@@ -111,7 +104,6 @@ function validateSvg(svgText: string): { ok: boolean; error?: string } {
     return { ok: false, error: e instanceof Error ? e.message : 'Failed to parse SVG' }
   }
 }
-
 function checkerboardStyle(): React.CSSProperties {
   return {
     backgroundImage:
@@ -121,12 +113,10 @@ function checkerboardStyle(): React.CSSProperties {
     backgroundColor: '#f8fafc',
   }
 }
-
 export default function SvgViewer(): React.JSX.Element {
   const [svgText, setSvgText] = React.useState<string>(SAMPLE_SVG)
   const [bg, setBg] = React.useState<BgMode>('checker')
   const [zoom, setZoom] = React.useState<Zoom>('100')
-
   const validation = React.useMemo(() => validateSvg(svgText), [svgText])
   const stats = React.useMemo<SvgStats>(() => {
     const { width, height, hasViewBox } = parseDimensions(svgText)
@@ -134,21 +124,17 @@ export default function SvgViewer(): React.JSX.Element {
     const fileSize = new Blob([svgText]).size
     return { width, height, hasViewBox, elementCount, fileSize }
   }, [svgText])
-
   const previewBg =
     bg === 'white'
       ? { backgroundColor: '#ffffff' }
       : bg === 'dark'
         ? { backgroundColor: '#0f172a' }
         : checkerboardStyle()
-
   const zoomScale = parseInt(zoom, 10) / 100
-
   const download = (): void => {
     if (!validation.ok) return
     downloadBlob(new Blob([svgText], { type: 'image/svg+xml' }), 'image.svg')
   }
-
   return (
     <div className="space-y-5">
       <Card>
@@ -200,7 +186,6 @@ export default function SvgViewer(): React.JSX.Element {
           </div>
         </CardContent>
       </Card>
-
       <div className="grid gap-3 sm:grid-cols-3">
         <Field label="Background" htmlFor="sv-bg">
           <Select value={bg} onValueChange={(v) => setBg(v as BgMode)}>
@@ -227,7 +212,6 @@ export default function SvgViewer(): React.JSX.Element {
           </Select>
         </Field>
       </div>
-
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat
           label="Dimensions"
@@ -241,7 +225,6 @@ export default function SvgViewer(): React.JSX.Element {
         <Stat label="Elements" value={stats.elementCount} />
         <Stat label="File size" value={`${stats.fileSize} B`} />
       </div>
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Preview</CardTitle>
@@ -275,9 +258,7 @@ export default function SvgViewer(): React.JSX.Element {
           )}
         </CardContent>
       </Card>
-
       <Separator />
-
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
         <FileCode2 className="size-3.5" />
         <span>

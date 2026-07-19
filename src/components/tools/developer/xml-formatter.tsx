@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Eraser, Maximize2, Minimize2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -13,13 +12,10 @@ import {
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Field, ResultBox, Stat } from '@/lib/tools/tool-ui'
 import { toast } from 'sonner'
-
 const SAMPLE = `<?xml version="1.0" encoding="UTF-8"?><note><to>Tove</to><from>Jani</from><heading>Reminder</heading><body><p>Don't forget me this weekend!</p><p>Bring cake.</p></body></note>`
-
 type Token =
   | { type: 'tag'; value: string; raw: string; start: number }
   | { type: 'text'; value: string; start: number }
-
 /** Tokenize XML into tags + text. */
 function tokenizeXml(xml: string): Token[] {
   const tokens: Token[] = []
@@ -50,7 +46,6 @@ function tokenizeXml(xml: string): Token[] {
   }
   return tokens
 }
-
 function tagName(tagInner: string): string {
   // strip leading "/", "!", "?"
   let s = tagInner.trim()
@@ -59,21 +54,17 @@ function tagName(tagInner: string): string {
   const m = s.match(/^([^\s/>]+)/)
   return m ? m[1] : s
 }
-
 function isProcessingOrDecl(tagInner: string): boolean {
   const t = tagInner.trim()
   return t.startsWith('?') || t.startsWith('!')
 }
-
 function isSelfClosing(tagInner: string): boolean {
   const t = tagInner.trim()
   return t.endsWith('/')
 }
-
 function isClosing(tagInner: string): boolean {
   return tagInner.trim().startsWith('/')
 }
-
 function validateWellFormed(tokens: Token[]): string | null {
   const stack: { name: string; pos: number }[] = []
   for (const t of tokens) {
@@ -101,7 +92,6 @@ function validateWellFormed(tokens: Token[]): string | null {
   }
   return null
 }
-
 function formatXml(xml: string, indent = '  '): string {
   const tokens = tokenizeXml(xml)
   const err = validateWellFormed(tokens)
@@ -126,7 +116,6 @@ function formatXml(xml: string, indent = '  '): string {
   }
   return lines.join('\n')
 }
-
 function minifyXml(xml: string): string {
   // Collapse whitespace between tags, trim each text node, drop empty text.
   const tokens = tokenizeXml(xml)
@@ -143,13 +132,11 @@ function minifyXml(xml: string): string {
   }
   return out
 }
-
 export default function XmlFormatter() {
   const [input, setInput] = React.useState(SAMPLE)
   const [tab, setTab] = React.useState<'format' | 'minify'>('format')
   const [output, setOutput] = React.useState('')
   const [error, setError] = React.useState<string | null>(null)
-
   React.useEffect(() => {
     if (!input.trim()) {
       setError(null)
@@ -168,7 +155,6 @@ export default function XmlFormatter() {
       toast.error('XML formatting failed')
     }
   }, [input, tab])
-
   return (
     <div className="space-y-5">
       <Tabs value={tab} onValueChange={(v) => setTab(v as 'format' | 'minify')}>
@@ -195,7 +181,6 @@ export default function XmlFormatter() {
           </p>
         </TabsContent>
       </Tabs>
-
       <Field label="XML input" htmlFor="xml-input">
         <Textarea
           id="xml-input"
@@ -207,7 +192,6 @@ export default function XmlFormatter() {
           placeholder="<root><item>value</item></root>"
         />
       </Field>
-
       <div className="flex flex-wrap items-center gap-2">
         <Button variant="outline" size="sm" onClick={() => setInput('')}>
           <Eraser className="size-4" />
@@ -217,7 +201,6 @@ export default function XmlFormatter() {
           Load sample
         </Button>
       </div>
-
       {error ? (
         <Alert variant="destructive">
           <AlertDescription className="font-mono text-xs">
@@ -225,13 +208,11 @@ export default function XmlFormatter() {
           </AlertDescription>
         </Alert>
       ) : null}
-
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         <Stat label="Input bytes" value={new Blob([input]).size} />
         <Stat label="Output bytes" value={new Blob([output]).size} />
         <Stat label="Lines" value={output ? output.split('\n').length : 0} />
       </div>
-
       <ResultBox
         value={output}
         label={tab === 'format' ? 'Formatted XML' : 'Minified XML'}

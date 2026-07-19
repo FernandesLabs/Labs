@@ -1,12 +1,10 @@
 import Link from 'next/link'
 import { CATEGORY_ORDER, CATEGORY_META } from '@/lib/tools/types'
-
 /** Not-found for /category/[invalid] */
 export const metadata = {
   title: 'Category not found — Fernandes Labs',
   robots: { index: false, follow: true },
 }
-
 export default function NotFound() {
   return (
     <main className="flex-1">

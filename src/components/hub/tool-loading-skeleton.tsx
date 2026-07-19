@@ -1,7 +1,5 @@
 'use client'
-
 import { Loader2 } from 'lucide-react'
-
 /** Loading skeleton shown while a lazy-loaded tool component fetches its chunk. */
 export function ToolLoadingSkeleton() {
   return (

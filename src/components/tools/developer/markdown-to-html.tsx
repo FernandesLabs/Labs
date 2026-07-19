@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { FileText, Eraser, Code2, Github } from 'lucide-react'
 import { marked } from 'marked'
@@ -16,38 +15,29 @@ import {
 } from '@/components/ui/card'
 import { Field, ResultBox, Stat } from '@/lib/tools/tool-ui'
 import { toast } from 'sonner'
-
 const SAMPLE_MARKDOWN = `# Hello Fernandes Labs
-
 A **markdown** document with [a link](https://fernandeslabs.com) and \`inline code\`.
-
 ## Features
-
 - GFM tables
 - ~~strikethrough~~
 - Task lists
   - [x] Render markdown
   - [ ] Ship it
-
 \`\`\`js
 function greet(name) {
   return \`Hello, \${name}!\`;
 }
 \`\`\`
-
 | Tool             | Mode  | Status |
 | ---------------- | ----- | ------ |
 | Markdown→HTML    | GFM   | Ready  |
 | Diff Checker     | LCS   | Ready  |
-
 > Markdown is a lightweight markup language.
 `
-
 export default function MarkdownToHtml(): React.JSX.Element {
   const [input, setInput] = React.useState<string>(SAMPLE_MARKDOWN)
   const [gfm, setGfm] = React.useState<boolean>(true)
   const [breaks, setBreaks] = React.useState<boolean>(false)
-
   const html = React.useMemo<string>(() => {
     if (input.trim() === '') return ''
     try {
@@ -60,7 +50,6 @@ export default function MarkdownToHtml(): React.JSX.Element {
       return ''
     }
   }, [input, gfm, breaks])
-
   const stats = React.useMemo(() => {
     const inBytes = new Blob([input]).size
     const outBytes = new Blob([html]).size
@@ -68,12 +57,10 @@ export default function MarkdownToHtml(): React.JSX.Element {
     const lines = input ? input.split('\n').length : 0
     return { inBytes, outBytes, words, lines }
   }, [input, html])
-
   const handleClear = (): void => {
     setInput('')
     toast.success('Cleared')
   }
-
   return (
     <div className="space-y-5">
       <Card>
@@ -139,7 +126,6 @@ export default function MarkdownToHtml(): React.JSX.Element {
           </div>
         </CardContent>
       </Card>
-
       <Field
         label="Markdown input"
         htmlFor="mdh-input"
@@ -157,7 +143,6 @@ export default function MarkdownToHtml(): React.JSX.Element {
           autoCorrect="off"
         />
       </Field>
-
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat label="Input chars" value={input.length} />
         <Stat label="Output chars" value={html.length} />
@@ -168,7 +153,6 @@ export default function MarkdownToHtml(): React.JSX.Element {
           accent="oklch(0.6 0.17 150)"
         />
       </div>
-
       <ResultBox
         value={html}
         label="HTML output"
@@ -177,7 +161,6 @@ export default function MarkdownToHtml(): React.JSX.Element {
         downloadName="markdown.html"
         empty="Type markdown above to see the generated HTML source here."
       />
-
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
         <Github className="size-3.5" />
         <span>

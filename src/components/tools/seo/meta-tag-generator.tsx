@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -21,16 +20,13 @@ import {
 } from '@/components/ui/select'
 import { toast } from 'sonner'
 import { Field, ResultBox } from '@/lib/tools/tool-ui'
-
 type OgType = 'website' | 'article' | 'product' | 'profile'
-
 const OG_TYPES: { value: OgType; label: string }[] = [
   { value: 'website', label: 'Website' },
   { value: 'article', label: 'Article' },
   { value: 'product', label: 'Product' },
   { value: 'profile', label: 'Profile' },
 ]
-
 function esc(value: string): string {
   return value
     .replace(/&/g, '&amp;')
@@ -38,7 +34,6 @@ function esc(value: string): string {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
 }
-
 function buildMetaTags(input: {
   title: string
   description: string
@@ -99,7 +94,6 @@ function buildMetaTags(input: {
   }
   return lines.join('\n')
 }
-
 export default function MetaTagGenerator(): React.JSX.Element {
   const [title, setTitle] = React.useState('')
   const [description, setDescription] = React.useState('')
@@ -108,7 +102,6 @@ export default function MetaTagGenerator(): React.JSX.Element {
   const [ogImage, setOgImage] = React.useState('')
   const [twitterHandle, setTwitterHandle] = React.useState('')
   const [ogType, setOgType] = React.useState<OgType>('website')
-
   const output = React.useMemo(
     () =>
       buildMetaTags({
@@ -122,10 +115,8 @@ export default function MetaTagGenerator(): React.JSX.Element {
       }),
     [title, description, keywords, canonical, ogImage, twitterHandle, ogType]
   )
-
   const charCount = description.length
   const descWarn = charCount > 160
-
   const handleReset = (): void => {
     setTitle('')
     setDescription('')
@@ -136,7 +127,6 @@ export default function MetaTagGenerator(): React.JSX.Element {
     setOgType('website')
     toast.success('Form reset')
   }
-
   return (
     <div className="space-y-5">
       <Card>
@@ -245,7 +235,6 @@ export default function MetaTagGenerator(): React.JSX.Element {
           </div>
         </CardContent>
       </Card>
-
       <ResultBox
         value={output}
         label="Generated meta tags"

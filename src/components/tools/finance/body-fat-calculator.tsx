@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { toast } from 'sonner'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -7,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 function parseNum(value: string): number {
   if (value == null) return NaN
   const trimmed = value.trim()
@@ -15,7 +13,6 @@ function parseNum(value: string): number {
   const n = Number(trimmed)
   return Number.isFinite(n) ? n : NaN
 }
-
 function fmt(n: number, digits = 1): string {
   if (!Number.isFinite(n)) return '—'
   return n.toLocaleString(undefined, {
@@ -23,19 +20,16 @@ function fmt(n: number, digits = 1): string {
     minimumFractionDigits: digits,
   })
 }
-
 function toCm(value: string, unit: 'cm' | 'in'): number {
   const n = parseNum(value)
   if (!Number.isFinite(n)) return NaN
   return unit === 'in' ? n * 2.54 : n
 }
-
 interface FatCategory {
   label: string
   color: string
   bg: string
 }
-
 function categorize(bf: number, gender: 'male' | 'female'): FatCategory | null {
   if (!Number.isFinite(bf) || bf <= 0) return null
   // American Council on Exercise ranges
@@ -52,7 +46,6 @@ function categorize(bf: number, gender: 'male' | 'female'): FatCategory | null {
   if (bf < 32) return { label: 'Average', color: '#d97706', bg: 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300' }
   return { label: 'Obese', color: '#dc2626', bg: 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300' }
 }
-
 /**
  * Body Fat Calculator — U.S. Navy method.
  * Gender toggle (Tabs). Inputs in cm or in (unit toggle).
@@ -68,15 +61,12 @@ export default function BodyFatCalculator() {
   const [neck, setNeck] = React.useState('38')
   const [waist, setWaist] = React.useState('85')
   const [hip, setHip] = React.useState('95')
-
   const hCm = toCm(height, unit)
   const nCm = toCm(neck, unit)
   const wCm = toCm(waist, unit)
   const hipCm = toCm(hip, unit)
-
   let bf = NaN
   let errorReason: string | null = null
-
   if (
     Number.isFinite(hCm) &&
     Number.isFinite(nCm) &&
@@ -117,7 +107,6 @@ export default function BodyFatCalculator() {
       }
     }
   }
-
   // Surface the error via toast when inputs are present but invalid.
   const warnedRef = React.useRef<string | null>(null)
   React.useEffect(() => {
@@ -128,9 +117,7 @@ export default function BodyFatCalculator() {
       warnedRef.current = null
     }
   }, [errorReason])
-
   const cat = categorize(bf, gender)
-
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -147,7 +134,6 @@ export default function BodyFatCalculator() {
           </TabsList>
         </Tabs>
       </div>
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Measurements ({unit})</CardTitle>
@@ -198,7 +184,6 @@ export default function BodyFatCalculator() {
           ) : null}
         </CardContent>
       </Card>
-
       <Card>
         <CardContent className="space-y-4 pt-6">
           <div className="flex flex-wrap items-center justify-between gap-3">

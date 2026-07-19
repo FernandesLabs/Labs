@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Plus, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -15,12 +14,10 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 interface GradeInfo {
   label: string
   point: number
 }
-
 const GRADES: GradeInfo[] = [
   { label: 'A+', point: 4.0 },
   { label: 'A', point: 4.0 },
@@ -35,14 +32,12 @@ const GRADES: GradeInfo[] = [
   { label: 'D', point: 1.0 },
   { label: 'F', point: 0.0 },
 ]
-
 interface Course {
   id: number
   name: string
   grade: string
   credits: string
 }
-
 function parseNum(value: string): number {
   if (value == null) return NaN
   const trimmed = value.trim()
@@ -50,7 +45,6 @@ function parseNum(value: string): number {
   const n = Number(trimmed)
   return Number.isFinite(n) ? n : NaN
 }
-
 function fmt(n: number, digits = 2): string {
   if (!Number.isFinite(n)) return '—'
   return n.toLocaleString(undefined, {
@@ -58,13 +52,11 @@ function fmt(n: number, digits = 2): string {
     minimumFractionDigits: digits,
   })
 }
-
 let _nextId = 3
 function nextId(): number {
   _nextId += 1
   return _nextId
 }
-
 /**
  * GPA Calculator
  * Dynamic course list — each row has a course name (optional), grade, and
@@ -75,24 +67,20 @@ export default function GpaCalculator() {
     { id: 1, name: 'Calculus I', grade: 'A', credits: '4' },
     { id: 2, name: 'English Composition', grade: 'B+', credits: '3' },
   ])
-
   const addCourse = () => {
     setCourses((prev) => [
       ...prev,
       { id: nextId(), name: '', grade: 'A', credits: '3' },
     ])
   }
-
   const removeCourse = (id: number) => {
     setCourses((prev) => prev.filter((c) => c.id !== id))
   }
-
   const updateCourse = (id: number, patch: Partial<Course>) => {
     setCourses((prev) =>
       prev.map((c) => (c.id === id ? { ...c, ...patch } : c)),
     )
   }
-
   // Live GPA computation — runs on every render so results update instantly.
   let totalCredits = 0
   let totalPoints = 0
@@ -106,9 +94,7 @@ export default function GpaCalculator() {
       hasValid = true
     }
   }
-
   const gpa = totalCredits > 0 ? totalPoints / totalCredits : NaN
-
   return (
     <div className="space-y-5">
       <Card>
@@ -184,7 +170,6 @@ export default function GpaCalculator() {
           </ScrollArea>
         </CardContent>
       </Card>
-
       <Card>
         <CardContent className="space-y-4 pt-6">
           <div className="flex flex-wrap items-center justify-between gap-3">

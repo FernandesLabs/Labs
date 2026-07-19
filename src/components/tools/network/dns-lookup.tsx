@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Loader2, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -30,9 +29,7 @@ import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { toast } from 'sonner'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 type RecordType = 'A' | 'AAAA' | 'MX' | 'TXT' | 'NS' | 'CNAME' | 'SOA' | 'CAA'
-
 const TYPES: RecordType[] = [
   'A',
   'AAAA',
@@ -43,7 +40,6 @@ const TYPES: RecordType[] = [
   'SOA',
   'CAA',
 ]
-
 /** Map numeric DNS record type → human name. */
 const TYPE_NAME: Record<number, string> = {
   1: 'A',
@@ -55,14 +51,12 @@ const TYPE_NAME: Record<number, string> = {
   28: 'AAAA',
   257: 'CAA',
 }
-
 interface DnsAnswer {
   name: string
   type: number
   TTL: number
   data: string
 }
-
 interface DnsResponse {
   ok: boolean
   error?: string
@@ -71,9 +65,7 @@ interface DnsResponse {
   Authority?: DnsAnswer[]
   Comment?: string
 }
-
 const SAMPLE_DOMAINS = ['example.com', 'google.com', 'cloudflare.com']
-
 async function fetchDns(
   domain: string,
   type: RecordType,
@@ -83,7 +75,6 @@ async function fetchDns(
   const res = await fetch(url, { signal })
   return (await res.json()) as DnsResponse
 }
-
 export default function DnsLookup(): React.JSX.Element {
   const [domain, setDomain] = React.useState('example.com')
   const [type, setType] = React.useState<RecordType>('A')
@@ -91,9 +82,7 @@ export default function DnsLookup(): React.JSX.Element {
   const [answers, setAnswers] = React.useState<DnsAnswer[]>([])
   const [status, setStatus] = React.useState<number | null>(null)
   const [hasResult, setHasResult] = React.useState(false)
-
   const controllerRef = React.useRef<AbortController | null>(null)
-
   const lookup = React.useCallback(
     async (override?: { domain?: string; type?: RecordType }) => {
       const d = (override?.domain ?? domain).trim()
@@ -142,13 +131,11 @@ export default function DnsLookup(): React.JSX.Element {
     },
     [domain, type]
   )
-
   React.useEffect(() => {
     return () => {
       if (controllerRef.current) controllerRef.current.abort()
     }
   }, [])
-
   return (
     <div className="space-y-5">
       <Card>
@@ -194,7 +181,6 @@ export default function DnsLookup(): React.JSX.Element {
               </Select>
             </Field>
           </div>
-
           <div className="flex flex-wrap items-center gap-2">
             <Button
               type="button"
@@ -227,7 +213,6 @@ export default function DnsLookup(): React.JSX.Element {
           </div>
         </CardContent>
       </Card>
-
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat
           label="Records"
@@ -244,14 +229,12 @@ export default function DnsLookup(): React.JSX.Element {
         />
         <Stat label="Resolver" value="Google DoH" />
       </div>
-
       {hasResult && answers.length === 0 ? (
         <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-amber-700 dark:text-amber-400">
           No {type} records returned for{' '}
           <span className="font-mono">{domain}</span>.
         </div>
       ) : null}
-
       {answers.length > 0 ? (
         <Card>
           <CardHeader>

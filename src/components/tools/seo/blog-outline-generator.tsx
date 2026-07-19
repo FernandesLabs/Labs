@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Copy, FileText, ListTree } from 'lucide-react'
 import { Input } from '@/components/ui/input'
@@ -23,9 +22,7 @@ import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Field, ResultBox, Stat } from '@/lib/tools/tool-ui'
 import { useCopy } from '@/lib/tools/use-copy'
-
 type Tone = 'informative' | 'conversational' | 'persuasive' | 'technical' | 'inspirational'
-
 interface FormState {
   topic: string
   audience: string
@@ -33,7 +30,6 @@ interface FormState {
   sections: number
   wordCount: number
 }
-
 const TONE_HINTS: Record<Tone, string> = {
   informative: 'Clear, fact-led, neutral voice.',
   conversational: 'Warm, first-person, accessible.',
@@ -41,12 +37,10 @@ const TONE_HINTS: Record<Tone, string> = {
   technical: 'Precise, terminology-aware, deep.',
   inspirational: 'Uplifting, story-led, motivational.',
 }
-
 function titleVariations(topic: string, tone: Tone): string[] {
   const t = topic.trim() || 'your topic'
   const lower = t.charAt(0).toLowerCase() + t.slice(1)
   const cap = t.charAt(0).toUpperCase() + t.slice(1)
-
   const variations: Record<Tone, string[]> = {
     informative: [
       `The Complete Guide to ${cap}`,
@@ -74,16 +68,13 @@ function titleVariations(topic: string, tone: Tone): string[] {
       `From Spark to System: The ${cap} Story`,
     ],
   }
-
   return variations[tone]
 }
-
 interface Section {
   heading: string
   summary: string
   words: number
 }
-
 function buildSections(s: FormState): Section[] {
   const topic = s.topic.trim() || 'the topic'
   const cap = topic.charAt(0).toUpperCase() + topic.slice(1)
@@ -129,23 +120,19 @@ function buildSections(s: FormState): Section[] {
       summary: `For readers who want more: edge cases, integrations, and the non-obvious tricks that compound.`,
     },
   ]
-
   const count = Math.max(3, Math.min(10, s.sections))
   const picked = templates.slice(0, count)
   const perSection = Math.max(50, Math.floor(s.wordCount / (count + 1)))
-
   return picked.map((p) => ({
     heading: p.heading,
     summary: p.summary,
     words: perSection,
   }))
 }
-
 function introHook(topic: string, tone: Tone, audience: string): string {
   const t = topic.trim() || 'this topic'
   const aud = audience.trim() || 'curious readers'
   const cap = t.charAt(0).toUpperCase() + t.slice(1)
-
   const hooks: Record<Tone, string> = {
     informative: `If you've ever felt overwhelmed by ${t}, this introduction sets the stage for ${aud}.`,
     conversational: `Let's be honest — most of us stumble into ${t} without a map. This post is that map, written for ${aud}.`,
@@ -155,11 +142,9 @@ function introHook(topic: string, tone: Tone, audience: string): string {
   }
   return hooks[tone]
 }
-
 function conclusion(topic: string, tone: Tone): string {
   const t = topic.trim() || 'the topic'
   const cap = t.charAt(0).toUpperCase() + t.slice(1)
-
   const closers: Record<Tone, string> = {
     informative: `To recap: ${cap} rewards clear definitions, careful measurement, and steady iteration. Pick one principle and start.`,
     conversational: `So that's ${t} — less mysterious than it sounded, right? Take one idea from above and try it this week.`,
@@ -169,12 +154,10 @@ function conclusion(topic: string, tone: Tone): string {
   }
   return closers[tone]
 }
-
 function buildOutline(s: FormState): string {
   const sections = buildSections(s)
   const titles = titleVariations(s.topic, s.tone)
   const totalWords = sections.reduce((sum, sec) => sum + sec.words, 0) + 150 // intro + outro
-
   const lines: string[] = []
   lines.push(`# ${titles[0]}`)
   lines.push('')
@@ -199,10 +182,8 @@ function buildOutline(s: FormState): string {
   lines.push(`## Conclusion`)
   lines.push(conclusion(s.topic, s.tone))
   lines.push(`_${150} words_`)
-
   return lines.join('\n')
 }
-
 const DEFAULT_STATE: FormState = {
   topic: 'technical SEO audits',
   audience: 'junior-to-mid SEO specialists',
@@ -210,25 +191,21 @@ const DEFAULT_STATE: FormState = {
   sections: 5,
   wordCount: 1500,
 }
-
 export default function BlogOutlineGenerator() {
   const { copy } = useCopy()
   const [state, setState] = React.useState<FormState>(DEFAULT_STATE)
-
   const update = <K extends keyof FormState>(
     key: K,
     value: FormState[K]
   ): void => {
     setState((prev) => ({ ...prev, [key]: value }))
   }
-
   const outline = React.useMemo(() => buildOutline(state), [state])
   const titles = React.useMemo(
     () => titleVariations(state.topic, state.tone),
     [state.topic, state.tone]
   )
   const sections = React.useMemo(() => buildSections(state), [state])
-
   return (
     <div className="space-y-5">
       <Card>
@@ -264,7 +241,6 @@ export default function BlogOutlineGenerator() {
               />
             </Field>
           </div>
-
           <div className="grid gap-4 sm:grid-cols-2">
             <Field
               label="Tone"
@@ -287,7 +263,6 @@ export default function BlogOutlineGenerator() {
                 </SelectContent>
               </Select>
             </Field>
-
             <Field
               label="Target word count"
               htmlFor="bo-words"
@@ -309,7 +284,6 @@ export default function BlogOutlineGenerator() {
               />
             </Field>
           </div>
-
           <Field
             label="Number of sections"
             htmlFor="bo-sections"
@@ -331,7 +305,6 @@ export default function BlogOutlineGenerator() {
           </Field>
         </CardContent>
       </Card>
-
       <div
         className="grid gap-3 sm:grid-cols-3"
         role="status"
@@ -352,9 +325,7 @@ export default function BlogOutlineGenerator() {
           accent="#16a34a"
         />
       </div>
-
       <Separator />
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Title variations</CardTitle>
@@ -379,7 +350,6 @@ export default function BlogOutlineGenerator() {
           ))}
         </CardContent>
       </Card>
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Outline preview</CardTitle>
@@ -428,7 +398,6 @@ export default function BlogOutlineGenerator() {
           </div>
         </CardContent>
       </Card>
-
       <ResultBox
         value={outline}
         label="Markdown outline"
@@ -437,7 +406,6 @@ export default function BlogOutlineGenerator() {
         downloadName="blog-outline.md"
         empty="Fill in the topic to generate an outline."
       />
-
       <div className="flex flex-wrap items-center gap-2">
         <Button
           type="button"

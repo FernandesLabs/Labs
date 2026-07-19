@@ -1,5 +1,4 @@
 import type { ComponentType } from 'react'
-
 export type ToolCategory =
   | 'developer'
   | 'text'
@@ -9,7 +8,6 @@ export type ToolCategory =
   | 'network'
   | 'media'
   | 'misc'
-
 export interface ToolMeta {
   slug: string
   category: ToolCategory
@@ -17,11 +15,9 @@ export interface ToolMeta {
   description: string
   keywords?: string[]
 }
-
 export interface Tool extends ToolMeta {
   Component: ComponentType
 }
-
 export const CATEGORY_META: Record<
   ToolCategory,
   { label: string; blurb: string; color: string }
@@ -67,7 +63,6 @@ export const CATEGORY_META: Record<
     color: 'oklch(0.55 0.16 200)',
   },
 }
-
 export const CATEGORY_ORDER: ToolCategory[] = [
   'developer',
   'text',

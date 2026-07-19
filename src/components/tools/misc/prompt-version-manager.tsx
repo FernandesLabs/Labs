@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import {
   Save,
@@ -30,11 +29,9 @@ import {
 import { Field, Stat, downloadBlob, randomInt } from '@/lib/tools/tool-ui'
 import { useCopy } from '@/lib/tools/use-copy'
 import { toast } from 'sonner'
-
 /* ------------------------------------------------------------------ */
 /*  Types & storage                                                    */
 /* ------------------------------------------------------------------ */
-
 interface Version {
   id: string
   name: string
@@ -42,18 +39,14 @@ interface Version {
   message: string
   createdAt: number
 }
-
 interface Library {
   /** All versions across all prompt names. */
   versions: Version[]
 }
-
 const STORAGE_KEY = 'fl-prompt-versions'
-
 function makeId(): string {
   return `v-${Date.now().toString(36)}-${randomInt(1_000_000).toString(36)}`
 }
-
 function loadLibrary(): Library {
   if (typeof window === 'undefined') return { versions: [] }
   try {
@@ -72,7 +65,6 @@ function loadLibrary(): Library {
     return { versions: [] }
   }
 }
-
 function saveLibrary(lib: Library): void {
   if (typeof window === 'undefined') return
   try {
@@ -81,16 +73,13 @@ function saveLibrary(lib: Library): void {
     toast.error('Could not save — localStorage quota exceeded?')
   }
 }
-
 /* ------------------------------------------------------------------ */
 /*  Simple line-based LCS diff                                         */
 /* ------------------------------------------------------------------ */
-
 interface DiffLine {
   type: 'equal' | 'add' | 'remove'
   text: string
 }
-
 function diffLines(oldText: string, newText: string): DiffLine[] {
   const a = oldText.split('\n')
   const b = newText.split('\n')
@@ -130,16 +119,13 @@ function diffLines(oldText: string, newText: string): DiffLine[] {
   }
   return out
 }
-
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
 /* ------------------------------------------------------------------ */
-
 function formatDate(ts: number): string {
   if (!Number.isFinite(ts)) return '—'
   return new Date(ts).toLocaleString()
 }
-
 function relativeTime(ts: number): string {
   if (!Number.isFinite(ts)) return ''
   const diff = Date.now() - ts
@@ -153,11 +139,9 @@ function relativeTime(ts: number): string {
   if (day < 30) return `${day}d ago`
   return formatDate(ts)
 }
-
 /* ------------------------------------------------------------------ */
 /*  Component                                                          */
 /* ------------------------------------------------------------------ */
-
 export default function PromptVersionManager() {
   const [library, setLibrary] = React.useState<Library>({ versions: [] })
   const [hydrated, setHydrated] = React.useState(false)
@@ -169,26 +153,22 @@ export default function PromptVersionManager() {
   const [showDiff, setShowDiff] = React.useState(false)
   const fileInputRef = React.useRef<HTMLInputElement | null>(null)
   const { copy } = useCopy()
-
   // Hydrate from localStorage on mount (client-only).
   React.useEffect(() => {
     setLibrary(loadLibrary())
     setHydrated(true)
   }, [])
-
   // Persist on change (after hydration).
   React.useEffect(() => {
     if (!hydrated) return
     saveLibrary(library)
   }, [library, hydrated])
-
   // Versions sorted newest-first.
   const versions = React.useMemo(
     () =>
       [...library.versions].sort((a, b) => b.createdAt - a.createdAt),
     [library.versions]
   )
-
   // Group versions by prompt name for the timeline.
   const grouped = React.useMemo(() => {
     const map = new Map<string, Version[]>()
@@ -200,7 +180,6 @@ export default function PromptVersionManager() {
     }
     return Array.from(map.entries())
   }, [versions])
-
   const handleSave = (): void => {
     const trimmedName = name.trim()
     const trimmedText = text
@@ -223,13 +202,11 @@ export default function PromptVersionManager() {
     setMessage('')
     toast.success('Version saved')
   }
-
   const handleRestore = (v: Version): void => {
     setName(v.name)
     setText(v.text)
     toast.success(`Restored version from ${formatDate(v.createdAt)}`)
   }
-
   const handleDelete = (id: string): void => {
     setLibrary((prev) => ({
       versions: prev.versions.filter((v) => v.id !== id),
@@ -238,7 +215,6 @@ export default function PromptVersionManager() {
     if (diffRight === id) setDiffRight(null)
     toast.success('Version deleted')
   }
-
   const handleClearAll = (): void => {
     if (versions.length === 0) return
     if (
@@ -252,7 +228,6 @@ export default function PromptVersionManager() {
     setDiffRight(null)
     toast.success('All versions cleared')
   }
-
   const handleExport = (): void => {
     if (versions.length === 0) {
       toast.error('No versions to export')
@@ -264,11 +239,9 @@ export default function PromptVersionManager() {
     downloadBlob(blob, 'prompt-versions.json')
     toast.success('Versions exported')
   }
-
   const handleImportClick = (): void => {
     fileInputRef.current?.click()
   }
-
   const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -330,7 +303,6 @@ export default function PromptVersionManager() {
     reader.onerror = () => toast.error('Could not read file')
     reader.readAsText(file)
   }
-
   const diffResult = React.useMemo(() => {
     if (!showDiff || !diffLeft || !diffRight) return null
     const left = library.versions.find((v) => v.id === diffLeft)
@@ -342,7 +314,6 @@ export default function PromptVersionManager() {
       lines: diffLines(left.text, right.text),
     }
   }, [showDiff, diffLeft, diffRight, library.versions])
-
   const diffStats = React.useMemo(() => {
     if (!diffResult) return null
     let added = 0
@@ -353,7 +324,6 @@ export default function PromptVersionManager() {
     }
     return { added, removed }
   }, [diffResult])
-
   return (
     <div className="space-y-5">
       <Card>
@@ -439,7 +409,6 @@ export default function PromptVersionManager() {
           </div>
         </CardContent>
       </Card>
-
       <div
         className="grid gap-3 sm:grid-cols-3"
         role="status"
@@ -456,7 +425,6 @@ export default function PromptVersionManager() {
           }
         />
       </div>
-
       <Card>
         <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0">
           <div>
@@ -647,7 +615,6 @@ export default function PromptVersionManager() {
           )}
         </CardContent>
       </Card>
-
       {showDiff ? (
         <Card>
           <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0">
@@ -764,7 +731,6 @@ export default function PromptVersionManager() {
           </CardContent>
         </Card>
       ) : null}
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">How it works</CardTitle>

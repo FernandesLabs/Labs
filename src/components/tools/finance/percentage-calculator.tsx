@@ -1,11 +1,9 @@
 'use client'
-
 import * as React from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 /** Safely parse a float from an input string. Returns NaN for invalid/empty. */
 function parseNum(value: string): number {
   if (value == null) return NaN
@@ -14,7 +12,6 @@ function parseNum(value: string): number {
   const n = Number(trimmed)
   return Number.isFinite(n) ? n : NaN
 }
-
 function fmt(n: number, digits = 4): string {
   if (!Number.isFinite(n)) return '—'
   return n.toLocaleString(undefined, {
@@ -22,7 +19,6 @@ function fmt(n: number, digits = 4): string {
     minimumFractionDigits: 0,
   })
 }
-
 /**
  * Percentage Calculator
  * Three modes: "What is X% of Y", "X is what % of Y", "% change from X to Y".
@@ -30,35 +26,28 @@ function fmt(n: number, digits = 4): string {
  */
 export default function PercentageCalculator() {
   const [mode, setMode] = React.useState<'of' | 'isWhat' | 'change'>('of')
-
   // Mode 1: what is X% of Y
   const [pct, setPct] = React.useState('15')
   const [ofValue, setOfValue] = React.useState('200')
-
   // Mode 2: X is what % of Y
   const [part, setPart] = React.useState('30')
   const [whole, setWhole] = React.useState('200')
-
   // Mode 3: % change from X to Y
   const [fromVal, setFromVal] = React.useState('200')
   const [toVal, setToVal] = React.useState('250')
-
   const p = parseNum(pct)
   const y = parseNum(ofValue)
   const resultOf = Number.isFinite(p) && Number.isFinite(y) ? (p / 100) * y : NaN
-
   const a = parseNum(part)
   const b = parseNum(whole)
   const resultIsWhat =
     Number.isFinite(a) && Number.isFinite(b) && b !== 0 ? (a / b) * 100 : NaN
-
   const f = parseNum(fromVal)
   const t = parseNum(toVal)
   const resultChange =
     Number.isFinite(f) && Number.isFinite(t) && f !== 0
       ? ((t - f) / Math.abs(f)) * 100
       : NaN
-
   return (
     <div className="space-y-5">
       <Tabs value={mode} onValueChange={(v) => setMode(v as typeof mode)}>
@@ -67,7 +56,6 @@ export default function PercentageCalculator() {
           <TabsTrigger value="isWhat">X is what % of Y</TabsTrigger>
           <TabsTrigger value="change">% change</TabsTrigger>
         </TabsList>
-
         {/* Mode 1 */}
         <TabsContent value="of">
           <Card>
@@ -108,7 +96,6 @@ export default function PercentageCalculator() {
             </CardContent>
           </Card>
         </TabsContent>
-
         {/* Mode 2 */}
         <TabsContent value="isWhat">
           <Card>
@@ -149,7 +136,6 @@ export default function PercentageCalculator() {
             </CardContent>
           </Card>
         </TabsContent>
-
         {/* Mode 3 */}
         <TabsContent value="change">
           <Card>

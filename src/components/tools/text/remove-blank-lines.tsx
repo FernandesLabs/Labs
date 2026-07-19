@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Eraser, Wand2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -8,35 +7,29 @@ import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Badge } from '@/components/ui/badge'
 import { Field, ResultBox, Stat } from '@/lib/tools/tool-ui'
-
 interface Options {
   removeEmpty: boolean
   removeWhitespaceOnly: boolean
   trimEach: boolean
   collapseBlanks: boolean
 }
-
 const DEFAULTS: Options = {
   removeEmpty: true,
   removeWhitespaceOnly: true,
   trimEach: false,
   collapseBlanks: false,
 }
-
 function process(input: string, opts: Options): string {
   if (!input) return ''
   let lines = input.split('\n')
-
   if (opts.trimEach) {
     lines = lines.map((l) => l.trim())
   }
-
   if (opts.removeWhitespaceOnly) {
     lines = lines.filter((l) => l.trim().length > 0)
   } else if (opts.removeEmpty) {
     lines = lines.filter((l) => l.length > 0)
   }
-
   if (opts.collapseBlanks) {
     const out: string[] = []
     let prevBlank = false
@@ -52,24 +45,19 @@ function process(input: string, opts: Options): string {
       out.pop()
     lines = out
   }
-
   return lines.join('\n')
 }
-
 export default function RemoveBlankLines() {
   const [text, setText] = React.useState('')
   const [opts, setOpts] = React.useState<Options>(DEFAULTS)
   const [output, setOutput] = React.useState('')
-
   const inputLines = text ? text.split('\n').length : 0
   const outputLines = output ? output.split('\n').length : 0
   const removed = Math.max(0, inputLines - outputLines)
-
   const handleProcess = () => {
     if (!text) return
     setOutput(process(text, opts))
   }
-
   // Live update whenever text or options change.
   React.useEffect(() => {
     if (!text) {
@@ -78,10 +66,8 @@ export default function RemoveBlankLines() {
     }
     setOutput(process(text, opts))
   }, [text, opts])
-
   const toggle = (key: keyof Options) => (checked: boolean) =>
     setOpts((prev) => ({ ...prev, [key]: checked }))
-
   return (
     <div className="space-y-5">
       <Field
@@ -97,7 +83,6 @@ export default function RemoveBlankLines() {
           className="min-h-32 font-mono text-sm"
         />
       </Field>
-
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="flex items-center justify-between rounded-lg border border-border bg-card p-3">
           <Label
@@ -164,7 +149,6 @@ export default function RemoveBlankLines() {
           />
         </div>
       </div>
-
       <div className="grid grid-cols-3 gap-3">
         <Stat label="Before" value={inputLines.toLocaleString()} />
         <Stat label="After" value={outputLines.toLocaleString()} />
@@ -174,7 +158,6 @@ export default function RemoveBlankLines() {
           accent={removed > 0 ? 'oklch(0.6 0.2 20)' : undefined}
         />
       </div>
-
       <div className="flex flex-wrap items-center justify-between gap-2">
         <Button
           variant="ghost"
@@ -198,7 +181,6 @@ export default function RemoveBlankLines() {
           Process now
         </Button>
       </div>
-
       {output ? (
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <Badge variant="secondary">{inputLines.toLocaleString()} in</Badge>
@@ -211,7 +193,6 @@ export default function RemoveBlankLines() {
           </span>
         </div>
       ) : null}
-
       <ResultBox
         value={output}
         label="Cleaned text"

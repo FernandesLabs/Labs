@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Download, Upload } from 'lucide-react'
 import { toast } from 'sonner'
@@ -15,15 +14,12 @@ import {
 } from '@/components/ui/select'
 import { Card, CardContent } from '@/components/ui/card'
 import { Field, Stat, downloadBlob } from '@/lib/tools/tool-ui'
-
 type Format = 'image/jpeg' | 'image/webp'
-
 function formatBytes(b: number): string {
   if (b < 1024) return `${b} B`
   if (b < 1024 * 1024) return `${(b / 1024).toFixed(1)} KB`
   return `${(b / 1024 / 1024).toFixed(2)} MB`
 }
-
 export default function ImageCompressor() {
   const [file, setFile] = React.useState<File | null>(null)
   const [imgUrl, setImgUrl] = React.useState<string | null>(null)
@@ -35,7 +31,6 @@ export default function ImageCompressor() {
   const [dims, setDims] = React.useState<{ w: number; h: number } | null>(null)
   const [loadedImg, setLoadedImg] = React.useState<HTMLImageElement | null>(null)
   const fileRef = React.useRef<HTMLInputElement | null>(null)
-
   const onFile = (f: File) => {
     if (!f.type.startsWith('image/')) {
       toast.error('Please choose an image file')
@@ -62,7 +57,6 @@ export default function ImageCompressor() {
     img.onerror = () => toast.error('Failed to load image')
     img.src = url
   }
-
   React.useEffect(() => {
     if (!loadedImg) return
     const canvas = document.createElement('canvas')
@@ -94,16 +88,13 @@ export default function ImageCompressor() {
       quality
     )
   }, [loadedImg, format, quality])
-
   React.useEffect(() => {
     return () => {
       if (imgUrl) URL.revokeObjectURL(imgUrl)
       if (compUrl) URL.revokeObjectURL(compUrl)
     }
   }, [imgUrl, compUrl])
-
   const savings = compressed ? Math.max(0, 1 - compressed.size / original) : 0
-
   const handleDownload = () => {
     if (!compressed) {
       toast.error('Nothing to download yet')
@@ -114,7 +105,6 @@ export default function ImageCompressor() {
     downloadBlob(compressed, `${base}-compressed.${ext}`)
     toast.success('Compressed image downloaded')
   }
-
   return (
     <div className="space-y-5">
       <Field label="Source image">
@@ -150,7 +140,6 @@ export default function ImageCompressor() {
           </p>
         </div>
       </Field>
-
       <div className="grid gap-5 sm:grid-cols-2">
         <Field
           label="Quality"
@@ -166,7 +155,6 @@ export default function ImageCompressor() {
             onValueChange={(v) => setQuality(v[0] ?? quality)}
           />
         </Field>
-
         <Field label="Output format" htmlFor="ic-format">
           <Select
             value={format}
@@ -182,14 +170,12 @@ export default function ImageCompressor() {
           </Select>
         </Field>
       </div>
-
       {imgUrl ? (
         <div className="grid grid-cols-2 gap-4">
           <Stat label="Original" value={formatBytes(original)} />
           <Stat label="Compressed" value={compressed ? formatBytes(compressed.size) : '…'} />
         </div>
       ) : null}
-
       {compressed ? (
         <div className="grid gap-3 sm:grid-cols-3">
           <Stat
@@ -201,7 +187,6 @@ export default function ImageCompressor() {
           <Stat label="Format" value={format === 'image/jpeg' ? 'JPEG' : 'WebP'} />
         </div>
       ) : null}
-
       {imgUrl && compUrl ? (
         <Card>
           <CardContent className="pt-6">
@@ -231,7 +216,6 @@ export default function ImageCompressor() {
           </CardContent>
         </Card>
       ) : null}
-
       <Button
         type="button"
         onClick={handleDownload}

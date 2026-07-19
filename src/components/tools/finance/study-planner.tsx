@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Plus, Trash2, TriangleAlert } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -17,19 +16,16 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 interface Subject {
   id: number
   name: string
   hours: string
 }
-
 let _nextId = 3
 function nextId(): number {
   _nextId += 1
   return _nextId
 }
-
 function parseNum(value: string): number {
   if (value == null) return NaN
   const trimmed = value.trim()
@@ -37,7 +33,6 @@ function parseNum(value: string): number {
   const n = Number(trimmed)
   return Number.isFinite(n) ? n : NaN
 }
-
 function fmt(n: number, digits = 1): string {
   if (!Number.isFinite(n)) return '—'
   return n.toLocaleString(undefined, {
@@ -45,12 +40,10 @@ function fmt(n: number, digits = 1): string {
     minimumFractionDigits: 0,
   })
 }
-
 function daysBetween(from: Date, to: Date): number {
   const ms = to.getTime() - from.getTime()
   return Math.floor(ms / (1000 * 60 * 60 * 24))
 }
-
 function fmtDate(d: Date): string {
   return d.toLocaleDateString(undefined, {
     weekday: 'short',
@@ -58,16 +51,13 @@ function fmtDate(d: Date): string {
     day: 'numeric',
   })
 }
-
 interface DayPlan {
   day: number
   date: Date
   hours: number
   subjects: { name: string; hours: number }[]
 }
-
 const MAX_SCHEDULE_DAYS = 365
-
 /**
  * Study Planner
  * Exam date + dynamic subject list (name + estimated hours). Computes days
@@ -81,7 +71,6 @@ export default function StudyPlanner() {
     { id: 1, name: 'Mathematics', hours: '12' },
     { id: 2, name: 'History', hours: '8' },
   ])
-
   const add = () =>
     setSubjects((prev) => [...prev, { id: nextId(), name: '', hours: '4' }])
   const remove = (id: number) =>
@@ -90,30 +79,24 @@ export default function StudyPlanner() {
     setSubjects((prev) =>
       prev.map((s) => (s.id === id ? { ...s, ...patch } : s)),
     )
-
   const today = React.useMemo(() => {
     const t = new Date()
     t.setHours(0, 0, 0, 0)
     return t
   }, [])
-
   const exam = examDate ? new Date(`${examDate}T00:00:00`) : null
   const examValid = exam !== null && !Number.isNaN(exam.getTime())
   const daysLeft = examValid ? daysBetween(today, exam as Date) : NaN
   const isPast = Number.isFinite(daysLeft) && daysLeft < 0
   const isToday = Number.isFinite(daysLeft) && daysLeft === 0
-
   const totalHours = subjects.reduce((sum, s) => {
     const h = parseNum(s.hours)
     return Number.isFinite(h) && h > 0 ? sum + h : sum
   }, 0)
-
   const effectiveDays =
     Number.isFinite(daysLeft) && daysLeft > 0 ? daysLeft : isToday ? 1 : 0
-
   const hoursPerDay =
     effectiveDays > 0 && totalHours > 0 ? totalHours / effectiveDays : NaN
-
   const schedule = React.useMemo<DayPlan[]>(() => {
     if (effectiveDays <= 0 || totalHours <= 0) return []
     const queue = subjects
@@ -126,7 +109,6 @@ export default function StudyPlanner() {
       })
       .filter((s) => s.remaining > 0)
     if (queue.length === 0) return []
-
     const rows: DayPlan[] = []
     let qIdx = 0
     let consumed = 0
@@ -167,7 +149,6 @@ export default function StudyPlanner() {
     }
     return rows
   }, [effectiveDays, totalHours, hoursPerDay, today, subjects])
-
   return (
     <div className="space-y-5">
       <Card>
@@ -186,7 +167,6 @@ export default function StudyPlanner() {
               />
             </Field>
           </div>
-
           <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
             <span className="text-sm font-medium text-foreground">Subjects</span>
             <Button size="sm" onClick={add} className="bg-primary text-primary-foreground">
@@ -194,7 +174,6 @@ export default function StudyPlanner() {
               Add subject
             </Button>
           </div>
-
           <ScrollArea className="max-h-72">
             <div className="space-y-2 pr-3">
               {subjects.length === 0 ? (
@@ -241,7 +220,6 @@ export default function StudyPlanner() {
           </ScrollArea>
         </CardContent>
       </Card>
-
       {isPast ? (
         <Alert variant="destructive">
           <TriangleAlert className="size-4" />
@@ -252,7 +230,6 @@ export default function StudyPlanner() {
           </AlertDescription>
         </Alert>
       ) : null}
-
       <Card>
         <CardContent className="space-y-4 pt-6">
           <div
@@ -286,7 +263,6 @@ export default function StudyPlanner() {
               accent="#7c3aed"
             />
           </div>
-
           <div className="flex items-center gap-2">
             <Badge variant="outline">
               {schedule.length} day{schedule.length === 1 ? '' : 's'} scheduled
@@ -297,7 +273,6 @@ export default function StudyPlanner() {
               </Badge>
             ) : null}
           </div>
-
           {schedule.length > 0 ? (
             <ScrollArea className="max-h-96">
               <div className="pr-3">
@@ -348,7 +323,6 @@ export default function StudyPlanner() {
                 : 'Add at least one subject with study hours to build a schedule.'}
             </div>
           )}
-
           <p className="text-xs text-muted-foreground">
             Schedule distributes your subjects round-robin across the available
             days, filling each day with roughly{' '}

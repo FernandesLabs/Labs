@@ -1,147 +1,551 @@
+// src/lib/tools/registry.tsx
 'use client'
-
-import type { ComponentType } from 'react'
 import type { Tool } from './types'
 import dynamic from 'next/dynamic'
 import { ToolLoadingSkeleton } from '@/components/hub/tool-loading-skeleton'
-import { toolMetaList } from './tool-meta'
-
-const JsonFormatter = dynamic(() => import('@/components/tools/developer/json-formatter'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const JsonYamlConverter = dynamic(() => import('@/components/tools/developer/json-yaml-converter'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const XmlFormatter = dynamic(() => import('@/components/tools/developer/xml-formatter'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const Base64EncoderDecoder = dynamic(() => import('@/components/tools/developer/base64-encoder-decoder'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const UuidGenerator = dynamic(() => import('@/components/tools/developer/uuid-generator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const HashGenerator = dynamic(() => import('@/components/tools/developer/hash-generator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const HmacGenerator = dynamic(() => import('@/components/tools/developer/hmac-generator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const JwtDecoder = dynamic(() => import('@/components/tools/developer/jwt-decoder'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const JwtGenerator = dynamic(() => import('@/components/tools/developer/jwt-generator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const RegexTester = dynamic(() => import('@/components/tools/developer/regex-tester'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const UrlEncoderDecoder = dynamic(() => import('@/components/tools/developer/url-encoder-decoder'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const UnixTimestampConverter = dynamic(() => import('@/components/tools/developer/unix-timestamp-converter'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const ColorConverter = dynamic(() => import('@/components/tools/developer/color-converter'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const HtmlEntityEncoder = dynamic(() => import('@/components/tools/developer/html-entity-encoder'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const SqlFormatter = dynamic(() => import('@/components/tools/developer/sql-formatter'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const CronExpressionGenerator = dynamic(() => import('@/components/tools/developer/cron-expression-generator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const DiffChecker = dynamic(() => import('@/components/tools/developer/diff-checker'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const MarkdownPreview = dynamic(() => import('@/components/tools/developer/markdown-preview'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const WordCounter = dynamic(() => import('@/components/tools/text/word-counter'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const CharacterCounter = dynamic(() => import('@/components/tools/text/character-counter'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const CaseConverter = dynamic(() => import('@/components/tools/text/case-converter'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const SlugGenerator = dynamic(() => import('@/components/tools/text/slug-generator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const LoremIpsumGenerator = dynamic(() => import('@/components/tools/text/lorem-ipsum-generator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const TextSorter = dynamic(() => import('@/components/tools/text/text-sorter'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const RemoveBlankLines = dynamic(() => import('@/components/tools/text/remove-blank-lines'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const DuplicateLineRemover = dynamic(() => import('@/components/tools/text/duplicate-line-remover'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const ReadingTimeCalculator = dynamic(() => import('@/components/tools/text/reading-time-calculator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const UnicodeInspector = dynamic(() => import('@/components/tools/text/unicode-inspector'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const CapitalizationTool = dynamic(() => import('@/components/tools/text/capitalization-tool'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const TextCompare = dynamic(() => import('@/components/tools/text/text-compare'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const PercentageCalculator = dynamic(() => import('@/components/tools/finance/percentage-calculator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const BmiCalculator = dynamic(() => import('@/components/tools/finance/bmi-calculator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const VatCalculator = dynamic(() => import('@/components/tools/finance/vat-calculator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const LoanCalculator = dynamic(() => import('@/components/tools/finance/loan-calculator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const MortgageCalculator = dynamic(() => import('@/components/tools/finance/mortgage-calculator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const CompoundInterestCalculator = dynamic(() => import('@/components/tools/finance/compound-interest-calculator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const GpaCalculator = dynamic(() => import('@/components/tools/finance/gpa-calculator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const CurrencyConverter = dynamic(() => import('@/components/tools/finance/currency-converter'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const BodyFatCalculator = dynamic(() => import('@/components/tools/finance/body-fat-calculator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const UnitConverter = dynamic(() => import('@/components/tools/finance/unit-converter'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const InvoiceGenerator = dynamic(() => import('@/components/tools/finance/invoice-generator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const BmrCalculator = dynamic(() => import('@/components/tools/finance/bmr-calculator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const TdeeCalculator = dynamic(() => import('@/components/tools/finance/tdee-calculator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const CalorieCalculator = dynamic(() => import('@/components/tools/finance/calorie-calculator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const MacroCalculator = dynamic(() => import('@/components/tools/finance/macro-calculator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const WaterIntakeCalculator = dynamic(() => import('@/components/tools/finance/water-intake-calculator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const RetirementCalculator = dynamic(() => import('@/components/tools/finance/retirement-calculator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const RoiCalculator = dynamic(() => import('@/components/tools/finance/roi-calculator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const SavingsCalculator = dynamic(() => import('@/components/tools/finance/savings-calculator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const BreakEvenCalculator = dynamic(() => import('@/components/tools/finance/break-even-calculator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const ProfitMarginCalculator = dynamic(() => import('@/components/tools/finance/profit-margin-calculator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const InflationCalculator = dynamic(() => import('@/components/tools/finance/inflation-calculator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const GradeCalculator = dynamic(() => import('@/components/tools/finance/grade-calculator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const QuoteGenerator = dynamic(() => import('@/components/tools/finance/quote-generator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const FlashcardGenerator = dynamic(() => import('@/components/tools/finance/flashcard-generator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const CitationGenerator = dynamic(() => import('@/components/tools/finance/citation-generator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const InvoiceNumberGenerator = dynamic(() => import('@/components/tools/finance/invoice-number-generator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const StudyPlanner = dynamic(() => import('@/components/tools/finance/study-planner'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const MetaTagGenerator = dynamic(() => import('@/components/tools/seo/meta-tag-generator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const TitleGenerator = dynamic(() => import('@/components/tools/seo/title-generator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const CtaGenerator = dynamic(() => import('@/components/tools/seo/cta-generator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const RobotsTxtGenerator = dynamic(() => import('@/components/tools/seo/robots-txt-generator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const SitemapGenerator = dynamic(() => import('@/components/tools/seo/sitemap-generator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const JsonLdGenerator = dynamic(() => import('@/components/tools/seo/json-ld-generator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const OpenGraphPreview = dynamic(() => import('@/components/tools/seo/open-graph-preview'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const HeadlineAnalyzer = dynamic(() => import('@/components/tools/seo/headline-analyzer'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const KeywordDensityChecker = dynamic(() => import('@/components/tools/seo/keyword-density-checker'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const EmailSignatureGenerator = dynamic(() => import('@/components/tools/seo/email-signature-generator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const UtmBuilder = dynamic(() => import('@/components/tools/seo/utm-builder'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const FaqGenerator = dynamic(() => import('@/components/tools/seo/faq-generator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const TwitterCardPreview = dynamic(() => import('@/components/tools/seo/twitter-card-preview'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const BreadcrumbSchemaGenerator = dynamic(() => import('@/components/tools/seo/breadcrumb-schema-generator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const OrganizationSchemaGenerator = dynamic(() => import('@/components/tools/seo/organization-schema-generator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const CanonicalUrlChecker = dynamic(() => import('@/components/tools/seo/canonical-url-checker'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const BlogOutlineGenerator = dynamic(() => import('@/components/tools/seo/blog-outline-generator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const PasswordGenerator = dynamic(() => import('@/components/tools/security/password-generator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const SecurePassphraseGenerator = dynamic(() => import('@/components/tools/security/secure-passphrase-generator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const PasswordStrengthChecker = dynamic(() => import('@/components/tools/security/password-strength-checker'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const CspGenerator = dynamic(() => import('@/components/tools/security/csp-generator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const DnsLookup = dynamic(() => import('@/components/tools/network/dns-lookup'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const IpLookup = dynamic(() => import('@/components/tools/network/ip-lookup'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const HttpHeaderChecker = dynamic(() => import('@/components/tools/network/http-header-checker'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const SslChecker = dynamic(() => import('@/components/tools/network/ssl-checker'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const PingTool = dynamic(() => import('@/components/tools/network/ping-tool'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const RedirectChecker = dynamic(() => import('@/components/tools/network/redirect-checker'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const UserAgentParser = dynamic(() => import('@/components/tools/network/user-agent-parser'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const QrGenerator = dynamic(() => import('@/components/tools/media/qr-generator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const ColorPaletteExtractor = dynamic(() => import('@/components/tools/media/color-palette-extractor'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const ColorContrastChecker = dynamic(() => import('@/components/tools/media/color-contrast-checker'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const ImageCompressor = dynamic(() => import('@/components/tools/media/image-compressor'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const ImageResizer = dynamic(() => import('@/components/tools/media/image-resizer'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const FaviconGenerator = dynamic(() => import('@/components/tools/media/favicon-generator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const SocialImageGenerator = dynamic(() => import('@/components/tools/media/social-image-generator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const CssGradientGenerator = dynamic(() => import('@/components/tools/media/css-gradient-generator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const SvgViewer = dynamic(() => import('@/components/tools/media/svg-viewer'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const FileSizeConverter = dynamic(() => import('@/components/tools/media/file-size-converter'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const AltTextGenerator = dynamic(() => import('@/components/tools/media/alt-text-generator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const MimeDetector = dynamic(() => import('@/components/tools/media/mime-detector'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const FileHash = dynamic(() => import('@/components/tools/media/file-hash'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const AriaValidator = dynamic(() => import('@/components/tools/media/aria-validator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const TokenCounter = dynamic(() => import('@/components/tools/misc/token-counter'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const AiCostCalculator = dynamic(() => import('@/components/tools/misc/ai-cost-calculator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const PromptOptimizer = dynamic(() => import('@/components/tools/misc/prompt-optimizer'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const PromptVariableReplacer = dynamic(() => import('@/components/tools/misc/prompt-variable-replacer'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const SystemPromptGenerator = dynamic(() => import('@/components/tools/misc/system-prompt-generator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const AiPersonaGenerator = dynamic(() => import('@/components/tools/misc/ai-persona-generator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const PromptLibrary = dynamic(() => import('@/components/tools/misc/prompt-library'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const PromptVersionManager = dynamic(() => import('@/components/tools/misc/prompt-version-manager'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const AiWorkflowBuilder = dynamic(() => import('@/components/tools/misc/ai-workflow-builder'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const MarkdownToHtml = dynamic(() => import('@/components/tools/developer/markdown-to-html'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const TextCompareDiff = dynamic(() => import('@/components/tools/developer/text-compare-diff'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const CampaignUrlBuilder = dynamic(() => import('@/components/tools/seo/campaign-url-builder'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const QrCampaignGenerator = dynamic(() => import('@/components/tools/seo/qr-campaign-generator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const SvgOptimizer = dynamic(() => import('@/components/tools/media/svg-optimizer'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const MergePdfs = dynamic(() => import('@/components/tools/media/merge-pdfs'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const SplitPdf = dynamic(() => import('@/components/tools/media/split-pdf'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const RotatePdf = dynamic(() => import('@/components/tools/media/rotate-pdf'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const ExtractPdfPages = dynamic(() => import('@/components/tools/media/extract-pdf-pages'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const CompressPdf = dynamic(() => import('@/components/tools/media/compress-pdf'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const PdfToImages = dynamic(() => import('@/components/tools/media/pdf-to-images'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const ImagesToPdf = dynamic(() => import('@/components/tools/media/images-to-pdf'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const PdfMetadataViewer = dynamic(() => import('@/components/tools/media/pdf-metadata-viewer'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const FileChecksum = dynamic(() => import('@/components/tools/media/file-checksum'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const FileSignatureInspector = dynamic(() => import('@/components/tools/media/file-signature-inspector'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const ImageMetadataViewer = dynamic(() => import('@/components/tools/media/image-metadata-viewer'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const FontAccessibilityChecker = dynamic(() => import('@/components/tools/media/font-accessibility-checker'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const PngToWebp = dynamic(() => import('@/components/tools/media/png-to-webp'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const CssMinifier = dynamic(() => import('@/components/tools/developer/css-minifier'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const JsMinifier = dynamic(() => import('@/components/tools/developer/js-minifier'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const HtmlMinifier = dynamic(() => import('@/components/tools/developer/html-minifier'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const RemoveDuplicateWords = dynamic(() => import('@/components/tools/text/remove-duplicate-words'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-const TipCalculator = dynamic(() => import('@/components/tools/finance/tip-calculator'), { loading: () => <ToolLoadingSkeleton />, ssr: false })
-
-// Attach the lazy-loaded React Component to each tool's metadata.
-// This keeps a single source of truth (tool-meta.json) for slug/name/desc/keywords.
-const componentBySlug: Record<string, ComponentType> = {
+import { toolMetadata } from './tool-metadata'
+// ──────────────────────────────────────────────────────────────
+// 1. Dynamic imports – one per tool
+// ──────────────────────────────────────────────────────────────
+const JsonFormatter = dynamic(
+  () => import('@/components/tools/developer/json-formatter'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const JsonYamlConverter = dynamic(
+  () => import('@/components/tools/developer/json-yaml-converter'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const XmlFormatter = dynamic(
+  () => import('@/components/tools/developer/xml-formatter'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const Base64EncoderDecoder = dynamic(
+  () => import('@/components/tools/developer/base64-encoder-decoder'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const UuidGenerator = dynamic(
+  () => import('@/components/tools/developer/uuid-generator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const HashGenerator = dynamic(
+  () => import('@/components/tools/developer/hash-generator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const HmacGenerator = dynamic(
+  () => import('@/components/tools/developer/hmac-generator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const JwtDecoder = dynamic(
+  () => import('@/components/tools/developer/jwt-decoder'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const JwtGenerator = dynamic(
+  () => import('@/components/tools/developer/jwt-generator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const RegexTester = dynamic(
+  () => import('@/components/tools/developer/regex-tester'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const UrlEncoderDecoder = dynamic(
+  () => import('@/components/tools/developer/url-encoder-decoder'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const UnixTimestampConverter = dynamic(
+  () => import('@/components/tools/developer/unix-timestamp-converter'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const ColorConverter = dynamic(
+  () => import('@/components/tools/developer/color-converter'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const HtmlEntityEncoder = dynamic(
+  () => import('@/components/tools/developer/html-entity-encoder'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const SqlFormatter = dynamic(
+  () => import('@/components/tools/developer/sql-formatter'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const MarkdownToHtml = dynamic(
+  () => import('@/components/tools/developer/markdown-to-html'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const TextCompareDiff = dynamic(
+  () => import('@/components/tools/developer/text-compare-diff'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const CronExpressionGenerator = dynamic(
+  () => import('@/components/tools/developer/cron-expression-generator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const DiffChecker = dynamic(
+  () => import('@/components/tools/developer/diff-checker'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const MarkdownPreview = dynamic(
+  () => import('@/components/tools/developer/markdown-preview'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const CssMinifier = dynamic(
+  () => import('@/components/tools/developer/css-minifier'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const JsMinifier = dynamic(
+  () => import('@/components/tools/developer/js-minifier'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const HtmlMinifier = dynamic(
+  () => import('@/components/tools/developer/html-minifier'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+// ── Text tools ────────────────────────────────────────────────
+const WordCounter = dynamic(
+  () => import('@/components/tools/text/word-counter'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const CharacterCounter = dynamic(
+  () => import('@/components/tools/text/character-counter'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const CaseConverter = dynamic(
+  () => import('@/components/tools/text/case-converter'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const SlugGenerator = dynamic(
+  () => import('@/components/tools/text/slug-generator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const LoremIpsumGenerator = dynamic(
+  () => import('@/components/tools/text/lorem-ipsum-generator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const TextSorter = dynamic(
+  () => import('@/components/tools/text/text-sorter'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const RemoveBlankLines = dynamic(
+  () => import('@/components/tools/text/remove-blank-lines'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const DuplicateLineRemover = dynamic(
+  () => import('@/components/tools/text/duplicate-line-remover'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const ReadingTimeCalculator = dynamic(
+  () => import('@/components/tools/text/reading-time-calculator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const UnicodeInspector = dynamic(
+  () => import('@/components/tools/text/unicode-inspector'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const CapitalizationTool = dynamic(
+  () => import('@/components/tools/text/capitalization-tool'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const TextCompare = dynamic(
+  () => import('@/components/tools/text/text-compare'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const RemoveDuplicateWords = dynamic(
+  () => import('@/components/tools/text/remove-duplicate-words'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+// ── Finance tools ─────────────────────────────────────────────
+const PercentageCalculator = dynamic(
+  () => import('@/components/tools/finance/percentage-calculator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const BmiCalculator = dynamic(
+  () => import('@/components/tools/finance/bmi-calculator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const VatCalculator = dynamic(
+  () => import('@/components/tools/finance/vat-calculator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const LoanCalculator = dynamic(
+  () => import('@/components/tools/finance/loan-calculator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const MortgageCalculator = dynamic(
+  () => import('@/components/tools/finance/mortgage-calculator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const CompoundInterestCalculator = dynamic(
+  () => import('@/components/tools/finance/compound-interest-calculator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const GpaCalculator = dynamic(
+  () => import('@/components/tools/finance/gpa-calculator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const CurrencyConverter = dynamic(
+  () => import('@/components/tools/finance/currency-converter'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const BodyFatCalculator = dynamic(
+  () => import('@/components/tools/finance/body-fat-calculator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const UnitConverter = dynamic(
+  () => import('@/components/tools/finance/unit-converter'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const InvoiceGenerator = dynamic(
+  () => import('@/components/tools/finance/invoice-generator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const BmrCalculator = dynamic(
+  () => import('@/components/tools/finance/bmr-calculator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const TdeeCalculator = dynamic(
+  () => import('@/components/tools/finance/tdee-calculator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const CalorieCalculator = dynamic(
+  () => import('@/components/tools/finance/calorie-calculator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const MacroCalculator = dynamic(
+  () => import('@/components/tools/finance/macro-calculator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const WaterIntakeCalculator = dynamic(
+  () => import('@/components/tools/finance/water-intake-calculator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const RetirementCalculator = dynamic(
+  () => import('@/components/tools/finance/retirement-calculator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const RoiCalculator = dynamic(
+  () => import('@/components/tools/finance/roi-calculator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const SavingsCalculator = dynamic(
+  () => import('@/components/tools/finance/savings-calculator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const BreakEvenCalculator = dynamic(
+  () => import('@/components/tools/finance/break-even-calculator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const ProfitMarginCalculator = dynamic(
+  () => import('@/components/tools/finance/profit-margin-calculator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const InflationCalculator = dynamic(
+  () => import('@/components/tools/finance/inflation-calculator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const GradeCalculator = dynamic(
+  () => import('@/components/tools/finance/grade-calculator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const QuoteGenerator = dynamic(
+  () => import('@/components/tools/finance/quote-generator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const FlashcardGenerator = dynamic(
+  () => import('@/components/tools/finance/flashcard-generator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const CitationGenerator = dynamic(
+  () => import('@/components/tools/finance/citation-generator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const InvoiceNumberGenerator = dynamic(
+  () => import('@/components/tools/finance/invoice-number-generator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const StudyPlanner = dynamic(
+  () => import('@/components/tools/finance/study-planner'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const TipCalculator = dynamic(
+  () => import('@/components/tools/finance/tip-calculator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+// ── SEO tools ──────────────────────────────────────────────────
+const MetaTagGenerator = dynamic(
+  () => import('@/components/tools/seo/meta-tag-generator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const TitleGenerator = dynamic(
+  () => import('@/components/tools/seo/title-generator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const CtaGenerator = dynamic(
+  () => import('@/components/tools/seo/cta-generator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const RobotsTxtGenerator = dynamic(
+  () => import('@/components/tools/seo/robots-txt-generator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const SitemapGenerator = dynamic(
+  () => import('@/components/tools/seo/sitemap-generator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const JsonLdGenerator = dynamic(
+  () => import('@/components/tools/seo/json-ld-generator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const OpenGraphPreview = dynamic(
+  () => import('@/components/tools/seo/open-graph-preview'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const HeadlineAnalyzer = dynamic(
+  () => import('@/components/tools/seo/headline-analyzer'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const KeywordDensityChecker = dynamic(
+  () => import('@/components/tools/seo/keyword-density-checker'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const EmailSignatureGenerator = dynamic(
+  () => import('@/components/tools/seo/email-signature-generator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const CampaignUrlBuilder = dynamic(
+  () => import('@/components/tools/seo/campaign-url-builder'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const QrCampaignGenerator = dynamic(
+  () => import('@/components/tools/seo/qr-campaign-generator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const UtmBuilder = dynamic(
+  () => import('@/components/tools/seo/utm-builder'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const FaqGenerator = dynamic(
+  () => import('@/components/tools/seo/faq-generator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const TwitterCardPreview = dynamic(
+  () => import('@/components/tools/seo/twitter-card-preview'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const BreadcrumbSchemaGenerator = dynamic(
+  () => import('@/components/tools/seo/breadcrumb-schema-generator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const OrganizationSchemaGenerator = dynamic(
+  () => import('@/components/tools/seo/organization-schema-generator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const CanonicalUrlChecker = dynamic(
+  () => import('@/components/tools/seo/canonical-url-checker'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const BlogOutlineGenerator = dynamic(
+  () => import('@/components/tools/seo/blog-outline-generator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+// ── Security tools ─────────────────────────────────────────────
+const PasswordGenerator = dynamic(
+  () => import('@/components/tools/security/password-generator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const SecurePassphraseGenerator = dynamic(
+  () => import('@/components/tools/security/secure-passphrase-generator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const PasswordStrengthChecker = dynamic(
+  () => import('@/components/tools/security/password-strength-checker'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const CspGenerator = dynamic(
+  () => import('@/components/tools/security/csp-generator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+// ── Network tools ──────────────────────────────────────────────
+const DnsLookup = dynamic(
+  () => import('@/components/tools/network/dns-lookup'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const IpLookup = dynamic(
+  () => import('@/components/tools/network/ip-lookup'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const HttpHeaderChecker = dynamic(
+  () => import('@/components/tools/network/http-header-checker'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const SslChecker = dynamic(
+  () => import('@/components/tools/network/ssl-checker'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const PingTool = dynamic(
+  () => import('@/components/tools/network/ping-tool'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const RedirectChecker = dynamic(
+  () => import('@/components/tools/network/redirect-checker'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const UserAgentParser = dynamic(
+  () => import('@/components/tools/network/user-agent-parser'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+// ── Media tools ────────────────────────────────────────────────
+const QrGenerator = dynamic(
+  () => import('@/components/tools/media/qr-generator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const ColorPaletteExtractor = dynamic(
+  () => import('@/components/tools/media/color-palette-extractor'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const ColorContrastChecker = dynamic(
+  () => import('@/components/tools/media/color-contrast-checker'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const ImageCompressor = dynamic(
+  () => import('@/components/tools/media/image-compressor'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const ImageResizer = dynamic(
+  () => import('@/components/tools/media/image-resizer'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const FaviconGenerator = dynamic(
+  () => import('@/components/tools/media/favicon-generator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const SocialImageGenerator = dynamic(
+  () => import('@/components/tools/media/social-image-generator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const CssGradientGenerator = dynamic(
+  () => import('@/components/tools/media/css-gradient-generator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const SvgViewer = dynamic(
+  () => import('@/components/tools/media/svg-viewer'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const FileSizeConverter = dynamic(
+  () => import('@/components/tools/media/file-size-converter'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const AltTextGenerator = dynamic(
+  () => import('@/components/tools/media/alt-text-generator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const SvgOptimizer = dynamic(
+  () => import('@/components/tools/media/svg-optimizer'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const MimeDetector = dynamic(
+  () => import('@/components/tools/media/mime-detector'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const FileHash = dynamic(
+  () => import('@/components/tools/media/file-hash'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const AriaValidator = dynamic(
+  () => import('@/components/tools/media/aria-validator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const MergePdfs = dynamic(
+  () => import('@/components/tools/media/merge-pdfs'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const SplitPdf = dynamic(
+  () => import('@/components/tools/media/split-pdf'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const RotatePdf = dynamic(
+  () => import('@/components/tools/media/rotate-pdf'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const ExtractPdfPages = dynamic(
+  () => import('@/components/tools/media/extract-pdf-pages'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const CompressPdf = dynamic(
+  () => import('@/components/tools/media/compress-pdf'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const PdfToImages = dynamic(
+  () => import('@/components/tools/media/pdf-to-images'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const ImagesToPdf = dynamic(
+  () => import('@/components/tools/media/images-to-pdf'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const PdfMetadataViewer = dynamic(
+  () => import('@/components/tools/media/pdf-metadata-viewer'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const FileChecksum = dynamic(
+  () => import('@/components/tools/media/file-checksum'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const FileSignatureInspector = dynamic(
+  () => import('@/components/tools/media/file-signature-inspector'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const ImageMetadataViewer = dynamic(
+  () => import('@/components/tools/media/image-metadata-viewer'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const FontAccessibilityChecker = dynamic(
+  () => import('@/components/tools/media/font-accessibility-checker'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const PngToWebp = dynamic(
+  () => import('@/components/tools/media/png-to-webp'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+// ── Misc tools ─────────────────────────────────────────────────
+const TokenCounter = dynamic(
+  () => import('@/components/tools/misc/token-counter'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const AiCostCalculator = dynamic(
+  () => import('@/components/tools/misc/ai-cost-calculator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const PromptOptimizer = dynamic(
+  () => import('@/components/tools/misc/prompt-optimizer'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const PromptVariableReplacer = dynamic(
+  () => import('@/components/tools/misc/prompt-variable-replacer'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const SystemPromptGenerator = dynamic(
+  () => import('@/components/tools/misc/system-prompt-generator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const AiPersonaGenerator = dynamic(
+  () => import('@/components/tools/misc/ai-persona-generator'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const PromptLibrary = dynamic(
+  () => import('@/components/tools/misc/prompt-library'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const PromptVersionManager = dynamic(
+  () => import('@/components/tools/misc/prompt-version-manager'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+const AiWorkflowBuilder = dynamic(
+  () => import('@/components/tools/misc/ai-workflow-builder'),
+  { loading: () => <ToolLoadingSkeleton />, ssr: false }
+)
+// ──────────────────────────────────────────────────────────────
+// 2. Map slugs to their dynamically imported components
+// ──────────────────────────────────────────────────────────────
+const componentMap: Record<string, React.ComponentType> = {
   'json-formatter': JsonFormatter,
   'json-yaml-converter': JsonYamlConverter,
   'xml-formatter': XmlFormatter,
@@ -275,19 +679,34 @@ const componentBySlug: Record<string, ComponentType> = {
   'prompt-version-manager': PromptVersionManager,
   'ai-workflow-builder': AiWorkflowBuilder,
 }
-
-export const tools: Tool[] = toolMetaList
-  .filter((m) => componentBySlug[m.slug])
-  .map((m) => ({ ...m, Component: componentBySlug[m.slug] }))
-
+// ──────────────────────────────────────────────────────────────
+// 3. Build the final tools array
+// ──────────────────────────────────────────────────────────────
+export const tools: Tool[] = toolMetadata.map((meta) => ({
+  ...meta,
+  Component: componentMap[meta.slug],
+}))
 export const toolsBySlug = new Map(tools.map((t) => [t.slug, t]))
-
-/**
- * Raw dynamic-import functions per tool slug, for preload-on-hover.
- * When a user hovers a tool card, we fire the importer so the chunk
- * is fetched before they click — making the tool open instantly.
- */
-export const toolImporters: Record<string, () => Promise<unknown>> = {
+// ──────────────────────────────────────────────────────────────
+// 4. Preload functions – used for on‑hover fetching
+// ──────────────────────────────────────────────────────────────
+export const preloadFunctions = new Map<string, () => Promise<unknown>>(
+  Object.entries(componentMap).map(([slug, comp]) => [
+    slug,
+    () => {
+      // We use the same dynamic import as the component itself.
+      // Since dynamic() already returns a component, we just need to
+      // trigger the import. We can simply call the import() that
+      // was used in the dynamic() call.
+      // However, we need to store the actual import function.
+      // A simpler approach: use a switch or a dictionary.
+      // We'll define a separate map of importers.
+      return importers[slug]?.() || Promise.resolve()
+    },
+  ])
+)
+// We also need the raw import functions for preload.
+const importers: Record<string, () => Promise<unknown>> = {
   'json-formatter': () => import('@/components/tools/developer/json-formatter'),
   'json-yaml-converter': () => import('@/components/tools/developer/json-yaml-converter'),
   'xml-formatter': () => import('@/components/tools/developer/xml-formatter'),

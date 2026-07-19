@@ -3,7 +3,6 @@ import { ArrowLeft, Search, Home } from 'lucide-react'
 import { toolMetaList } from '@/lib/tools/tool-meta'
 import { CATEGORY_META, CATEGORY_ORDER, type ToolCategory } from '@/lib/tools/types'
 import { siteConfig } from '@/lib/site-config'
-
 /**
  * Not-found page for `/tools/[slug]` (and any other unmatched route).
  *
@@ -18,7 +17,6 @@ export const metadata = {
     'The tool you were looking for could not be found. Browse all 132 free online tools on Fernandes Labs.',
   robots: { index: false, follow: true },
 }
-
 // Curated "popular" tools shown on the 404 page (high-traffic slugs).
 const POPULAR_SLUGS = [
   'json-formatter',
@@ -30,13 +28,11 @@ const POPULAR_SLUGS = [
   'color-converter',
   'hash-generator',
 ]
-
 export default function NotFound() {
   const baseUrl = siteConfig.site.url
   const popular = POPULAR_SLUGS.map((s) => toolMetaList.find((t) => t.slug === s))
     .filter(Boolean)
     .slice(0, 8)
-
   // Organization + WebSite JSON-LD on the 404 too (consistent site identity).
   const orgJsonLd = {
     '@context': 'https://schema.org',
@@ -45,7 +41,6 @@ export default function NotFound() {
     url: baseUrl,
     description: siteConfig.site.description,
   }
-
   return (
     <main className="flex-1">
       <script
@@ -78,7 +73,7 @@ export default function NotFound() {
               All tools
             </Link>
             <Link
-              href="/#cat=developer"
+              href="/category/developer"
               className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition hover:border-primary hover:text-primary"
             >
               <ArrowLeft className="size-4" />
@@ -87,7 +82,6 @@ export default function NotFound() {
           </div>
         </div>
       </section>
-
       <section className="mx-auto max-w-5xl px-4 py-10">
         <h2 className="mb-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">
           Popular tools
@@ -120,7 +114,6 @@ export default function NotFound() {
             )
           })}
         </div>
-
         <h2 className="mb-4 mt-10 text-sm font-bold uppercase tracking-wider text-muted-foreground">
           Browse by category
         </h2>

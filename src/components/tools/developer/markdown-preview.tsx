@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Eye, FileText, Eraser, Download } from 'lucide-react'
 import { marked } from 'marked'
@@ -17,48 +16,34 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Stat, downloadBlob } from '@/lib/tools/tool-ui'
 import { useCopy } from '@/lib/tools/use-copy'
-
 const SAMPLE_MARKDOWN = `# Markdown Preview
-
 A live, **client-side** Markdown previewer using [marked](https://marked.js.org/)
 with GitHub-flavored markdown and line-break support.
-
 ## Features
-
 - Headings (H1–H6)
 - **Bold**, *italic*, ~~strikethrough~~
 - Lists, links, \`inline code\`
 - Code blocks with syntax styling
 - Tables, blockquotes, and task lists
-
 ## Code block
-
 \`\`\`js
 function hello(name) {
   return \`Hello, \${name}!\`
 }
 \`\`\`
-
 ## Table
-
 | Tool           | Category   | Status |
 | -------------- | ---------- | ------ |
 | Cron Generator | Developer  | Ready  |
 | Diff Checker   | Developer  | Ready  |
-
 ## Blockquote
-
 > "Simplicity is the soul of efficiency." — Austin Freeman
-
 ## Task list
-
 - [x] Build markdown preview
 - [ ] Ship it
 `
-
 // Configure marked once (GFM + line breaks)
 marked.setOptions({ breaks: true, gfm: true })
-
 const PREVIEW_STYLE = `
 .fl-markdown {
   color: var(--foreground);
@@ -138,12 +123,10 @@ const PREVIEW_STYLE = `
 .fl-markdown del { color: var(--muted-foreground); }
 .fl-markdown strong { font-weight: 700; }
 `
-
 export default function MarkdownPreview() {
   const [input, setInput] = React.useState(SAMPLE_MARKDOWN)
   const [livePreview, setLivePreview] = React.useState(true)
   const [stagedHtml, setStagedHtml] = React.useState('')
-
   const liveHtml = React.useMemo<string>(() => {
     if (input.trim() === '') return ''
     try {
@@ -153,15 +136,11 @@ export default function MarkdownPreview() {
       return ''
     }
   }, [input])
-
   const html = livePreview ? liveHtml : stagedHtml
-
   const { copied, copy } = useCopy()
-
   const editorRef = React.useRef<HTMLTextAreaElement | null>(null)
   const previewRef = React.useRef<HTMLDivElement | null>(null)
   const [syncScroll, setSyncScroll] = React.useState(true)
-
   const onEditorScroll = () => {
     if (!syncScroll || !livePreview) return
     const ed = editorRef.current
@@ -175,12 +154,10 @@ export default function MarkdownPreview() {
       pv.scrollTop = ratio * (pv.scrollHeight - pv.clientHeight)
     }
   }
-
   const wordCount = React.useMemo(
     () => (input.match(/\S+/g) || []).length,
     [input]
   )
-
   const handleDownloadHtml = () => {
     const doc = `<!doctype html>
 <html lang="en">
@@ -204,11 +181,9 @@ ${html}
       'markdown.html'
     )
   }
-
   return (
     <div className="space-y-5">
       <style dangerouslySetInnerHTML={{ __html: PREVIEW_STYLE }} />
-
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
@@ -280,7 +255,6 @@ ${html}
           </div>
         </CardContent>
       </Card>
-
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="space-y-2">
           <div className="flex items-baseline justify-between">
@@ -347,7 +321,6 @@ ${html}
           </div>
         </div>
       </div>
-
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat label="Characters" value={input.length} />
         <Stat label="Words" value={wordCount} />

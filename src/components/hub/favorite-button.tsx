@@ -1,10 +1,8 @@
 'use client'
-
 import * as React from 'react'
 import { Star } from 'lucide-react'
 import { useToolHistory } from '@/lib/tools/use-tool-history'
 import { cn } from '@/lib/utils'
-
 /** A compact star toggle button for tool cards / headers. */
 export function FavoriteButton({
   slug,
@@ -20,7 +18,6 @@ export function FavoriteButton({
   const { favorites, toggleFavorite } = useToolHistory()
   const isFav = favorites.includes(slug)
   const iconSize = size === 'sm' ? 'size-3.5' : 'size-4'
-
   return (
     <button
       type="button"

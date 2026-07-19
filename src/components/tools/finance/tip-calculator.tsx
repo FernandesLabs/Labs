@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -7,34 +6,27 @@ import { Label } from '@/components/ui/label'
 import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 const QUICK_TIPS = [15, 18, 20, 25] as const
-
 const currencyFmt = new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: 'USD',
 })
-
 function parseNum(value: string): number {
   const trimmed = value.trim()
   if (trimmed === '') return NaN
   const n = Number(trimmed)
   return Number.isFinite(n) ? n : NaN
 }
-
 export default function TipCalculator() {
   const [bill, setBill] = React.useState('50')
   const [tipPct, setTipPct] = React.useState(18)
   const [people, setPeople] = React.useState('1')
   const [roundUp, setRoundUp] = React.useState(false)
-
   const billNum = parseNum(bill)
   const peopleNum = parseNum(people)
-
   const validBill = Number.isFinite(billNum) && billNum > 0
   const validPeople =
     Number.isFinite(peopleNum) && Number.isInteger(peopleNum) && peopleNum >= 1
-
   const tipAmount = validBill ? billNum * (tipPct / 100) : NaN
   let total = validBill ? billNum + tipAmount : NaN
   if (roundUp && Number.isFinite(total)) {
@@ -42,10 +34,8 @@ export default function TipCalculator() {
   }
   const perPerson =
     validBill && validPeople ? total / peopleNum : NaN
-
   const display = (n: number) =>
     Number.isFinite(n) ? currencyFmt.format(n) : '—'
-
   return (
     <div className="space-y-5">
       <div className="grid gap-4 sm:grid-cols-2">
@@ -71,7 +61,6 @@ export default function TipCalculator() {
             />
           </div>
         </Field>
-
         <Field
           label="Number of people"
           htmlFor="tc-people"
@@ -89,7 +78,6 @@ export default function TipCalculator() {
           />
         </Field>
       </div>
-
       <Field
         label="Tip percentage"
         htmlFor="tc-tip"
@@ -104,7 +92,6 @@ export default function TipCalculator() {
           onValueChange={(v) => setTipPct(v[0] ?? tipPct)}
         />
       </Field>
-
       <Field label="Quick tip">
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           {QUICK_TIPS.map((pct) => (
@@ -125,7 +112,6 @@ export default function TipCalculator() {
           ))}
         </div>
       </Field>
-
       <div className="flex items-center justify-between rounded-lg border border-border bg-card p-3">
         <Label
           htmlFor="tc-round"
@@ -143,7 +129,6 @@ export default function TipCalculator() {
           aria-label="Round total up to nearest whole number"
         />
       </div>
-
       <div
         className="grid grid-cols-1 gap-3 sm:grid-cols-3"
         role="status"
@@ -161,7 +146,6 @@ export default function TipCalculator() {
         />
         <Stat label="Per person" value={display(perPerson)} />
       </div>
-
       {!validBill && bill.trim() !== '' ? (
         <p className="text-sm text-destructive">
           Enter a bill amount greater than zero.
@@ -172,7 +156,6 @@ export default function TipCalculator() {
           Enter at least one person to split the bill.
         </p>
       ) : null}
-
       <p className="text-xs text-muted-foreground">
         Calculations update live as you type. Values are formatted in US
         dollars using <code className="font-mono">Intl.NumberFormat</code>.
