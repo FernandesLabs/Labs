@@ -1,15 +1,18 @@
 import type { MetadataRoute } from 'next'
 import { siteConfig } from '@/lib/site-config'
 import { toolSlugs } from '@/lib/tools/tool-meta'
+import { CATEGORY_ORDER } from '@/lib/tools/types'
 
 /**
  * Auto-generated sitemap.xml at /sitemap.xml.
- * Lists the hub page + privacy + terms + all 132 tool pages (as PATH routes).
- * Submit this to Google Search Console after deployment.
  *
- * After the path-based-routing migration (SEO Priority 1), each tool has its
- * own URL: `/tools/<slug>` (instead of `/#tool=<slug>`). Google now indexes
- * each tool as a separate page.
+ * Lists:
+ *   - the hub (`/`)
+ *   - 8 category landing pages (`/category/<cat>`)
+ *   - 132 tool pages (`/tools/<slug>`)
+ *   - privacy + terms
+ *
+ * Total: 143 URLs. Submit to Google Search Console after deployment.
  */
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = siteConfig.site.url
@@ -36,6 +39,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ]
 
+  // Category landing pages — high priority for category-level SEO queries.
+  const categoryPages: MetadataRoute.Sitemap = CATEGORY_ORDER.map((cat) => ({
+    url: `${baseUrl}/category/${cat}`,
+    lastModified: now,
+    changeFrequency: 'weekly' as const,
+    priority: 0.9,
+  }))
+
   const toolPages: MetadataRoute.Sitemap = toolSlugs.map((slug) => ({
     url: `${baseUrl}/tools/${slug}`,
     lastModified: now,
@@ -43,5 +54,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.8,
   }))
 
-  return [...staticPages, ...toolPages]
+  return [...staticPages, ...categoryPages, ...toolPages]
 }

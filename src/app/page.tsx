@@ -8,6 +8,7 @@ import { HubView } from '@/components/hub/hub-view'
 import { CommandPalette } from '@/components/hub/command-palette'
 import { ShortcutsHelp } from '@/components/hub/shortcuts-help'
 import { BackToTop } from '@/components/hub/back-to-top'
+import { HomeJsonLd } from '@/components/hub/home-json-ld'
 import { tools } from '@/lib/tools/registry'
 
 /**
@@ -25,8 +26,9 @@ export default function Home() {
   const router = useRouter()
   const [paletteOpen, setPaletteOpen] = React.useState(false)
   const [helpOpen, setHelpOpen] = React.useState(false)
-  const [initialCategory, setInitialCategory] =
-    React.useState<`all` | `developer` | `text` | `finance` | `seo` | `security` | `network` | `media` | `misc` | null>(null)
+  const [initialCategory, setInitialCategory] = React.useState<
+    'all' | 'developer' | 'text' | 'finance' | 'seo' | 'security' | 'network' | 'media' | 'misc'
+  >('all')
   const searchRef = React.useRef<HTMLInputElement | null>(null)
 
   // On mount, check for legacy `#tool=<slug>` and redirect to `/tools/<slug>`.
@@ -97,6 +99,7 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen flex-col">
+      <HomeJsonLd />
       <SiteHeader
         onHome={() => router.push('/')}
         toolCount={tools.length}

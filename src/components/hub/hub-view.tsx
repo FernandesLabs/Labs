@@ -11,6 +11,7 @@ import {
   Sparkles,
   Command as CommandIcon,
   Wand2,
+  TrendingUp,
 } from 'lucide-react'
 import Link from 'next/link'
 import { Input } from '@/components/ui/input'
@@ -49,6 +50,23 @@ const FEATURED_SLUGS = [
   'markdown-preview',
   'hash-generator',
   'invoice-generator',
+]
+
+// "Popular" tools — a second curated row highlighting different categories
+// so visitors immediately see the breadth of the collection.
+const POPULAR_SLUGS = [
+  'base64-encoder-decoder',
+  'jwt-decoder',
+  'regex-tester',
+  'word-counter',
+  'bmi-calculator',
+  'password-strength-checker',
+  'color-palette-extractor',
+  'unix-timestamp-converter',
+  'slug-generator',
+  'unit-converter',
+  'meta-tag-generator',
+  'dns-lookup',
 ]
 
 function matchTool(tool: Tool, q: string): boolean {
@@ -162,6 +180,13 @@ export function HubView({
       ),
     [toolsBySlug]
   )
+  const popular = React.useMemo(
+    () =>
+      POPULAR_SLUGS.map((s) => toolsBySlug.get(s)).filter(
+        (t): t is Tool => Boolean(t)
+      ),
+    [toolsBySlug]
+  )
   const favTools = React.useMemo(
     () =>
       favorites
@@ -189,14 +214,22 @@ export function HubView({
         />
         <div className="relative mx-auto max-w-6xl px-4 py-14 sm:py-20">
           <div className="mx-auto max-w-3xl text-center">
+            {/* Eyebrow badge */}
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border/70 bg-muted/40 px-3 py-1 text-xs font-medium text-muted-foreground backdrop-blur">
+              <span className="relative flex size-1.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
+                <span className="relative inline-flex size-1.5 rounded-full bg-success" />
+              </span>
+              {tools.length} tools · 100% client-side · No sign-up
+            </div>
             <h1 className="text-balance text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl md:text-6xl">
               Free Online&nbsp;
               <span className="bg-gradient-to-r from-primary via-[oklch(0.65_0.2_280)] to-[oklch(0.7_0.16_200)] bg-clip-text text-transparent">
                 Tools
               </span>
             </h1>
-            <p className="mx-auto mt-4 max-w-2xl text-pretty text-base text-muted-foreground sm:text-lg">
-              A growing collection of {tools.length} fast, privacy-first tools for developers,
+            <p className="mx-auto mt-4 max-w-2xl text-pretty text-base text-foreground/75 sm:text-lg">
+              A growing collection of <strong className="font-semibold text-foreground">{tools.length} fast, privacy-first tools</strong> for developers,
               designers, and marketers. No sign-up. No tracking. Works offline.
             </p>
 
@@ -238,11 +271,22 @@ export function HubView({
                 )}
               </div>
             </div>
-            <p className="mt-2 text-[11px] text-muted-foreground/70">
-              Tip: press <kbd className="rounded border border-border bg-muted px-1 font-mono text-[10px]">/</kbd>{' '}
-              to search, <kbd className="rounded border border-border bg-muted px-1 font-mono text-[10px]">⌘K</kbd>{' '}
-              for the command palette
-            </p>
+            <div className="mt-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+              <span className="inline-flex items-center gap-1.5">
+                <kbd className="rounded border border-border bg-muted/80 px-1.5 py-0.5 font-mono text-[10px] font-semibold text-foreground/80">/</kbd>
+                to search
+              </span>
+              <span className="text-border">·</span>
+              <span className="inline-flex items-center gap-1.5">
+                <kbd className="rounded border border-border bg-muted/80 px-1.5 py-0.5 font-mono text-[10px] font-semibold text-foreground/80">⌘K</kbd>
+                command palette
+              </span>
+              <span className="text-border">·</span>
+              <Link href="/category/developer" className="inline-flex items-center gap-1 transition hover:text-foreground">
+                Browse categories
+                <ArrowRight className="size-3" />
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -296,6 +340,12 @@ export function HubView({
               title="Featured"
               icon={<Sparkles className="size-4 text-primary" />}
               tools={featured}
+              onSelect={onSelect}
+            />
+            <QuickRow
+              title="Popular"
+              icon={<TrendingUp className="size-4 text-rose-500" />}
+              tools={popular}
               onSelect={onSelect}
             />
           </div>
@@ -354,26 +404,38 @@ export function HubView({
             {grouped.map(({ category, items }) => (
               <div key={category} className="fl-fade-in">
                 <div className="mb-4 flex items-end justify-between gap-3">
-                  <div className="flex items-center gap-3">
+                  <Link
+                    href={`/category/${category}`}
+                    className="group flex items-center gap-3"
+                  >
                     <span
-                      className="grid size-9 place-items-center rounded-lg text-primary-foreground"
+                      className="grid size-9 place-items-center rounded-lg text-primary-foreground transition group-hover:scale-105"
                       style={{ backgroundColor: CATEGORY_META[category].color }}
                     >
                       {CATEGORY_ICONS[category]}
                     </span>
                     <div>
-                      <h2 className="text-lg font-bold tracking-tight">
+                      <h2 className="text-lg font-bold tracking-tight transition group-hover:text-primary">
                         {CATEGORY_META[category].label}
                       </h2>
                       <p className="text-xs text-muted-foreground">
                         {CATEGORY_META[category].blurb}
                       </p>
                     </div>
+                  </Link>
+                  <div className="flex items-center gap-3">
+                    <span className="hidden items-center gap-1 text-xs font-medium text-muted-foreground sm:flex">
+                      <Layers className="size-3.5" />
+                      {items.length} tool{items.length === 1 ? '' : 's'}
+                    </span>
+                    <Link
+                      href={`/category/${category}`}
+                      className="inline-flex items-center gap-1 rounded-md border border-border/60 bg-background px-2 py-1 text-[11px] font-medium text-muted-foreground transition hover:border-primary hover:text-primary"
+                    >
+                      View all
+                      <ArrowRight className="size-3" />
+                    </Link>
                   </div>
-                  <span className="hidden items-center gap-1 text-xs font-medium text-muted-foreground sm:flex">
-                    <Layers className="size-3.5" />
-                    {items.length} tool{items.length === 1 ? '' : 's'}
-                  </span>
                 </div>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   {items.map((tool) => (
@@ -385,17 +447,6 @@ export function HubView({
                       query={query}
                     />
                   ))}
-                  {/* Category footer link — internal-linking for SEO (Priority 8).
-                      Links to the JSON-LD BreadcrumbList `cat` hash, which the
-                      hub interprets as a category filter. */}
-                  <div className="col-span-full mt-1 flex justify-end">
-                    <Link
-                      href={`/#cat=${category}`}
-                      className="text-[11px] font-medium text-muted-foreground transition hover:text-foreground"
-                    >
-                      View all {CATEGORY_META[category].label.toLowerCase()} tools →
-                    </Link>
-                  </div>
                 </div>
               </div>
             ))}
@@ -409,6 +460,61 @@ export function HubView({
           <div className="grid gap-4 sm:grid-cols-2">
             <CryptoDonate />
             <AdUnit slot="footer" />
+          </div>
+        </section>
+      ) : null}
+
+      {/* Browse by category — SEO internal-linking grid */}
+      {!isFiltering ? (
+        <section className="mx-auto max-w-6xl px-4 pb-14">
+          <div className="mb-4 flex items-end justify-between gap-3">
+            <div>
+              <h2 className="text-lg font-bold tracking-tight text-foreground">
+                Browse by category
+              </h2>
+              <p className="text-xs text-muted-foreground">
+                {tools.length} tools across 8 categories — pick one to dive in.
+              </p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {CATEGORY_ORDER.map((cat) => {
+              const meta = CATEGORY_META[cat]
+              const count = counts[cat] ?? 0
+              return (
+                <Link
+                  key={cat}
+                  href={`/category/${cat}`}
+                  className="group relative flex flex-col gap-2 overflow-hidden rounded-xl border border-border/80 bg-card p-4 fl-card-hover"
+                >
+                  <div
+                    className="absolute -right-6 -top-6 size-20 rounded-full opacity-10 transition group-hover:opacity-20"
+                    style={{ backgroundColor: meta.color }}
+                    aria-hidden="true"
+                  />
+                  <span
+                    className="grid size-9 place-items-center rounded-lg text-xs font-bold text-primary-foreground"
+                    style={{ backgroundColor: meta.color }}
+                  >
+                    {meta.label.slice(0, 2)}
+                  </span>
+                  <div>
+                    <h3 className="text-sm font-semibold text-foreground">
+                      {meta.label}
+                    </h3>
+                    <p className="mt-0.5 line-clamp-2 text-[11px] leading-relaxed text-muted-foreground">
+                      {meta.blurb}
+                    </p>
+                  </div>
+                  <div className="mt-auto flex items-center justify-between text-[11px]">
+                    <span className="font-medium text-muted-foreground tabular-nums">
+                      {count} tool{count === 1 ? '' : 's'}
+                    </span>
+                    <ArrowRight className="size-3 text-muted-foreground/40 transition group-hover:translate-x-0.5 group-hover:text-primary" />
+                  </div>
+                </Link>
+              )
+            })}
           </div>
         </section>
       ) : null}
@@ -434,7 +540,7 @@ function QuickRow({
   if (tools.length === 0) return null
   return (
     <div className="fl-fade-in">
-      <div className="mb-3 flex items-center justify-between gap-2">
+      <div className="mb-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <span className="grid size-6 place-items-center rounded-md bg-muted/60">
             {icon}
@@ -446,15 +552,17 @@ function QuickRow({
             {tools.length}
           </span>
         </div>
-        {onClear ? (
-          <button
-            type="button"
-            onClick={onClear}
-            className="text-[11px] font-medium text-muted-foreground transition hover:text-foreground"
-          >
-            {clearLabel}
-          </button>
-        ) : null}
+        <div className="flex items-center gap-3">
+          {onClear ? (
+            <button
+              type="button"
+              onClick={onClear}
+              className="rounded-md px-2 py-0.5 text-[11px] font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground"
+            >
+              {clearLabel}
+            </button>
+          ) : null}
+        </div>
       </div>
       <div className="flex gap-2.5 overflow-x-auto pb-1 fl-scroll">
         {tools.map((tool) => (
@@ -577,10 +685,20 @@ function ToolCard({
           <Highlight text={tool.description} query={query} />
         </p>
       </div>
-      <span className="mt-auto inline-flex items-center gap-1 rounded-full bg-muted/50 px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
-        <Wand2 className="size-2.5" />
-        {CATEGORY_META[tool.category].label}
-      </span>
+      <div className="mt-auto flex flex-wrap items-center gap-1.5 pt-1">
+        <span className="inline-flex items-center gap-1 rounded-full bg-muted/50 px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+          <Wand2 className="size-2.5" />
+          {CATEGORY_META[tool.category].label}
+        </span>
+        {tool.keywords?.slice(0, 2).map((k) => (
+          <span
+            key={k}
+            className="rounded-full border border-border/40 px-1.5 py-0.5 text-[9px] font-medium text-muted-foreground/80"
+          >
+            {k}
+          </span>
+        ))}
+      </div>
     </div>
   )
 }
