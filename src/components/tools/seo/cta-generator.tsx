@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -24,11 +23,8 @@ import { Separator } from '@/components/ui/separator'
 import { toast } from 'sonner'
 import { Field, randomInt } from '@/lib/tools/tool-ui'
 import { useCopy } from '@/lib/tools/use-copy'
-
 type Tone = 'Urgent' | 'Friendly' | 'Premium' | 'Playful' | 'Direct'
-
 const TONES: Tone[] = ['Urgent', 'Friendly', 'Premium', 'Playful', 'Direct']
-
 function buildCtas(
   verb: string,
   product: string,
@@ -86,7 +82,6 @@ function buildCtas(
   }
   return variants
 }
-
 function shuffle<T>(arr: T[]): T[] {
   const out = arr.slice()
   for (let i = out.length - 1; i > 0; i--) {
@@ -97,12 +92,10 @@ function shuffle<T>(arr: T[]): T[] {
   }
   return out
 }
-
 interface CtaVariant {
   text: string
   tone: Tone
 }
-
 function pickVariants(
   verb: string,
   product: string,
@@ -112,7 +105,6 @@ function pickVariants(
   const shuffled = shuffle(list)
   return shuffled.slice(0, 6).map((text) => ({ text, tone }))
 }
-
 function CtaRow({
   variant,
   index,
@@ -156,18 +148,15 @@ function CtaRow({
     </li>
   )
 }
-
 export default function CtaGenerator(): React.JSX.Element {
   const [verb, setVerb] = React.useState('')
   const [product, setProduct] = React.useState('')
   const [tone, setTone] = React.useState<Tone>('Direct')
   const [seed, setSeed] = React.useState(0)
-
   const variants = React.useMemo<CtaVariant[]>(() => {
     void seed
     return pickVariants(verb, product, tone)
   }, [verb, product, tone, seed])
-
   const regenerate = (): void => {
     if (!product.trim() && !verb.trim()) {
       toast.error('Enter an action verb or product/topic first')
@@ -176,7 +165,6 @@ export default function CtaGenerator(): React.JSX.Element {
     setSeed((s) => s + 1)
     toast.success('New CTAs generated')
   }
-
   return (
     <div className="space-y-5">
       <Card>
@@ -236,7 +224,6 @@ export default function CtaGenerator(): React.JSX.Element {
           </div>
         </CardContent>
       </Card>
-
       <div>
         <div className="mb-2 flex items-center justify-between">
           <h3 className="text-sm font-medium text-foreground">

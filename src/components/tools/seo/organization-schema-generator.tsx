@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Plus, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -15,12 +14,10 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'
 import { Field, ResultBox, Stat, randomInt } from '@/lib/tools/tool-ui'
-
 interface SameAs {
   id: string
   url: string
 }
-
 interface OrgState {
   name: string
   legalName: string
@@ -38,11 +35,9 @@ interface OrgState {
   country: string
   sameAs: SameAs[]
 }
-
 function makeId(): string {
   return `sa-${Date.now().toString(36)}-${randomInt(1_000_000).toString(36)}`
 }
-
 const DEFAULT: OrgState = {
   name: 'Fernandes Labs',
   legalName: 'Fernandes Labs, Inc.',
@@ -63,7 +58,6 @@ const DEFAULT: OrgState = {
     { id: 's2', url: 'https://github.com/FernandesLabs' },
   ],
 }
-
 function buildJsonLd(s: OrgState): string {
   const obj: Record<string, unknown> = {
     '@context': 'https://schema.org',
@@ -78,7 +72,6 @@ function buildJsonLd(s: OrgState): string {
   if (s.founder.trim()) obj.founder = { '@type': 'Person', name: s.founder.trim() }
   if (s.email.trim()) obj.email = s.email.trim()
   if (s.phone.trim()) obj.telephone = s.phone.trim()
-
   const hasAddress =
     s.street.trim() ||
     s.city.trim() ||
@@ -94,27 +87,21 @@ function buildJsonLd(s: OrgState): string {
     if (s.country.trim()) address.addressCountry = s.country.trim()
     obj.address = address
   }
-
   const sameAs = s.sameAs.map((x) => x.url.trim()).filter((u) => u.length > 0)
   if (sameAs.length > 0) obj.sameAs = sameAs
-
   return JSON.stringify(obj, null, 2)
 }
-
 export default function OrganizationSchemaGenerator(): React.JSX.Element {
   const [state, setState] = React.useState<OrgState>(DEFAULT)
-
   const update = <K extends keyof OrgState>(key: K, value: string): void => {
     setState((prev) => ({ ...prev, [key]: value }))
   }
-
   const updateSameAs = (id: string, url: string): void => {
     setState((prev) => ({
       ...prev,
       sameAs: prev.sameAs.map((x) => (x.id === id ? { ...x, url } : x)),
     }))
   }
-
   const addSameAs = (): void => {
     if (state.sameAs.length >= 20) {
       toast.error('Maximum of 20 social URLs reached')
@@ -122,17 +109,14 @@ export default function OrganizationSchemaGenerator(): React.JSX.Element {
     }
     setState((prev) => ({ ...prev, sameAs: [...prev.sameAs, { id: makeId(), url: '' }] }))
   }
-
   const removeSameAs = (id: string): void => {
     setState((prev) => ({
       ...prev,
       sameAs: prev.sameAs.filter((x) => x.id !== id),
     }))
   }
-
   const jsonLd = React.useMemo(() => buildJsonLd(state), [state])
   const filledSameAs = state.sameAs.filter((x) => x.url.trim().length > 0).length
-
   return (
     <div className="space-y-5">
       <Card>
@@ -215,7 +199,6 @@ export default function OrganizationSchemaGenerator(): React.JSX.Element {
               />
             </Field>
           </div>
-
           <Field label="Description" htmlFor="org-desc">
             <Textarea
               id="org-desc"
@@ -225,7 +208,6 @@ export default function OrganizationSchemaGenerator(): React.JSX.Element {
               rows={3}
             />
           </Field>
-
           <div>
             <div className="mb-2 text-sm font-medium text-foreground">
               Postal address
@@ -273,7 +255,6 @@ export default function OrganizationSchemaGenerator(): React.JSX.Element {
               </Field>
             </div>
           </div>
-
           <div>
             <div className="mb-2 flex items-center justify-between">
               <span className="text-sm font-medium text-foreground">
@@ -314,14 +295,12 @@ export default function OrganizationSchemaGenerator(): React.JSX.Element {
           </div>
         </CardContent>
       </Card>
-
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat label="Name set" value={state.name.trim() ? 'Yes' : 'No'} accent={state.name.trim() ? 'oklch(0.6 0.17 150)' : 'oklch(0.6 0.2 25)'} />
         <Stat label="Has address" value={state.street.trim() || state.city.trim() ? 'Yes' : 'No'} />
         <Stat label="Social URLs" value={filledSameAs} />
         <Stat label="Schema size" value={`${jsonLd.length} chars`} />
       </div>
-
       <ResultBox
         value={jsonLd}
         label="Organization JSON-LD"
@@ -329,7 +308,6 @@ export default function OrganizationSchemaGenerator(): React.JSX.Element {
         downloadName="organization.json"
         empty="Fill in at least one field to generate the schema."
       />
-
       {filledSameAs > 0 ? (
         <div className="flex flex-wrap gap-2">
           {state.sameAs

@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { PDFDocument } from 'pdf-lib'
 import { toast } from 'sonner'
@@ -10,7 +9,6 @@ import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Field, Stat, downloadBlob } from '@/lib/tools/tool-ui'
-
 function formatBytes(b: number): string {
   if (!Number.isFinite(b) || b < 0) return '—'
   if (b === 0) return '0 B'
@@ -18,11 +16,9 @@ function formatBytes(b: number): string {
   if (b < 1024 * 1024) return `${(b / 1024).toFixed(1)} KB`
   return `${(b / 1024 / 1024).toFixed(2)} MB`
 }
-
 function baseName(name: string): string {
   return name.replace(/\.[^.]+$/, '') || 'document'
 }
-
 export default function CompressPdf() {
   const [file, setFile] = React.useState<File | null>(null)
   const [pageCount, setPageCount] = React.useState(0)
@@ -34,7 +30,6 @@ export default function CompressPdf() {
   const [stripMeta, setStripMeta] = React.useState(true)
   const [objectStreams, setObjectStreams] = React.useState(true)
   const inputRef = React.useRef<HTMLInputElement | null>(null)
-
   const loadFile = async (f: File): Promise<void> => {
     setLoading(true)
     setCompressedBytes(null)
@@ -59,13 +54,11 @@ export default function CompressPdf() {
       setLoading(false)
     }
   }
-
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const f = e.target.files?.[0]
     if (f) void loadFile(f)
     e.target.value = ''
   }
-
   const compress = async (): Promise<void> => {
     if (!file) {
       toast.error('Load a PDF first')
@@ -106,7 +99,6 @@ export default function CompressPdf() {
       setComposing(false)
     }
   }
-
   const download = (): void => {
     if (!compressedBytes || !file) {
       toast.error('Run compression first')
@@ -117,11 +109,9 @@ export default function CompressPdf() {
       `${baseName(file.name)}-compressed.pdf`
     )
   }
-
   const delta = originalSize - compressedSize
   const pct = originalSize > 0 ? (delta / originalSize) * 100 : 0
   const hasSavings = compressedBytes !== null && delta > 0
-
   return (
     <div className="space-y-5">
       <Alert>
@@ -135,7 +125,6 @@ export default function CompressPdf() {
           aggressive image-based compression, use a tool like Ghostscript.
         </AlertDescription>
       </Alert>
-
       <Field label="Source PDF">
         <div
           className="flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-border bg-muted/30 p-6 text-center"
@@ -173,7 +162,6 @@ export default function CompressPdf() {
           </p>
         </div>
       </Field>
-
       {file ? (
         <div className="space-y-3 rounded-lg border border-border bg-card p-4">
           <div className="flex items-center justify-between gap-3">
@@ -204,7 +192,6 @@ export default function CompressPdf() {
           </div>
         </div>
       ) : null}
-
       {file ? (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <Stat label="Original" value={formatBytes(originalSize)} />
@@ -224,7 +211,6 @@ export default function CompressPdf() {
           />
         </div>
       ) : null}
-
       {compressedBytes && delta <= 0 ? (
         <Alert>
           <AlertTriangle className="size-4" />
@@ -237,7 +223,6 @@ export default function CompressPdf() {
           </AlertDescription>
         </Alert>
       ) : null}
-
       <div className="flex flex-wrap gap-3">
         <Button
           type="button"

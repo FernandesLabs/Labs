@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import {
   Card,
@@ -27,7 +26,6 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 function parseNum(value: string): number {
   if (value == null) return NaN
   const trimmed = value.trim()
@@ -35,7 +33,6 @@ function parseNum(value: string): number {
   const n = Number(trimmed)
   return Number.isFinite(n) ? n : NaN
 }
-
 function fmt(n: number, digits = 0): string {
   if (!Number.isFinite(n)) return '—'
   return n.toLocaleString(undefined, {
@@ -43,9 +40,7 @@ function fmt(n: number, digits = 0): string {
     minimumFractionDigits: digits,
   })
 }
-
 type Gender = 'male' | 'female'
-
 const ACTIVITY_LEVELS = [
   { value: '1.2', label: 'Sedentary (little or no exercise)' },
   { value: '1.375', label: 'Light (1-3 days/wk)' },
@@ -53,7 +48,6 @@ const ACTIVITY_LEVELS = [
   { value: '1.725', label: 'Active (6-7 days/wk)' },
   { value: '1.9', label: 'Very Active (physical job)' },
 ] as const
-
 const GOAL_TARGETS = [
   { label: 'Lose 1 lb/week', delta: -500 },
   { label: 'Lose 0.5 lb/week', delta: -250 },
@@ -61,10 +55,8 @@ const GOAL_TARGETS = [
   { label: 'Gain 0.5 lb/week', delta: 250 },
   { label: 'Gain 1 lb/week', delta: 500 },
 ] as const
-
 const LB_TO_KG = 0.45359237
 const IN_TO_CM = 2.54
-
 /**
  * TDEE Calculator
  * Total Daily Energy Expenditure = BMR × activity multiplier.
@@ -73,23 +65,18 @@ const IN_TO_CM = 2.54
  */
 export default function TdeeCalculator() {
   const [mode, setMode] = React.useState<'compute' | 'direct'>('compute')
-
   // Compute-mode inputs
   const [gender, setGender] = React.useState<Gender>('male')
   const [age, setAge] = React.useState('30')
   const [weight, setWeight] = React.useState('70')
   const [height, setHeight] = React.useState('175')
-
   // Direct mode
   const [bmrInput, setBmrInput] = React.useState('1600')
-
   const [activity, setActivity] = React.useState<string>('1.55')
-
   // Compute BMR
   const ageN = parseNum(age)
   const kg = parseNum(weight)
   const cm = parseNum(height)
-
   let computedBmr = NaN
   if (
     Number.isFinite(ageN) &&
@@ -102,7 +89,6 @@ export default function TdeeCalculator() {
     const base = 10 * kg + 6.25 * cm - 5 * ageN
     computedBmr = gender === 'male' ? base + 5 : base - 161
   }
-
   const directBmr = parseNum(bmrInput)
   const bmr =
     mode === 'direct'
@@ -110,13 +96,11 @@ export default function TdeeCalculator() {
         ? directBmr
         : NaN
       : computedBmr
-
   const multiplier = Number(activity)
   const tdee =
     Number.isFinite(bmr) && Number.isFinite(multiplier) && multiplier > 0
       ? bmr * multiplier
       : NaN
-
   return (
     <div className="space-y-5">
       <Tabs value={mode} onValueChange={(v) => setMode(v as typeof mode)}>
@@ -124,7 +108,6 @@ export default function TdeeCalculator() {
           <TabsTrigger value="compute">Compute BMR</TabsTrigger>
           <TabsTrigger value="direct">Enter BMR directly</TabsTrigger>
         </TabsList>
-
         <TabsContent value="compute">
           <Card>
             <CardHeader>
@@ -181,7 +164,6 @@ export default function TdeeCalculator() {
             </CardContent>
           </Card>
         </TabsContent>
-
         <TabsContent value="direct">
           <Card>
             <CardHeader>
@@ -206,7 +188,6 @@ export default function TdeeCalculator() {
           </Card>
         </TabsContent>
       </Tabs>
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Activity level</CardTitle>
@@ -228,7 +209,6 @@ export default function TdeeCalculator() {
           </Field>
         </CardContent>
       </Card>
-
       <div className="grid gap-3 sm:grid-cols-2">
         <Stat
           label="BMR"
@@ -241,7 +221,6 @@ export default function TdeeCalculator() {
           accent="#16a34a"
         />
       </div>
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Calorie targets by goal</CardTitle>
@@ -291,7 +270,6 @@ export default function TdeeCalculator() {
           </p>
         </CardContent>
       </Card>
-
       <Card>
         <CardContent>
           <Button

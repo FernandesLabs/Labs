@@ -1,8 +1,9 @@
+// src/components/ads/ad-unit.tsx
 'use client'
-
 import * as React from 'react'
 import { siteConfig, isAdsenseConfigured } from '@/lib/site-config'
 
+// AdSense pushes ad creatives into the global `adsbygoogle` array.
 declare global {
   interface Window {
     adsbygoogle?: unknown[]
@@ -10,21 +11,26 @@ declare global {
 }
 
 /**
- * AdSense ad unit. Shows a real Google ad when configured, falls back to
- * a branded placeholder when not.
+ * AdUnit — renders a Google AdSense ad slot, or a tasteful branded
+ * placeholder when AdSense is not yet configured (e.g. in development or
+ * before the user has created ad units in their AdSense dashboard).
  *
- * The AdSense loader script is injected in src/app/layout.tsx (<head>),
- * NOT here — that way it's in the server-rendered HTML for Google's
- * crawler to verify.
+ * Slots:
+ *  - "horizontal" — banner ad shown at the top/bottom of tool pages and the
+ *    hub. Uses `data-ad-format="auto"` for responsive sizing.
+ *  - "vertical" — sidebar ad (desktop only). Uses
+ *    `data-ad-format="vertical"`.
+ *  - "footer" — full-width ad above the site footer.
  *
- * This component only renders the <ins> ad tag and pushes it to AdSense.
+ * Configuration: set the following env vars (see `.env.example`):
+ *   NEXT_PUBLIC_ADSENSE_ENABLED=true
+ *   NEXT_PUBLIC_ADSENSE_CLIENT_ID=ca-pub-XXXXXXXXXXXXXXXX
+ *   NEXT_PUBLIC_ADSENSE_SLOT_HORIZONTAL=1234567890
+ *   NEXT_PUBLIC_ADSENSE_SLOT_VERTICAL=1234567890
+ *   NEXT_PUBLIC_ADSENSE_SLOT_FOOTER=1234567890
  *
- * Env vars (set in Vercel → Settings → Environment Variables):
- *   NEXT_PUBLIC_ADSENSE_ENABLED = true
- *   NEXT_PUBLIC_ADSENSE_CLIENT_ID = ca-pub-XXXXXXXXXXXXXXXX
- *   NEXT_PUBLIC_ADSENSE_SLOT_HORIZONTAL = 1234567890
- *   NEXT_PUBLIC_ADSENSE_SLOT_VERTICAL = 0987654321
- *   NEXT_PUBLIC_ADSENSE_SLOT_FOOTER = 1111111111
+ * The AdSense loader script is injected in `src/app/layout.tsx` (in <head>)
+ * when `enabled` + `clientId` are set, so crawler verification works.
  */
 export function AdUnit({
   slot = 'horizontal',
@@ -38,51 +44,51 @@ export function AdUnit({
     siteConfig.adsense.slots[slot] || siteConfig.adsense.slots.horizontal
   const [pushed, setPushed] = React.useState(false)
 
-  // Push the ad to AdSense after the <ins> renders
+  // Push the ad into the AdSense queue once the <ins> is in the DOM.
+  // Retries every 500ms if the AdSense script hasn't loaded yet.
   React.useEffect(() => {
     if (!configured || !adSlot || pushed) return
-    // Wait for the AdSense script (loaded in <head>) to be ready
     const tryPush = () => {
       try {
         ;(window.adsbygoogle = window.adsbygoogle || []).push({})
         setPushed(true)
       } catch {
-        // AdSense script not loaded yet — retry in 500ms
+        // AdSense script not loaded yet — retry shortly.
         setTimeout(tryPush, 500)
       }
     }
-    tryPush()
+    const timer = setTimeout(tryPush, 100)
+    return () => clearTimeout(timer)
   }, [configured, adSlot, pushed])
 
-  // Not configured or no slot ID → show branded placeholder
+  // Not configured or no slot ID → show a professional branded placeholder.
+  // This keeps the layout stable (no layout shift when ads are enabled later)
+  // and signals to the user where ads will appear.
   if (!configured || !adSlot) {
     return (
       <div
-        aria-hidden="true"
-        className={`flex h-20 w-full items-center justify-center rounded-lg border border-dashed border-border/70 bg-muted/30 text-xs font-medium uppercase tracking-wider text-muted-foreground/60 ${className || ''}`}
+        className={`flex w-full items-center justify-center rounded-lg border border-dashed border-border/70 bg-muted/30 px-4 py-6 text-center ${className ?? ''}`}
+        aria-label="Advertisement placeholder"
       >
-        Advertisement{slot ? ` · ${slot}` : ''}
+        <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground/60">
+          Advertisement
+          {slot ? ` · ${slot}` : ''}
+        </span>
       </div>
     )
   }
 
+  // Real AdSense ad unit.
   const isVertical = slot === 'vertical'
   const format = isVertical ? 'vertical' : 'auto'
-
   return (
-    <div className={`w-full overflow-hidden rounded-lg ${className || ''}`}>
-      <ins
-        className="adsbygoogle"
-        style={{
-          display: 'block',
-          width: '100%',
-          minHeight: isVertical ? 600 : 100,
-        }}
-        data-ad-client={siteConfig.adsense.clientId!}
-        data-ad-slot={adSlot}
-        data-ad-format={format}
-        data-full-width-responsive="true"
-      />
-    </div>
+    <ins
+      className={`adsbygoogle ${className ?? ''}`}
+      style={{ display: 'block' }}
+      data-ad-client={siteConfig.adsense.clientId}
+      data-ad-slot={adSlot}
+      data-ad-format={format}
+      data-full-width-responsive="true"
+    />
   )
 }

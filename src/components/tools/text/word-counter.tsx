@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Eraser } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -14,7 +13,6 @@ import {
 } from '@/components/ui/table'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 interface WordStats {
   words: number
   characters: number
@@ -24,15 +22,12 @@ interface WordStats {
   readingTimeMin: number
   speakingTimeMin: number
 }
-
 interface FreqEntry {
   word: string
   count: number
 }
-
 const READING_WPM = 200
 const SPEAKING_WPM = 130
-
 function computeStats(text: string): WordStats {
   if (!text) {
     return {
@@ -65,7 +60,6 @@ function computeStats(text: string): WordStats {
     speakingTimeMin: words / SPEAKING_WPM,
   }
 }
-
 function formatMinutes(minutes: number): string {
   if (minutes <= 0) return '0s'
   const totalSeconds = Math.round(minutes * 60)
@@ -74,7 +68,6 @@ function formatMinutes(minutes: number): string {
   const s = totalSeconds % 60
   return s === 0 ? `${m}m` : `${m}m ${s}s`
 }
-
 function computeFrequency(text: string, limit: number): FreqEntry[] {
   const tokens = (text.toLowerCase().match(/[a-z0-9''-]+/g) || []) as string[]
   const stops = new Set([
@@ -114,13 +107,10 @@ function computeFrequency(text: string, limit: number): FreqEntry[] {
     .sort((a, b) => b.count - a.count || a.word.localeCompare(b.word))
     .slice(0, limit)
 }
-
 export default function WordCounter() {
   const [text, setText] = React.useState('')
-
   const stats = React.useMemo(() => computeStats(text), [text])
   const freq = React.useMemo(() => computeFrequency(text, 10), [text])
-
   return (
     <div className="space-y-5">
       <Field label="Text" htmlFor="wc-text" hint={`${stats.characters} chars`}>
@@ -133,7 +123,6 @@ export default function WordCounter() {
           aria-describedby="wc-stats"
         />
       </Field>
-
       <div
         id="wc-stats"
         className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4"
@@ -161,7 +150,6 @@ export default function WordCounter() {
           value={`${READING_WPM} / ${SPEAKING_WPM}`}
         />
       </div>
-
       <div className="flex justify-end">
         <Button
           variant="ghost"
@@ -176,7 +164,6 @@ export default function WordCounter() {
           Clear
         </Button>
       </div>
-
       <div>
         <div className="mb-2 flex items-center justify-between">
           <h3 className="text-sm font-semibold text-foreground">

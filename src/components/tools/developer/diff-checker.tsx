@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { FileText, GitCompare, Eraser } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -16,20 +15,16 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
 import { Field, ResultBox, Stat } from '@/lib/tools/tool-ui'
-
 type DiffOpType = 'equal' | 'add' | 'remove'
-
 interface DiffOp {
   type: DiffOpType
   line: string
 }
-
 interface DiffStats {
   added: number
   removed: number
   unchanged: number
 }
-
 function normalizeLine(
   line: string,
   ignoreWhitespace: boolean,
@@ -40,14 +35,12 @@ function normalizeLine(
   if (ignoreWhitespace) s = s.replace(/\s+/g, '').trim()
   return s
 }
-
 function splitLines(text: string): string[] {
   if (text === '') return []
   // Preserve trailing newline behaviour: split on \n but drop final empty
   const lines = text.split('\n')
   return lines
 }
-
 /**
  * LCS-based line diff (dynamic programming).
  * Returns a sequence of operations that transform `original` into `modified`.
@@ -64,7 +57,6 @@ function lcsDiff(
   if (modified.length === 0) {
     return original.map((line) => ({ type: 'remove' as DiffOpType, line }))
   }
-
   // Normalize for comparison
   const a = original.map((l) =>
     normalizeLine(l, ignoreWhitespace, ignoreCase)
@@ -72,10 +64,8 @@ function lcsDiff(
   const b = modified.map((l) =>
     normalizeLine(l, ignoreWhitespace, ignoreCase)
   )
-
   const m = a.length
   const n = b.length
-
   // dp[i][j] = length of LCS of a[i..] and b[j..]
   // Use Uint32Array for memory efficiency (m, n ≤ ~5000 reasonable)
   const dp: Uint32Array[] = Array.from({ length: m + 1 }, () => {
@@ -92,7 +82,6 @@ function lcsDiff(
       }
     }
   }
-
   // Backtrack to build the diff
   const ops: DiffOp[] = []
   let i = 0
@@ -120,7 +109,6 @@ function lcsDiff(
   }
   return ops
 }
-
 function computeStats(ops: DiffOp[]): DiffStats {
   let added = 0
   let removed = 0
@@ -132,7 +120,6 @@ function computeStats(ops: DiffOp[]): DiffStats {
   }
   return { added, removed, unchanged }
 }
-
 /**
  * Build a unified-diff text with proper @@ hunks and configurable context.
  */
@@ -143,7 +130,6 @@ function toUnifiedDiff(
   context = 3
 ): string {
   const lines: string[] = ['--- original', '+++ modified']
-
   // Indices of changed ops
   const changeIdx: number[] = []
   for (let i = 0; i < ops.length; i++) {
@@ -152,7 +138,6 @@ function toUnifiedDiff(
   if (changeIdx.length === 0) {
     return lines.join('\n')
   }
-
   // Group into hunks (merge if windows overlap)
   interface Hunk {
     start: number
@@ -176,7 +161,6 @@ function toUnifiedDiff(
     }
   }
   hunks.push(current)
-
   for (const hunk of hunks) {
     // Walk ops[0..hunk.start-1] to find old/new line numbers at hunk.start
     let oi = 0
@@ -194,7 +178,6 @@ function toUnifiedDiff(
     }
     const oldStart = oi + 1
     const newStart = mi + 1
-
     let oldCount = 0
     let newCount = 0
     for (let i = hunk.start; i <= hunk.end; i++) {
@@ -208,7 +191,6 @@ function toUnifiedDiff(
         newCount++
       }
     }
-
     lines.push(`@@ -${oldStart},${oldCount} +${newStart},${newCount} @@`)
     for (let i = hunk.start; i <= hunk.end; i++) {
       const op = ops[i]
@@ -219,27 +201,23 @@ function toUnifiedDiff(
   }
   return lines.join('\n')
 }
-
 const SAMPLE_ORIGINAL = `The quick brown fox
 jumps over the lazy dog.
 Line three is here.
 A line that will be removed.
 Line five stays.
 The end.`
-
 const SAMPLE_MODIFIED = `The quick brown fox
 jumps over the lazy dog.
 Line three is here.
 A brand new line was added.
 Line five stays.
 The end.`
-
 export default function DiffChecker() {
   const [original, setOriginal] = React.useState(SAMPLE_ORIGINAL)
   const [modified, setModified] = React.useState(SAMPLE_MODIFIED)
   const [ignoreWhitespace, setIgnoreWhitespace] = React.useState(false)
   const [ignoreCase, setIgnoreCase] = React.useState(false)
-
   const { ops, stats, unified } = React.useMemo(() => {
     const origLines = splitLines(original)
     const modLines = splitLines(modified)
@@ -253,9 +231,7 @@ export default function DiffChecker() {
     const u = toUnifiedDiff(origLines, modLines, opsArr, 3)
     return { ops: opsArr, stats: s, unified: u }
   }, [original, modified, ignoreWhitespace, ignoreCase])
-
   const hasInput = original.length > 0 || modified.length > 0
-
   return (
     <div className="space-y-5">
       <Card>
@@ -321,7 +297,6 @@ export default function DiffChecker() {
           </div>
         </CardContent>
       </Card>
-
       <div className="grid gap-4 md:grid-cols-2">
         <Field
           label="Original"
@@ -354,13 +329,11 @@ export default function DiffChecker() {
           />
         </Field>
       </div>
-
       <div className="grid grid-cols-3 gap-3">
         <Stat label="Added" value={stats.added} accent="#16a34a" />
         <Stat label="Removed" value={stats.removed} accent="#dc2626" />
         <Stat label="Unchanged" value={stats.unchanged} />
       </div>
-
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
@@ -419,7 +392,6 @@ export default function DiffChecker() {
           ) : null}
         </CardContent>
       </Card>
-
       <ResultBox
         value={unified}
         label="Unified diff"

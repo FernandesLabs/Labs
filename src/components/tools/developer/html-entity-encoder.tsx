@@ -1,14 +1,11 @@
 'use client'
-
 import * as React from 'react'
 import { Textarea } from '@/components/ui/textarea'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import { Field, ResultBox } from '@/lib/tools/tool-ui'
-
 type EncodeStyle = 'named' | 'numeric'
-
 const NAMED_ENTITIES: Array<[string, string]> = [
   ['&', '&amp;'],
   ['<', '&lt;'],
@@ -16,7 +13,6 @@ const NAMED_ENTITIES: Array<[string, string]> = [
   ['"', '&quot;'],
   ["'", '&apos;'],
 ]
-
 const NUMERIC_ENTITIES: Array<[string, string]> = [
   ['&', '&#38;'],
   ['<', '&#60;'],
@@ -24,7 +20,6 @@ const NUMERIC_ENTITIES: Array<[string, string]> = [
   ['"', '&#34;'],
   ["'", '&#39;'],
 ]
-
 function encodeEntities(input: string, style: EncodeStyle): string {
   const table = style === 'named' ? NAMED_ENTITIES : NUMERIC_ENTITIES
   let out = ''
@@ -41,7 +36,6 @@ function encodeEntities(input: string, style: EncodeStyle): string {
   }
   return out
 }
-
 const NAMED_DECODE: Record<string, string> = {
   amp: '&',
   lt: '<',
@@ -97,9 +91,7 @@ const NAMED_DECODE: Record<string, string> = {
   Sigma: '\u03a3',
   Omega: '\u03a9',
 }
-
 const ENTITY_RE = /&#x([0-9a-fA-F]+);|&#([0-9]+);|&([a-zA-Z][a-zA-Z0-9]*);/g
-
 function decodeEntities(input: string): string {
   return input.replace(ENTITY_RE, (full, hex?: string, dec?: string, name?: string) => {
     if (typeof hex === 'string' && hex.length > 0) {
@@ -127,12 +119,10 @@ function decodeEntities(input: string): string {
     return full
   })
 }
-
 export default function HtmlEntityEncoder() {
   const [style, setStyle] = React.useState<EncodeStyle>('named')
   const [encodeInput, setEncodeInput] = React.useState('')
   const [decodeInput, setDecodeInput] = React.useState('')
-
   const encodeOutput = React.useMemo(
     () => (encodeInput ? encodeEntities(encodeInput, style) : ''),
     [encodeInput, style]
@@ -141,17 +131,14 @@ export default function HtmlEntityEncoder() {
     () => (decodeInput ? decodeEntities(decodeInput) : ''),
     [decodeInput]
   )
-
   const loadEncodeSample = () => {
     setEncodeInput(`<a href="/search?q=core&sons">Tom & Jerry "The Cat's" <b>Meow</b></a>`)
   }
-
   const loadDecodeSample = () => {
     setDecodeInput(
       `Tom &amp; Jerry &lt;the cat&apos;s&gt; &quot;meow&quot; &#8212; caf&#xe9; &#8364;5`
     )
   }
-
   return (
     <div className="space-y-5">
       <Tabs defaultValue="encode">
@@ -159,7 +146,6 @@ export default function HtmlEntityEncoder() {
           <TabsTrigger value="encode">Encode</TabsTrigger>
           <TabsTrigger value="decode">Decode</TabsTrigger>
         </TabsList>
-
         <TabsContent value="encode" className="space-y-4">
           <Field
             label="Input text"
@@ -175,7 +161,6 @@ export default function HtmlEntityEncoder() {
               className="font-mono"
             />
           </Field>
-
           <Field label="Encoding style" hint="named or numeric">
             <RadioGroup
               value={style}
@@ -202,7 +187,6 @@ export default function HtmlEntityEncoder() {
               </div>
             </RadioGroup>
           </Field>
-
           <button
             type="button"
             onClick={loadEncodeSample}
@@ -210,7 +194,6 @@ export default function HtmlEntityEncoder() {
           >
             Load sample
           </button>
-
           <ResultBox
             label="Encoded output"
             value={encodeOutput}
@@ -218,7 +201,6 @@ export default function HtmlEntityEncoder() {
             empty="Encoded text will appear here."
           />
         </TabsContent>
-
         <TabsContent value="decode" className="space-y-4">
           <Field
             label="Input text"
@@ -234,7 +216,6 @@ export default function HtmlEntityEncoder() {
               className="font-mono"
             />
           </Field>
-
           <button
             type="button"
             onClick={loadDecodeSample}
@@ -242,7 +223,6 @@ export default function HtmlEntityEncoder() {
           >
             Load sample
           </button>
-
           <ResultBox
             label="Decoded output"
             value={decodeOutput}

@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import {
   Card,
@@ -18,7 +17,6 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 function parseNum(value: string): number {
   if (value == null) return NaN
   const trimmed = value.trim()
@@ -26,7 +24,6 @@ function parseNum(value: string): number {
   const n = Number(trimmed)
   return Number.isFinite(n) ? n : NaN
 }
-
 function fmt(n: number, digits = 0): string {
   if (!Number.isFinite(n)) return '—'
   return n.toLocaleString(undefined, {
@@ -34,7 +31,6 @@ function fmt(n: number, digits = 0): string {
     minimumFractionDigits: digits,
   })
 }
-
 interface DietPreset {
   value: string
   label: string
@@ -42,18 +38,15 @@ interface DietPreset {
   carbs: number // %
   fat: number // %
 }
-
 const DIET_PRESETS: DietPreset[] = [
   { value: 'balanced', label: 'Balanced (30P / 40C / 30F)', protein: 30, carbs: 40, fat: 30 },
   { value: 'lowcarb', label: 'Low-carb (30P / 20C / 50F)', protein: 30, carbs: 20, fat: 50 },
   { value: 'keto', label: 'Keto (25P / 5C / 70F)', protein: 25, carbs: 5, fat: 70 },
   { value: 'highprotein', label: 'High-protein (40P / 40C / 20F)', protein: 40, carbs: 40, fat: 20 },
 ]
-
 const PROTEIN_CAL_PER_G = 4
 const CARB_CAL_PER_G = 4
 const FAT_CAL_PER_G = 9
-
 /**
  * Macro Calculator
  * Daily calories + diet type → protein/carbs/fat in grams.
@@ -62,23 +55,18 @@ const FAT_CAL_PER_G = 9
 export default function MacroCalculator() {
   const [calories, setCalories] = React.useState('2000')
   const [dietValue, setDietValue] = React.useState<string>('balanced')
-
   const cal = parseNum(calories)
   const valid = Number.isFinite(cal) && cal > 0
-
   const diet = DIET_PRESETS.find((d) => d.value === dietValue) ?? DIET_PRESETS[0]
-
   const proteinG = valid ? (cal * diet.protein) / 100 / PROTEIN_CAL_PER_G : NaN
   const carbsG = valid ? (cal * diet.carbs) / 100 / CARB_CAL_PER_G : NaN
   const fatG = valid ? (cal * diet.fat) / 100 / FAT_CAL_PER_G : NaN
-
   // Verify the split adds up to the calorie target
   const derivedCalories = valid
     ? proteinG * PROTEIN_CAL_PER_G +
       carbsG * CARB_CAL_PER_G +
       fatG * FAT_CAL_PER_G
     : NaN
-
   return (
     <div className="space-y-5">
       <Card>
@@ -118,7 +106,6 @@ export default function MacroCalculator() {
           </div>
         </CardContent>
       </Card>
-
       <div className="grid gap-3 sm:grid-cols-3">
         <Stat
           label="Protein"
@@ -136,7 +123,6 @@ export default function MacroCalculator() {
           accent="#0ea5e9"
         />
       </div>
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Calorie split</CardTitle>
@@ -162,7 +148,6 @@ export default function MacroCalculator() {
               </div>
             )}
           </div>
-
           <div className="grid gap-2 sm:grid-cols-3">
             <MacroLegend
               label="Protein"
@@ -183,7 +168,6 @@ export default function MacroCalculator() {
               color="bg-sky-500"
             />
           </div>
-
           <div className="rounded-md border border-border bg-muted/30 p-3 text-xs text-muted-foreground">
             <span className="font-medium text-foreground">Check:</span>{' '}
             {valid
@@ -192,7 +176,6 @@ export default function MacroCalculator() {
           </div>
         </CardContent>
       </Card>
-
       <Card>
         <CardContent>
           <Button
@@ -211,7 +194,6 @@ export default function MacroCalculator() {
     </div>
   )
 }
-
 function MacroSegment({
   label,
   pct,
@@ -233,7 +215,6 @@ function MacroSegment({
     </div>
   )
 }
-
 function MacroLegend({
   label,
   pct,

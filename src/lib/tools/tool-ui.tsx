@@ -1,9 +1,7 @@
 'use client'
-
 import * as React from 'react'
 import { Check, Copy, Download } from 'lucide-react'
 import { useCopy } from './use-copy'
-
 /** A labelled field wrapper. */
 export function Field({
   label,
@@ -35,18 +33,15 @@ export function Field({
     </div>
   )
 }
-
 /** Ad unit — shows real AdSense ads when configured, branded placeholder otherwise.
  *  Re-exports the AdUnit component for convenience. Configure in src/lib/site-config.ts. */
 import { AdUnit } from '@/components/ads/ad-unit'
-
 export function AdPlaceholder({ slot = 'horizontal' }: { slot?: string }) {
   const validSlot = (['horizontal', 'vertical', 'footer'].includes(slot)
     ? slot
     : 'horizontal') as 'horizontal' | 'vertical' | 'footer'
   return <AdUnit slot={validSlot} />
 }
-
 /** Output box with copy + download. */
 export function ResultBox({
   value,
@@ -65,7 +60,6 @@ export function ResultBox({
 }) {
   const { copied, copy } = useCopy()
   const hasValue = value.length > 0
-
   const download = () => {
     const blob = new Blob([value], { type: 'text/plain;charset=utf-8' })
     const url = URL.createObjectURL(blob)
@@ -77,7 +71,6 @@ export function ResultBox({
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
   }
-
   return (
     <div>
       <div className="mb-1.5 flex items-center justify-between gap-2">
@@ -120,7 +113,6 @@ export function ResultBox({
     </div>
   )
 }
-
 /** Small stat tile. */
 export function Stat({
   label,
@@ -145,7 +137,6 @@ export function Stat({
     </div>
   )
 }
-
 /** Download helper for blobs. */
 export function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob)
@@ -157,14 +148,12 @@ export function downloadBlob(blob: Blob, filename: string) {
   document.body.removeChild(a)
   URL.revokeObjectURL(url)
 }
-
 /** Secure random bytes via Web Crypto (never Math.random). */
 export function randomBytes(length: number): Uint8Array {
   const arr = new Uint8Array(length)
   crypto.getRandomValues(arr)
   return arr
 }
-
 /** Secure random integer in [0, max) using rejection sampling. */
 export function randomInt(max: number): number {
   if (max <= 0) return 0

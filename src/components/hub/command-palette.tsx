@@ -1,64 +1,58 @@
+// src/components/hub/command-palette.tsx
 'use client'
-
 import * as React from 'react'
-import { CornerDownLeft, Star, Clock, ArrowRight } from 'lucide-react'
+import { Command } from 'cmdk'
+import { Search, ArrowRight, Star } from 'lucide-react'
 import {
-  CommandDialog,
-  CommandInput,
-  CommandList,
-  CommandEmpty,
-  CommandGroup,
-  CommandItem,
-  CommandSeparator,
-} from '@/components/ui/command'
-import {
-  CATEGORY_META,
-  type Tool,
-  type ToolCategory,
-} from '@/lib/tools/types'
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
+import { tools, toolsBySlug } from '@/lib/tools/registry'
+import { CATEGORY_META, type Tool } from '@/lib/tools/types'
 import { useToolHistory } from '@/lib/tools/use-tool-history'
-
 export function CommandPalette({
-  tools,
   open,
   onOpenChange,
   onSelect,
 }: {
-  tools: Tool[]
   open: boolean
-  onOpenChange: (v: boolean) => void
+  onOpenChange: (open: boolean) => void
   onSelect: (slug: string) => void
 }) {
+  const [query, setQuery] = React.useState('')
   const { recent, favorites } = useToolHistory()
-  const toolsBySlug = React.useMemo(
-    () => new Map(tools.map((t) => [t.slug, t])),
-    [tools]
-  )
-
-  const favTools = React.useMemo(
-    () =>
-      favorites
-        .map((s) => toolsBySlug.get(s))
-        .filter((t): t is Tool => Boolean(t)),
-    [favorites, toolsBySlug]
-  )
-  const recentTools = React.useMemo(
-    () =>
-      recent
-        .map((s) => toolsBySlug.get(s))
-        .filter((t): t is Tool => Boolean(t)),
-    [recent, toolsBySlug]
-  )
-
+  const inputRef = React.useRef<HTMLInputElement>(null)
+  // Filter tools based on query
+  const filtered = React.useMemo(() => {
+    if (!query.trim()) return tools
+    const q = query.toLowerCase()
+    return tools.filter(
+      (t) =>
+        t.name.toLowerCase().includes(q) ||
+        t.description.toLowerCase().includes(q) ||
+        t.keywords?.some((k) => k.toLowerCase().includes(q))
+    )
+  }, [query])
+  // Group filtered tools
   const grouped = React.useMemo(() => {
-    const map = new Map<ToolCategory, Tool[]>()
-    for (const t of tools) {
-      if (!map.has(t.category)) map.set(t.category, [])
-      map.get(t.category)!.push(t)
+    const groups: Record<string, Tool[]> = {}
+    for (const tool of filtered) {
+      const cat = tool.category
+      if (!groups[cat]) groups[cat] = []
+      groups[cat].push(tool)
     }
-    return map
-  }, [tools])
-
+    return Object.entries(groups).sort(([a], [b]) => a.localeCompare(b))
+  }, [filtered])
+  // Reset query when opening/closing
+  React.useEffect(() => {
+    if (open) {
+      setQuery('')
+      // Focus input when opening
+      setTimeout(() => inputRef.current?.focus(), 0)
+    }
+  }, [open])
   const handleSelect = React.useCallback(
     (slug: string) => {
       onSelect(slug)
@@ -66,110 +60,72 @@ export function CommandPalette({
     },
     [onSelect, onOpenChange]
   )
-
   return (
-    <CommandDialog
-      open={open}
-      onOpenChange={onOpenChange}
-      title="Command Palette"
-      description="Search tools by name, category, or keyword."
-      className="max-w-2xl"
-    >
-      <CommandInput placeholder="Search 62 tools by name or keyword…" />
-      <CommandList className="max-h-[60vh]">
-        <CommandEmpty>No tools found.</CommandEmpty>
-
-        {favTools.length > 0 || recentTools.length > 0 ? (
-          <>
-            {favTools.length > 0 ? (
-              <CommandGroup heading="Favorites">
-                {favTools.map((t) => (
-                  <PaletteItem
-                    key={`fav-${t.slug}`}
-                    tool={t}
-                    onSelect={handleSelect}
-                    icon={<Star className="size-4 fill-amber-400 text-amber-400" />}
-                  />
-                ))}
-              </CommandGroup>
-            ) : null}
-            {recentTools.length > 0 ? (
-              <CommandGroup heading="Recently used">
-                {recentTools.map((t) => (
-                  <PaletteItem
-                    key={`rec-${t.slug}`}
-                    tool={t}
-                    onSelect={handleSelect}
-                    icon={<Clock className="size-4 text-muted-foreground" />}
-                  />
-                ))}
-              </CommandGroup>
-            ) : null}
-            <CommandSeparator />
-          </>
-        ) : null}
-
-        {[...grouped.entries()].map(([cat, items]) => (
-          <CommandGroup
-            key={cat}
-            heading={CATEGORY_META[cat].label}
-          >
-            {items.map((t) => (
-              <PaletteItem
-                key={`${cat}-${t.slug}`}
-                tool={t}
-                onSelect={handleSelect}
-              />
-            ))}
-          </CommandGroup>
-        ))}
-
-        <CommandSeparator />
-        <CommandGroup heading="Tips">
-          <div className="flex items-center justify-between px-2 py-2 text-xs text-muted-foreground">
-            <span>Navigate with ↑ ↓, open with Enter</span>
-            <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px]">
-              esc
-            </kbd>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="overflow-hidden p-0 shadow-lg sm:max-w-lg">
+        {/* VisuallyHidden title fixes the Radix DialogTitle accessibility error */}
+        <VisuallyHidden>
+          <DialogTitle>Search Tools</DialogTitle>
+        </VisuallyHidden>
+        <Command className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5">
+          <div className="flex items-center border-b px-3" cmdk-input-wrapper="">
+            <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+            <Command.Input
+              ref={inputRef}
+              value={query}
+              onValueChange={setQuery}
+              placeholder={`Search ${tools.length} tools by name or keyword…`}
+              className="placeholder:text-muted-foreground flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-hidden disabled:cursor-not-allowed disabled:opacity-50"
+            />
           </div>
-        </CommandGroup>
-      </CommandList>
-    </CommandDialog>
-  )
-}
-
-function PaletteItem({
-  tool,
-  onSelect,
-  icon,
-}: {
-  tool: Tool
-  onSelect: (slug: string) => void
-  icon?: React.ReactNode
-}) {
-  return (
-    <CommandItem
-      value={`${tool.name} ${tool.description} ${tool.category} ${
-        tool.keywords?.join(' ') ?? ''
-      }`}
-      onSelect={() => onSelect(tool.slug)}
-      className="group"
-    >
-      <span
-        className="grid size-7 shrink-0 place-items-center rounded-md text-[10px] font-bold text-primary-foreground"
-        style={{ backgroundColor: CATEGORY_META[tool.category].color }}
-      >
-        {tool.name.slice(0, 2).toUpperCase()}
-      </span>
-      <div className="flex min-w-0 flex-1 flex-col">
-        <span className="truncate text-sm font-medium">{tool.name}</span>
-        <span className="truncate text-xs text-muted-foreground">
-          {tool.description}
-        </span>
-      </div>
-      {icon ?? (
-        <ArrowRight className="size-4 shrink-0 text-muted-foreground/40 transition group-data-[selected=true]:translate-x-0.5 group-data-[selected=true]:text-foreground" />
-      )}
-    </CommandItem>
+          <Command.List className="max-h-[300px] overflow-y-auto p-1">
+            <Command.Empty className="py-6 text-center text-sm text-muted-foreground">
+              No tools found.
+            </Command.Empty>
+            {!query.trim() && recent.length > 0 && (
+              <Command.Group heading="Recently Used" className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
+                {recent.slice(0, 5).map((slug) => {
+                  const tool = toolsBySlug.get(slug)
+                  if (!tool) return null
+                  return (
+                    <Command.Item
+                      key={tool.slug}
+                      value={tool.slug}
+                      onSelect={() => handleSelect(tool.slug)}
+                      className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground"
+                    >
+                      <span className="flex h-6 w-6 items-center justify-center rounded bg-primary/10 text-[10px] font-bold text-primary">
+                        {tool.name.slice(0, 2).toUpperCase()}
+                      </span>
+                      <span className="flex-1">{tool.name}</span>
+                      <ArrowRight className="h-3 w-3 opacity-50" />
+                    </Command.Item>
+                  )
+                })}
+              </Command.Group>
+            )}
+            {grouped.map(([category, categoryTools]) => (
+              <Command.Group key={category} heading={CATEGORY_META[category]?.label || category} className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
+                {categoryTools.map((tool) => (
+                  <Command.Item
+                    key={tool.slug}
+                    value={tool.slug}
+                    onSelect={() => handleSelect(tool.slug)}
+                    className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground"
+                  >
+                    <span className="flex h-6 w-6 items-center justify-center rounded bg-primary/10 text-[10px] font-bold text-primary">
+                      {tool.name.slice(0, 2).toUpperCase()}
+                    </span>
+                    <span className="flex-1">{tool.name}</span>
+                    {favorites.includes(tool.slug) ? <Star className="h-3 w-3 text-yellow-500" /> : null}
+                    <ArrowRight className="h-3 w-3 opacity-50" />
+                  </Command.Item>
+                ))}
+              </Command.Group>
+            ))}
+          </Command.List>
+        </Command>
+      </DialogContent>
+    </Dialog>
   )
 }

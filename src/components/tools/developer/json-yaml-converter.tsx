@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { dump as yamlDump, load as yamlLoad } from '@/lib/yaml'
 import { ArrowLeftRight, Eraser } from 'lucide-react'
@@ -14,7 +13,6 @@ import {
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Field, ResultBox, Stat } from '@/lib/tools/tool-ui'
 import { toast } from 'sonner'
-
 const SAMPLE_JSON = `{
   "name": "Fernandes Labs",
   "tools": ["json", "yaml", "xml"],
@@ -25,7 +23,6 @@ const SAMPLE_JSON = `{
     "retries": 3
   }
 }`
-
 const SAMPLE_YAML = `name: Fernandes Labs
 tools:
   - json
@@ -37,14 +34,12 @@ config:
   timeout: 30
   retries: 3
 `
-
 export default function JsonYamlConverter() {
   const [mode, setMode] = React.useState<'j2y' | 'y2j'>('j2y')
   const [jsonIn, setJsonIn] = React.useState(SAMPLE_JSON)
   const [yamlIn, setYamlIn] = React.useState(SAMPLE_YAML)
   const [output, setOutput] = React.useState('')
   const [error, setError] = React.useState<string | null>(null)
-
   React.useEffect(() => {
     setError(null)
     setOutput('')
@@ -74,7 +69,6 @@ export default function JsonYamlConverter() {
       }
     }
   }, [mode, jsonIn, yamlIn])
-
   return (
     <div className="space-y-5">
       <Tabs value={mode} onValueChange={(v) => setMode(v as 'j2y' | 'y2j')}>
@@ -88,7 +82,6 @@ export default function JsonYamlConverter() {
             YAML → JSON
           </TabsTrigger>
         </TabsList>
-
         <TabsContent value="j2y" className="space-y-5">
           <Field label="JSON input" htmlFor="json-in" hint="Paste any valid JSON">
             <Textarea
@@ -119,7 +112,6 @@ export default function JsonYamlConverter() {
             </Button>
           </div>
         </TabsContent>
-
         <TabsContent value="y2j" className="space-y-5">
           <Field label="YAML input" htmlFor="yaml-in" hint="Paste any valid YAML">
             <Textarea
@@ -151,7 +143,6 @@ export default function JsonYamlConverter() {
           </div>
         </TabsContent>
       </Tabs>
-
       {error ? (
         <Alert variant="destructive">
           <AlertDescription className="font-mono text-xs">
@@ -159,13 +150,11 @@ export default function JsonYamlConverter() {
           </AlertDescription>
         </Alert>
       ) : null}
-
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         <Stat label="Mode" value={mode === 'j2y' ? 'JSON→YAML' : 'YAML→JSON'} />
         <Stat label="Input bytes" value={new Blob([mode === 'j2y' ? jsonIn : yamlIn]).size} />
         <Stat label="Output bytes" value={new Blob([output]).size} />
       </div>
-
       <ResultBox
         value={output}
         label={mode === 'j2y' ? 'YAML output' : 'JSON output'}

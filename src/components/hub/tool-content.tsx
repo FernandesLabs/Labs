@@ -1,152 +1,147 @@
 'use client'
-
 import * as React from 'react'
-import { ChevronDown } from 'lucide-react'
+import Link from 'next/link'
+import {
+  ChevronDown,
+  Sparkles,
+  Wrench,
+  CheckCircle2,
+  Code2,
+  Lightbulb,
+  ArrowRight,
+} from 'lucide-react'
 import type { Tool } from '@/lib/tools/types'
 import { CATEGORY_META } from '@/lib/tools/types'
-
+import {
+  generateToolFaq,
+  generateToolHowTo,
+  generateToolIntro,
+  generateToolTips,
+  generateToolUseCases,
+} from '@/app/tools/[slug]/tool-seo'
+import { getToolContentOverride } from '@/app/tools/[slug]/tool-content-overrides'
 /**
- * Generates SEO content for a tool page: an intro paragraph, a "how to use"
- * section, and an FAQ accordion. This text content is what Google needs to
- * rank the page — tools without body text rarely rank well.
+ * Generates SEO content for a tool page: an intro paragraph, concrete
+ * input→output examples, "how to use" steps, "common use cases", "tips",
+ * and an FAQ accordion.
  *
- * Content is generated from the tool's metadata (name, description, category,
- * keywords) using templates, so every tool gets unique, relevant content
- * without manual writing.
+ * Content priority:
+ *   1. Hand-written override (tool-content-overrides.ts) — for the top
+ *      tools with the highest search intent. Unique, specific, deep.
+ *   2. Template generator (tool-seo.ts) — for the other 129 tools.
+ *
+ * The same content is emitted as FAQPage + HowTo JSON-LD by the server
+ * component (`page.tsx`), so the visible text and structured data match.
  */
-
-interface FaqItem {
-  q: string
-  a: string
-}
-
-function generateIntro(tool: Tool): string {
-  const cat = CATEGORY_META[tool.category]
-  const kws = tool.keywords?.slice(0, 3).join(', ') || tool.name.toLowerCase()
-  return `The ${tool.name} is a free online ${cat.label.toLowerCase()} tool that ${tool.description.toLowerCase().replace(/\.$/, '')}. It runs entirely in your browser — no data is sent to any server, no sign-up is required, and it works offline once loaded. Whether you need to ${kws}, or related tasks, this tool provides a fast, privacy-first solution.`
-}
-
-function generateHowTo(tool: Tool): string[] {
-  const cat = tool.category
-  const steps: string[] = []
-
-  // Generic steps that apply to most tools
-  steps.push(
-    `Locate the primary input area at the top of the tool card. This is where you enter your data — text, a file, a URL, or numbers depending on the tool.`
-  )
-
-  if (cat === 'finance' || cat === 'developer' || cat === 'text') {
-    steps.push(
-      `Adjust any options below the input. Most tools offer toggles, sliders, or dropdowns to customize the output — try different settings to see live results update instantly.`
-    )
-  } else if (cat === 'media' || cat === 'network') {
-    steps.push(
-      `If the tool requires a file, click the upload area or drag-and-drop your file. For URL-based tools, paste a valid URL into the input field.`
-    )
-  } else {
-    steps.push(
-      `Configure the available options to customize the output. Most settings update the result live as you change them.`
-    )
-  }
-
-  steps.push(
-    `View the result in the output area below. Use the Copy button to copy the result to your clipboard, or the Download/Save button to save it as a file.`
-  )
-
-  steps.push(
-    `All processing happens client-side in your browser. Your data never leaves your device, making this tool safe for sensitive inputs like passwords, private keys, or personal documents.`
-  )
-
-  return steps
-}
-
-function generateFaq(tool: Tool): FaqItem[] {
-  const cat = CATEGORY_META[tool.category]
-  const kws = tool.keywords || []
-
-  const faqs: FaqItem[] = [
-    {
-      q: `Is the ${tool.name} free to use?`,
-      a: `Yes, completely free. There are no sign-ups, no hidden costs, and no usage limits. The tool is supported by ads (shown above and below the tool card).`,
-    },
-    {
-      q: `Is my data safe when using this tool?`,
-      a: `Absolutely. All processing happens entirely in your browser. Your input is never sent to any server, stored, or tracked. You can safely use this tool with sensitive data like passwords, private documents, or personal information. You can even use it offline once the page is loaded.`,
-    },
-    {
-      q: `Does the ${tool.name} work offline?`,
-      a: `Yes. Once the page has loaded, the tool runs entirely client-side. You can disconnect from the internet and continue using it. The site is also installable as a Progressive Web App (PWA) for offline access from your home screen.`,
-    },
-  ]
-
-  // Add tool-specific FAQs based on category
-  if (cat.label === 'Developer') {
-    faqs.push({
-      q: `Can I use the output in my code or production project?`,
-      a: `Yes. The output is standard ${kws[0] || 'code'} that you can copy directly into your projects. There are no restrictions on how you use the results.`,
-    })
-  } else if (cat.label === 'Finance') {
-    faqs.push({
-      q: `Are the calculations accurate?`,
-      a: `Yes, the calculations use standard, well-established formulas. However, this tool is for informational purposes only and should not replace professional financial advice for important decisions.`,
-    })
-  } else if (cat.label === 'Media') {
-    faqs.push({
-      q: `What file formats and sizes are supported?`,
-      a: `The tool supports common file formats related to ${kws[0] || 'the tool\'s purpose'}. There are no hard file size limits, but very large files (>100MB) may be slow to process depending on your device. All processing happens in your browser.`,
-    })
-  } else if (cat.label === 'SEO') {
-    faqs.push({
-      q: `Will using this tool improve my SEO?`,
-      a: `The tool helps you create or analyze ${kws[0] || 'SEO elements'} that can improve your search rankings. However, SEO depends on many factors — content quality, backlinks, site speed, and more. Use this tool as part of a broader SEO strategy.`,
-    })
-  } else if (cat.label === 'Security') {
-    faqs.push({
-      q: `Is it safe to generate passwords and security tokens here?`,
-      a: `Yes. All randomness is generated using the Web Crypto API (cryptographically secure), never Math.random(). Your generated values never leave your browser. This is safer than most online generators that may log or transmit your data.`,
-    })
-  } else if (cat.label === 'Network') {
-    faqs.push({
-      q: `Why do some network lookups fail?`,
-      a: `Network tools query external services (like DNS resolvers or IP databases). If a service is temporarily unavailable or rate-limits requests, the lookup may fail. Try again in a few moments. The tool itself is working correctly.`,
-    })
-  }
-
-  faqs.push({
-    q: `Can I use this tool on mobile?`,
-    a: `Yes. The tool is fully responsive and works on phones, tablets, and desktops. The layout adapts to your screen size, and all features are available on every device.`,
-  })
-
-  return faqs
-}
-
+// Re-export so ToolJsonLd (and other consumers) can build FAQPage schema
+// from the same source as the visible accordion.
+export const generateFaq = (tool: Tool) =>
+  getToolContentOverride(tool.slug)?.faqs ?? generateToolFaq(tool)
 export function ToolContent({ tool }: { tool: Tool }) {
-  const intro = React.useMemo(() => generateIntro(tool), [tool])
-  const howTo = React.useMemo(() => generateHowTo(tool), [tool])
-  const faqs = React.useMemo(() => generateFaq(tool), [tool])
+  // Check for a hand-written override first; fall back to templates.
+  const override = React.useMemo(() => getToolContentOverride(tool.slug), [tool.slug])
+  const intro = React.useMemo(
+    () => override?.intro ?? generateToolIntro(tool),
+    [override, tool]
+  )
+  const howTo = React.useMemo(
+    () => override?.howTo ?? generateToolHowTo(tool),
+    [override, tool]
+  )
+  const faqs = React.useMemo(
+    () => override?.faqs ?? generateToolFaq(tool),
+    [override, tool]
+  )
+  const useCases = React.useMemo(
+    () => override?.useCases ?? generateToolUseCases(tool),
+    [override, tool]
+  )
+  const tips = React.useMemo(
+    () => override?.tips ?? generateToolTips(tool),
+    [override, tool]
+  )
+  const examples = override?.examples ?? []
   const [openFaq, setOpenFaq] = React.useState<number | null>(0)
-
+  const cat = CATEGORY_META[tool.category]
   return (
-    <div className="mt-12 space-y-8">
+    <div className="mt-12 space-y-10">
       {/* Intro */}
-      <section>
-        <h2 className="mb-2 text-xl font-bold tracking-tight text-foreground">
-          About the {tool.name}
-        </h2>
+      <section id="about" className="scroll-mt-20">
+        <div className="mb-3 flex items-center gap-2">
+          <span className="h-5 w-1 rounded-full bg-primary" aria-hidden />
+          <h2 className="text-xl font-bold tracking-tight text-foreground">
+            About the {tool.name}
+          </h2>
+        </div>
         <p className="text-sm leading-relaxed text-muted-foreground sm:text-base">
           {intro}
         </p>
+        {override ? (
+          <div className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">
+            <CheckCircle2 className="size-3" />
+            Hand-written guide
+          </div>
+        ) : null}
       </section>
-
+      {/* Concrete examples (only for tools with overrides) */}
+      {examples.length > 0 ? (
+        <section id="examples" className="scroll-mt-20">
+          <div className="mb-3 flex items-center gap-2">
+            <span className="h-5 w-1 rounded-full bg-primary" aria-hidden />
+            <h2 className="flex items-center gap-2 text-xl font-bold tracking-tight text-foreground">
+              <Code2 className="size-5 text-primary" />
+              Examples
+            </h2>
+          </div>
+          <div className="space-y-3">
+            {examples.map((ex, i) => (
+              <div
+                key={i}
+                className="overflow-hidden rounded-xl border border-border/70 bg-card shadow-sm"
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2">
+                  <div className="border-b border-border/60 bg-muted/30 p-3 md:border-b-0 md:border-r">
+                    <div className="mb-1.5 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                      <ArrowRight className="size-3" />
+                      Input
+                    </div>
+                    <pre className="overflow-x-auto whitespace-pre-wrap break-words font-mono text-xs leading-relaxed text-foreground/80">
+                      {ex.input}
+                    </pre>
+                  </div>
+                  <div className="p-3">
+                    <div className="mb-1.5 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                      <CheckCircle2 className="size-3 text-emerald-500" />
+                      Output
+                    </div>
+                    <pre className="overflow-x-auto whitespace-pre-wrap break-words font-mono text-xs leading-relaxed text-foreground/80">
+                      {ex.output}
+                    </pre>
+                  </div>
+                </div>
+                {ex.note ? (
+                  <div className="border-t border-border/60 bg-amber-500/5 px-3 py-2 text-[11px] text-muted-foreground">
+                    <span className="font-medium text-amber-600 dark:text-amber-400">Note:</span>{' '}
+                    {ex.note}
+                  </div>
+                ) : null}
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : null}
       {/* How to use */}
-      <section>
-        <h2 className="mb-3 text-xl font-bold tracking-tight text-foreground">
-          How to use
-        </h2>
+      <section id="how-to" className="scroll-mt-20">
+        <div className="mb-3 flex items-center gap-2">
+          <span className="h-5 w-1 rounded-full bg-primary" aria-hidden />
+          <h2 className="text-xl font-bold tracking-tight text-foreground">
+            How to use
+          </h2>
+        </div>
         <ol className="space-y-3">
           {howTo.map((step, i) => (
             <li key={i} className="flex gap-3">
-              <span className="grid size-6 shrink-0 place-items-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+              <span className="grid size-7 shrink-0 place-items-center rounded-full bg-primary text-xs font-bold text-primary-foreground shadow-sm">
                 {i + 1}
               </span>
               <p className="text-sm leading-relaxed text-muted-foreground pt-0.5">
@@ -156,40 +151,118 @@ export function ToolContent({ tool }: { tool: Tool }) {
           ))}
         </ol>
       </section>
-
-      {/* FAQ */}
-      <section>
-        <h2 className="mb-3 text-xl font-bold tracking-tight text-foreground">
-          Frequently asked questions
-        </h2>
-        <div className="space-y-2">
-          {faqs.map((faq, i) => (
-            <div
+      {/* Common use cases */}
+      <section id="use-cases" className="scroll-mt-20">
+        <div className="mb-3 flex items-center gap-2">
+          <span className="h-5 w-1 rounded-full bg-primary" aria-hidden />
+          <h2 className="flex items-center gap-2 text-xl font-bold tracking-tight text-foreground">
+            <Sparkles className="size-5 text-primary" />
+            Common use cases
+          </h2>
+        </div>
+        <ul className="grid gap-2 sm:grid-cols-2">
+          {useCases.map((u, i) => (
+            <li
               key={i}
-              className="overflow-hidden rounded-lg border border-border/70 bg-card"
+              className="flex items-start gap-2 rounded-lg border border-border/60 bg-card p-3 text-sm leading-relaxed text-muted-foreground transition hover:border-border hover:bg-muted/20"
             >
-              <button
-                type="button"
-                onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition hover:bg-muted/30"
-                aria-expanded={openFaq === i}
-              >
-                <span className="text-sm font-medium text-foreground">
-                  {faq.q}
-                </span>
-                <ChevronDown
-                  className={`size-4 shrink-0 text-muted-foreground transition-transform ${
-                    openFaq === i ? 'rotate-180' : ''
-                  }`}
-                />
-              </button>
-              {openFaq === i ? (
-                <div className="px-4 pb-3 text-sm leading-relaxed text-muted-foreground">
-                  {faq.a}
-                </div>
-              ) : null}
-            </div>
+              <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-primary/80" />
+              <span>{u}</span>
+            </li>
           ))}
+        </ul>
+      </section>
+      {/* Tips */}
+      <section id="tips" className="scroll-mt-20">
+        <div className="mb-3 flex items-center gap-2">
+          <span className="h-5 w-1 rounded-full bg-primary" aria-hidden />
+          <h2 className="flex items-center gap-2 text-xl font-bold tracking-tight text-foreground">
+            <Lightbulb className="size-5 text-amber-500" />
+            Tips
+          </h2>
+        </div>
+        <ul className="space-y-2">
+          {tips.map((t, i) => (
+            <li
+              key={i}
+              className="flex items-start gap-2 rounded-lg border border-border/40 bg-muted/20 px-3 py-2 text-sm leading-relaxed text-muted-foreground"
+            >
+              <Wrench className="mt-0.5 size-3.5 shrink-0 text-primary/60" />
+              <span>{t}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+      {/* FAQ */}
+      <section id="faq" className="scroll-mt-20">
+        <div className="mb-3 flex items-center gap-2">
+          <span className="h-5 w-1 rounded-full bg-primary" aria-hidden />
+          <h2 className="text-xl font-bold tracking-tight text-foreground">
+            Frequently asked questions
+          </h2>
+        </div>
+        <div className="space-y-2">
+          {faqs.map((faq, i) => {
+            const open = openFaq === i
+            return (
+              <div
+                key={i}
+                className={`overflow-hidden rounded-lg border bg-card transition-colors ${
+                  open ? 'border-primary/40' : 'border-border/70'
+                }`}
+              >
+                <button
+                  type="button"
+                  onClick={() => setOpenFaq(open ? null : i)}
+                  className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition hover:bg-muted/30"
+                  aria-expanded={open}
+                >
+                  <span className="text-sm font-medium text-foreground">
+                    {faq.q}
+                  </span>
+                  <ChevronDown
+                    className={`size-4 shrink-0 text-muted-foreground transition-transform duration-200 ${
+                      open ? 'rotate-180' : ''
+                    }`}
+                  />
+                </button>
+                {open ? (
+                  <div className="border-t border-border/40 px-4 py-3 text-sm leading-relaxed text-muted-foreground">
+                    {faq.a}
+                  </div>
+                ) : null}
+              </div>
+            )
+          })}
+        </div>
+      </section>
+      {/* Internal linking footer */}
+      <section className="rounded-xl border border-border/60 bg-gradient-to-br from-muted/40 to-muted/10 p-4 sm:p-5">
+        <h2 className="mb-1 text-sm font-bold tracking-tight text-foreground">
+          Explore more {cat.label.toLowerCase()} tools
+        </h2>
+        <p className="mb-3 text-xs text-muted-foreground">
+          Browse the full collection of {cat.label.toLowerCase()} tools on the
+          hub, or jump back to all categories.
+        </p>
+        <div className="flex flex-wrap gap-2 text-xs">
+          <Link
+            href={`/category/${tool.category}`}
+            className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-background px-3 py-1.5 font-medium text-foreground transition hover:border-primary hover:text-primary hover:shadow-sm"
+          >
+            <span
+              className="size-2 rounded-full"
+              style={{ backgroundColor: cat.color }}
+            />
+            All {cat.label} tools
+            <ArrowRight className="size-3" />
+          </Link>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-background px-3 py-1.5 font-medium text-foreground transition hover:border-primary hover:text-primary hover:shadow-sm"
+          >
+            All categories
+          </Link>
         </div>
       </section>
     </div>

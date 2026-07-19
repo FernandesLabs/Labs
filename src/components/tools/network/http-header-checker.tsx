@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Loader2, Search, ShieldCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -23,7 +22,6 @@ import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { toast } from 'sonner'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 interface HeadersResponse {
   ok: boolean
   error?: string
@@ -33,7 +31,6 @@ interface HeadersResponse {
   redirected?: boolean
   finalUrl: string
 }
-
 /** HTTP security headers worth flagging in the UI. */
 const SECURITY_HEADERS = new Set<string>([
   'content-security-policy',
@@ -46,7 +43,6 @@ const SECURITY_HEADERS = new Set<string>([
   'cross-origin-embedder-policy',
   'cross-origin-resource-policy',
 ])
-
 function statusAccent(status: number): string | undefined {
   if (status >= 200 && status < 300) return 'oklch(0.6 0.17 150)'
   if (status >= 300 && status < 400) return 'oklch(0.6 0.15 230)'
@@ -54,7 +50,6 @@ function statusAccent(status: number): string | undefined {
   if (status >= 500) return 'oklch(0.6 0.22 25)'
   return undefined
 }
-
 function statusBadgeClass(status: number): string {
   if (status >= 200 && status < 300)
     return 'border-transparent bg-emerald-500/15 text-emerald-700 dark:text-emerald-400'
@@ -66,7 +61,6 @@ function statusBadgeClass(status: number): string {
     return 'border-transparent bg-rose-500/15 text-rose-700 dark:text-rose-400'
   return ''
 }
-
 async function fetchHeaders(
   url: string,
   signal: AbortSignal
@@ -75,13 +69,11 @@ async function fetchHeaders(
   const res = await fetch(api, { signal })
   return (await res.json()) as HeadersResponse
 }
-
 export default function HttpHeaderChecker(): React.JSX.Element {
   const [url, setUrl] = React.useState('https://example.com')
   const [loading, setLoading] = React.useState(false)
   const [data, setData] = React.useState<HeadersResponse | null>(null)
   const controllerRef = React.useRef<AbortController | null>(null)
-
   const check = React.useCallback(
     async (override?: string) => {
       const target = (override ?? url).trim()
@@ -126,13 +118,11 @@ export default function HttpHeaderChecker(): React.JSX.Element {
     },
     [url]
   )
-
   React.useEffect(() => {
     return () => {
       if (controllerRef.current) controllerRef.current.abort()
     }
   }, [])
-
   const headerRows = React.useMemo(() => {
     if (!data) return []
     return Object.entries(data.headers)
@@ -143,9 +133,7 @@ export default function HttpHeaderChecker(): React.JSX.Element {
         secure: SECURITY_HEADERS.has(name.toLowerCase()),
       }))
   }, [data])
-
   const secureCount = headerRows.filter((h) => h.secure).length
-
   return (
     <div className="space-y-5">
       <Card>
@@ -187,7 +175,6 @@ export default function HttpHeaderChecker(): React.JSX.Element {
           </Button>
         </CardContent>
       </Card>
-
       {data ? (
         <>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -209,7 +196,6 @@ export default function HttpHeaderChecker(): React.JSX.Element {
               value={data.redirected ? 'Yes' : 'No'}
             />
           </div>
-
           <Card>
             <CardHeader>
               <CardTitle className="flex flex-wrap items-center gap-2 text-base">

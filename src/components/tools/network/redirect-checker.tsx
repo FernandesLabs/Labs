@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import {
   Loader2,
@@ -22,21 +21,18 @@ import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { toast } from 'sonner'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 interface ChainHop {
   url: string
   status: number
   location?: string
   ttfbMs: number
 }
-
 interface RedirectResponse {
   ok: boolean
   error?: string
   chain: ChainHop[]
   hops: number
 }
-
 function statusBadgeClass(status: number): string {
   if (status >= 200 && status < 300)
     return 'border-transparent bg-emerald-500/15 text-emerald-700 dark:text-emerald-400'
@@ -48,13 +44,11 @@ function statusBadgeClass(status: number): string {
     return 'border-transparent bg-rose-500/15 text-rose-700 dark:text-rose-400'
   return 'border-transparent bg-muted text-muted-foreground'
 }
-
 function ttfbAccent(ms: number): string | undefined {
   if (ms < 500) return 'oklch(0.6 0.17 150)'
   if (ms < 1500) return 'oklch(0.7 0.18 75)'
   return 'oklch(0.6 0.22 25)'
 }
-
 /** Detect loops in the chain (same URL appearing twice). */
 function findLoop(chain: ChainHop[]): { loop: boolean; visited: Set<string> } {
   const visited = new Set<string>()
@@ -67,7 +61,6 @@ function findLoop(chain: ChainHop[]): { loop: boolean; visited: Set<string> } {
   }
   return { loop: false, visited }
 }
-
 async function fetchRedirect(
   url: string,
   signal: AbortSignal
@@ -76,13 +69,11 @@ async function fetchRedirect(
   const res = await fetch(api, { signal })
   return (await res.json()) as RedirectResponse
 }
-
 export default function RedirectChecker(): React.JSX.Element {
   const [url, setUrl] = React.useState('https://example.com')
   const [loading, setLoading] = React.useState(false)
   const [data, setData] = React.useState<RedirectResponse | null>(null)
   const controllerRef = React.useRef<AbortController | null>(null)
-
   const trace = React.useCallback(
     async (override?: string) => {
       const target = (override ?? url).trim()
@@ -130,13 +121,11 @@ export default function RedirectChecker(): React.JSX.Element {
     },
     [url]
   )
-
   React.useEffect(() => {
     return () => {
       if (controllerRef.current) controllerRef.current.abort()
     }
   }, [])
-
   const loop = data ? findLoop(data.chain).loop : false
   const totalTtfb = data
     ? data.chain.reduce((sum, h) => sum + h.ttfbMs, 0)
@@ -145,7 +134,6 @@ export default function RedirectChecker(): React.JSX.Element {
     ? data.chain.filter((h) => h.status >= 300 && h.status < 400).length
     : 0
   const finalHop = data?.chain[data.chain.length - 1]
-
   return (
     <div className="space-y-5">
       <Card>
@@ -187,7 +175,6 @@ export default function RedirectChecker(): React.JSX.Element {
           </Button>
         </CardContent>
       </Card>
-
       {data ? (
         <>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -215,7 +202,6 @@ export default function RedirectChecker(): React.JSX.Element {
               }
             />
           </div>
-
           {loop ? (
             <div className="flex items-center gap-2 rounded-lg border border-rose-500/40 bg-rose-500/10 p-3 text-sm text-rose-700 dark:text-rose-400">
               <AlertTriangle className="size-4" />
@@ -225,7 +211,6 @@ export default function RedirectChecker(): React.JSX.Element {
               </span>
             </div>
           ) : null}
-
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">

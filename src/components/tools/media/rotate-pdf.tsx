@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { PDFDocument, degrees } from 'pdf-lib'
 import { toast } from 'sonner'
@@ -21,21 +20,17 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Field, Stat, downloadBlob } from '@/lib/tools/tool-ui'
-
 type Angle = 90 | 180 | 270
 type Target = 'all' | 'custom'
-
 function formatBytes(b: number): string {
   if (!Number.isFinite(b) || b < 0) return '—'
   if (b < 1024) return `${b} B`
   if (b < 1024 * 1024) return `${(b / 1024).toFixed(1)} KB`
   return `${(b / 1024 / 1024).toFixed(2)} MB`
 }
-
 function baseName(name: string): string {
   return name.replace(/\.[^.]+$/, '') || 'document'
 }
-
 /**
  * Parse a comma-separated list of pages and ranges (e.g. "1,3,5-7") into
  * 0-based page indices. Throws Error with a friendly message if any token
@@ -87,7 +82,6 @@ function parsePageList(
   if (out.length === 0) throw new Error('No valid pages parsed')
   return out
 }
-
 export default function RotatePdf() {
   const [file, setFile] = React.useState<File | null>(null)
   const [pageCount, setPageCount] = React.useState(0)
@@ -97,7 +91,6 @@ export default function RotatePdf() {
   const [pagesInput, setPagesInput] = React.useState('')
   const [rotating, setRotating] = React.useState(false)
   const inputRef = React.useRef<HTMLInputElement | null>(null)
-
   const loadFile = async (f: File): Promise<void> => {
     setLoading(true)
     try {
@@ -119,13 +112,11 @@ export default function RotatePdf() {
       setLoading(false)
     }
   }
-
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const f = e.target.files?.[0]
     if (f) void loadFile(f)
     e.target.value = ''
   }
-
   const rotate = async (): Promise<void> => {
     if (!file) {
       toast.error('Load a PDF first')
@@ -168,7 +159,6 @@ export default function RotatePdf() {
       setRotating(false)
     }
   }
-
   return (
     <div className="space-y-5">
       <Field label="Source PDF">
@@ -208,7 +198,6 @@ export default function RotatePdf() {
           </p>
         </div>
       </Field>
-
       {file ? (
         <div className="grid gap-5 sm:grid-cols-2">
           <Field label="Rotation angle" htmlFor="rp-angle">
@@ -226,7 +215,6 @@ export default function RotatePdf() {
               </SelectContent>
             </Select>
           </Field>
-
           <Field label="Apply to" htmlFor="rp-target">
             <Select
               value={target}
@@ -243,7 +231,6 @@ export default function RotatePdf() {
           </Field>
         </div>
       ) : null}
-
       {file && target === 'custom' ? (
         <Field
           label="Pages to rotate"
@@ -260,7 +247,6 @@ export default function RotatePdf() {
           />
         </Field>
       ) : null}
-
       {file ? (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           <Stat label="Source pages" value={pageCount} />
@@ -272,7 +258,6 @@ export default function RotatePdf() {
           />
         </div>
       ) : null}
-
       {file && target === 'custom' && pagesInput.trim() ? (
         <Card>
           <CardHeader>
@@ -307,7 +292,6 @@ export default function RotatePdf() {
           </CardContent>
         </Card>
       ) : null}
-
       <Button
         type="button"
         onClick={() => void rotate()}

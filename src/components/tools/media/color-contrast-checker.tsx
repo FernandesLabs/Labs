@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Check, X } from 'lucide-react'
 import { Input } from '@/components/ui/input'
@@ -7,7 +6,6 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
   const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex.trim())
   if (!m) return null
@@ -17,16 +15,13 @@ function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
     b: parseInt(m[3], 16),
   }
 }
-
 function channel(c: number): number {
   const s = c / 255
   return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4)
 }
-
 function luminance({ r, g, b }: { r: number; g: number; b: number }): number {
   return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b)
 }
-
 function contrastRatio(fg: string, bg: string): number | null {
   const a = hexToRgb(fg)
   const b = hexToRgb(bg)
@@ -37,13 +32,11 @@ function contrastRatio(fg: string, bg: string): number | null {
   const darker = Math.min(la, lb)
   return (lighter + 0.05) / (darker + 0.05)
 }
-
 interface GradeResult {
   label: string
   pass: boolean
   threshold: number
 }
-
 function gradeFor(ratio: number, large: boolean): GradeResult {
   const threshold = large ? 3 : 4.5
   return {
@@ -52,18 +45,14 @@ function gradeFor(ratio: number, large: boolean): GradeResult {
     threshold,
   }
 }
-
 function aaaGrade(ratio: number, large: boolean): GradeResult {
   const threshold = large ? 4.5 : 7
   return { label: large ? 'AAA Large' : 'AAA Normal', pass: ratio >= threshold, threshold }
 }
-
 export default function ColorContrastChecker() {
   const [fg, setFg] = React.useState('#0f172a')
   const [bg, setBg] = React.useState('#f8fafc')
-
   const ratio = contrastRatio(fg, bg)
-
   const grades = React.useMemo(() => {
     if (ratio == null) return []
     return [
@@ -73,7 +62,6 @@ export default function ColorContrastChecker() {
       aaaGrade(ratio, true),
     ]
   }, [ratio])
-
   return (
     <div className="space-y-5">
       <div className="grid gap-5 sm:grid-cols-2">
@@ -95,7 +83,6 @@ export default function ColorContrastChecker() {
             />
           </div>
         </Field>
-
         <Field label="Background" htmlFor="cc-bg">
           <div className="flex items-center gap-3">
             <input
@@ -115,7 +102,6 @@ export default function ColorContrastChecker() {
           </div>
         </Field>
       </div>
-
       <div className="grid gap-4 sm:grid-cols-2">
         <Stat
           label="Contrast Ratio"
@@ -137,7 +123,6 @@ export default function ColorContrastChecker() {
           }
         />
       </div>
-
       <div>
         <Label className="mb-2 block text-sm font-medium">WCAG compliance</Label>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -165,7 +150,6 @@ export default function ColorContrastChecker() {
           ))}
         </div>
       </div>
-
       <Card>
         <CardContent className="pt-6">
           <Label className="mb-2 block text-sm font-medium">Live preview</Label>
@@ -199,7 +183,6 @@ export default function ColorContrastChecker() {
           ) : null}
         </CardContent>
       </Card>
-
       <div className="flex flex-wrap gap-2">
         <Badge variant="secondary">AA Normal ≥ 4.5:1</Badge>
         <Badge variant="secondary">AA Large ≥ 3:1</Badge>

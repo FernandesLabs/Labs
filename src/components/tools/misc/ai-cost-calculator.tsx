@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -20,14 +19,12 @@ import {
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 interface Model {
   id: string
   label: string
   inputPerM: number
   outputPerM: number
 }
-
 // Approximate public pricing in USD per 1M tokens (input / output).
 const MODELS: Model[] = [
   { id: 'gpt-4o', label: 'GPT-4o', inputPerM: 5, outputPerM: 15 },
@@ -39,7 +36,6 @@ const MODELS: Model[] = [
   { id: 'llama-3.1-70b', label: 'Llama 3.1 70B', inputPerM: 0.59, outputPerM: 0.79 },
   { id: 'gemini-1.5-pro', label: 'Gemini 1.5 Pro', inputPerM: 1.25, outputPerM: 5 },
 ]
-
 function parseNum(value: string): number {
   if (value == null) return NaN
   const trimmed = value.trim()
@@ -47,7 +43,6 @@ function parseNum(value: string): number {
   const n = Number(trimmed)
   return Number.isFinite(n) ? n : NaN
 }
-
 function fmtUSD(n: number): string {
   if (!Number.isFinite(n)) return '—'
   if (n === 0) return '$0.00'
@@ -58,12 +53,10 @@ function fmtUSD(n: number): string {
     maximumFractionDigits: n < 1 ? 4 : 2,
   }).format(n)
 }
-
 function fmtTokens(n: number): string {
   if (!Number.isFinite(n)) return '—'
   return n.toLocaleString(undefined, { maximumFractionDigits: 0 })
 }
-
 /**
  * AI Cost Calculator
  * Estimate LLM API spend across providers. Pick a model with hardcoded
@@ -75,25 +68,20 @@ export default function AiCostCalculator() {
   const [inputTokens, setInputTokens] = React.useState('1000')
   const [outputTokens, setOutputTokens] = React.useState('500')
   const [reqPerDay, setReqPerDay] = React.useState('100')
-
   const model = MODELS.find((m) => m.id === modelId) ?? MODELS[0]
   const it = parseNum(inputTokens)
   const ot = parseNum(outputTokens)
   const rpd = parseNum(reqPerDay)
-
   const validIt = Number.isFinite(it) && it >= 0 ? it : 0
   const validOt = Number.isFinite(ot) && ot >= 0 ? ot : 0
   const validRpd = Number.isFinite(rpd) && rpd > 0 ? rpd : 0
-
   const inputCostPerReq = (validIt / 1_000_000) * model.inputPerM
   const outputCostPerReq = (validOt / 1_000_000) * model.outputPerM
   const costPerReq = inputCostPerReq + outputCostPerReq
   const daily = costPerReq * validRpd
   const monthly = daily * 30
   const yearly = daily * 365
-
   const valid = validRpd > 0 && (validIt > 0 || validOt > 0)
-
   const rows: {
     label: string
     perReq: number
@@ -116,7 +104,6 @@ export default function AiCostCalculator() {
       perYear: outputCostPerReq * validRpd * 365,
     },
   ]
-
   return (
     <div className="space-y-5">
       <Card>
@@ -175,7 +162,6 @@ export default function AiCostCalculator() {
               />
             </Field>
           </div>
-
           {Number.isFinite(it) && it < 0 ? (
             <p className="text-sm text-destructive">Input tokens cannot be negative.</p>
           ) : null}
@@ -187,7 +173,6 @@ export default function AiCostCalculator() {
           ) : null}
         </CardContent>
       </Card>
-
       <Card>
         <CardContent className="space-y-4 pt-6">
           <div
@@ -201,7 +186,6 @@ export default function AiCostCalculator() {
             <Stat label="Monthly cost" value={valid ? fmtUSD(monthly) : '—'} accent="#f59e0b" />
             <Stat label="Yearly cost" value={valid ? fmtUSD(yearly) : '—'} accent="#dc2626" />
           </div>
-
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="outline">{model.label}</Badge>
             <Badge variant="outline">
@@ -209,7 +193,6 @@ export default function AiCostCalculator() {
               {fmtTokens(validRpd)} req/day
             </Badge>
           </div>
-
           <div className="overflow-hidden rounded-lg border border-border">
             <Table>
               <TableHeader>
@@ -257,7 +240,6 @@ export default function AiCostCalculator() {
               </TableBody>
             </Table>
           </div>
-
           <p className="text-xs text-muted-foreground">
             Pricing is approximate (USD per 1M tokens) and varies by provider,
             tier, and region. Monthly = daily × 30; yearly = daily × 365. Verify

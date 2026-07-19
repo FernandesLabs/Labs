@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Plus, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -15,9 +14,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 type GradeType = 'percent' | 'letter'
-
 const LETTER_GRADES: Record<string, number> = {
   A: 95,
   B: 85,
@@ -25,7 +22,6 @@ const LETTER_GRADES: Record<string, number> = {
   D: 65,
   F: 50,
 }
-
 interface Assignment {
   id: number
   name: string
@@ -34,13 +30,11 @@ interface Assignment {
   percent: string
   weight: string
 }
-
 let _nextId = 3
 function nextId(): number {
   _nextId += 1
   return _nextId
 }
-
 function parseNum(value: string): number {
   if (value == null) return NaN
   const trimmed = value.trim()
@@ -48,7 +42,6 @@ function parseNum(value: string): number {
   const n = Number(trimmed)
   return Number.isFinite(n) ? n : NaN
 }
-
 function pctToLetter(p: number): string {
   if (!Number.isFinite(p)) return '—'
   if (p >= 90) return 'A'
@@ -57,7 +50,6 @@ function pctToLetter(p: number): string {
   if (p >= 60) return 'D'
   return 'F'
 }
-
 function fmt(n: number, digits = 2): string {
   if (!Number.isFinite(n)) return '—'
   return n.toLocaleString(undefined, {
@@ -65,7 +57,6 @@ function fmt(n: number, digits = 2): string {
     minimumFractionDigits: digits,
   })
 }
-
 /**
  * Grade Calculator
  * Dynamic assignment list — each row has an optional name, a grade (numeric
@@ -78,21 +69,17 @@ export default function GradeCalculator() {
     { id: 2, name: 'Midterm', gradeType: 'percent', letter: 'A', percent: '85', weight: '30' },
     { id: 3, name: 'Final', gradeType: 'percent', letter: 'A', percent: '88', weight: '50' },
   ])
-
   const add = () =>
     setAssignments((prev) => [
       ...prev,
       { id: nextId(), name: '', gradeType: 'percent', letter: 'A', percent: '90', weight: '10' },
     ])
-
   const remove = (id: number) =>
     setAssignments((prev) => prev.filter((a) => a.id !== id))
-
   const update = (id: number, patch: Partial<Assignment>) =>
     setAssignments((prev) =>
       prev.map((a) => (a.id === id ? { ...a, ...patch } : a)),
     )
-
   let totalWeight = 0
   let weightedSum = 0
   let validRows = 0
@@ -112,11 +99,9 @@ export default function GradeCalculator() {
       validRows++
     }
   }
-
   const finalGrade = totalWeight > 0 ? weightedSum / totalWeight : NaN
   const letter = pctToLetter(finalGrade)
   const weightMismatch = totalWeight > 0 && Math.abs(totalWeight - 100) > 0.01
-
   return (
     <div className="space-y-5">
       <Card>
@@ -223,7 +208,6 @@ export default function GradeCalculator() {
               ))}
             </div>
           </ScrollArea>
-
           {weightMismatch ? (
             <div className="flex flex-wrap items-center gap-2">
               <Badge
@@ -239,7 +223,6 @@ export default function GradeCalculator() {
           ) : null}
         </CardContent>
       </Card>
-
       <Card>
         <CardContent className="space-y-4 pt-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -258,7 +241,6 @@ export default function GradeCalculator() {
               {validRows > 0 ? letter : '—'}
             </Badge>
           </div>
-
           <div
             className="grid gap-3 sm:grid-cols-3"
             role="status"
@@ -276,7 +258,6 @@ export default function GradeCalculator() {
             />
             <Stat label="Letter" value={validRows > 0 ? letter : '—'} />
           </div>
-
           <p className="text-xs text-muted-foreground">
             Weighted average updates live. Letter cutoffs: A ≥ 90, B ≥ 80, C ≥ 70,
             D ≥ 60, F &lt; 60. Letter inputs map to A=95, B=85, C=75, D=65, F=50.

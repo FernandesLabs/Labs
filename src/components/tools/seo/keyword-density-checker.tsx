@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Textarea } from '@/components/ui/textarea'
 import {
@@ -21,7 +20,6 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 const STOPWORDS = new Set<string>([
   'the',
   'a',
@@ -79,13 +77,11 @@ const STOPWORDS = new Set<string>([
   'has',
   'had',
 ])
-
 interface TermRow {
   term: string
   count: number
   density: number
 }
-
 function tokenize(text: string): string[] {
   return text
     .toLowerCase()
@@ -93,7 +89,6 @@ function tokenize(text: string): string[] {
     .map((w) => w.trim())
     .filter((w) => w.length > 0)
 }
-
 function analyzeDensity(text: string): {
   totalWords: number
   uniqueTerms: number
@@ -126,12 +121,9 @@ function analyzeDensity(text: string): {
     rows: rows.slice(0, 20),
   }
 }
-
 export default function KeywordDensityChecker(): React.JSX.Element {
   const [text, setText] = React.useState('')
-
   const result = React.useMemo(() => analyzeDensity(text), [text])
-
   return (
     <div className="space-y-5">
       <Card>
@@ -159,7 +151,6 @@ export default function KeywordDensityChecker(): React.JSX.Element {
           </Field>
         </CardContent>
       </Card>
-
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         <Stat label="Total words" value={result.totalWords} />
         <Stat label="Unique terms" value={result.uniqueTerms} />
@@ -168,7 +159,6 @@ export default function KeywordDensityChecker(): React.JSX.Element {
           value={result.rows[0] ? result.rows[0].term : '—'}
         />
       </div>
-
       <div>
         <div className="mb-2 flex items-center justify-between">
           <h3 className="text-sm font-medium text-foreground">

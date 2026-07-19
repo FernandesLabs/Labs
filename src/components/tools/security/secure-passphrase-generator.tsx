@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { RefreshCw, Copy, Check, ShieldCheck } from 'lucide-react'
 import { toast } from 'sonner'
@@ -24,7 +23,6 @@ import {
 } from '@/components/ui/select'
 import { Field, Stat, randomInt } from '@/lib/tools/tool-ui'
 import { useCopy } from '@/lib/tools/use-copy'
-
 // A curated EFF-style word list (~150 common, easy-to-picture words).
 const WORD_LIST: string[] = [
   'apple', 'baker', 'camel', 'dance', 'eagle', 'flame', 'globe', 'heart',
@@ -50,12 +48,9 @@ const WORD_LIST: string[] = [
   'ibex', 'jay', 'koala', 'lynx', 'moose', 'narwhal', 'otter', 'panther',
   'quail', 'raccoon', 'salmon', 'trout', 'urial', 'vole', 'wallaby', 'yak',
 ]
-
 // De-duplicate while preserving order so entropy math stays accurate.
 const WORDS: string[] = Array.from(new Set(WORD_LIST))
-
 type Separator = 'hyphen' | 'space' | 'dot' | 'underscore' | 'none'
-
 const SEPARATORS: Record<Separator, string> = {
   hyphen: '-',
   space: ' ',
@@ -63,18 +58,15 @@ const SEPARATORS: Record<Separator, string> = {
   underscore: '_',
   none: '',
 }
-
 const APPEND_DIGITS = '0123456789'
 const APPEND_SYMBOLS = '!@#$%&*?'
 const SYMBOL_BITS = Math.log2(APPEND_SYMBOLS.length)
 const DIGIT_BITS = Math.log2(APPEND_DIGITS.length)
-
 type Grade = {
   level: 0 | 1 | 2 | 3 | 4
   label: string
   tone: string
 }
-
 function gradeForEntropy(bits: number): Grade {
   if (bits < 28) return { level: 0, label: 'Very Weak', tone: 'text-red-600' }
   if (bits < 36) return { level: 1, label: 'Weak', tone: 'text-orange-600' }
@@ -82,16 +74,13 @@ function gradeForEntropy(bits: number): Grade {
   if (bits < 128) return { level: 3, label: 'Strong', tone: 'text-emerald-600' }
   return { level: 4, label: 'Very Strong', tone: 'text-emerald-700' }
 }
-
 function pickWord(): string {
   return WORDS[randomInt(WORDS.length)]!
 }
-
 function capitalize(w: string): string {
   if (w.length === 0) return w
   return w.charAt(0).toUpperCase() + w.slice(1)
 }
-
 function generatePassphrase(opts: {
   count: number
   separator: Separator
@@ -115,7 +104,6 @@ function generatePassphrase(opts: {
   }
   return out
 }
-
 export default function SecurePassphraseGenerator() {
   const [count, setCount] = React.useState(4)
   const [separator, setSeparator] = React.useState<Separator>('hyphen')
@@ -124,13 +112,11 @@ export default function SecurePassphraseGenerator() {
   const [appendSymbol, setAppendSymbol] = React.useState(false)
   const [passphrase, setPassphrase] = React.useState('')
   const { copied, copy } = useCopy()
-
   const wordBits = Math.log2(WORDS.length) * count
   const extraBits =
     (appendNumber ? DIGIT_BITS : 0) + (appendSymbol ? SYMBOL_BITS : 0)
   const entropy = wordBits + extraBits
   const grade = gradeForEntropy(entropy)
-
   const regenerate = React.useCallback(() => {
     if (WORDS.length === 0) {
       toast.error('Word list unavailable')
@@ -146,7 +132,6 @@ export default function SecurePassphraseGenerator() {
       })
     )
   }, [count, separator, cap, appendNumber, appendSymbol])
-
   // Generate on mount and whenever options change.
   React.useEffect(() => {
     setPassphrase(
@@ -159,12 +144,10 @@ export default function SecurePassphraseGenerator() {
       })
     )
   }, [count, separator, cap, appendNumber, appendSymbol])
-
   const progressValue = Math.min(100, (entropy / 256) * 100)
   const wordCount = passphrase
     .split(SEPARATORS[separator] || ' ')
     .filter(Boolean).length
-
   return (
     <div className="space-y-5">
       <Card>
@@ -213,7 +196,6 @@ export default function SecurePassphraseGenerator() {
               {copied ? 'Copied' : 'Copy'}
             </Button>
           </div>
-
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
               <span className="font-medium">Strength</span>
@@ -230,7 +212,6 @@ export default function SecurePassphraseGenerator() {
           </div>
         </CardContent>
       </Card>
-
       <div className="grid gap-5 lg:grid-cols-2">
         <Card>
           <CardHeader>
@@ -253,7 +234,6 @@ export default function SecurePassphraseGenerator() {
                 aria-label="Word count"
               />
             </Field>
-
             <Field label="Separator" htmlFor="pp-sep">
               <Select
                 value={separator}
@@ -271,7 +251,6 @@ export default function SecurePassphraseGenerator() {
                 </SelectContent>
               </Select>
             </Field>
-
             <div className="flex items-center justify-between gap-3">
               <Label htmlFor="pp-cap" className="cursor-pointer">
                 Capitalize each word
@@ -282,7 +261,6 @@ export default function SecurePassphraseGenerator() {
                 onCheckedChange={setCap}
               />
             </div>
-
             <div className="flex items-center justify-between gap-3">
               <Label htmlFor="pp-num" className="cursor-pointer">
                 Append a number
@@ -293,7 +271,6 @@ export default function SecurePassphraseGenerator() {
                 onCheckedChange={setAppendNumber}
               />
             </div>
-
             <div className="flex items-center justify-between gap-3">
               <Label htmlFor="pp-sym" className="cursor-pointer">
                 Append a symbol
@@ -306,7 +283,6 @@ export default function SecurePassphraseGenerator() {
             </div>
           </CardContent>
         </Card>
-
         <Card>
           <CardHeader>
             <CardTitle>Entropy Breakdown</CardTitle>

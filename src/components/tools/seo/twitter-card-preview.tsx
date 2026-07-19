@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { ImageOff, Globe } from 'lucide-react'
 import { Input } from '@/components/ui/input'
@@ -20,9 +19,7 @@ import {
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { Field, ResultBox, Stat } from '@/lib/tools/tool-ui'
-
 type CardType = 'summary' | 'summary_large_image'
-
 interface CardState {
   cardType: CardType
   title: string
@@ -31,7 +28,6 @@ interface CardState {
   site: string
   creator: string
 }
-
 const DEFAULT: CardState = {
   cardType: 'summary_large_image',
   title: 'The Ultimate Guide to Sustainable Coffee',
@@ -41,7 +37,6 @@ const DEFAULT: CardState = {
   site: '@fernandeslabs',
   creator: '@fernandeslabs',
 }
-
 function esc(value: string): string {
   return value
     .replace(/&/g, '&amp;')
@@ -49,7 +44,6 @@ function esc(value: string): string {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
 }
-
 function metaTags(state: CardState): string {
   const lines: string[] = ['<!-- Twitter Card meta tags -->']
   lines.push(`<meta name="twitter:card" content="${state.cardType}" />`)
@@ -64,7 +58,6 @@ function metaTags(state: CardState): string {
   }
   return lines.join('\n')
 }
-
 function hostOf(url: string): string {
   if (!url) return 'example.com'
   try {
@@ -73,7 +66,6 @@ function hostOf(url: string): string {
     return url.trim() || 'example.com'
   }
 }
-
 function TwitterCard({
   state,
 }: {
@@ -83,10 +75,8 @@ function TwitterCard({
   React.useEffect(() => {
     setImgError(false)
   }, [state.image])
-
   const isLarge = state.cardType === 'summary_large_image'
   const hostname = hostOf(state.image || '')
-
   if (isLarge) {
     return (
       <div className="overflow-hidden rounded-2xl border border-border bg-background shadow-sm">
@@ -124,7 +114,6 @@ function TwitterCard({
       </div>
     )
   }
-
   // summary: square thumbnail on the left, text on the right
   return (
     <div className="flex overflow-hidden rounded-2xl border border-border bg-background shadow-sm">
@@ -160,16 +149,12 @@ function TwitterCard({
     </div>
   )
 }
-
 export default function TwitterCardPreview(): React.JSX.Element {
   const [state, setState] = React.useState<CardState>(DEFAULT)
-
   const update = <K extends keyof CardState>(key: K, value: string): void => {
     setState((prev) => ({ ...prev, [key]: value }))
   }
-
   const tags = React.useMemo(() => metaTags(state), [state])
-
   return (
     <div className="space-y-5">
       <Card>
@@ -198,7 +183,6 @@ export default function TwitterCardPreview(): React.JSX.Element {
               </SelectContent>
             </Select>
           </Field>
-
           <Field label="Title" htmlFor="tc-title" hint={`${state.title.length} chars`}>
             <Input
               id="tc-title"
@@ -207,7 +191,6 @@ export default function TwitterCardPreview(): React.JSX.Element {
               placeholder="The Ultimate Guide to Sustainable Coffee"
             />
           </Field>
-
           <Field
             label="Description"
             htmlFor="tc-desc"
@@ -221,7 +204,6 @@ export default function TwitterCardPreview(): React.JSX.Element {
               rows={3}
             />
           </Field>
-
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Image URL" htmlFor="tc-image">
               <Input
@@ -257,7 +239,6 @@ export default function TwitterCardPreview(): React.JSX.Element {
           </Field>
         </CardContent>
       </Card>
-
       <div>
         <h3 className="mb-2 text-sm font-medium text-foreground">
           Card preview
@@ -267,7 +248,6 @@ export default function TwitterCardPreview(): React.JSX.Element {
           <TwitterCard state={state} />
         </div>
       </div>
-
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat label="Card type" value={state.cardType === 'summary' ? 'summary' : 'large'} />
         <Stat label="Title length" value={state.title.length} />
@@ -278,7 +258,6 @@ export default function TwitterCardPreview(): React.JSX.Element {
           accent={state.image ? 'oklch(0.6 0.17 150)' : 'oklch(0.6 0.2 25)'}
         />
       </div>
-
       <ResultBox
         value={tags}
         label="Twitter meta tags"

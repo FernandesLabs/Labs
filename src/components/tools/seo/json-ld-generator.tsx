@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Plus, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -22,9 +21,7 @@ import {
 import { Separator } from '@/components/ui/separator'
 import { toast } from 'sonner'
 import { Field, ResultBox, randomInt } from '@/lib/tools/tool-ui'
-
 type SchemaType = 'Article' | 'Product' | 'FAQPage' | 'Organization' | 'BreadcrumbList'
-
 const SCHEMA_TYPES: SchemaType[] = [
   'Article',
   'Product',
@@ -32,23 +29,19 @@ const SCHEMA_TYPES: SchemaType[] = [
   'Organization',
   'BreadcrumbList',
 ]
-
 interface FaqPair {
   id: string
   question: string
   answer: string
 }
-
 interface BreadcrumbItem {
   id: string
   name: string
   url: string
 }
-
 function uid(prefix: string): string {
   return `${prefix}-${Date.now().toString(36)}-${randomInt(1_000_000).toString(36)}`
 }
-
 function buildArticle(input: {
   headline: string
   author: string
@@ -69,7 +62,6 @@ function buildArticle(input: {
   }
   return obj
 }
-
 function buildProduct(input: {
   name: string
   description: string
@@ -106,7 +98,6 @@ function buildProduct(input: {
   }
   return obj
 }
-
 function buildFaq(pairs: FaqPair[]): Record<string, unknown> {
   const valid = pairs.filter((p) => p.question.trim() && p.answer.trim())
   return {
@@ -119,7 +110,6 @@ function buildFaq(pairs: FaqPair[]): Record<string, unknown> {
     })),
   }
 }
-
 function buildOrganization(input: {
   name: string
   url: string
@@ -141,7 +131,6 @@ function buildOrganization(input: {
   }
   return obj
 }
-
 function buildBreadcrumb(items: BreadcrumbItem[]): Record<string, unknown> {
   const valid = items.filter((i) => i.name.trim() && i.url.trim())
   return {
@@ -155,17 +144,14 @@ function buildBreadcrumb(items: BreadcrumbItem[]): Record<string, unknown> {
     })),
   }
 }
-
 export default function JsonLdGenerator(): React.JSX.Element {
   const [type, setType] = React.useState<SchemaType>('Article')
-
   // Article
   const [artHeadline, setArtHeadline] = React.useState('')
   const [artAuthor, setArtAuthor] = React.useState('')
   const [artDate, setArtDate] = React.useState('')
   const [artImage, setArtImage] = React.useState('')
   const [artPublisher, setArtPublisher] = React.useState('')
-
   // Product
   const [pName, setPName] = React.useState('')
   const [pDesc, setPDesc] = React.useState('')
@@ -174,23 +160,19 @@ export default function JsonLdGenerator(): React.JSX.Element {
   const [pCurrency, setPCurrency] = React.useState('USD')
   const [pRating, setPRating] = React.useState('')
   const [pImage, setPImage] = React.useState('')
-
   // FAQ
   const [faqPairs, setFaqPairs] = React.useState<FaqPair[]>([
     { id: uid('q'), question: '', answer: '' },
   ])
-
   // Organization
   const [oName, setOName] = React.useState('')
   const [oUrl, setOUrl] = React.useState('')
   const [oLogo, setOLogo] = React.useState('')
   const [oSameAs, setOSameAs] = React.useState('')
-
   // Breadcrumb
   const [crumbs, setCrumbs] = React.useState<BreadcrumbItem[]>([
     { id: uid('b'), name: 'Home', url: '/' },
   ])
-
   const output = React.useMemo<string>(() => {
     let obj: Record<string, unknown> = {}
     switch (type) {
@@ -251,7 +233,6 @@ export default function JsonLdGenerator(): React.JSX.Element {
     oSameAs,
     crumbs,
   ])
-
   // FAQ handlers
   const addFaq = (): void => {
     setFaqPairs((prev) => [...prev, { id: uid('q'), question: '', answer: '' }])
@@ -264,7 +245,6 @@ export default function JsonLdGenerator(): React.JSX.Element {
   const removeFaq = (id: string): void => {
     setFaqPairs((prev) => prev.filter((p) => p.id !== id))
   }
-
   // Breadcrumb handlers
   const addCrumb = (): void => {
     setCrumbs((prev) => [...prev, { id: uid('b'), name: '', url: '' }])
@@ -277,7 +257,6 @@ export default function JsonLdGenerator(): React.JSX.Element {
   const removeCrumb = (id: string): void => {
     setCrumbs((prev) => prev.filter((c) => c.id !== id))
   }
-
   return (
     <div className="space-y-5">
       <Card>
@@ -303,9 +282,7 @@ export default function JsonLdGenerator(): React.JSX.Element {
               </SelectContent>
             </Select>
           </Field>
-
           <Separator />
-
           {type === 'Article' ? (
             <div className="space-y-3">
               <Field label="Headline" htmlFor="jl-art-h">
@@ -353,7 +330,6 @@ export default function JsonLdGenerator(): React.JSX.Element {
               </Field>
             </div>
           ) : null}
-
           {type === 'Product' ? (
             <div className="space-y-3">
               <Field label="Product name" htmlFor="jl-p-n">
@@ -421,7 +397,6 @@ export default function JsonLdGenerator(): React.JSX.Element {
               </div>
             </div>
           ) : null}
-
           {type === 'FAQPage' ? (
             <div className="space-y-3">
               {faqPairs.length === 0 ? (
@@ -474,7 +449,6 @@ export default function JsonLdGenerator(): React.JSX.Element {
               </Button>
             </div>
           ) : null}
-
           {type === 'Organization' ? (
             <div className="space-y-3">
               <Field label="Organization name" htmlFor="jl-o-n">
@@ -517,7 +491,6 @@ export default function JsonLdGenerator(): React.JSX.Element {
               </Field>
             </div>
           ) : null}
-
           {type === 'BreadcrumbList' ? (
             <div className="space-y-3">
               {crumbs.length === 0 ? (
@@ -577,7 +550,6 @@ export default function JsonLdGenerator(): React.JSX.Element {
               </Button>
             </div>
           ) : null}
-
           <div className="flex items-center gap-2">
             <Button
               type="button"
@@ -593,7 +565,6 @@ export default function JsonLdGenerator(): React.JSX.Element {
           </div>
         </CardContent>
       </Card>
-
       <ResultBox
         value={output}
         label="JSON-LD"

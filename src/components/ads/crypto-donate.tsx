@@ -1,10 +1,8 @@
 'use client'
-
 import * as React from 'react'
 import { Heart, Copy, Check, Bitcoin, Coins } from 'lucide-react'
 import { siteConfig, isCryptoConfigured } from '@/lib/site-config'
 import { useCopy } from '@/lib/tools/use-copy'
-
 /**
  * Crypto donation widget. Only renders when wallet addresses are configured
  * in site-config.ts. Shows a "Support us" button that expands to reveal
@@ -13,27 +11,22 @@ import { useCopy } from '@/lib/tools/use-copy'
 export function CryptoDonate() {
   const [open, setOpen] = React.useState(false)
   const { copied, copy } = useCopy()
-
   if (!isCryptoConfigured()) return null
-
   const wallets = Object.entries(siteConfig.crypto.wallets).filter(
     ([, addr]) => addr
   ) as [string, string][]
-
   const labels: Record<string, string> = {
     bitcoin: 'Bitcoin (BTC)',
     ethereum: 'Ethereum (ETH)',
     usdc_base: 'USDC (Base)',
     solana: 'Solana (SOL)',
   }
-
   const icons: Record<string, React.ReactNode> = {
     bitcoin: <Bitcoin className="size-4" />,
     ethereum: <Coins className="size-4" />,
     usdc_base: <Coins className="size-4" />,
     solana: <Coins className="size-4" />,
   }
-
   return (
     <div className="rounded-xl border border-border/60 bg-gradient-to-br from-muted/40 to-muted/10 p-4">
       <button
@@ -49,7 +42,6 @@ export function CryptoDonate() {
           {open ? 'Hide' : 'Donate crypto'}
         </span>
       </button>
-
       {open ? (
         <div className="mt-3 space-y-2">
           <p className="text-xs text-muted-foreground">

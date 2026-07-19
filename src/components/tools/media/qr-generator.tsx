@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { toCanvas as qrToCanvas } from 'qrcode'
 import { Download, QrCode } from 'lucide-react'
@@ -18,9 +17,7 @@ import {
 } from '@/components/ui/select'
 import { Card, CardContent } from '@/components/ui/card'
 import { Field, downloadBlob } from '@/lib/tools/tool-ui'
-
 type ECLevel = 'L' | 'M' | 'Q' | 'H'
-
 export default function QrGenerator() {
   const [text, setText] = React.useState('https://fernandeslabs.com')
   const [size, setSize] = React.useState(320)
@@ -29,7 +26,6 @@ export default function QrGenerator() {
   const [bg, setBg] = React.useState('#ffffff')
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null)
   const [ready, setReady] = React.useState(false)
-
   const generate = React.useCallback(async () => {
     if (!text.trim()) {
       setReady(false)
@@ -57,11 +53,9 @@ export default function QrGenerator() {
       setReady(false)
     }
   }, [text, size, ecLevel, fg, bg])
-
   React.useEffect(() => {
     void generate()
   }, [generate])
-
   const handleDownload = () => {
     const canvas = canvasRef.current
     if (!canvas || !ready) {
@@ -77,7 +71,6 @@ export default function QrGenerator() {
       toast.success('QR code downloaded')
     }, 'image/png')
   }
-
   return (
     <div className="space-y-5">
       <Field label="Text or URL" htmlFor="qr-text">
@@ -89,7 +82,6 @@ export default function QrGenerator() {
           rows={3}
         />
       </Field>
-
       <div className="grid gap-5 md:grid-cols-2">
         <Field
           label="Size"
@@ -105,7 +97,6 @@ export default function QrGenerator() {
             onValueChange={(v) => setSize(v[0] ?? size)}
           />
         </Field>
-
         <Field label="Error correction" htmlFor="qr-ec">
           <Select value={ecLevel} onValueChange={(v) => setEcLevel(v as ECLevel)}>
             <SelectTrigger id="qr-ec" className="w-full">
@@ -120,7 +111,6 @@ export default function QrGenerator() {
           </Select>
         </Field>
       </div>
-
       <div className="grid gap-5 sm:grid-cols-2">
         <Field label="Foreground" htmlFor="qr-fg">
           <div className="flex items-center gap-3">
@@ -140,7 +130,6 @@ export default function QrGenerator() {
             />
           </div>
         </Field>
-
         <Field label="Background" htmlFor="qr-bg">
           <div className="flex items-center gap-3">
             <input
@@ -160,7 +149,6 @@ export default function QrGenerator() {
           </div>
         </Field>
       </div>
-
       <Card>
         <CardContent className="flex flex-col items-center gap-4 pt-6">
           <div className="flex size-full min-h-[200px] items-center justify-center rounded-lg border border-border bg-muted/30 p-4">

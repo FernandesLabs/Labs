@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { PDFDocument } from 'pdf-lib'
 import { toast } from 'sonner'
@@ -25,14 +24,12 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Slider } from '@/components/ui/slider'
 import { Field, Stat, downloadBlob } from '@/lib/tools/tool-ui'
-
 interface PageSize {
   index: number
   widthPt: number
   heightPt: number
   rotation: number
 }
-
 interface ReportData {
   fileName: string
   fileSize: number
@@ -49,7 +46,6 @@ interface ReportData {
     modificationDate: string | null
   }
 }
-
 function formatBytes(b: number): string {
   if (!Number.isFinite(b) || b < 0) return '—'
   if (b === 0) return '0 B'
@@ -57,19 +53,15 @@ function formatBytes(b: number): string {
   if (b < 1024 * 1024) return `${(b / 1024).toFixed(1)} KB`
   return `${(b / 1024 / 1024).toFixed(2)} MB`
 }
-
 function ptToMm(pt: number): number {
   return (pt * 25.4) / 72
 }
-
 function ptToIn(pt: number): number {
   return pt / 72
 }
-
 function baseName(name: string): string {
   return name.replace(/\.[^.]+$/, '') || 'document'
 }
-
 export default function PdfToImages() {
   const [file, setFile] = React.useState<File | null>(null)
   const [report, setReport] = React.useState<ReportData | null>(null)
@@ -79,7 +71,6 @@ export default function PdfToImages() {
   const [scale, setScale] = React.useState(1.5)
   const inputRef = React.useRef<HTMLInputElement | null>(null)
   const pdfBytesRef = React.useRef<ArrayBuffer | null>(null)
-
   const loadFile = async (f: File): Promise<void> => {
     setLoading(true)
     setReport(null)
@@ -133,7 +124,6 @@ export default function PdfToImages() {
       setLoading(false)
     }
   }
-
   const renderImages = async (): Promise<void> => {
     if (!pdfBytesRef.current || !report) return
     if (report.pageCount > 50) {
@@ -150,7 +140,6 @@ export default function PdfToImages() {
       // Use the locally-bundled worker (copied to /public) for offline reliability.
       // The worker version must match the pdfjs-dist package version.
       pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs'
-
       const loadingTask = pdfjs.getDocument({
         data: pdfBytesRef.current.slice(0),
       })
@@ -184,13 +173,11 @@ export default function PdfToImages() {
       setRendering(false)
     }
   }
-
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const f = e.target.files?.[0]
     if (f) void loadFile(f)
     e.target.value = ''
   }
-
   const downloadReport = (): void => {
     if (!report) {
       toast.error('Load a PDF first')
@@ -203,7 +190,6 @@ export default function PdfToImages() {
     )
     toast.success('Structure report downloaded')
   }
-
   const downloadImage = (dataUrl: string, index: number): void => {
     const base = report ? baseName(report.fileName) : 'page'
     fetch(dataUrl)
@@ -213,7 +199,6 @@ export default function PdfToImages() {
         toast.success(`Downloaded page ${index + 1}`)
       })
   }
-
   return (
     <div className="space-y-5">
       <Field label="Source PDF">
@@ -257,7 +242,6 @@ export default function PdfToImages() {
           </p>
         </div>
       </Field>
-
       {report ? (
         <>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -278,7 +262,6 @@ export default function PdfToImages() {
               }
             />
           </div>
-
           <Tabs defaultValue="render">
             <TabsList>
               <TabsTrigger value="render">
@@ -290,7 +273,6 @@ export default function PdfToImages() {
                 Inspect structure
               </TabsTrigger>
             </TabsList>
-
             <TabsContent value="render" className="space-y-4">
               <Alert>
                 <ImageIcon className="size-4" />
@@ -301,7 +283,6 @@ export default function PdfToImages() {
                   larger files. Max 50 pages.
                 </AlertDescription>
               </Alert>
-
               <Field
                 label="Render scale"
                 hint={`${scale.toFixed(1)}× (${Math.round(
@@ -333,7 +314,6 @@ export default function PdfToImages() {
                   </Button>
                 </div>
               </Field>
-
               {images.length > 0 ? (
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
                   {images.map((dataUrl, i) => (
@@ -364,7 +344,6 @@ export default function PdfToImages() {
                 </div>
               ) : null}
             </TabsContent>
-
             <TabsContent value="inspect" className="space-y-4">
               <Card>
                 <CardHeader>
@@ -417,7 +396,6 @@ export default function PdfToImages() {
                   </ScrollArea>
                 </CardContent>
               </Card>
-
               <Card>
                 <CardHeader>
                   <CardTitle className="text-base">Metadata</CardTitle>
@@ -470,7 +448,6 @@ export default function PdfToImages() {
                   </dl>
                 </CardContent>
               </Card>
-
               <Button
                 type="button"
                 variant="outline"

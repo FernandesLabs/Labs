@@ -1,22 +1,18 @@
 'use client'
-
 import * as React from 'react'
 import { ExternalLink, Sparkles } from 'lucide-react'
 import { siteConfig } from '@/lib/site-config'
 import type { ToolCategory } from '@/lib/tools/types'
-
 /**
  * Contextual affiliate recommendations per tool category.
  * Only shows when affiliate links are configured in site-config.ts.
  * These earn commission when users click through and sign up.
  */
-
 interface AffiliateRec {
   name: string
   description: string
   url: string | null
 }
-
 const CATEGORY_AFFILIATES: Record<ToolCategory, AffiliateRec[]> = {
   developer: [
     {
@@ -78,13 +74,10 @@ const CATEGORY_AFFILIATES: Record<ToolCategory, AffiliateRec[]> = {
   ],
   misc: [],
 }
-
 export function AffiliateLinks({ category }: { category: ToolCategory }) {
   if (!siteConfig.affiliate.enabled) return null
-
   const recs = (CATEGORY_AFFILIATES[category] || []).filter((r) => r.url)
   if (recs.length === 0) return null
-
   return (
     <div className="mt-6 rounded-xl border border-border/60 bg-muted/20 p-4">
       <div className="mb-2 flex items-center gap-2">

@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { PDFDocument } from 'pdf-lib'
 import { toast } from 'sonner'
@@ -23,46 +22,38 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Field, Stat, downloadBlob } from '@/lib/tools/tool-ui'
-
 interface PdfItem {
   id: string
   file: File
   pageCount: number
   status: 'pending' | 'loaded' | 'error'
 }
-
 function formatBytes(b: number): string {
   if (!Number.isFinite(b) || b < 0) return '—'
   if (b < 1024) return `${b} B`
   if (b < 1024 * 1024) return `${(b / 1024).toFixed(1)} KB`
   return `${(b / 1024 / 1024).toFixed(2)} MB`
 }
-
 function uid(): string {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
     return crypto.randomUUID()
   }
   return `pdf-${Date.now()}-${Math.floor(performance.now() * 1000)}`
 }
-
 export default function MergePdfs() {
   const [items, setItems] = React.useState<PdfItem[]>([])
   const [merging, setMerging] = React.useState(false)
   const inputRef = React.useRef<HTMLInputElement | null>(null)
-
   const addFiles = async (fileList: FileList | null): Promise<void> => {
     if (!fileList || fileList.length === 0) return
     const incoming: PdfItem[] = Array.from(fileList)
       .filter((f) => f.type === 'application/pdf' || /\.pdf$/i.test(f.name))
       .map((f) => ({ id: uid(), file: f, pageCount: 0, status: 'pending' as const }))
-
     if (incoming.length === 0) {
       toast.error('Please choose PDF files')
       return
     }
-
     setItems((prev) => [...prev, ...incoming])
-
     // Load page counts asynchronously so the UI stays responsive.
     for (const item of incoming) {
       try {
@@ -85,11 +76,9 @@ export default function MergePdfs() {
       }
     }
   }
-
   const removeItem = (id: string): void => {
     setItems((prev) => prev.filter((p) => p.id !== id))
   }
-
   const move = (id: string, dir: -1 | 1): void => {
     setItems((prev) => {
       const idx = prev.findIndex((p) => p.id === id)
@@ -102,12 +91,9 @@ export default function MergePdfs() {
       return copy
     })
   }
-
   const clearAll = (): void => setItems([])
-
   const readyItems = items.filter((p) => p.status === 'loaded')
   const totalPages = readyItems.reduce((sum, p) => sum + p.pageCount, 0)
-
   const merge = async (): Promise<void> => {
     if (readyItems.length === 0) {
       toast.error('Add at least one valid PDF to merge')
@@ -135,7 +121,6 @@ export default function MergePdfs() {
       setMerging(false)
     }
   }
-
   return (
     <div className="space-y-5">
       <Field label="Source PDFs">
@@ -171,7 +156,6 @@ export default function MergePdfs() {
           </p>
         </div>
       </Field>
-
       {items.length > 0 ? (
         <Card>
           <CardHeader>
@@ -257,7 +241,6 @@ export default function MergePdfs() {
           </CardContent>
         </Card>
       ) : null}
-
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         <Stat label="Files" value={items.length} />
         <Stat
@@ -267,7 +250,6 @@ export default function MergePdfs() {
         />
         <Stat label="Total pages" value={totalPages} />
       </div>
-
       <Button
         type="button"
         onClick={() => void merge()}
@@ -281,7 +263,6 @@ export default function MergePdfs() {
         )}
         {merging ? 'Merging…' : 'Merge PDFs'}
       </Button>
-
       <p className="text-xs text-muted-foreground">
         <Badge variant="outline" className="mr-2">client-side</Badge>
         Files are read with <code className="font-mono">pdf-lib</code> in your

@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Code, PenTool, BarChart3, Wand2 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
@@ -22,10 +21,8 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Field, ResultBox } from '@/lib/tools/tool-ui'
-
 type Tone = 'professional' | 'casual' | 'friendly' | 'authoritative'
 type OutputFormat = 'text' | 'markdown' | 'json' | 'table' | 'bullet-list'
-
 interface FormState {
   role: string
   task: string
@@ -34,14 +31,12 @@ interface FormState {
   outputFormat: OutputFormat
   language: string
 }
-
 const TONE_DESCRIPTIONS: Record<Tone, string> = {
   professional: 'Polished, neutral, third-person where appropriate.',
   casual: 'Conversational, first-person, contractions welcome.',
   friendly: 'Warm and approachable, encouraging.',
   authoritative: 'Direct, confident, decisive — minimal hedging.',
 }
-
 const FORMAT_DESCRIPTIONS: Record<OutputFormat, string> = {
   text: 'Plain prose paragraphs.',
   markdown: 'Markdown with appropriate headings and emphasis.',
@@ -49,7 +44,6 @@ const FORMAT_DESCRIPTIONS: Record<OutputFormat, string> = {
   table: 'Markdown table with headers.',
   'bullet-list': 'Concise bulleted list, one item per line.',
 }
-
 const PRESETS: {
   id: string
   label: string
@@ -110,24 +104,18 @@ const PRESETS: {
     },
   },
 ]
-
 const DEFAULT_STATE: FormState = PRESETS[0].state
-
 function buildPrompt(s: FormState): string {
   const parts: string[] = []
-
   if (s.role.trim()) {
     parts.push(`# Role\nYou are ${s.role.trim()}.`)
   }
-
   if (s.task.trim()) {
     parts.push(`# Task\n${s.task.trim()}`)
   }
-
   if (s.tone) {
     parts.push(`# Tone\nAdopt a ${s.tone} tone. ${TONE_DESCRIPTIONS[s.tone]}`)
   }
-
   const constraints = s.constraints
     .split('\n')
     .map((l) => l.trim())
@@ -137,43 +125,33 @@ function buildPrompt(s: FormState): string {
       `# Constraints\n${constraints.map((c) => `- ${c}`).join('\n')}`
     )
   }
-
   if (s.outputFormat) {
     parts.push(
       `# Output format\nRespond in ${s.outputFormat}. ${FORMAT_DESCRIPTIONS[s.outputFormat]}`
     )
   }
-
   if (s.language.trim()) {
     parts.push(`# Language\nRespond in ${s.language.trim()}.`)
   }
-
   parts.push(
     `# Behaviour\n- If the request is ambiguous, ask one clarifying question before proceeding.\n- If you do not know, say so explicitly rather than guessing.`
   )
-
   return parts.join('\n\n')
 }
-
 export default function SystemPromptGenerator() {
   const [state, setState] = React.useState<FormState>(DEFAULT_STATE)
-
   const update = <K extends keyof FormState>(key: K, value: FormState[K]): void => {
     setState((prev) => ({ ...prev, [key]: value }))
   }
-
   const output = React.useMemo(() => buildPrompt(state), [state])
-
   const applyPreset = (id: string): void => {
     const preset = PRESETS.find((p) => p.id === id)
     if (preset) setState(preset.state)
   }
-
   const constraintCount = state.constraints
     .split('\n')
     .map((l) => l.trim())
     .filter((l) => l.length > 0).length
-
   return (
     <div className="space-y-5">
       <Card>
@@ -220,7 +198,6 @@ export default function SystemPromptGenerator() {
           </div>
         </CardContent>
       </Card>
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Inputs</CardTitle>
@@ -234,7 +211,6 @@ export default function SystemPromptGenerator() {
               placeholder="a senior copywriter specialised in B2B SaaS"
             />
           </Field>
-
           <Field
             label="Task description"
             htmlFor="sp-task"
@@ -248,7 +224,6 @@ export default function SystemPromptGenerator() {
               rows={4}
             />
           </Field>
-
           <div className="grid gap-4 sm:grid-cols-2">
             <Field
               label="Tone"
@@ -270,7 +245,6 @@ export default function SystemPromptGenerator() {
                 </SelectContent>
               </Select>
             </Field>
-
             <Field
               label="Output format"
               htmlFor="sp-format"
@@ -293,7 +267,6 @@ export default function SystemPromptGenerator() {
               </Select>
             </Field>
           </div>
-
           <Field
             label="Constraints"
             htmlFor="sp-constraints"
@@ -307,7 +280,6 @@ export default function SystemPromptGenerator() {
               rows={4}
             />
           </Field>
-
           <Field
             label="Language"
             htmlFor="sp-language"
@@ -322,16 +294,13 @@ export default function SystemPromptGenerator() {
           </Field>
         </CardContent>
       </Card>
-
       <div className="flex flex-wrap items-center gap-2" role="status" aria-live="polite">
         <Badge variant="outline">Tone: {state.tone}</Badge>
         <Badge variant="outline">Format: {state.outputFormat}</Badge>
         <Badge variant="outline">{constraintCount} constraints</Badge>
         <Badge variant="outline">{output.length} chars</Badge>
       </div>
-
       <Separator />
-
       <ResultBox
         value={output}
         label="Generated system prompt"

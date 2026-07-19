@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Plus, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -8,15 +7,12 @@ import { Label } from '@/components/ui/label'
 import { Slider } from '@/components/ui/slider'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Field, ResultBox } from '@/lib/tools/tool-ui'
-
 type GradientType = 'linear' | 'radial'
-
 interface Stop {
   id: string
   color: string
   position: number
 }
-
 function newStopId(): string {
   // Use crypto.randomUUID if available, fallback otherwise (no Math.random)
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
@@ -26,11 +22,9 @@ function newStopId(): string {
   crypto.getRandomValues(arr)
   return Array.from(arr, (b) => b.toString(16).padStart(2, '0')).join('')
 }
-
 function clamp(n: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, n))
 }
-
 function buildCss(
   type: GradientType,
   angle: number,
@@ -45,7 +39,6 @@ function buildCss(
   }
   return `radial-gradient(circle at center, ${stopsStr})`
 }
-
 export default function CssGradientGenerator() {
   const [type, setType] = React.useState<GradientType>('linear')
   const [angle, setAngle] = React.useState(135)
@@ -53,12 +46,10 @@ export default function CssGradientGenerator() {
     { id: newStopId(), color: '#7c3aed', position: 0 },
     { id: newStopId(), color: '#ec4899', position: 100 },
   ])
-
   const css = React.useMemo(
     () => buildCss(type, angle, stops),
     [type, angle, stops]
   )
-
   const addStop = () => {
     const lastPos = stops[stops.length - 1]?.position ?? 50
     const newPos = clamp(lastPos - 25, 0, 100)
@@ -67,20 +58,17 @@ export default function CssGradientGenerator() {
       { id: newStopId(), color: '#10b981', position: newPos },
     ])
   }
-
   const removeStop = (id: string) => {
     setStops((prev) => {
       if (prev.length <= 2) return prev
       return prev.filter((s) => s.id !== id)
     })
   }
-
   const updateStop = (id: string, patch: Partial<Stop>) => {
     setStops((prev) =>
       prev.map((s) => (s.id === id ? { ...s, ...patch } : s))
     )
   }
-
   return (
     <div className="space-y-5">
       <Tabs
@@ -91,7 +79,6 @@ export default function CssGradientGenerator() {
           <TabsTrigger value="linear">Linear</TabsTrigger>
           <TabsTrigger value="radial">Radial</TabsTrigger>
         </TabsList>
-
         <TabsContent value="linear" className="pt-4">
           <Field label="Angle" htmlFor="cg-angle" hint={`${angle}°`}>
             <Slider
@@ -110,7 +97,6 @@ export default function CssGradientGenerator() {
           </p>
         </TabsContent>
       </Tabs>
-
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <Label className="text-sm font-medium">Color stops</Label>
@@ -124,7 +110,6 @@ export default function CssGradientGenerator() {
             Add stop
           </Button>
         </div>
-
         <div className="space-y-3">
           {stops.map((stop, idx) => (
             <div
@@ -198,7 +183,6 @@ export default function CssGradientGenerator() {
           ))}
         </div>
       </div>
-
       <div>
         <Label className="mb-2 block text-sm font-medium">Preview</Label>
         <div
@@ -208,7 +192,6 @@ export default function CssGradientGenerator() {
           aria-label="Gradient preview"
         />
       </div>
-
       <ResultBox
         label="CSS"
         value={`background: ${css};`}

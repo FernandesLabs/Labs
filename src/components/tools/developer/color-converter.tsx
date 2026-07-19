@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { toast } from 'sonner'
 import { Check, Copy } from 'lucide-react'
@@ -7,10 +6,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Field } from '@/lib/tools/tool-ui'
 import { useCopy } from '@/lib/tools/use-copy'
-
 type RGB = { r: number; g: number; b: number }
 type HSL = { h: number; s: number; l: number }
-
 function hexToRgb(hex: string): RGB | null {
   let h = hex.trim().replace(/^#/, '')
   if (/^[0-9a-fA-F]{3}$/.test(h)) {
@@ -23,12 +20,10 @@ function hexToRgb(hex: string): RGB | null {
   const num = parseInt(h, 16)
   return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 }
 }
-
 function rgbToHex({ r, g, b }: RGB): string {
   const to2 = (x: number) => x.toString(16).padStart(2, '0')
   return `#${to2(r)}${to2(g)}${to2(b)}`.toUpperCase()
 }
-
 function rgbToHsl({ r, g, b }: RGB): HSL {
   const rn = r / 255
   const gn = g / 255
@@ -60,11 +55,9 @@ function rgbToHsl({ r, g, b }: RGB): HSL {
     l: Math.round(l * 100),
   }
 }
-
 function clampByte(n: number): number {
   return Math.max(0, Math.min(255, Math.round(n)))
 }
-
 function parseRgb(text: string): RGB | null {
   const m = text.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i)
   if (!m) return null
@@ -73,7 +66,6 @@ function parseRgb(text: string): RGB | null {
   const b = clampByte(Number(m[3]))
   return { r, g, b }
 }
-
 function CopyRow({ label, value }: { label: string; value: string }) {
   const { copied, copy } = useCopy()
   const has = value.length > 0
@@ -100,22 +92,17 @@ function CopyRow({ label, value }: { label: string; value: string }) {
     </div>
   )
 }
-
 export default function ColorConverter() {
   const [hex, setHex] = React.useState<string>('#0EA5E9')
-
   const rgb = React.useMemo<RGB | null>(() => hexToRgb(hex), [hex])
   const hsl = React.useMemo<HSL | null>(() => (rgb ? rgbToHsl(rgb) : null), [rgb])
-
   const pickerValue = React.useMemo<string>(() => {
     if (rgb) return rgbToHex(rgb).toLowerCase()
     return '#000000'
   }, [rgb])
-
   const handleHexChange = (v: string) => {
     setHex(v)
   }
-
   const handleHexBlur = () => {
     if (hex.trim() && !hexToRgb(hex)) {
       toast.error('Invalid hex color', {
@@ -123,7 +110,6 @@ export default function ColorConverter() {
       })
     }
   }
-
   const handleRgbInput = (v: string) => {
     const parsed = parseRgb(v)
     if (parsed) {
@@ -132,11 +118,9 @@ export default function ColorConverter() {
       setHex('')
     }
   }
-
   const hexOut = rgb ? rgbToHex(rgb) : ''
   const rgbOut = rgb ? `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})` : ''
   const hslOut = hsl ? `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)` : ''
-
   return (
     <div className="space-y-5">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
@@ -150,7 +134,6 @@ export default function ColorConverter() {
             aria-label="Pick a color"
           />
         </Field>
-
         <Field label="Hex" htmlFor="hex-input" className="flex-1">
           <Input
             id="hex-input"
@@ -161,7 +144,6 @@ export default function ColorConverter() {
             className="font-mono"
           />
         </Field>
-
         <div
           className="h-10 w-full rounded-md border border-border shadow-inner sm:w-32"
           style={{ backgroundColor: hexOut || 'transparent' }}
@@ -169,7 +151,6 @@ export default function ColorConverter() {
           aria-label={`Live color preview ${hexOut || 'empty'}`}
         />
       </div>
-
       <Field label="Or enter RGB" htmlFor="rgb-input" hint="rgb(r, g, b)">
         <Input
           id="rgb-input"
@@ -178,14 +159,12 @@ export default function ColorConverter() {
           className="font-mono"
         />
       </Field>
-
       <div className="space-y-2">
         <Label className="text-sm font-medium text-foreground">Conversions</Label>
         <CopyRow label="HEX" value={hexOut} />
         <CopyRow label="RGB" value={rgbOut} />
         <CopyRow label="HSL" value={hslOut} />
       </div>
-
       {rgb && hsl ? (
         <div className="grid grid-cols-3 gap-2 text-center">
           <div className="rounded-lg border border-border bg-card p-2">

@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Eraser, FileCode2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -8,35 +7,29 @@ import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { Field, ResultBox, Stat } from '@/lib/tools/tool-ui'
 import { toast } from 'sonner'
-
 // ---------------------------------------------------------------------------
 // Tokenizer — split CSS into opaque chunks so we never mutate string/url
 // content. Quoted strings and url() bodies are preserved verbatim.
 // ---------------------------------------------------------------------------
-
 type CssToken =
   | { type: 'comment'; value: string }
   | { type: 'string'; value: string }
   | { type: 'url'; inner: string }
   | { type: 'raw'; value: string }
-
 function tokenizeCss(input: string): CssToken[] {
   const tokens: CssToken[] = []
   const n = input.length
   let i = 0
   let buf = ''
-
   const flush = () => {
     if (buf.length > 0) {
       tokens.push({ type: 'raw', value: buf })
       buf = ''
     }
   }
-
   while (i < n) {
     const ch = input[i]
     const next = input[i + 1]
-
     // Block comment /* ... */
     if (ch === '/' && next === '*') {
       flush()
@@ -47,7 +40,6 @@ function tokenizeCss(input: string): CssToken[] {
       i = j
       continue
     }
-
     // Quoted string ("..." or '...')
     if (ch === '"' || ch === "'") {
       flush()
@@ -73,7 +65,6 @@ function tokenizeCss(input: string): CssToken[] {
       i = j
       continue
     }
-
     // url( ... ) — preserve content verbatim, but tolerate quoted ")" inside.
     if ((ch === 'u' || ch === 'U') && input.slice(i, i + 4).toLowerCase() === 'url(') {
       flush()
@@ -108,28 +99,22 @@ function tokenizeCss(input: string): CssToken[] {
       i = j < n ? j + 1 : n
       continue
     }
-
     buf += ch
     i++
   }
-
   flush()
   return tokens
 }
-
 // ---------------------------------------------------------------------------
 // Minifier
 // ---------------------------------------------------------------------------
-
 type CssOptions = {
   removeComments: boolean
   collapseWhitespace: boolean
   removeLastSemicolons: boolean
 }
-
 function minifyCss(input: string, opts: CssOptions): string {
   if (!input.trim()) return ''
-
   // Pass 1 — drop comments (if option) and normalise url() bodies, while
   // preserving strings and url() content verbatim. Comments removed here mean
   // adjacent raw runs (e.g. `body /* c */ .cls`) get joined back together so
@@ -144,7 +129,6 @@ function minifyCss(input: string, opts: CssOptions): string {
     }
     intermediate += tok.value
   }
-
   // Pass 2 — re-tokenise so whitespace minification only touches raw segments.
   const pass2 = tokenizeCss(intermediate)
   let result = ''
@@ -170,11 +154,9 @@ function minifyCss(input: string, opts: CssOptions): string {
     }
     result += v
   }
-
   if (opts.removeLastSemicolons) {
     result = result.replace(/;\s*\}/g, '}')
   }
-
   // Remove empty rules — selector followed by an empty block. Iterate until
   // stable so empty @media / nested blocks collapse too.
   let prev: string
@@ -182,12 +164,9 @@ function minifyCss(input: string, opts: CssOptions): string {
     prev = result
     result = result.replace(/[^{}]+\{\s*\}/g, '')
   } while (result !== prev)
-
   return result.trim()
 }
-
 // ---------------------------------------------------------------------------
-
 const SAMPLE = `/* Fernandes Labs — button component */
 .btn {
   /* Primary action button */
@@ -201,31 +180,25 @@ const SAMPLE = `/* Fernandes Labs — button component */
   border-radius: 0.375rem;
   transition: color 0.15s ease, background 0.15s ease;
 }
-
 .btn:hover {
   background: url('/assets/btn-bg-hover.png');
   color: #f5f5f5;
 }
-
 /* Empty rule — will be dropped */
 .empty-rule {
 }
-
 @media (min-width: 768px) {
   .btn { padding: 0.75rem 1.5rem; }
 }`
-
 export default function CssMinifier() {
   const [input, setInput] = React.useState('')
   const [removeComments, setRemoveComments] = React.useState(true)
   const [collapseWhitespace, setCollapseWhitespace] = React.useState(true)
   const [removeLastSemicolons, setRemoveLastSemicolons] = React.useState(true)
-
   const output = React.useMemo(
     () => minifyCss(input, { removeComments, collapseWhitespace, removeLastSemicolons }),
     [input, removeComments, collapseWhitespace, removeLastSemicolons],
   )
-
   const stats = React.useMemo(() => {
     const inBytes = new Blob([input]).size
     const outBytes = new Blob([output]).size
@@ -233,17 +206,14 @@ export default function CssMinifier() {
     const pct = inBytes > 0 ? Math.round((1 - outBytes / inBytes) * 100) : 0
     return { inBytes, outBytes, saved, pct }
   }, [input, output])
-
   const handleLoadSample = () => {
     setInput(SAMPLE)
     toast.success('Sample CSS loaded')
   }
-
   const handleClear = () => {
     setInput('')
     toast.success('Input cleared')
   }
-
   return (
     <div className="space-y-5">
       <Field label="CSS input" htmlFor="css-input" hint={`${stats.inBytes} bytes`}>
@@ -257,7 +227,6 @@ export default function CssMinifier() {
           placeholder="Paste your CSS here…"
         />
       </Field>
-
       <div
         className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-lg border border-border bg-card p-4"
         role="group"
@@ -294,7 +263,6 @@ export default function CssMinifier() {
           </Label>
         </div>
       </div>
-
       <div className="flex flex-wrap items-center gap-2">
         <Button variant="outline" size="sm" onClick={handleLoadSample}>
           <FileCode2 className="size-4" />
@@ -305,7 +273,6 @@ export default function CssMinifier() {
           Clear
         </Button>
       </div>
-
       <div
         className="grid grid-cols-2 gap-3 sm:grid-cols-4"
         role="status"
@@ -324,7 +291,6 @@ export default function CssMinifier() {
           accent={stats.pct > 0 ? '#16a34a' : undefined}
         />
       </div>
-
       <ResultBox
         value={output}
         label="Minified CSS"

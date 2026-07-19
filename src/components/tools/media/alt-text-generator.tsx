@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Info, CheckCircle2, AlertCircle } from 'lucide-react'
 import { Input } from '@/components/ui/input'
@@ -22,39 +21,30 @@ import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Field, ResultBox } from '@/lib/tools/tool-ui'
 import { useCopy } from '@/lib/tools/use-copy'
-
 type Context = 'decorative' | 'button' | 'link' | 'content' | 'photo'
 type Tone = 'concise' | 'detailed'
-
 interface AltState {
   description: string
   context: Context
   tone: Tone
   linkTarget: string
 }
-
 function escAttr(value: string): string {
   return value.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
-
 function capitalize(s: string): string {
   if (!s) return s
   return s.charAt(0).toUpperCase() + s.slice(1)
 }
-
 function buildVariants(state: AltState): string[] {
   const desc = state.description.trim()
   const ctx = state.context
   const tone = state.tone
-
   if (ctx === 'decorative') {
     return ['', '', '']
   }
-
   if (!desc) return ['', '', '']
-
   const variants: string[] = []
-
   switch (ctx) {
     case 'button': {
       variants.push(`Icon: ${desc}`)
@@ -104,14 +94,11 @@ function buildVariants(state: AltState): string[] {
       break
     }
   }
-
   return variants.slice(0, 3)
 }
-
 function htmlSnippet(alt: string): string {
   return `<img src="image.jpg" alt="${escAttr(alt)}" />`
 }
-
 const CONTEXT_HINTS: Record<Context, string> = {
   decorative: 'Hidden from screen readers — use empty alt="" for purely decorative images.',
   button: 'Conveys the action of an icon-only button.',
@@ -119,7 +106,6 @@ const CONTEXT_HINTS: Record<Context, string> = {
   content: 'Informative image embedded in page content.',
   photo: 'Photograph — describe what is shown.',
 }
-
 export default function AltTextGenerator(): React.JSX.Element {
   const { copy } = useCopy()
   const [state, setState] = React.useState<AltState>({
@@ -128,17 +114,14 @@ export default function AltTextGenerator(): React.JSX.Element {
     tone: 'concise',
     linkTarget: 'the gallery page',
   })
-
   const update = <K extends keyof AltState>(key: K, value: AltState[K]): void => {
     setState((prev) => ({ ...prev, [key]: value }))
   }
-
   const variants = React.useMemo(() => buildVariants(state), [state])
   const snippet = React.useMemo(() => {
     const primary = variants.find((v) => v !== '') ?? ''
     return htmlSnippet(primary)
   }, [variants])
-
   return (
     <div className="space-y-5">
       <Card>
@@ -165,7 +148,6 @@ export default function AltTextGenerator(): React.JSX.Element {
               rows={3}
             />
           </Field>
-
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Context" htmlFor="at-ctx" hint={CONTEXT_HINTS[state.context]}>
               <Select
@@ -199,7 +181,6 @@ export default function AltTextGenerator(): React.JSX.Element {
               </Select>
             </Field>
           </div>
-
           {state.context === 'link' ? (
             <Field label="Link target" htmlFor="at-link">
               <Input
@@ -212,7 +193,6 @@ export default function AltTextGenerator(): React.JSX.Element {
           ) : null}
         </CardContent>
       </Card>
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Suggested alt text</CardTitle>
@@ -257,7 +237,6 @@ export default function AltTextGenerator(): React.JSX.Element {
           )}
         </CardContent>
       </Card>
-
       <ResultBox
         value={snippet}
         label="HTML snippet"
@@ -265,9 +244,7 @@ export default function AltTextGenerator(): React.JSX.Element {
         mono
         empty="Fill in the description to generate the snippet."
       />
-
       <Separator />
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">WCAG guidance</CardTitle>

@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Download } from 'lucide-react'
 import {
@@ -22,7 +21,6 @@ import {
 } from '@/components/ui/table'
 import { Field, Stat, downloadBlob } from '@/lib/tools/tool-ui'
 import { toast } from 'sonner'
-
 function parseNum(value: string): number {
   if (value == null) return NaN
   const trimmed = value.trim()
@@ -30,7 +28,6 @@ function parseNum(value: string): number {
   const n = Number(trimmed)
   return Number.isFinite(n) ? n : NaN
 }
-
 function fmtCurrency(n: number): string {
   if (!Number.isFinite(n)) return '—'
   return new Intl.NumberFormat('en-US', {
@@ -39,12 +36,10 @@ function fmtCurrency(n: number): string {
     maximumFractionDigits: 0,
   }).format(n)
 }
-
 function fmtInt(n: number): string {
   if (!Number.isFinite(n)) return '—'
   return n.toLocaleString(undefined, { maximumFractionDigits: 0 })
 }
-
 interface Row {
   year: number
   age: number
@@ -52,7 +47,6 @@ interface Row {
   contributions: number
   real: number
 }
-
 /**
  * Retirement Calculator
  * Projects retirement savings using monthly compounding. Computes:
@@ -70,14 +64,12 @@ export default function RetirementCalculator() {
   const [monthlyContrib, setMonthlyContrib] = React.useState('500')
   const [annualReturn, setAnnualReturn] = React.useState('7')
   const [inflation, setInflation] = React.useState('3')
-
   const ageN = parseNum(currentAge)
   const retireN = parseNum(retireAge)
   const savingsN = parseNum(savings)
   const contribN = parseNum(monthlyContrib)
   const rateN = parseNum(annualReturn)
   const inflN = parseNum(inflation)
-
   const valid =
     Number.isFinite(ageN) &&
     ageN > 0 &&
@@ -89,11 +81,9 @@ export default function RetirementCalculator() {
     contribN >= 0 &&
     Number.isFinite(rateN) &&
     Number.isFinite(inflN)
-
   const yearsToRetire = valid ? Math.floor(retireN - ageN) : NaN
   const monthlyRate = valid ? rateN / 100 / 12 : 0
   const months = valid ? yearsToRetire * 12 : 0
-
   // Build year-by-year projection
   const rows: Row[] = React.useMemo(() => {
     if (!valid) return []
@@ -130,7 +120,6 @@ export default function RetirementCalculator() {
     yearsToRetire,
     inflN,
   ])
-
   // Final values
   const finalRow = rows.length > 0 ? rows[rows.length - 1] : null
   const fvLumpSum =
@@ -149,7 +138,6 @@ export default function RetirementCalculator() {
   const realFV = finalRow ? finalRow.real : NaN
   const totalContrib = finalRow ? finalRow.contributions : NaN
   const totalInterest = Number.isFinite(totalFV) ? totalFV - totalContrib : NaN
-
   // Display every 5 years + always show final year (if not on boundary)
   const displayRows: Row[] = React.useMemo(() => {
     if (rows.length === 0) return []
@@ -160,7 +148,6 @@ export default function RetirementCalculator() {
     }
     return filtered
   }, [rows])
-
   const downloadCsv = () => {
     if (rows.length === 0) {
       toast.error('Nothing to export — enter valid inputs first')
@@ -180,7 +167,6 @@ export default function RetirementCalculator() {
     downloadBlob(new Blob([csv], { type: 'text/csv;charset=utf-8' }), 'retirement-projection.csv')
     toast.success('Projection exported as CSV')
   }
-
   return (
     <div className="space-y-5">
       <Card>
@@ -268,7 +254,6 @@ export default function RetirementCalculator() {
           </div>
         </CardContent>
       </Card>
-
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Stat
           label="Years to retirement"
@@ -291,13 +276,11 @@ export default function RetirementCalculator() {
           accent="#16a34a"
         />
       </div>
-
       <div className="grid gap-3 sm:grid-cols-3">
         <Stat label="FV of current savings" value={fmtCurrency(fvLumpSum)} />
         <Stat label="FV of contributions" value={fmtCurrency(fvAnnuity)} />
         <Stat label="Total contributions" value={fmtCurrency(totalContrib)} />
       </div>
-
       <Card>
         <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0">
           <div>

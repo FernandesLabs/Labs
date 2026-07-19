@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Loader2, Globe, MapPin, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -13,7 +12,6 @@ import {
 } from '@/components/ui/card'
 import { toast } from 'sonner'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 interface IpResponse {
   ok: boolean
   error?: string
@@ -31,7 +29,6 @@ interface IpResponse {
   error_msg?: string
   reason?: string
 }
-
 /** Convert an ISO 3166-1 alpha-2 country code to a flag emoji. */
 function countryFlag(code?: string): string {
   if (!code || code.length !== 2) return ''
@@ -41,7 +38,6 @@ function countryFlag(code?: string): string {
   const cp = (ch: string): number => 0x1f1e6 + (ch.charCodeAt(0) - 65)
   return String.fromCodePoint(cp(upper[0]!), cp(upper[1]!))
 }
-
 async function fetchIp(
   ip: string,
   signal: AbortSignal
@@ -52,13 +48,11 @@ async function fetchIp(
   const res = await fetch(url, { signal })
   return (await res.json()) as IpResponse
 }
-
 export default function IpLookup(): React.JSX.Element {
   const [ip, setIp] = React.useState('')
   const [loading, setLoading] = React.useState(false)
   const [data, setData] = React.useState<IpResponse | null>(null)
   const controllerRef = React.useRef<AbortController | null>(null)
-
   const lookup = React.useCallback(
     async (overrideIp?: string) => {
       const target = (overrideIp ?? ip).trim()
@@ -105,13 +99,11 @@ export default function IpLookup(): React.JSX.Element {
     },
     [ip]
   )
-
   React.useEffect(() => {
     return () => {
       if (controllerRef.current) controllerRef.current.abort()
     }
   }, [])
-
   const flag = countryFlag(data?.country_code)
   const lat = data?.latitude
   const lon = data?.longitude
@@ -119,7 +111,6 @@ export default function IpLookup(): React.JSX.Element {
     lat !== undefined && lon !== undefined
       ? `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=10/${lat}/${lon}`
       : null
-
   return (
     <div className="space-y-5">
       <Card>
@@ -163,7 +154,6 @@ export default function IpLookup(): React.JSX.Element {
               </Button>
             </div>
           </Field>
-
           <Button
             type="button"
             onClick={() => void lookup()}
@@ -178,7 +168,6 @@ export default function IpLookup(): React.JSX.Element {
           </Button>
         </CardContent>
       </Card>
-
       {data ? (
         <Card>
           <CardHeader>
@@ -230,7 +219,6 @@ export default function IpLookup(): React.JSX.Element {
               />
               <Stat label="ISP / Org" value={data.org ?? '—'} />
             </div>
-
             {mapHref ? (
               <div>
                 <Button asChild type="button" variant="outline" size="sm">

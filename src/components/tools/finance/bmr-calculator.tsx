@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import {
   Card,
@@ -20,7 +19,6 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 function parseNum(value: string): number {
   if (value == null) return NaN
   const trimmed = value.trim()
@@ -28,7 +26,6 @@ function parseNum(value: string): number {
   const n = Number(trimmed)
   return Number.isFinite(n) ? n : NaN
 }
-
 function fmt(n: number, digits = 0): string {
   if (!Number.isFinite(n)) return '—'
   return n.toLocaleString(undefined, {
@@ -36,14 +33,11 @@ function fmt(n: number, digits = 0): string {
     minimumFractionDigits: digits,
   })
 }
-
 type Gender = 'male' | 'female'
 type WeightUnit = 'kg' | 'lb'
 type HeightUnit = 'cm' | 'in'
-
 const LB_TO_KG = 0.45359237
 const IN_TO_CM = 2.54
-
 const ACTIVITY_LEVELS = [
   { label: 'Sedentary', multiplier: 1.2, desc: 'Little or no exercise' },
   { label: 'Light', multiplier: 1.375, desc: 'Light exercise 1-3 days/wk' },
@@ -51,7 +45,6 @@ const ACTIVITY_LEVELS = [
   { label: 'Active', multiplier: 1.725, desc: 'Hard exercise 6-7 days/wk' },
   { label: 'Very Active', multiplier: 1.9, desc: 'Very hard exercise / physical job' },
 ] as const
-
 /**
  * BMR Calculator
  * Basal Metabolic Rate via the Mifflin-St Jeor equation.
@@ -65,13 +58,11 @@ export default function BmrCalculator() {
   const [weight, setWeight] = React.useState('70')
   const [heightUnit, setHeightUnit] = React.useState<HeightUnit>('cm')
   const [height, setHeight] = React.useState('175')
-
   const ageN = parseNum(age)
   const wRaw = parseNum(weight)
   const hRaw = parseNum(height)
   const kg = weightUnit === 'lb' ? wRaw * LB_TO_KG : wRaw
   const cm = heightUnit === 'in' ? hRaw * IN_TO_CM : hRaw
-
   const valid =
     Number.isFinite(ageN) &&
     ageN > 0 &&
@@ -79,13 +70,11 @@ export default function BmrCalculator() {
     kg > 0 &&
     Number.isFinite(cm) &&
     cm > 0
-
   let bmr = NaN
   if (valid) {
     const base = 10 * kg + 6.25 * cm - 5 * ageN
     bmr = gender === 'male' ? base + 5 : base - 161
   }
-
   return (
     <div className="space-y-5">
       <Card>
@@ -109,7 +98,6 @@ export default function BmrCalculator() {
               </TabsList>
             </Tabs>
           </Field>
-
           <div className="grid gap-4 sm:grid-cols-3">
             <Field label="Age" htmlFor="bmr-age" hint="years">
               <Input
@@ -122,7 +110,6 @@ export default function BmrCalculator() {
                 aria-label="Age in years"
               />
             </Field>
-
             <Field label="Weight" htmlFor="bmr-weight" hint={weightUnit}>
               <div className="flex gap-2">
                 <Input
@@ -159,7 +146,6 @@ export default function BmrCalculator() {
                 </div>
               </div>
             </Field>
-
             <Field label="Height" htmlFor="bmr-height" hint={heightUnit}>
               <div className="flex gap-2">
                 <Input
@@ -199,7 +185,6 @@ export default function BmrCalculator() {
           </div>
         </CardContent>
       </Card>
-
       <div className="grid gap-3 sm:grid-cols-3">
         <Stat
           label="BMR"
@@ -215,7 +200,6 @@ export default function BmrCalculator() {
           value={Number.isFinite(cm) && cm > 0 ? `${fmt(cm, 1)} cm` : '—'}
         />
       </div>
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">TDEE by activity level</CardTitle>

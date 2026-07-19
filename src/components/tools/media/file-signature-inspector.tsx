@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import {
   Upload,
@@ -30,11 +29,9 @@ import {
 } from '@/components/ui/table'
 import { Field, Stat } from '@/lib/tools/tool-ui'
 import { toast } from 'sonner'
-
 /* ------------------------------------------------------------------ */
 /*  Magic-number database (~40 common file types)                      */
 /* ------------------------------------------------------------------ */
-
 type Category =
   | 'image'
   | 'video'
@@ -44,7 +41,6 @@ type Category =
   | 'executable'
   | 'font'
   | 'other'
-
 interface Signature {
   /** Display name. */
   name: string
@@ -62,7 +58,6 @@ interface Signature {
   /** Notes / clarifications. */
   notes?: string
 }
-
 const SIGNATURES: Signature[] = [
   // ---- Images ----
   { name: 'PDF document', mime: 'application/pdf', category: 'document', hex: '25 50 44 46', length: 4, notes: '%PDF' },
@@ -82,7 +77,6 @@ const SIGNATURES: Signature[] = [
   { name: 'AVIF image', mime: 'image/avif', category: 'image', hex: '00 00 00 18 66 74 79 70 61 76 69 66', length: 12 },
   { name: 'PSD (Photoshop)', mime: 'image/vnd.adobe.photoshop', category: 'image', hex: '38 42 50 53', length: 4, notes: '8BPS' },
   { name: 'SVG image', mime: 'image/svg+xml', category: 'image', hex: '3C 3F 78 6D 6C', length: 5, notes: 'XML declaration' },
-
   // ---- Video ----
   { name: 'MP4 video', mime: 'video/mp4', category: 'video', hex: '00 00 00 18 66 74 79 70 6D 70 34 32', length: 12, notes: 'ftypmp42' },
   { name: 'MP4 video (iso2)', mime: 'video/mp4', category: 'video', hex: '00 00 00 1C 66 74 79 70 69 73 6F 32', length: 12 },
@@ -93,7 +87,6 @@ const SIGNATURES: Signature[] = [
   { name: 'FLV video', mime: 'video/x-flv', category: 'video', hex: '46 4C 56 01', length: 4, notes: 'FLV' },
   { name: 'WMV video', mime: 'video/x-ms-wmv', category: 'video', hex: '30 26 B2 75', length: 4, notes: 'ASF GUID' },
   { name: 'MPEG video', mime: 'video/mpeg', category: 'video', hex: '00 00 01 BA', length: 4 },
-
   // ---- Audio ----
   { name: 'MP3 audio (ID3v2)', mime: 'audio/mpeg', category: 'audio', hex: '49 44 33', length: 3, notes: 'ID3' },
   { name: 'MP3 audio (frame sync)', mime: 'audio/mpeg', category: 'audio', hex: 'FF FB', length: 2 },
@@ -103,7 +96,6 @@ const SIGNATURES: Signature[] = [
   { name: 'AIFF audio', mime: 'audio/aiff', category: 'audio', hex: '46 4F 52 4D', length: 4, notes: 'FORM' },
   { name: 'MIDI audio', mime: 'audio/midi', category: 'audio', hex: '4D 54 68 64', length: 4, notes: 'MThd' },
   { name: 'AAC audio (ADTS)', mime: 'audio/aac', category: 'audio', hex: 'FF F1', length: 2 },
-
   // ---- Archives ----
   { name: 'ZIP archive', mime: 'application/zip', category: 'archive', hex: '50 4B 03 04', length: 4, notes: 'PK' },
   { name: 'ZIP empty archive', mime: 'application/zip', category: 'archive', hex: '50 4B 05 06', length: 4 },
@@ -115,7 +107,6 @@ const SIGNATURES: Signature[] = [
   { name: 'Bzip2 archive', mime: 'application/x-bzip2', category: 'archive', hex: '42 5A 68', length: 3, notes: 'BZh' },
   { name: 'xz archive', mime: 'application/x-xz', category: 'archive', hex: 'FD 37 7A 58 5A 00', length: 6 },
   { name: 'Tar archive', mime: 'application/x-tar', category: 'archive', hex: '75 73 74 61 72', length: 5, offset: 257, notes: 'ustar at offset 257' },
-
   // ---- Documents (OLE2 & OOXML) ----
   { name: 'MS Office (OLE2)', mime: 'application/x-ole-storage', category: 'document', hex: 'D0 CF 11 E0 A1 B1 1A E1', length: 8, notes: 'DOC / XLS / PPT legacy' },
   { name: 'Word document (DOCX)', mime: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', category: 'document', hex: '50 4B 03 04', length: 4, notes: 'ZIP-based; verify [Content_Types].xml for Word' },
@@ -123,7 +114,6 @@ const SIGNATURES: Signature[] = [
   { name: 'PowerPoint (PPTX)', mime: 'application/vnd.openxmlformats-officedocument.presentationml.presentation', category: 'document', hex: '50 4B 03 04', length: 4, notes: 'ZIP-based; verify [Content_Types].xml for PowerPoint' },
   { name: 'EPUB ebook', mime: 'application/epub+zip', category: 'document', hex: '50 4B 03 04', length: 4, secondary: '6D 69 6D 65 74 79 70 65 61 70 70 6C 69 63 61 74 69 6F 6E 2F 65 70 75 62 2B 7A 69 70', notes: 'ZIP-based; mimetype entry' },
   { name: 'RTF document', mime: 'application/rtf', category: 'document', hex: '7B 5C 72 74 66', length: 5, notes: '{\\rtf' },
-
   // ---- Executables ----
   { name: 'Windows executable (PE)', mime: 'application/x-msdownload', category: 'executable', hex: '4D 5A', length: 2, notes: 'MZ' },
   { name: 'Linux ELF binary', mime: 'application/x-executable', category: 'executable', hex: '7F 45 4C 46', length: 4, notes: '\\x7fELF' },
@@ -134,19 +124,16 @@ const SIGNATURES: Signature[] = [
   { name: 'Java JAR archive', mime: 'application/java-archive', category: 'archive', hex: '50 4B 03 04', length: 4, notes: 'ZIP-based' },
   { name: 'WebAssembly module', mime: 'application/wasm', category: 'executable', hex: '00 61 73 6D', length: 4, notes: '\\0asm' },
   { name: 'Android APK', mime: 'application/vnd.android.package-archive', category: 'executable', hex: '50 4B 03 04', length: 4, notes: 'ZIP-based' },
-
   // ---- Fonts ----
   { name: 'TrueType font', mime: 'font/ttf', category: 'font', hex: '00 01 00 00', length: 4 },
   { name: 'OpenType font (CFF)', mime: 'font/otf', category: 'font', hex: '4F 54 54 4F', length: 4, notes: 'OTTO' },
   { name: 'WOFF font', mime: 'font/woff', category: 'font', hex: '77 4F 46 46', length: 4, notes: 'wOFF' },
   { name: 'WOFF2 font', mime: 'font/woff2', category: 'font', hex: '77 4F 46 32', length: 4, notes: 'wOF2' },
-
   // ---- Other ----
   { name: 'SQLite database', mime: 'application/vnd.sqlite3', category: 'other', hex: '53 51 4C 69 74 65 20 66 6F 72 6D 61 74 20 33 00', length: 16, notes: 'SQLite format 3' },
   { name: 'UTF-8 BOM', mime: 'text/plain', category: 'other', hex: 'EF BB BF', length: 3 },
   { name: 'JSON data', mime: 'application/json', category: 'other', hex: '7B', length: 1, notes: '{ (heuristic)' },
 ]
-
 const CATEGORY_COLORS: Record<Category, string> = {
   image: '#16a34a',
   video: '#dc2626',
@@ -157,11 +144,9 @@ const CATEGORY_COLORS: Record<Category, string> = {
   font: '#0d9488',
   other: '#64748b',
 }
-
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
 /* ------------------------------------------------------------------ */
-
 function bytesToHex(bytes: Uint8Array, sep = ' '): string {
   let out = ''
   for (let i = 0; i < bytes.length; i++) {
@@ -170,7 +155,6 @@ function bytesToHex(bytes: Uint8Array, sep = ' '): string {
   }
   return out
 }
-
 function parseHex(hex: string): number[] {
   return hex
     .trim()
@@ -178,7 +162,6 @@ function parseHex(hex: string): number[] {
     .map((h) => parseInt(h, 16))
     .filter((n) => Number.isFinite(n))
 }
-
 function matchesAt(bytes: Uint8Array, expected: number[], offset: number): boolean {
   if (offset + expected.length > bytes.length) return false
   for (let i = 0; i < expected.length; i++) {
@@ -186,7 +169,6 @@ function matchesAt(bytes: Uint8Array, expected: number[], offset: number): boole
   }
   return true
 }
-
 interface DetectionResult {
   signature: Signature
   /** 'exact' if all bytes match at the right offset; 'partial' if some do. */
@@ -194,7 +176,6 @@ interface DetectionResult {
   /** Whether the secondary signature also matched (boosts confidence for ZIP-based formats). */
   secondaryMatched: boolean
 }
-
 function detect(bytes: Uint8Array): DetectionResult | null {
   let best: DetectionResult | null = null
   // Longest signatures first — they are the most specific.
@@ -230,7 +211,6 @@ function detect(bytes: Uint8Array): DetectionResult | null {
   }
   return best
 }
-
 function formatBytes(bytes: number): string {
   if (!Number.isFinite(bytes) || bytes < 0) return '—'
   if (bytes === 0) return '0 B'
@@ -240,18 +220,15 @@ function formatBytes(bytes: number): string {
   const v = bytes / Math.pow(1024, safe)
   return `${v.toFixed(safe === 0 ? 0 : 2)} ${units[safe]}`
 }
-
 interface FileMeta {
   name: string
   size: number
   type: string
   lastModified: number
 }
-
 /* ------------------------------------------------------------------ */
 /*  Component                                                          */
 /* ------------------------------------------------------------------ */
-
 export default function FileSignatureInspector() {
   const [file, setFile] = React.useState<FileMeta | null>(null)
   const [head, setHead] = React.useState<Uint8Array | null>(null)
@@ -260,7 +237,6 @@ export default function FileSignatureInspector() {
   const [dragOver, setDragOver] = React.useState(false)
   const [search, setSearch] = React.useState('')
   const inputRef = React.useRef<HTMLInputElement>(null)
-
   const handleFile = async (f: File | null | undefined): Promise<void> => {
     if (!f) return
     if (f.size > 200 * 1024 * 1024) {
@@ -289,17 +265,14 @@ export default function FileSignatureInspector() {
       setReading(false)
     }
   }
-
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     void handleFile(e.target.files?.[0])
   }
-
   const onDrop = (e: React.DragEvent): void => {
     e.preventDefault()
     setDragOver(false)
     void handleFile(e.dataTransfer.files?.[0])
   }
-
   const filteredTable = React.useMemo(() => {
     const q = search.trim().toLowerCase()
     if (!q) return SIGNATURES
@@ -311,7 +284,6 @@ export default function FileSignatureInspector() {
         s.category.includes(q)
     )
   }, [search])
-
   const hexDump = React.useMemo(() => {
     if (!head) return ''
     const cells: string[] = []
@@ -320,7 +292,6 @@ export default function FileSignatureInspector() {
     }
     return cells.join(' ')
   }, [head])
-
   const asciiDump = React.useMemo(() => {
     if (!head) return ''
     let out = ''
@@ -330,13 +301,11 @@ export default function FileSignatureInspector() {
     }
     return out
   }, [head])
-
   const declaredMatches =
     file && detection
       ? file.type === detection.signature.mime ||
         (!file.type && detection.signature.mime !== '')
       : true
-
   return (
     <div className="space-y-5">
       <Card>
@@ -396,7 +365,6 @@ export default function FileSignatureInspector() {
           </div>
         </CardContent>
       </Card>
-
       {file ? (
         <Card>
           <CardHeader>
@@ -440,7 +408,6 @@ export default function FileSignatureInspector() {
                     }
                   />
                 </div>
-
                 {detection.signature.notes ? (
                   <div className="rounded-lg border border-border bg-muted/20 p-3">
                     <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
@@ -449,7 +416,6 @@ export default function FileSignatureInspector() {
                     <p className="mt-1 text-sm">{detection.signature.notes}</p>
                   </div>
                 ) : null}
-
                 {detection.confidence === 'partial' ? (
                   <div className="flex items-start gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-amber-700 dark:text-amber-400">
                     <AlertTriangle className="mt-0.5 size-4 shrink-0" />
@@ -465,7 +431,6 @@ export default function FileSignatureInspector() {
                     </div>
                   </div>
                 ) : null}
-
                 {file.type && detection.signature.mime !== file.type ? (
                   <div className="flex items-start gap-2 rounded-lg border border-rose-500/40 bg-rose-500/10 p-3 text-sm text-rose-700 dark:text-rose-400">
                     <AlertTriangle className="mt-0.5 size-4 shrink-0" />
@@ -498,7 +463,6 @@ export default function FileSignatureInspector() {
                 ) : null}
               </div>
             )}
-
             <div>
               <div className="mb-2 text-sm font-medium text-foreground">
                 Uploaded file metadata
@@ -523,7 +487,6 @@ export default function FileSignatureInspector() {
           </CardContent>
         </Card>
       ) : null}
-
       {head ? (
         <Card>
           <CardHeader>
@@ -546,7 +509,6 @@ export default function FileSignatureInspector() {
           </CardContent>
         </Card>
       ) : null}
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Signature reference</CardTitle>

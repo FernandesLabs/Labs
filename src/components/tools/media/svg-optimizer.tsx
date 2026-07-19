@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Sparkles, Eraser, AlertTriangle, FileCode2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -13,7 +12,6 @@ import {
 } from '@/components/ui/card'
 import { Field, ResultBox, Stat } from '@/lib/tools/tool-ui'
 import { toast } from 'sonner'
-
 const SAMPLE_SVG = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 <svg
@@ -44,7 +42,6 @@ const SAMPLE_SVG = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
   <g></g>
   <path d="M10 10 H 90 V 90 H 10 Z" fill="#10b981" />
 </svg>`
-
 // SVG defaults per the SVG specification. Removing these has no visual effect.
 const DEFAULT_ATTRS: Record<string, string[]> = {
   stroke: ['none'],
@@ -64,7 +61,6 @@ const DEFAULT_ATTRS: Record<string, string[]> = {
   'text-anchor': ['start'],
   'dominant-baseline': ['auto'],
 }
-
 const EDITOR_NS_PATTERNS = [
   'inkscape',
   'sodipodi',
@@ -72,7 +68,6 @@ const EDITOR_NS_PATTERNS = [
   'creativecommons.org',
   '1999/02/22-rdf-syntax-ns',
 ]
-
 interface OptimizeResult {
   ok: boolean
   output: string
@@ -83,11 +78,9 @@ interface OptimizeResult {
   removedAttrs: number
   removedNodes: number
 }
-
 function isEditorNamespace(ns: string): boolean {
   return EDITOR_NS_PATTERNS.some((p) => ns.includes(p))
 }
-
 function optimizeSvg(input: string): OptimizeResult {
   const trimmed = input.trim()
   if (!trimmed) {
@@ -103,7 +96,6 @@ function optimizeSvg(input: string): OptimizeResult {
     }
   }
   const original = new Blob([input]).size
-
   let doc: Document
   try {
     const parser = new DOMParser()
@@ -146,10 +138,8 @@ function optimizeSvg(input: string): OptimizeResult {
       removedNodes: 0,
     }
   }
-
   let removedAttrs = 0
   let removedNodes = 0
-
   // 1. Remove comments and processing instructions (XML declaration).
   const piWalker = doc.createTreeWalker(
     svg,
@@ -161,7 +151,6 @@ function optimizeSvg(input: string): OptimizeResult {
     n.parentNode?.removeChild(n)
     removedNodes++
   }
-
   // 2. Remove <metadata> elements and elements in editor namespaces.
   const allEls = Array.from(svg.querySelectorAll('*'))
   for (const el of allEls) {
@@ -173,7 +162,6 @@ function optimizeSvg(input: string): OptimizeResult {
       removedNodes++
     }
   }
-
   // 3. Remove editor-namespace attributes from every element (including root).
   const allEls2 = [svg, ...Array.from(svg.querySelectorAll('*'))]
   for (const el of allEls2) {
@@ -194,7 +182,6 @@ function optimizeSvg(input: string): OptimizeResult {
       }
     }
   }
-
   // 4. Remove default-value attributes per the SVG spec.
   const allEls3 = [svg, ...Array.from(svg.querySelectorAll('*'))]
   for (const el of allEls3) {
@@ -206,7 +193,6 @@ function optimizeSvg(input: string): OptimizeResult {
       }
     }
   }
-
   // 5. Remove empty elements (no children AND no attributes).
   //    Iterate to a fixed point: removing one empty element can leave its
   //    parent empty.
@@ -223,7 +209,6 @@ function optimizeSvg(input: string): OptimizeResult {
       }
     }
   }
-
   // 6. Remove whitespace-only text nodes outside of <text>/<tspan>/<title>/<desc>.
   const TEXT_TAGS = new Set(['text', 'tspan', 'title', 'desc', 'style', 'script'])
   const textWalker = doc.createTreeWalker(svg, NodeFilter.SHOW_TEXT)
@@ -244,7 +229,6 @@ function optimizeSvg(input: string): OptimizeResult {
     n.parentNode?.removeChild(n)
     removedNodes++
   }
-
   // 7. Serialize and collapse inter-tag whitespace.
   const serializer = new XMLSerializer()
   let out = serializer.serializeToString(svg)
@@ -252,11 +236,9 @@ function optimizeSvg(input: string): OptimizeResult {
   out = out.replace(/>\s+</g, '><').trim()
   // Collapse leading/trailing whitespace inside the root
   out = out.replace(/\s{2,}/g, ' ')
-
   const optimized = new Blob([out]).size
   const savings =
     original > 0 ? Math.round((1 - optimized / original) * 100) : 0
-
   return {
     ok: true,
     output: out,
@@ -267,17 +249,13 @@ function optimizeSvg(input: string): OptimizeResult {
     removedNodes,
   }
 }
-
 export default function SvgOptimizer(): React.JSX.Element {
   const [input, setInput] = React.useState<string>(SAMPLE_SVG)
-
   const result = React.useMemo(() => optimizeSvg(input), [input])
-
   const handleClear = (): void => {
     setInput('')
     toast.success('Cleared')
   }
-
   return (
     <div className="space-y-5">
       <Card>
@@ -318,7 +296,6 @@ export default function SvgOptimizer(): React.JSX.Element {
           </div>
         </CardContent>
       </Card>
-
       <Field
         label="SVG markup"
         htmlFor="so-input"
@@ -335,7 +312,6 @@ export default function SvgOptimizer(): React.JSX.Element {
           spellCheck={false}
         />
       </Field>
-
       {!result.ok && input.trim() !== '' ? (
         <div
           role="alert"
@@ -348,7 +324,6 @@ export default function SvgOptimizer(): React.JSX.Element {
           </div>
         </div>
       ) : null}
-
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat label="Original" value={`${result.original} B`} />
         <Stat
@@ -370,7 +345,6 @@ export default function SvgOptimizer(): React.JSX.Element {
           value={result.ok ? `${result.removedAttrs}/${result.removedNodes}` : '—'}
         />
       </div>
-
       <ResultBox
         value={result.ok ? result.output : ''}
         label="Optimized SVG"
@@ -383,7 +357,6 @@ export default function SvgOptimizer(): React.JSX.Element {
             : 'Fix the SVG errors to see optimized output.'
         }
       />
-
       {result.ok && result.output ? (
         <Card>
           <CardHeader>

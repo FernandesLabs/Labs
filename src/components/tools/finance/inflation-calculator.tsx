@@ -1,10 +1,8 @@
 'use client'
-
 import * as React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 function parseNum(value: string): number {
   if (value == null) return NaN
   const trimmed = value.trim()
@@ -12,7 +10,6 @@ function parseNum(value: string): number {
   const n = Number(trimmed)
   return Number.isFinite(n) ? n : NaN
 }
-
 function fmtCurrency(n: number): string {
   if (!Number.isFinite(n)) return '—'
   return new Intl.NumberFormat('en-US', {
@@ -21,14 +18,11 @@ function fmtCurrency(n: number): string {
     maximumFractionDigits: 2,
   }).format(n)
 }
-
 function fmtFactor(n: number): string {
   if (!Number.isFinite(n)) return '—'
   return `${n.toFixed(4)}×`
 }
-
 const CURRENT_YEAR = new Date().getFullYear()
-
 /**
  * Inflation Calculator
  * Initial amount, start/end year, annual inflation rate (%).
@@ -41,35 +35,28 @@ export default function InflationCalculator() {
   const [startYear, setStartYear] = React.useState(String(CURRENT_YEAR))
   const [endYear, setEndYear] = React.useState(String(CURRENT_YEAR + 10))
   const [rate, setRate] = React.useState('3')
-
   const amt = parseNum(amount)
   const sy = parseNum(startYear)
   const ey = parseNum(endYear)
   const r = parseNum(rate)
-
   const years =
     Number.isFinite(sy) && Number.isFinite(ey) && Number.isInteger(sy) && Number.isInteger(ey)
       ? ey - sy
       : NaN
-
   const factor =
     Number.isFinite(r) && Number.isFinite(years) && years >= 0
       ? Math.pow(1 + r / 100, years)
       : NaN
-
   const futureValue =
     Number.isFinite(amt) && Number.isFinite(factor) ? amt * factor : NaN
-
   const realValue =
     Number.isFinite(amt) && Number.isFinite(factor) && factor > 0
       ? amt / factor
       : NaN
-
   const valid =
     Number.isFinite(amt) && amt > 0 &&
     Number.isFinite(r) && r >= 0 &&
     Number.isFinite(years) && years >= 0
-
   return (
     <div className="space-y-5">
       <Card>
@@ -115,7 +102,6 @@ export default function InflationCalculator() {
               />
             </Field>
           </div>
-
           {Number.isFinite(amt) && amt <= 0 ? (
             <p className="text-sm text-destructive">Amount must be greater than zero.</p>
           ) : null}
@@ -133,7 +119,6 @@ export default function InflationCalculator() {
           ) : null}
         </CardContent>
       </Card>
-
       <Card>
         <CardContent className="space-y-4 pt-6">
           <div
@@ -157,7 +142,6 @@ export default function InflationCalculator() {
               value={valid ? fmtFactor(factor) : '—'}
             />
           </div>
-
           <div className="rounded-lg border border-border bg-muted/30 p-3 text-sm">
             <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
               Explanation
@@ -184,7 +168,6 @@ export default function InflationCalculator() {
               in today's terms.
             </p>
           </div>
-
           <p className="text-xs text-muted-foreground">
             Future value uses <span className="font-mono">FV = A · (1 + r/100)^n</span> and
             real value uses{' '}

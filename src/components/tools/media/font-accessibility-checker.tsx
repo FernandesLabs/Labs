@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import {
   Check,
@@ -30,27 +29,22 @@ import {
 } from '@/components/ui/select'
 import { Field, Stat } from '@/lib/tools/tool-ui'
 import { useCopy } from '@/lib/tools/use-copy'
-
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
 /* ------------------------------------------------------------------ */
-
 type Weight = 400 | 500 | 600 | 700
-
 const WEIGHT_OPTIONS: { value: Weight; label: string }[] = [
   { value: 400, label: '400 · Regular' },
   { value: 500, label: '500 · Medium' },
   { value: 600, label: '600 · Semibold' },
   { value: 700, label: '700 · Bold' },
 ]
-
 function parseNum(value: string, fallback: number): number {
   const trimmed = value.trim()
   if (trimmed === '') return fallback
   const n = Number(trimmed)
   return Number.isFinite(n) ? n : fallback
 }
-
 /**
  * Estimate the x-height of a font given its font-size in pixels.
  *
@@ -65,7 +59,6 @@ function estimateXHeight(fontSizePx: number): number {
   if (!Number.isFinite(fontSizePx) || fontSizePx <= 0) return 0
   return fontSizePx * 0.5
 }
-
 /**
  * Compute an accessibility score (0-100) for the given font settings.
  *
@@ -89,7 +82,6 @@ interface Metrics {
   score: number
   checks: { label: string; pass: boolean; detail: string }[]
 }
-
 function computeMetrics(
   fontSizeStr: string,
   lineHeightStr: string,
@@ -100,17 +92,14 @@ function computeMetrics(
   const lineHeight = parseNum(lineHeightStr, 1.5)
   const xHeight = estimateXHeight(fontSize)
   const xHeightRatio = fontSize > 0 ? xHeight / fontSize : 0
-
   const sampleChars = sample.replace(/\n/g, ' ').trim().length
   const sampleLines = sample.split('\n').length
-
   const minBodySizeOk = fontSize >= 16
   const lineHeightOk = lineHeight >= 1.4
   const lineHeightInRange = lineHeight >= 1.5 && lineHeight <= 1.6
   const lineLengthOk =
     sampleChars >= 45 && sampleChars <= 75
   const weightOk = weight >= 400 && weight <= 700
-
   const checks: { label: string; pass: boolean; detail: string }[] = [
     {
       label: 'Body font size ≥ 16px',
@@ -150,11 +139,9 @@ function computeMetrics(
         : `Weight ${weight} is unusual.`,
     },
   ]
-
   const score = Math.round(
     (checks.filter((c) => c.pass).length / checks.length) * 100
   )
-
   return {
     fontSize,
     lineHeight,
@@ -172,16 +159,13 @@ function computeMetrics(
     checks,
   }
 }
-
 /* ------------------------------------------------------------------ */
 /*  Component                                                          */
 /* ------------------------------------------------------------------ */
-
 const DEFAULT_SAMPLE =
   'The quick brown fox jumps over the lazy dog. Typography is the ' +
   'art and technique of arranging type to make written language ' +
   'legible, readable, and appealing when displayed.'
-
 export default function FontAccessibilityChecker() {
   const [fontFamily, setFontFamily] = React.useState(
     'system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif'
@@ -190,21 +174,17 @@ export default function FontAccessibilityChecker() {
   const [fontWeight, setFontWeight] = React.useState<Weight>(400)
   const [lineHeight, setLineHeight] = React.useState('1.5')
   const [sample, setSample] = React.useState(DEFAULT_SAMPLE)
-
   const metrics = React.useMemo(
     () => computeMetrics(fontSize, lineHeight, fontWeight, sample),
     [fontSize, lineHeight, fontWeight, sample]
   )
-
   const previewStyle: React.CSSProperties = {
     fontFamily: fontFamily.trim() || 'system-ui, sans-serif',
     fontSize: `${metrics.fontSize}px`,
     fontWeight: metrics.fontWeight,
     lineHeight: metrics.lineHeight,
   }
-
   const { copy } = useCopy()
-
   const copySettings = (): void => {
     const css = [
       `font-family: ${fontFamily.trim()};`,
@@ -214,7 +194,6 @@ export default function FontAccessibilityChecker() {
     ].join('\n')
     copy(css, 'CSS copied')
   }
-
   return (
     <div className="space-y-5">
       <Card>
@@ -244,7 +223,6 @@ export default function FontAccessibilityChecker() {
               aria-label="Font family"
             />
           </Field>
-
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <Field label="Font size (px)" htmlFor="fac-size">
               <Input
@@ -302,7 +280,6 @@ export default function FontAccessibilityChecker() {
               />
             </Field>
           </div>
-
           <Field label="Text sample" htmlFor="fac-sample">
             <Textarea
               id="fac-sample"
@@ -313,7 +290,6 @@ export default function FontAccessibilityChecker() {
               aria-label="Text sample for preview"
             />
           </Field>
-
           <div className="flex flex-wrap gap-2">
             <Button
               type="button"
@@ -342,7 +318,6 @@ export default function FontAccessibilityChecker() {
           </div>
         </CardContent>
       </Card>
-
       <div
         className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
         role="status"
@@ -375,7 +350,6 @@ export default function FontAccessibilityChecker() {
           hint="estimated"
         />
       </div>
-
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
@@ -414,7 +388,6 @@ export default function FontAccessibilityChecker() {
           </div>
         </CardContent>
       </Card>
-
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
@@ -442,13 +415,11 @@ export default function FontAccessibilityChecker() {
               </span>
             )}
           </div>
-
           <pre className="fl-scroll mt-3 overflow-auto rounded-lg border border-border bg-muted/30 p-3 font-mono text-xs">
             {`font-family: ${fontFamily.trim()};\nfont-size: ${metrics.fontSize}px;\nfont-weight: ${metrics.fontWeight};\nline-height: ${metrics.lineHeight};`}
           </pre>
         </CardContent>
       </Card>
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">WCAG guidance</CardTitle>
@@ -475,7 +446,6 @@ export default function FontAccessibilityChecker() {
               or word spacing (0.16×).
             </p>
           </div>
-
           <div className="flex items-start gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-amber-700 dark:text-amber-400">
             <AlertTriangle className="mt-0.5 size-4 shrink-0" />
             <div>
@@ -488,7 +458,6 @@ export default function FontAccessibilityChecker() {
               </div>
             </div>
           </div>
-
           <div>
             <div className="mb-2 text-sm font-medium text-foreground">
               Recommendations
@@ -519,7 +488,6 @@ export default function FontAccessibilityChecker() {
           </div>
         </CardContent>
       </Card>
-
       <div className="flex flex-wrap gap-2">
         <Badge variant="secondary">WCAG 1.4.4 / 1.4.8 / 1.4.12</Badge>
         <Badge variant="secondary">Live preview</Badge>

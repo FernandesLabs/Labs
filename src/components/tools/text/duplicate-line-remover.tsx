@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Eraser, Filter } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -13,15 +12,12 @@ import {
 } from '@/components/ui/radio-group'
 import { Field, ResultBox, Stat } from '@/lib/tools/tool-ui'
 import { toast } from 'sonner'
-
 type KeepMode = 'first' | 'last'
-
 interface Options {
   caseInsensitive: boolean
   trimBeforeCompare: boolean
   keep: KeepMode
 }
-
 function dedupe(
   input: string,
   opts: Options
@@ -31,14 +27,12 @@ function dedupe(
   const total = lines.length
   const seen = new Map<string, number>() // key -> output index
   const out: string[] = []
-
   const keyOf = (line: string) => {
     let k = line
     if (opts.trimBeforeCompare) k = k.trim()
     if (opts.caseInsensitive) k = k.toLowerCase()
     return k
   }
-
   if (opts.keep === 'first') {
     for (const line of lines) {
       const k = keyOf(line)
@@ -60,14 +54,12 @@ function dedupe(
       }
     }
   }
-
   return {
     output: out.join('\n'),
     total,
     removed: total - out.length,
   }
 }
-
 export default function DuplicateLineRemover() {
   const [text, setText] = React.useState('')
   const [opts, setOpts] = React.useState<Options>({
@@ -78,7 +70,6 @@ export default function DuplicateLineRemover() {
   const [output, setOutput] = React.useState('')
   const [removed, setRemoved] = React.useState(0)
   const [total, setTotal] = React.useState(0)
-
   const handleRun = () => {
     if (!text) {
       toast.error('Enter lines to deduplicate')
@@ -89,11 +80,9 @@ export default function DuplicateLineRemover() {
     setRemoved(result.removed)
     setTotal(result.total)
   }
-
   const toggle = (key: 'caseInsensitive' | 'trimBeforeCompare') => (
     checked: boolean
   ) => setOpts((prev) => ({ ...prev, [key]: checked }))
-
   return (
     <div className="space-y-5">
       <Field
@@ -109,7 +98,6 @@ export default function DuplicateLineRemover() {
           className="min-h-32 font-mono text-sm"
         />
       </Field>
-
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="flex items-center justify-between rounded-lg border border-border bg-card p-3">
           <Label
@@ -144,7 +132,6 @@ export default function DuplicateLineRemover() {
           />
         </div>
       </div>
-
       <Field label="Keep" htmlFor="dl-keep">
         <RadioGroup
           id="dl-keep"
@@ -168,7 +155,6 @@ export default function DuplicateLineRemover() {
           </Label>
         </RadioGroup>
       </Field>
-
       <div className="grid grid-cols-3 gap-3">
         <Stat label="Input" value={total.toLocaleString()} />
         <Stat
@@ -181,7 +167,6 @@ export default function DuplicateLineRemover() {
           accent={removed > 0 ? 'oklch(0.6 0.2 20)' : undefined}
         />
       </div>
-
       <div className="flex flex-wrap items-center justify-between gap-2">
         <Button
           variant="ghost"
@@ -207,7 +192,6 @@ export default function DuplicateLineRemover() {
           Remove duplicates
         </Button>
       </div>
-
       {output ? (
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <Badge variant="secondary">{total.toLocaleString()} in</Badge>
@@ -220,7 +204,6 @@ export default function DuplicateLineRemover() {
           </span>
         </div>
       ) : null}
-
       <ResultBox
         value={output}
         label="Unique lines"

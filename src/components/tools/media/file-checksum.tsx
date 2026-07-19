@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import {
   Upload,
@@ -26,11 +25,9 @@ import {
 } from '@/lib/tools/tool-ui'
 import { useCopy } from '@/lib/tools/use-copy'
 import { toast } from 'sonner'
-
 /* ------------------------------------------------------------------ */
 /*  CRC32 — table-based polynomial implementation                       */
 /* ------------------------------------------------------------------ */
-
 const CRC_TABLE: Uint32Array = (() => {
   const table = new Uint32Array(256)
   for (let n = 0; n < 256; n++) {
@@ -42,7 +39,6 @@ const CRC_TABLE: Uint32Array = (() => {
   }
   return table
 })()
-
 function crc32(bytes: Uint8Array): string {
   let crc = 0xffffffff
   for (let i = 0; i < bytes.length; i++) {
@@ -52,11 +48,9 @@ function crc32(bytes: Uint8Array): string {
   const final = (crc ^ 0xffffffff) >>> 0
   return final.toString(16).padStart(8, '0')
 }
-
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
 /* ------------------------------------------------------------------ */
-
 function formatBytes(bytes: number): string {
   if (!Number.isFinite(bytes) || bytes < 0) return '—'
   if (bytes === 0) return '0 B'
@@ -66,7 +60,6 @@ function formatBytes(bytes: number): string {
   const v = bytes / Math.pow(1024, safe)
   return `${v.toFixed(safe === 0 ? 0 : 2)} ${units[safe]}`
 }
-
 function bufferToHex(buf: ArrayBuffer): string {
   const bytes = new Uint8Array(buf)
   let out = ''
@@ -75,27 +68,22 @@ function bufferToHex(buf: ArrayBuffer): string {
   }
   return out
 }
-
 type Algo = 'CRC32' | 'MD5' | 'SHA-1' | 'SHA-256' | 'SHA-512'
-
 interface HashResult {
   algo: Algo
   hex: string
   ms: number
   unsupported?: boolean
 }
-
 interface FileMeta {
   name: string
   size: number
   type: string
   lastModified: number
 }
-
 /* ------------------------------------------------------------------ */
 /*  Hash row                                                           */
 /* ------------------------------------------------------------------ */
-
 function HashRow({ result }: { result: HashResult | null }) {
   const { copied, copy } = useCopy()
   const algo = result?.algo
@@ -147,11 +135,9 @@ function HashRow({ result }: { result: HashResult | null }) {
     </div>
   )
 }
-
 /* ------------------------------------------------------------------ */
 /*  Component                                                          */
 /* ------------------------------------------------------------------ */
-
 export default function FileChecksum() {
   const [file, setFile] = React.useState<FileMeta | null>(null)
   const [results, setResults] = React.useState<Record<Algo, HashResult | null>>({
@@ -165,13 +151,11 @@ export default function FileChecksum() {
   const [dragOver, setDragOver] = React.useState(false)
   const inputRef = React.useRef<HTMLInputElement>(null)
   const lastFileRef = React.useRef<File | null>(null)
-
   const compute = React.useCallback(async (f: File): Promise<void> => {
     setComputing(true)
     try {
       const buffer = await f.arrayBuffer()
       const bytes = new Uint8Array(buffer)
-
       const next: Record<Algo, HashResult | null> = {
         CRC32: null,
         MD5: null,
@@ -179,7 +163,6 @@ export default function FileChecksum() {
         'SHA-256': null,
         'SHA-512': null,
       }
-
       // CRC32 (synchronous, manual)
       const t0 = performance.now()
       const crcHex = crc32(bytes)
@@ -189,7 +172,6 @@ export default function FileChecksum() {
         hex: crcHex,
         ms: Math.max(1, Math.round(t1 - t0)),
       }
-
       // SHA-* via Web Crypto
       const shaAlgos: Algo[] = ['SHA-1', 'SHA-256', 'SHA-512']
       for (const algo of shaAlgos) {
@@ -202,7 +184,6 @@ export default function FileChecksum() {
           ms: Math.max(1, Math.round(a1 - a0)),
         }
       }
-
       // MD5 — not in Web Crypto. Attempt digest('MD5') and gracefully
       // fall back if the browser throws.
       try {
@@ -224,7 +205,6 @@ export default function FileChecksum() {
           unsupported: true,
         }
       }
-
       setResults(next)
     } catch {
       toast.error('Failed to compute checksums.')
@@ -232,7 +212,6 @@ export default function FileChecksum() {
       setComputing(false)
     }
   }, [])
-
   const handleFile = (f: File | null | undefined): void => {
     if (!f) return
     if (f.size > 500 * 1024 * 1024) {
@@ -248,21 +227,17 @@ export default function FileChecksum() {
     })
     void compute(f)
   }
-
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     handleFile(e.target.files?.[0])
   }
-
   const onDrop = (e: React.DragEvent): void => {
     e.preventDefault()
     setDragOver(false)
     handleFile(e.dataTransfer.files?.[0])
   }
-
   const recompute = (): void => {
     if (lastFileRef.current) void compute(lastFileRef.current)
   }
-
   const downloadReport = (): void => {
     if (!file) return
     const lines: string[] = [
@@ -296,9 +271,7 @@ export default function FileChecksum() {
       `${file.name || 'file'}-checksums.txt`
     )
   }
-
   const largeFile = file && file.size > 50 * 1024 * 1024
-
   return (
     <div className="space-y-5">
       <Card>
@@ -356,7 +329,6 @@ export default function FileChecksum() {
               </p>
             ) : null}
           </div>
-
           {largeFile ? (
             <div className="flex items-start gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-amber-700 dark:text-amber-400">
               <AlertTriangle className="mt-0.5 size-4 shrink-0" />
@@ -372,7 +344,6 @@ export default function FileChecksum() {
               </div>
             </div>
           ) : null}
-
           {file ? (
             <div className="flex flex-wrap gap-2">
               <Button
@@ -399,7 +370,6 @@ export default function FileChecksum() {
           ) : null}
         </CardContent>
       </Card>
-
       {file ? (
         <Card>
           <CardHeader>
@@ -419,7 +389,6 @@ export default function FileChecksum() {
           </CardContent>
         </Card>
       ) : null}
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Checksums</CardTitle>
@@ -457,9 +426,7 @@ export default function FileChecksum() {
           )}
         </CardContent>
       </Card>
-
       <Separator />
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Notes</CardTitle>

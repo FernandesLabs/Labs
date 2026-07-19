@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Copy, Eraser } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -7,7 +6,6 @@ import { Textarea } from '@/components/ui/textarea'
 import { Field, ResultBox } from '@/lib/tools/tool-ui'
 import { useCopy } from '@/lib/tools/use-copy'
 import { toast } from 'sonner'
-
 type CaseId =
   | 'upper'
   | 'lower'
@@ -20,13 +18,11 @@ type CaseId =
   | 'constant'
   | 'alternating'
   | 'inverse'
-
 interface CaseOption {
   id: CaseId
   label: string
   description: string
 }
-
 const OPTIONS: CaseOption[] = [
   { id: 'upper', label: 'UPPERCASE', description: 'All letters uppercase' },
   { id: 'lower', label: 'lowercase', description: 'All letters lowercase' },
@@ -44,7 +40,6 @@ const OPTIONS: CaseOption[] = [
   { id: 'alternating', label: 'aLtErNaTiNg', description: 'Alternating letter case' },
   { id: 'inverse', label: 'InVeRsE', description: 'Swap case of each letter' },
 ]
-
 function splitWords(input: string): string[] {
   // Split on non-alphanumeric (keep apostrophes and hyphens inside words).
   return (
@@ -55,7 +50,6 @@ function splitWords(input: string): string[] {
       .filter((w) => w.length > 0)
   )
 }
-
 function applyCase(text: string, id: CaseId): string {
   if (!text) return ''
   switch (id) {
@@ -128,13 +122,11 @@ function applyCase(text: string, id: CaseId): string {
     }
   }
 }
-
 export default function CaseConverter() {
   const [original, setOriginal] = React.useState('')
   const [output, setOutput] = React.useState('')
   const [lastApplied, setLastApplied] = React.useState<CaseId | null>(null)
   const { copy } = useCopy()
-
   const handleApply = (id: CaseId) => {
     if (!original) {
       toast.error('Enter text to convert')
@@ -143,7 +135,6 @@ export default function CaseConverter() {
     setOutput(applyCase(original, id))
     setLastApplied(id)
   }
-
   return (
     <div className="space-y-5">
       <Field
@@ -164,7 +155,6 @@ export default function CaseConverter() {
           className="min-h-32 font-sans"
         />
       </Field>
-
       <div>
         <h3 className="mb-2 text-sm font-semibold text-foreground">
           Transformations
@@ -184,7 +174,6 @@ export default function CaseConverter() {
           ))}
         </div>
       </div>
-
       <div className="flex flex-wrap items-center justify-between gap-2">
         <Button
           variant="ghost"
@@ -216,7 +205,6 @@ export default function CaseConverter() {
           Copy output
         </Button>
       </div>
-
       <ResultBox
         value={output}
         label="Converted text"

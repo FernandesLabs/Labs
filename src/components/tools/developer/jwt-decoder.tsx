@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Eraser } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -8,13 +7,11 @@ import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Field, ResultBox, Stat } from '@/lib/tools/tool-ui'
 import { toast } from 'sonner'
-
 interface DecodedPart {
   raw: string
   pretty: string
   bytes: number
 }
-
 function base64UrlToBytes(s: string): Uint8Array {
   let str = s.replace(/-/g, '+').replace(/_/g, '/')
   while (str.length % 4 !== 0) str += '='
@@ -23,7 +20,6 @@ function base64UrlToBytes(s: string): Uint8Array {
   for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i)
   return bytes
 }
-
 function bytesToHex(bytes: Uint8Array): string {
   let out = ''
   for (let i = 0; i < bytes.length; i++) {
@@ -31,7 +27,6 @@ function bytesToHex(bytes: Uint8Array): string {
   }
   return out
 }
-
 interface Decoded {
   header: DecodedPart
   payload: DecodedPart
@@ -39,7 +34,6 @@ interface Decoded {
   signatureBytes: number
   parts: string[]
 }
-
 function decodeJwt(token: string): Decoded {
   const trimmed = token.trim()
   const parts = trimmed.split('.')
@@ -51,7 +45,6 @@ function decodeJwt(token: string): Decoded {
   if (!parts[0] || !parts[1] || !parts[2]) {
     throw new Error('One or more JWT segments are empty.')
   }
-
   const decodePart = (label: string, segment: string): DecodedPart => {
     let bytes: Uint8Array
     try {
@@ -72,11 +65,9 @@ function decodeJwt(token: string): Decoded {
       bytes: bytes.length,
     }
   }
-
   const header = decodePart('header', parts[0])
   const payload = decodePart('payload', parts[1])
   const sigBytes = base64UrlToBytes(parts[2])
-
   return {
     header,
     payload,
@@ -85,12 +76,10 @@ function decodeJwt(token: string): Decoded {
     parts,
   }
 }
-
 export default function JwtDecoder() {
   const [token, setToken] = React.useState('')
   const [decoded, setDecoded] = React.useState<Decoded | null>(null)
   const [error, setError] = React.useState<string | null>(null)
-
   React.useEffect(() => {
     if (!token.trim()) {
       setDecoded(null)
@@ -108,7 +97,6 @@ export default function JwtDecoder() {
       toast.error('Malformed JWT')
     }
   }, [token])
-
   return (
     <div className="space-y-5">
       <Field
@@ -126,14 +114,12 @@ export default function JwtDecoder() {
           placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.signature"
         />
       </Field>
-
       <div className="flex items-center gap-2">
         <Button variant="outline" size="sm" onClick={() => setToken('')}>
           <Eraser className="size-4" />
           Clear
         </Button>
       </div>
-
       {error ? (
         <Alert variant="destructive">
           <AlertDescription className="font-mono text-xs">
@@ -141,7 +127,6 @@ export default function JwtDecoder() {
           </AlertDescription>
         </Alert>
       ) : null}
-
       {decoded ? (
         <>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -164,7 +149,6 @@ export default function JwtDecoder() {
               }
             />
           </div>
-
           <div>
             <div className="mb-1.5 flex items-center gap-2">
               <Badge
@@ -184,7 +168,6 @@ export default function JwtDecoder() {
               downloadName="jwt-header.json"
             />
           </div>
-
           <div>
             <div className="mb-1.5 flex items-center gap-2">
               <Badge
@@ -204,7 +187,6 @@ export default function JwtDecoder() {
               downloadName="jwt-payload.json"
             />
           </div>
-
           <ResultBox
             value={decoded.signatureHex}
             label="Signature (hex)"

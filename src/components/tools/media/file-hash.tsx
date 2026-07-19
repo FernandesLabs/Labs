@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Upload, FileText, Hash, AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -15,24 +14,19 @@ import { Separator } from '@/components/ui/separator'
 import { Field, Stat, downloadBlob } from '@/lib/tools/tool-ui'
 import { useCopy } from '@/lib/tools/use-copy'
 import { toast } from 'sonner'
-
 type Algo = 'SHA-1' | 'SHA-256' | 'SHA-384' | 'SHA-512'
-
 const ALGOS: Algo[] = ['SHA-1', 'SHA-256', 'SHA-384', 'SHA-512']
-
 interface HashResult {
   algo: Algo
   hex: string
   ms: number
 }
-
 interface FileMeta {
   name: string
   size: number
   type: string
   lastModified: number
 }
-
 function formatBytes(bytes: number): string {
   if (!Number.isFinite(bytes) || bytes < 0) return '—'
   if (bytes === 0) return '0 B'
@@ -42,7 +36,6 @@ function formatBytes(bytes: number): string {
   const v = bytes / Math.pow(1024, safe)
   return `${v.toFixed(safe === 0 ? 0 : 2)} ${units[safe]}`
 }
-
 function bufferToHex(buf: ArrayBuffer): string {
   const bytes = new Uint8Array(buf)
   let out = ''
@@ -51,7 +44,6 @@ function bufferToHex(buf: ArrayBuffer): string {
   }
   return out
 }
-
 function HashRow({ result }: { result: HashResult | null }) {
   const { copied, copy } = useCopy()
   const algo = result?.algo
@@ -90,7 +82,6 @@ function HashRow({ result }: { result: HashResult | null }) {
     </div>
   )
 }
-
 export default function FileHash() {
   const [file, setFile] = React.useState<FileMeta | null>(null)
   const [results, setResults] = React.useState<Record<Algo, HashResult | null>>({
@@ -103,7 +94,6 @@ export default function FileHash() {
   const [dragOver, setDragOver] = React.useState(false)
   const inputRef = React.useRef<HTMLInputElement>(null)
   const lastFileRef = React.useRef<File | null>(null)
-
   const compute = React.useCallback(async (f: File): Promise<void> => {
     setComputing(true)
     try {
@@ -131,7 +121,6 @@ export default function FileHash() {
       setComputing(false)
     }
   }, [])
-
   const handleFile = (f: File | null | undefined): void => {
     if (!f) return
     if (f.size > 500 * 1024 * 1024) {
@@ -147,21 +136,17 @@ export default function FileHash() {
     })
     void compute(f)
   }
-
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     handleFile(e.target.files?.[0])
   }
-
   const onDrop = (e: React.DragEvent): void => {
     e.preventDefault()
     setDragOver(false)
     handleFile(e.dataTransfer.files?.[0])
   }
-
   const recompute = (): void => {
     if (lastFileRef.current) void compute(lastFileRef.current)
   }
-
   const downloadReport = (): void => {
     if (!file) return
     const lines: string[] = [
@@ -190,9 +175,7 @@ export default function FileHash() {
       `${file.name || 'file'}-hashes.txt`
     )
   }
-
   const largeFile = file && file.size > 10 * 1024 * 1024
-
   return (
     <div className="space-y-5">
       <Card>
@@ -245,7 +228,6 @@ export default function FileHash() {
               </p>
             ) : null}
           </div>
-
           {largeFile ? (
             <div className="flex items-start gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-amber-700 dark:text-amber-400">
               <AlertTriangle className="mt-0.5 size-4 shrink-0" />
@@ -259,7 +241,6 @@ export default function FileHash() {
               </div>
             </div>
           ) : null}
-
           {file ? (
             <div className="flex flex-wrap gap-2">
               <Button
@@ -285,7 +266,6 @@ export default function FileHash() {
           ) : null}
         </CardContent>
       </Card>
-
       {file ? (
         <Card>
           <CardHeader>
@@ -308,7 +288,6 @@ export default function FileHash() {
           </CardContent>
         </Card>
       ) : null}
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Hashes</CardTitle>
@@ -343,9 +322,7 @@ export default function FileHash() {
           )}
         </CardContent>
       </Card>
-
       <Separator />
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Notes</CardTitle>

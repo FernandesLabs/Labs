@@ -1,12 +1,10 @@
 'use client'
-
 import * as React from 'react'
 import { Monitor, Smartphone, Tablet } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent } from '@/components/ui/card'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 interface ParseResult {
   browser: string
   browserVersion?: string
@@ -14,7 +12,6 @@ interface ParseResult {
   device: 'desktop' | 'mobile' | 'tablet'
   engine: string
 }
-
 function parseUA(ua: string): ParseResult {
   const u = ua || ''
   const empty: ParseResult = {
@@ -24,7 +21,6 @@ function parseUA(ua: string): ParseResult {
     engine: 'Unknown',
   }
   if (!u.trim()) return empty
-
   // Engine
   let engine = 'Unknown'
   if (/Gecko\/\d/.test(u) && /Firefox/.test(u)) engine = 'Gecko'
@@ -32,7 +28,6 @@ function parseUA(ua: string): ParseResult {
   else if (/AppleWebKit/.test(u) && !/Chrome|CriOS/.test(u)) engine = 'WebKit'
   else if (/Trident/.test(u)) engine = 'Trident'
   else if (/Edge?\//.test(u) && /Edg/.test(u)) engine = 'Blink'
-
   // Browser + version
   let browser = 'Unknown'
   let browserVersion: string | undefined
@@ -53,7 +48,6 @@ function parseUA(ua: string): ParseResult {
       break
     }
   }
-
   // OS
   let os = 'Unknown'
   let osMatch: RegExpExecArray | null = null
@@ -76,7 +70,6 @@ function parseUA(ua: string): ParseResult {
   } else if (/CrOS/.test(u)) os = 'ChromeOS'
   else if (/Linux/.test(u)) os = 'Linux'
   else if (/FreeBSD/.test(u)) os = 'FreeBSD'
-
   // Device type
   let device: ParseResult['device'] = 'desktop'
   if (/iPad|Tablet|PlayBook|Silk/.test(u) || (/Android/.test(u) && !/Mobile/.test(u))) {
@@ -84,10 +77,8 @@ function parseUA(ua: string): ParseResult {
   } else if (/Mobi|iPhone|iPod|Android.*Mobile|Windows Phone|BlackBerry|Opera Mini/.test(u)) {
     device = 'mobile'
   }
-
   return { browser, browserVersion, os, device, engine }
 }
-
 const DEVICE_META: Record<
   ParseResult['device'],
   { label: string; icon: typeof Monitor }
@@ -96,25 +87,20 @@ const DEVICE_META: Record<
   mobile: { label: 'Mobile', icon: Smartphone },
   tablet: { label: 'Tablet', icon: Tablet },
 }
-
 export default function UserAgentParser() {
   const [ua, setUa] = React.useState<string>('')
-
   React.useEffect(() => {
     if (typeof navigator !== 'undefined') {
       setUa(navigator.userAgent)
     }
   }, [])
-
   const result = React.useMemo(() => parseUA(ua), [ua])
   const DeviceIcon = DEVICE_META[result.device].icon
-
   const useMyUA = () => {
     if (typeof navigator !== 'undefined') {
       setUa(navigator.userAgent)
     }
   }
-
   return (
     <div className="space-y-5">
       <Field label="User-Agent string" htmlFor="ua-input">
@@ -127,7 +113,6 @@ export default function UserAgentParser() {
           className="font-mono text-xs"
         />
       </Field>
-
       <div className="flex flex-wrap gap-2">
         <Button
           type="button"
@@ -144,7 +129,6 @@ export default function UserAgentParser() {
           Clear
         </Button>
       </div>
-
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Stat
           label="Browser"
@@ -153,7 +137,6 @@ export default function UserAgentParser() {
         <Stat label="Operating System" value={result.os} />
         <Stat label="Engine" value={result.engine} />
       </div>
-
       <Card>
         <CardContent className="pt-6">
           <div className="flex items-center gap-4">
@@ -171,7 +154,6 @@ export default function UserAgentParser() {
           </div>
         </CardContent>
       </Card>
-
       {ua.trim() ? (
         <Card>
           <CardContent className="pt-6">

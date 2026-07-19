@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Download, Link2, Upload } from 'lucide-react'
 import { toast } from 'sonner'
@@ -16,15 +15,12 @@ import {
 } from '@/components/ui/select'
 import { Card, CardContent } from '@/components/ui/card'
 import { Field, Stat, downloadBlob } from '@/lib/tools/tool-ui'
-
 type Format = 'image/png' | 'image/jpeg'
-
 function formatBytes(b: number): string {
   if (b < 1024) return `${b} B`
   if (b < 1024 * 1024) return `${(b / 1024).toFixed(1)} KB`
   return `${(b / 1024 / 1024).toFixed(2)} MB`
 }
-
 export default function ImageResizer() {
   const [file, setFile] = React.useState<File | null>(null)
   const [imgUrl, setImgUrl] = React.useState<string | null>(null)
@@ -38,7 +34,6 @@ export default function ImageResizer() {
   const [loadedImg, setLoadedImg] = React.useState<HTMLImageElement | null>(null)
   const ratioRef = React.useRef(1)
   const fileRef = React.useRef<HTMLInputElement | null>(null)
-
   const onFile = (f: File) => {
     if (!f.type.startsWith('image/')) {
       toast.error('Please choose an image file')
@@ -66,7 +61,6 @@ export default function ImageResizer() {
     img.onerror = () => toast.error('Failed to load image')
     img.src = url
   }
-
   React.useEffect(() => {
     if (!loadedImg) return
     if (width < 1 || height < 1) return
@@ -91,14 +85,12 @@ export default function ImageResizer() {
       })
     }, format)
   }, [loadedImg, width, height, format])
-
   React.useEffect(() => {
     return () => {
       if (imgUrl) URL.revokeObjectURL(imgUrl)
       if (outUrl) URL.revokeObjectURL(outUrl)
     }
   }, [imgUrl, outUrl])
-
   const onWidth = (v: number) => {
     if (lockRatio && ratioRef.current > 0) {
       setWidth(v)
@@ -115,7 +107,6 @@ export default function ImageResizer() {
       setHeight(v)
     }
   }
-
   const handleDownload = () => {
     if (!outUrl) {
       toast.error('Nothing to download yet')
@@ -131,7 +122,6 @@ export default function ImageResizer() {
       })
       .catch(() => toast.error('Download failed'))
   }
-
   return (
     <div className="space-y-5">
       <Field label="Source image">
@@ -167,7 +157,6 @@ export default function ImageResizer() {
           </p>
         </div>
       </Field>
-
       <div className="grid gap-5 sm:grid-cols-2">
         <Field label="Width (px)" htmlFor="ir-w">
           <Input
@@ -188,7 +177,6 @@ export default function ImageResizer() {
           />
         </Field>
       </div>
-
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <Switch
@@ -218,7 +206,6 @@ export default function ImageResizer() {
           </Field>
         </div>
       </div>
-
       {origDims ? (
         <div className="grid grid-cols-3 gap-3">
           <Stat label="Original" value={`${origDims.w}×${origDims.h}`} />
@@ -226,7 +213,6 @@ export default function ImageResizer() {
           <Stat label="File size" value={outUrl ? formatBytes(outSize) : '—'} />
         </div>
       ) : null}
-
       {outUrl ? (
         <Card>
           <CardContent className="pt-6">
@@ -239,7 +225,6 @@ export default function ImageResizer() {
           </CardContent>
         </Card>
       ) : null}
-
       <Button
         type="button"
         onClick={handleDownload}

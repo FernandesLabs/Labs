@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import {
   Plus,
@@ -35,9 +34,7 @@ import {
 import { Field, Stat, downloadBlob, randomInt } from '@/lib/tools/tool-ui'
 import { useCopy } from '@/lib/tools/use-copy'
 import { toast } from 'sonner'
-
 type Category = 'writing' | 'coding' | 'analysis' | 'creative' | 'productivity'
-
 const CATEGORIES: Category[] = [
   'writing',
   'coding',
@@ -45,7 +42,6 @@ const CATEGORIES: Category[] = [
   'creative',
   'productivity',
 ]
-
 interface Prompt {
   id: string
   title: string
@@ -54,9 +50,7 @@ interface Prompt {
   text: string
   builtIn?: boolean
 }
-
 const STORAGE_KEY = 'fl-prompt-library'
-
 const STARTER_PROMPTS: Prompt[] = [
   {
     id: 'builtin-1',
@@ -64,7 +58,6 @@ const STARTER_PROMPTS: Prompt[] = [
     category: 'writing',
     description: 'Generate a compelling 100-word intro that hooks the reader.',
     text: `You are a senior content writer. Write a 100-word introduction for a blog post titled "{{title}}" targeting {{audience}}.
-
 Open with a surprising statistic or question. Preview the article's value without giving away the conclusion. Use a confident, conversational tone — no marketing fluff. Plain text, no headings.`,
     builtIn: true,
   },
@@ -74,7 +67,6 @@ Open with a surprising statistic or question. Preview the article's value withou
     category: 'writing',
     description: 'Generate 10 subject line variants for an email campaign.',
     text: `You are an email marketing copywriter. Generate 10 subject line variants for a campaign about {{topic}}.
-
 Constraints:
 - Max 50 characters each
 - Mix curiosity, urgency, benefit, and personalization angles
@@ -88,12 +80,10 @@ Constraints:
     category: 'writing',
     description: 'Turn a repo description into a polished README intro.',
     text: `You are a technical writer. Write the opening "Overview" section of a README for an open-source project named {{project}}.
-
 Inputs:
 - One-line description: {{description}}
 - Primary language: {{language}}
 - Target user: {{audience}}
-
 Format as markdown. Include a 2-3 sentence overview, a "Key features" bullet list (3-5 items), and a "Quick start" code block.`,
     builtIn: true,
   },
@@ -103,7 +93,6 @@ Format as markdown. Include a 2-3 sentence overview, a "Key features" bullet lis
     category: 'writing',
     description: 'Standard press release structure for a product launch.',
     text: `Act as a PR specialist. Draft a 400-word press release for {{company}} announcing {{announcement}}.
-
 Use the inverted pyramid structure:
 - Strong headline
 - Dateline + 1-paragraph summary
@@ -111,7 +100,6 @@ Use the inverted pyramid structure:
 - Supporting details
 - Boilerplate "About {{company}}" paragraph
 - Media contact placeholder
-
 Tone: professional, factual, no hype words.`,
     builtIn: true,
   },
@@ -121,7 +109,6 @@ Tone: professional, factual, no hype words.`,
     category: 'coding',
     description: 'Generate a tailored code review checklist for a PR.',
     text: `You are a senior engineer reviewing a pull request. Generate a code review checklist for a {{language}} change that touches {{area}}.
-
 Include 8-12 items covering:
 - Correctness and edge cases
 - Security implications
@@ -129,7 +116,6 @@ Include 8-12 items covering:
 - Test coverage
 - Naming and readability
 - Backward compatibility
-
 Format as a markdown checklist. Be specific to {{language}} idioms and {{area}} concerns.`,
     builtIn: true,
   },
@@ -139,7 +125,6 @@ Format as a markdown checklist. Be specific to {{language}} idioms and {{area}} 
     category: 'coding',
     description: 'Plain-English explanation of a code snippet for non-engineers.',
     text: `Explain the following code to a non-technical stakeholder. Use an analogy where helpful. Do not exceed 150 words. End with one sentence on what could go wrong if this code breaks.
-
 \`\`\`
 {{code}}
 \`\`\``,
@@ -151,18 +136,15 @@ Format as a markdown checklist. Be specific to {{language}} idioms and {{area}} 
     category: 'coding',
     description: 'Produce unit tests for a given function.',
     text: `You are a test engineer. Write {{framework}} unit tests for the following function:
-
 \`\`\`
 {{code}}
 \`\`\`
-
 Cover:
 - Happy path
 - Empty / null inputs
 - Boundary values
 - Edge cases specific to the function's domain
 - One negative test
-
 Use describe/it blocks. Mock external calls. No comments — let the test names speak.`,
     builtIn: true,
   },
@@ -172,11 +154,9 @@ Use describe/it blocks. Mock external calls. No comments — let the test names 
     category: 'coding',
     description: 'Suggest a cleaner version of a function with rationale.',
     text: `Refactor the following {{language}} code for readability. Preserve behavior exactly.
-
 \`\`\`
 {{code}}
 \`\`\`
-
 Output:
 1. The refactored code in a code block
 2. A 3-bullet summary of what you changed and why
@@ -189,11 +169,9 @@ Output:
     category: 'analysis',
     description: 'Five-whys analysis for a production incident.',
     text: `You are a site reliability engineer. Perform a "five whys" root cause analysis on the following incident:
-
 Incident: {{description}}
 Symptoms: {{symptoms}}
 Timeline: {{timeline}}
-
 For each "why", state the assumption, the answer, and the evidence. End with:
 - Direct cause
 - Contributing causes
@@ -206,9 +184,7 @@ For each "why", state the assumption, the answer, and the evidence. End with:
     category: 'analysis',
     description: 'Structured comparison matrix of competing products.',
     text: `You are a product analyst. Build a feature comparison matrix for these competitors: {{competitors}}.
-
 Topic area: {{topic}}
-
 Output as a markdown table with:
 - Competitor names as columns
 - 8-12 feature rows (mix of must-have and differentiating features)
@@ -222,10 +198,8 @@ Output as a markdown table with:
     category: 'analysis',
     description: 'Turn raw survey data into an executive summary.',
     text: `You are a research analyst. Summarize the following survey results for an executive audience in under 250 words.
-
 Raw data:
 {{data}}
-
 Include:
 - Top 3 findings (with the supporting stat)
 - One surprising insight
@@ -239,14 +213,12 @@ Include:
     category: 'analysis',
     description: 'Identify and prioritize risks for a project.',
     text: `Act as a project risk manager. Identify the top 8 risks for: {{project_description}}.
-
 For each risk provide:
 - Risk name
 - Likelihood (Low/Medium/High)
 - Impact (Low/Medium/High)
 - Mitigation strategy (1 sentence)
 - Owner role
-
 Sort by likelihood × impact descending. Output as a markdown table.`,
     builtIn: true,
   },
@@ -256,12 +228,10 @@ Sort by likelihood × impact descending. Output as a markdown table.`,
     category: 'creative',
     description: 'Generate 3 alternative opening paragraphs for a story.',
     text: `You are a literary fiction writer. Write 3 distinct opening paragraphs (80-120 words each) for a story set in {{setting}} featuring {{character}}.
-
 Each opener should use a different narrative hook:
 1. Action
 2. Voice / interior monologue
 3. Atmospheric description
-
 Label each clearly. No clichés. Avoid adverbs.`,
     builtIn: true,
   },
@@ -271,10 +241,8 @@ Label each clearly. No clichés. Avoid adverbs.`,
     category: 'creative',
     description: 'Define a brand voice from sample copy.',
     text: `You are a brand strategist. Analyze the following sample copy and produce brand voice guidelines for {{brand}}.
-
 Sample copy:
 {{samples}}
-
 Output:
 - 3 voice attributes (single words)
 - "We are / We are not" table (4 rows)
@@ -288,13 +256,11 @@ Output:
     category: 'creative',
     description: 'Generate 20 candidate names with rationale.',
     text: `Brainstorm 20 product names for {{product_description}}.
-
 Constraints:
 - 1-2 words, max 12 characters
 - Easy to pronounce
 - .com domain likely available (use real-word or compound constructions)
 - No trademark-obvious collisions with major brands
-
 For each name give a one-line rationale. Group by style: descriptive, evocative, invented, metaphorical.`,
     builtIn: true,
   },
@@ -304,7 +270,6 @@ For each name give a one-line rationale. Group by style: descriptive, evocative,
     category: 'creative',
     description: 'Five fresh metaphors for explaining an abstract concept.',
     text: `Generate 5 fresh metaphors for explaining "{{concept}}" to a {{audience}}.
-
 Rules:
 - No clichés (avoid "is like a highway", "is a journey", etc.)
 - Each metaphor ≤ 30 words
@@ -318,14 +283,12 @@ Rules:
     category: 'productivity',
     description: 'Structured weekly retrospective prompt.',
     text: `You are my productivity coach. Walk me through a weekly review.
-
 Ask me one question at a time, wait for my answer, then ask the next:
 1. What were my top 3 wins this week?
 2. What was the biggest lesson learned?
 3. What did I commit to but not finish? Why?
 4. What is the single most important outcome for next week?
 5. What support do I need?
-
 After my fifth answer, output a 1-paragraph summary and a 3-item priority list for next week.`,
     builtIn: true,
   },
@@ -335,9 +298,7 @@ After my fifth answer, output a 1-paragraph summary and a 3-item priority list f
     category: 'productivity',
     description: 'Draft a focused agenda from a meeting goal.',
     text: `You are a meeting facilitator. Build a tight agenda for a {{duration}}-minute meeting with goal: {{goal}}.
-
 Attendees: {{attendees}}
-
 Output:
 - 1-sentence desired outcome
 - Agenda items with timeboxes (in minutes) summing to {{duration}}
@@ -352,14 +313,12 @@ Output:
     category: 'productivity',
     description: 'Weighted decision matrix for choosing between options.',
     text: `Help me decide between these options: {{options}}.
-
 Build a weighted decision matrix:
 1. Ask me for 4-6 criteria and their weights (sum to 100)
 2. Ask me to score each option 1-5 on each criterion
 3. Compute weighted scores
 4. Recommend the top option and name the second-place finisher
 5. State the key risk of the recommended choice in one sentence
-
 Wait for my input between steps.`,
     builtIn: true,
   },
@@ -369,26 +328,21 @@ Wait for my input between steps.`,
     category: 'productivity',
     description: 'Sort a list of emails into action categories.',
     text: `You are an executive assistant. I will paste a list of email subjects and senders. Triage each into one of four buckets:
-
 - DO NOW (< 2 min)
 - SCHEDULE (calendar/block time)
 - DELEGATE (name the role that should handle it)
 - DEFER / DELETE
-
 Output as a markdown table. After the table, list the 3 most important items in priority order with a one-line next action each.
-
 Emails:
 {{emails}}`,
     builtIn: true,
   },
 ]
-
 function makeId(): string {
   // Non-security-relevant unique ID; uses the shared secure RNG helper
   // (no Math.random, per project conventions).
   return `user-${Date.now().toString(36)}-${randomInt(1_000_000).toString(36)}`
 }
-
 function loadPrompts(): Prompt[] {
   if (typeof window === 'undefined') return STARTER_PROMPTS
   try {
@@ -401,7 +355,6 @@ function loadPrompts(): Prompt[] {
     return STARTER_PROMPTS
   }
 }
-
 function savePrompts(prompts: Prompt[]): void {
   if (typeof window === 'undefined') return
   try {
@@ -410,7 +363,6 @@ function savePrompts(prompts: Prompt[]): void {
     toast.error('Could not save to localStorage — quota exceeded?')
   }
 }
-
 export default function PromptLibrary(): React.JSX.Element {
   const [prompts, setPrompts] = React.useState<Prompt[]>(STARTER_PROMPTS)
   const [hydrated, setHydrated] = React.useState<boolean>(false)
@@ -424,19 +376,16 @@ export default function PromptLibrary(): React.JSX.Element {
   const [formText, setFormText] = React.useState<string>('')
   const fileInputRef = React.useRef<HTMLInputElement | null>(null)
   const { copy } = useCopy()
-
   // Hydrate from localStorage on mount (client-only).
   React.useEffect(() => {
     setPrompts(loadPrompts())
     setHydrated(true)
   }, [])
-
   // Persist on change (after hydration).
   React.useEffect(() => {
     if (!hydrated) return
     savePrompts(prompts)
   }, [prompts, hydrated])
-
   const filtered = React.useMemo(() => {
     const q = search.trim().toLowerCase()
     return prompts.filter((p) => {
@@ -449,19 +398,16 @@ export default function PromptLibrary(): React.JSX.Element {
       )
     })
   }, [prompts, search, category])
-
   const selected = React.useMemo(
     () => prompts.find((p) => p.id === selectedId) ?? null,
     [prompts, selectedId]
   )
-
   const counts = React.useMemo(() => {
     const byCat: Record<string, number> = {}
     for (const c of CATEGORIES) byCat[c] = 0
     for (const p of prompts) byCat[p.category] = (byCat[p.category] ?? 0) + 1
     return byCat
   }, [prompts])
-
   const handleAdd = (): void => {
     const title = formTitle.trim()
     const text = formText.trim()
@@ -489,13 +435,11 @@ export default function PromptLibrary(): React.JSX.Element {
     setSelectedId(newPrompt.id)
     toast.success('Prompt added to your library')
   }
-
   const handleDelete = (id: string): void => {
     setPrompts((prev) => prev.filter((p) => p.id !== id))
     if (selectedId === id) setSelectedId(null)
     toast.success('Prompt deleted')
   }
-
   const handleExport = (): void => {
     const blob = new Blob([JSON.stringify(prompts, null, 2)], {
       type: 'application/json',
@@ -503,11 +447,9 @@ export default function PromptLibrary(): React.JSX.Element {
     downloadBlob(blob, 'prompt-library.json')
     toast.success('Library exported')
   }
-
   const handleImportClick = (): void => {
     fileInputRef.current?.click()
   }
-
   const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -562,7 +504,6 @@ export default function PromptLibrary(): React.JSX.Element {
     reader.onerror = () => toast.error('Could not read file')
     reader.readAsText(file)
   }
-
   return (
     <div className="space-y-5">
       <Card>
@@ -611,7 +552,6 @@ export default function PromptLibrary(): React.JSX.Element {
               </Select>
             </Field>
           </div>
-
           <div className="flex flex-wrap gap-2">
             <Button
               type="button"
@@ -650,7 +590,6 @@ export default function PromptLibrary(): React.JSX.Element {
               aria-label="Import prompts from JSON file"
             />
           </div>
-
           {showForm ? (
             <div className="space-y-3 rounded-lg border border-border bg-muted/20 p-3">
               <div className="flex items-center justify-between">
@@ -734,7 +673,6 @@ export default function PromptLibrary(): React.JSX.Element {
           ) : null}
         </CardContent>
       </Card>
-
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         <Stat label="Total" value={prompts.length} />
         {CATEGORIES.map((c) => (
@@ -745,7 +683,6 @@ export default function PromptLibrary(): React.JSX.Element {
           />
         ))}
       </div>
-
       <div className="grid gap-4 lg:grid-cols-2">
         {/* List */}
         <div className="space-y-2">
@@ -802,7 +739,6 @@ export default function PromptLibrary(): React.JSX.Element {
             )}
           </ScrollArea>
         </div>
-
         {/* Detail */}
         <Card>
           <CardHeader>

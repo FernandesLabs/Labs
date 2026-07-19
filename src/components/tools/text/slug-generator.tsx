@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -13,7 +12,6 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Field, ResultBox } from '@/lib/tools/tool-ui'
-
 const STOPWORDS = new Set([
   'a',
   'an',
@@ -46,13 +44,10 @@ const STOPWORDS = new Set([
   'we',
   'our',
 ])
-
 type SeparatorId = 'dash' | 'underscore'
-
 function stripDiacritics(input: string): string {
   return input.normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
 }
-
 function buildSlug(
   raw: string,
   separator: SeparatorId,
@@ -80,20 +75,17 @@ function buildSlug(
   }
   return slug
 }
-
 export default function SlugGenerator() {
   const [text, setText] = React.useState('')
   const [separator, setSeparator] = React.useState<SeparatorId>('dash')
   const [lowercase, setLowercase] = React.useState(true)
   const [stripStopwords, setStripStopwords] = React.useState(false)
   const [maxLength, setMaxLength] = React.useState(80)
-
   const slug = React.useMemo(
     () =>
       buildSlug(text, separator, lowercase, stripStopwords, maxLength),
     [text, separator, lowercase, stripStopwords, maxLength]
   )
-
   return (
     <div className="space-y-5">
       <Field
@@ -109,7 +101,6 @@ export default function SlugGenerator() {
           autoComplete="off"
         />
       </Field>
-
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Separator" htmlFor="sg-sep">
           <Select
@@ -125,7 +116,6 @@ export default function SlugGenerator() {
             </SelectContent>
           </Select>
         </Field>
-
         <Field
           label="Max length"
           htmlFor="sg-max"
@@ -148,7 +138,6 @@ export default function SlugGenerator() {
           </div>
         </Field>
       </div>
-
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="flex items-center justify-between rounded-lg border border-border bg-card p-3">
           <div className="pr-3">
@@ -187,7 +176,6 @@ export default function SlugGenerator() {
           />
         </div>
       </div>
-
       <ResultBox
         value={slug}
         label="Slug"

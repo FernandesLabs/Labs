@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Variable, Sparkles, FileText } from 'lucide-react'
 import { Textarea } from '@/components/ui/textarea'
@@ -15,16 +14,12 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Field, ResultBox } from '@/lib/tools/tool-ui'
-
 const SAMPLE_TEMPLATE = `You are a {{role}} with {{years}} years of experience.
-
 Write a {{tone}} {{content_type}} about {{topic}} for {{audience}}.
-
 Constraints:
 - Length: {{length}} words
 - Include {{num_examples}} examples
 - Reading level: {{reading_level}}`
-
 function detectVariables(template: string): string[] {
   const seen = new Set<string>()
   const out: string[] = []
@@ -39,7 +34,6 @@ function detectVariables(template: string): string[] {
   }
   return out
 }
-
 function fillTemplate(
   template: string,
   values: Record<string, string>
@@ -52,13 +46,10 @@ function fillTemplate(
     }
   )
 }
-
 export default function PromptVariableReplacer() {
   const [template, setTemplate] = React.useState(SAMPLE_TEMPLATE)
   const [values, setValues] = React.useState<Record<string, string>>({})
-
   const variables = React.useMemo(() => detectVariables(template), [template])
-
   // Prune stored values that are no longer in the template.
   React.useEffect(() => {
     setValues((prev) => {
@@ -75,23 +66,18 @@ export default function PromptVariableReplacer() {
       return changed ? next : prev
     })
   }, [variables])
-
   const output = React.useMemo(
     () => fillTemplate(template, values),
     [template, values]
   )
-
   const filledCount = variables.filter((v) => (values[v] ?? '').length > 0).length
-
   const loadSample = (): void => {
     setTemplate(SAMPLE_TEMPLATE)
     setValues({})
   }
-
   const setOne = (name: string, value: string): void => {
     setValues((prev) => ({ ...prev, [name]: value }))
   }
-
   const fillAllPlaceholder = (): void => {
     const filled: Record<string, string> = { ...values }
     for (const v of variables) {
@@ -99,7 +85,6 @@ export default function PromptVariableReplacer() {
     }
     setValues(filled)
   }
-
   return (
     <div className="space-y-5">
       <Card>
@@ -152,7 +137,6 @@ export default function PromptVariableReplacer() {
           </div>
         </CardContent>
       </Card>
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Variables</CardTitle>
@@ -192,7 +176,6 @@ export default function PromptVariableReplacer() {
               })}
             </div>
           )}
-
           {variables.length > 0 ? (
             <div className="mt-4 flex flex-wrap gap-2">
               {variables.map((v) => (
@@ -208,7 +191,6 @@ export default function PromptVariableReplacer() {
           ) : null}
         </CardContent>
       </Card>
-
       <ResultBox
         value={output}
         label="Final prompt"
@@ -217,7 +199,6 @@ export default function PromptVariableReplacer() {
         downloadName="prompt.txt"
         empty="Fill in variables to see the final prompt."
       />
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">How it works</CardTitle>

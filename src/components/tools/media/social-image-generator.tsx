@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Download } from 'lucide-react'
 import { toast } from 'sonner'
@@ -16,15 +15,12 @@ import {
 } from '@/components/ui/select'
 import { Card, CardContent } from '@/components/ui/card'
 import { Field, ResultBox, downloadBlob } from '@/lib/tools/tool-ui'
-
 const W = 1200
 const H = 630
-
 interface Gradient {
   name: string
   stops: [string, string]
 }
-
 const GRADIENTS: Gradient[] = [
   { name: 'Sunset', stops: ['#ff7e5f', '#feb47b'] },
   { name: 'Ocean', stops: ['#2e3192', '#1bffff'] },
@@ -33,7 +29,6 @@ const GRADIENTS: Gradient[] = [
   { name: 'Charcoal', stops: ['#232526', '#414345'] },
   { name: 'Amber', stops: ['#f12711', '#f5af19'] },
 ]
-
 function wrapText(
   ctx: CanvasRenderingContext2D,
   text: string,
@@ -54,7 +49,6 @@ function wrapText(
   if (line) lines.push(line)
   return lines
 }
-
 function fitTitle(
   ctx: CanvasRenderingContext2D,
   text: string,
@@ -76,7 +70,6 @@ function fitTitle(
   ctx.font = `800 ${minSize}px ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`
   return { lines: wrapText(ctx, text, maxWidth), size: minSize }
 }
-
 export default function SocialImageGenerator() {
   const [title, setTitle] = React.useState('Build better tools with Fernandes Labs')
   const [subtitle, setSubtitle] = React.useState('A modern developer toolkit, crafted with care.')
@@ -85,7 +78,6 @@ export default function SocialImageGenerator() {
   const [useGradient, setUseGradient] = React.useState(true)
   const [textColor, setTextColor] = React.useState('#ffffff')
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null)
-
   const render = React.useCallback(() => {
     const canvas = canvasRef.current
     if (!canvas) return
@@ -93,7 +85,6 @@ export default function SocialImageGenerator() {
     canvas.height = H
     const ctx = canvas.getContext('2d')
     if (!ctx) return
-
     // Background
     if (useGradient) {
       const g = GRADIENTS.find((x) => x.name === gradient) ?? GRADIENTS[0]
@@ -105,17 +96,14 @@ export default function SocialImageGenerator() {
       ctx.fillStyle = solidColor
     }
     ctx.fillRect(0, 0, W, H)
-
     // Subtle overlay vignette
     const overlay = ctx.createLinearGradient(0, 0, 0, H)
     overlay.addColorStop(0, 'rgba(0,0,0,0.05)')
     overlay.addColorStop(1, 'rgba(0,0,0,0.25)')
     ctx.fillStyle = overlay
     ctx.fillRect(0, 0, W, H)
-
     const padding = 80
     const maxWidth = W - padding * 2
-
     // Title (wrap + shrink)
     const titleText = title.trim() || 'Untitled'
     const { lines: titleLines, size: titleSize } = fitTitle(
@@ -126,7 +114,6 @@ export default function SocialImageGenerator() {
       84,
       36
     )
-
     // Subtitle
     const subText = subtitle.trim()
     ctx.font = `400 28px ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`
@@ -135,7 +122,6 @@ export default function SocialImageGenerator() {
     const titleLineH = titleSize * 1.15
     const gap = subText ? 28 : 0
     const totalH = titleLines.length * titleLineH + gap + subLines.length * subLineH
-
     let y = (H - totalH) / 2 + titleSize * 0.5
     ctx.fillStyle = textColor
     ctx.textAlign = 'left'
@@ -145,7 +131,6 @@ export default function SocialImageGenerator() {
       ctx.fillText(line, padding, y)
       y += titleLineH
     }
-
     if (subText) {
       y += gap - titleLineH + subLineH * 0.5
       ctx.font = `400 28px ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`
@@ -156,7 +141,6 @@ export default function SocialImageGenerator() {
       }
       ctx.globalAlpha = 1
     }
-
     // Small brand mark in bottom-right
     ctx.font = `600 20px ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`
     ctx.textAlign = 'right'
@@ -164,11 +148,9 @@ export default function SocialImageGenerator() {
     ctx.fillText('Fernandes Labs', W - padding, H - 48)
     ctx.globalAlpha = 1
   }, [title, subtitle, gradient, solidColor, useGradient, textColor])
-
   React.useEffect(() => {
     render()
   }, [render])
-
   const handleDownload = () => {
     const canvas = canvasRef.current
     if (!canvas) return
@@ -181,7 +163,6 @@ export default function SocialImageGenerator() {
       toast.success('Social image downloaded')
     }, 'image/png')
   }
-
   const css = `background: ${
     useGradient
       ? (() => {
@@ -190,7 +171,6 @@ export default function SocialImageGenerator() {
         })()
       : solidColor
   };\ncolor: ${textColor};`
-
   return (
     <div className="space-y-5">
       <div className="grid gap-5 md:grid-cols-2">
@@ -213,7 +193,6 @@ export default function SocialImageGenerator() {
           />
         </Field>
       </div>
-
       <div className="grid gap-5 sm:grid-cols-2">
         <Field label="Background" htmlFor="si-bg">
           <Select
@@ -240,7 +219,6 @@ export default function SocialImageGenerator() {
             </SelectContent>
           </Select>
         </Field>
-
         <Field label="Text color" htmlFor="si-fg">
           <div className="flex items-center gap-3">
             <input
@@ -259,7 +237,6 @@ export default function SocialImageGenerator() {
           </div>
         </Field>
       </div>
-
       {!useGradient ? (
         <Field label="Solid background color" htmlFor="si-solid">
           <div className="flex items-center gap-3">
@@ -279,7 +256,6 @@ export default function SocialImageGenerator() {
           </div>
         </Field>
       ) : null}
-
       <Card>
         <CardContent className="pt-6">
           <Label className="mb-2 block text-sm font-medium">
@@ -295,7 +271,6 @@ export default function SocialImageGenerator() {
           </div>
         </CardContent>
       </Card>
-
       <div className="flex flex-wrap items-center gap-3">
         <Button
           type="button"
@@ -309,7 +284,6 @@ export default function SocialImageGenerator() {
           Long titles wrap automatically and shrink to fit.
         </Label>
       </div>
-
       <ResultBox
         label="CSS snippet"
         value={css}

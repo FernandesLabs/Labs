@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { AlertTriangle } from 'lucide-react'
 import { Input } from '@/components/ui/input'
@@ -27,9 +26,7 @@ import {
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 type Unit = 'B' | 'KB' | 'MB' | 'GB' | 'TB' | 'PB'
-
 const UNITS: Unit[] = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
 const UNIT_LABELS: Record<Unit, string> = {
   B: 'Bytes',
@@ -39,17 +36,14 @@ const UNIT_LABELS: Record<Unit, string> = {
   TB: 'Terabytes',
   PB: 'Petabytes',
 }
-
 function unitToBytes(value: number, unit: Unit): number {
   const exp = UNITS.indexOf(unit)
   return value * Math.pow(1024, exp)
 }
-
 function bytesToUnit(bytes: number, unit: Unit): number {
   const exp = UNITS.indexOf(unit)
   return bytes / Math.pow(1024, exp)
 }
-
 function formatNumber(n: number): string {
   if (!Number.isFinite(n)) return '—'
   if (n === 0) return '0'
@@ -59,7 +53,6 @@ function formatNumber(n: number): string {
   if (abs >= 1) return n.toLocaleString(undefined, { maximumFractionDigits: 4 })
   return n.toLocaleString(undefined, { maximumFractionDigits: 6 })
 }
-
 function humanReadable(bytes: number): string {
   if (!Number.isFinite(bytes)) return '—'
   if (bytes === 0) return '0 B'
@@ -79,7 +72,6 @@ function humanReadable(bytes: number): string {
       : value.toFixed(2)
   return `${sign}${formatted} ${unit}`
 }
-
 const PRESETS: Array<{ label: string; value: string; unit: Unit }> = [
   { label: '1.44 MB floppy', value: '1.44', unit: 'MB' },
   { label: '700 MB CD', value: '700', unit: 'MB' },
@@ -87,25 +79,20 @@ const PRESETS: Array<{ label: string; value: string; unit: Unit }> = [
   { label: '25 GB Blu-ray', value: '25', unit: 'GB' },
   { label: '1 TB HDD', value: '1', unit: 'TB' },
 ]
-
 export default function FileSizeConverter(): React.JSX.Element {
   const [value, setValue] = React.useState('1536')
   const [unit, setUnit] = React.useState<Unit>('B')
-
   const numericValue = React.useMemo<number>(() => {
     const v = parseFloat(value.trim())
     return Number.isFinite(v) ? v : NaN
   }, [value])
-
   const isValid = Number.isFinite(numericValue)
   const isNegative = isValid && numericValue < 0
   const isZero = isValid && numericValue === 0
-
   const bytes = React.useMemo<number>(() => {
     if (!isValid) return NaN
     return unitToBytes(numericValue, unit)
   }, [numericValue, unit, isValid])
-
   const conversions = React.useMemo<Array<{ unit: Unit; value: number; label: string }>>(() => {
     if (!isValid) return []
     return UNITS.map((u) => ({
@@ -114,14 +101,11 @@ export default function FileSizeConverter(): React.JSX.Element {
       label: UNIT_LABELS[u],
     }))
   }, [bytes, isValid])
-
   const human = React.useMemo(() => (isValid ? humanReadable(bytes) : '—'), [bytes, isValid])
-
   const applyPreset = (preset: { value: string; unit: Unit }): void => {
     setValue(preset.value)
     setUnit(preset.unit)
   }
-
   return (
     <div className="space-y-5">
       <Card>
@@ -162,7 +146,6 @@ export default function FileSizeConverter(): React.JSX.Element {
               </Select>
             </Field>
           </div>
-
           <div className="flex flex-wrap gap-2">
             {PRESETS.map((p) => (
               <button
@@ -177,7 +160,6 @@ export default function FileSizeConverter(): React.JSX.Element {
           </div>
         </CardContent>
       </Card>
-
       {isNegative ? (
         <div
           role="alert"
@@ -187,7 +169,6 @@ export default function FileSizeConverter(): React.JSX.Element {
           Negative values are unusual for file sizes but are supported mathematically.
         </div>
       ) : null}
-
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat label="Input value" value={isValid ? `${formatNumber(numericValue)} ${unit}` : '—'} />
         <Stat label="In bytes" value={isValid ? formatNumber(bytes) : '—'} accent="oklch(0.6 0.17 150)" />
@@ -198,7 +179,6 @@ export default function FileSizeConverter(): React.JSX.Element {
           accent={isNegative ? 'oklch(0.7 0.18 75)' : 'oklch(0.6 0.17 150)'}
         />
       </div>
-
       {isValid ? (
         <Card>
           <CardHeader>

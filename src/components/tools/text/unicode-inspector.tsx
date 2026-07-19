@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Type } from 'lucide-react'
 import { Input } from '@/components/ui/input'
@@ -21,10 +20,8 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 /** Maximum number of characters rendered in the table (perf guard). */
 const MAX_ROWS = 512
-
 /** Names for ASCII code points 0–127 (per Unicode). */
 const ASCII_NAMES: string[] = [
   'NULL',
@@ -156,13 +153,11 @@ const ASCII_NAMES: string[] = [
   'TILDE',
   'DELETE',
 ]
-
 const RE_LETTER = /\p{L}/u
 const RE_NUMBER = /\p{N}/u
 const RE_PUNCT = /\p{P}/u
 const RE_SYMBOL = /\p{S}/u
 const RE_SEPARATOR = /\p{Z}/u
-
 type CharCategory =
   | 'Letter'
   | 'Number'
@@ -171,7 +166,6 @@ type CharCategory =
   | 'Space'
   | 'Control'
   | 'Other'
-
 function categoryFor(ch: string): CharCategory {
   if (RE_LETTER.test(ch)) return 'Letter'
   if (RE_NUMBER.test(ch)) return 'Number'
@@ -183,18 +177,15 @@ function categoryFor(ch: string): CharCategory {
   if (cp < 0x20 || cp === 0x7f || (cp >= 0x80 && cp <= 0x9f)) return 'Control'
   return 'Other'
 }
-
 function categoryName(ch: string, cp: number): string {
   if (cp <= 0x7f) return ASCII_NAMES[cp] ?? `U+${cp.toString(16).toUpperCase().padStart(4, '0')}`
   // Generic name for non-ASCII characters (no full Unicode database available client-side).
   return `Code point U+${cp.toString(16).toUpperCase().padStart(4, '0')}`
 }
-
 function utf8BytesHex(ch: string): string {
   const bytes = new TextEncoder().encode(ch)
   return Array.from(bytes, (b) => b.toString(16).toUpperCase().padStart(2, '0')).join(' ')
 }
-
 function utf16UnitsHex(ch: string): string {
   // For BMP chars: 1 code unit. For supplementary plane chars: 2 (surrogate pair).
   const units: number[] = []
@@ -203,7 +194,6 @@ function utf16UnitsHex(ch: string): string {
   }
   return units.map((u) => u.toString(16).toUpperCase().padStart(4, '0')).join(' ')
 }
-
 function categoryBadgeClass(cat: CharCategory): string {
   switch (cat) {
     case 'Letter':
@@ -222,7 +212,6 @@ function categoryBadgeClass(cat: CharCategory): string {
       return 'border-transparent bg-muted text-muted-foreground'
   }
 }
-
 /** A printable representation of the character for display. */
 function displayChar(ch: string, cat: CharCategory): string {
   if (cat === 'Control') {
@@ -239,7 +228,6 @@ function displayChar(ch: string, cat: CharCategory): string {
   }
   return ch
 }
-
 interface CharRow {
   index: number
   char: string
@@ -250,7 +238,6 @@ interface CharRow {
   utf8: string
   utf16: string
 }
-
 function buildRows(text: string): CharRow[] {
   const rows: CharRow[] = []
   const chars = Array.from(text) // iterates by code point
@@ -271,10 +258,8 @@ function buildRows(text: string): CharRow[] {
   }
   return rows
 }
-
 export default function UnicodeInspector(): React.JSX.Element {
   const [text, setText] = React.useState('Hello, 世界! 🌍')
-
   const rows = React.useMemo(() => buildRows(text), [text])
   const totalCodePoints = React.useMemo(() => Array.from(text).length, [text])
   const totalUtf8Bytes = React.useMemo(
@@ -282,7 +267,6 @@ export default function UnicodeInspector(): React.JSX.Element {
     [text]
   )
   const totalUtf16Units = React.useMemo(() => text.length, [text])
-
   const categoryCounts = React.useMemo(() => {
     const counts: Record<CharCategory, number> = {
       Letter: 0,
@@ -298,9 +282,7 @@ export default function UnicodeInspector(): React.JSX.Element {
     }
     return counts
   }, [text])
-
   const truncated = totalCodePoints > MAX_ROWS
-
   return (
     <div className="space-y-5">
       <Card>
@@ -330,7 +312,6 @@ export default function UnicodeInspector(): React.JSX.Element {
           </Field>
         </CardContent>
       </Card>
-
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat label="Code points" value={totalCodePoints} />
         <Stat
@@ -345,13 +326,11 @@ export default function UnicodeInspector(): React.JSX.Element {
           accent="oklch(0.6 0.17 150)"
         />
       </div>
-
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         {(Object.keys(categoryCounts) as CharCategory[]).map((cat) => (
           <Stat key={cat} label={cat} value={categoryCounts[cat]} />
         ))}
       </div>
-
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">

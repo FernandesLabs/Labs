@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Loader2, Lock, Search, ShieldCheck, ShieldAlert } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -16,7 +15,6 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { toast } from 'sonner'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 interface SslCertSubject {
   CN?: string
   O?: string
@@ -25,12 +23,10 @@ interface SslCertSubject {
   ST?: string
   L?: string
 }
-
 interface SslCipher {
   name?: string
   version?: string
 }
-
 interface SslResponse {
   ok: boolean
   error?: string
@@ -46,7 +42,6 @@ interface SslResponse {
   san?: string
   daysRemaining?: number
 }
-
 /** Parse the comma-separated `subjectaltname` string from a Node TLS cert. */
 function parseSans(san?: string): string[] {
   if (!san) return []
@@ -56,7 +51,6 @@ function parseSans(san?: string): string[] {
     .map((part) => part.trim())
     .filter((part) => part.length > 0)
 }
-
 /** Format an OpenSSL date string like "Oct 1 23:59:59 2024 GMT" nicely. */
 function formatDate(raw?: string): string {
   if (!raw) return '—'
@@ -71,7 +65,6 @@ function formatDate(raw?: string): string {
     timeZoneName: 'short',
   })
 }
-
 function daysRemainingAccent(days: number | undefined): string | undefined {
   if (days === undefined) return undefined
   if (days < 0) return 'oklch(0.6 0.22 25)'
@@ -79,7 +72,6 @@ function daysRemainingAccent(days: number | undefined): string | undefined {
   if (days < 30) return 'oklch(0.7 0.18 75)'
   return 'oklch(0.6 0.17 150)'
 }
-
 async function fetchSsl(
   host: string,
   signal: AbortSignal
@@ -88,13 +80,11 @@ async function fetchSsl(
   const res = await fetch(url, { signal })
   return (await res.json()) as SslResponse
 }
-
 export default function SslChecker(): React.JSX.Element {
   const [host, setHost] = React.useState('example.com')
   const [loading, setLoading] = React.useState(false)
   const [data, setData] = React.useState<SslResponse | null>(null)
   const controllerRef = React.useRef<AbortController | null>(null)
-
   const check = React.useCallback(
     async (override?: string) => {
       const target = (override ?? host)
@@ -135,15 +125,12 @@ export default function SslChecker(): React.JSX.Element {
     },
     [host]
   )
-
   React.useEffect(() => {
     return () => {
       if (controllerRef.current) controllerRef.current.abort()
     }
   }, [])
-
   const sans = React.useMemo(() => parseSans(data?.san), [data])
-
   return (
     <div className="space-y-5">
       <Card>
@@ -184,7 +171,6 @@ export default function SslChecker(): React.JSX.Element {
           </Button>
         </CardContent>
       </Card>
-
       {data ? (
         <Card>
           <CardHeader>
@@ -241,9 +227,7 @@ export default function SslChecker(): React.JSX.Element {
                 }
               />
             </div>
-
             <Separator />
-
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <h3 className="text-sm font-semibold text-foreground">
@@ -292,14 +276,11 @@ export default function SslChecker(): React.JSX.Element {
                 </dl>
               </div>
             </div>
-
             <Separator />
-
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <Stat label="Valid from" value={formatDate(data.validFrom)} />
               <Stat label="Valid to" value={formatDate(data.validTo)} />
             </div>
-
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="rounded-lg border border-border bg-card p-3">
                 <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
@@ -318,7 +299,6 @@ export default function SslChecker(): React.JSX.Element {
                 </div>
               </div>
             </div>
-
             <div>
               <h3 className="mb-2 text-sm font-semibold text-foreground">
                 Subject Alternative Names ({sans.length})
@@ -349,7 +329,6 @@ export default function SslChecker(): React.JSX.Element {
     </div>
   )
 }
-
 function DetailRow({
   label,
   value,

@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
 import { siteConfig } from '@/lib/site-config'
-
 /**
  * Serves /ads.txt for Google AdSense verification.
  *
@@ -14,18 +13,15 @@ import { siteConfig } from '@/lib/site-config'
  */
 export function GET() {
   const clientId = siteConfig.adsense.clientId
-
   if (!clientId) {
     // Return empty — no AdSense configured yet
     return new NextResponse('', {
       headers: { 'content-type': 'text/plain' },
     })
   }
-
   // Extract the publisher ID (strip "ca-" prefix)
   const pubId = clientId.replace(/^ca-/, '')
   const adsTxtContent = `google.com, ${pubId}, DIRECT, f08c47fec0942fa0\n`
-
   return new NextResponse(adsTxtContent, {
     headers: {
       'content-type': 'text/plain',

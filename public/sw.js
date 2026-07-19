@@ -3,14 +3,12 @@
 const SW_VERSION = 'fl-v1'
 const STATIC_CACHE = `${SW_VERSION}-static`
 const RUNTIME_CACHE = `${SW_VERSION}-runtime`
-
 // Assets to precache on install (app shell + shared assets)
 const PRECACHE_URLS = [
   '/',
   '/manifest.webmanifest',
   '/fl-logo.svg',
 ]
-
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches
@@ -19,7 +17,6 @@ self.addEventListener('install', (event) => {
       .then(() => self.skipWaiting())
   )
 })
-
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches
@@ -34,15 +31,12 @@ self.addEventListener('activate', (event) => {
       .then(() => self.clients.claim())
   )
 })
-
 self.addEventListener('fetch', (event) => {
   const req = event.request
   if (req.method !== 'GET') return
-
   const url = new URL(req.url)
   // Only handle same-origin requests; let cross-origin (CDN libs) pass through.
   if (url.origin !== self.location.origin) return
-
   // Navigation requests (HTML pages): network-first, fall back to cached shell.
   if (req.mode === 'navigate') {
     event.respondWith(
@@ -56,7 +50,6 @@ self.addEventListener('fetch', (event) => {
     )
     return
   }
-
   // Static assets (JS, CSS, fonts, images): stale-while-revalidate.
   event.respondWith(
     caches.match(req).then((cached) => {

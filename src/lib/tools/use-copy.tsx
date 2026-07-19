@@ -1,9 +1,7 @@
 'use client'
-
 import * as React from 'react'
 import { Check, Copy } from 'lucide-react'
 import { toast } from 'sonner'
-
 /**
  * Copy text to clipboard with toast feedback.
  * Returns [copied, copy] where `copied` is true briefly after copying.
@@ -11,7 +9,6 @@ import { toast } from 'sonner'
 export function useCopy(timeout = 1500) {
   const [copied, setCopied] = React.useState(false)
   const timer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
-
   const copy = React.useCallback(
     async (text: string, label = 'Copied to clipboard') => {
       try {
@@ -37,16 +34,13 @@ export function useCopy(timeout = 1500) {
     },
     [timeout]
   )
-
   React.useEffect(() => {
     return () => {
       if (timer.current) clearTimeout(timer.current)
     }
   }, [])
-
   return { copied, copy }
 }
-
 /** Copy button that uses the useCopy hook. */
 export function CopyButton({
   value,

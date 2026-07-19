@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Plus, Trash2, ArrowUp, ArrowDown, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -15,17 +14,14 @@ import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { toast } from 'sonner'
 import { Field, ResultBox, Stat, randomInt } from '@/lib/tools/tool-ui'
-
 interface Crumb {
   id: string
   name: string
   url: string
 }
-
 function makeId(): string {
   return `crumb-${Date.now().toString(36)}-${randomInt(1_000_000).toString(36)}`
 }
-
 function isValidUrl(url: string): boolean {
   if (!url) return false
   try {
@@ -35,7 +31,6 @@ function isValidUrl(url: string): boolean {
     return false
   }
 }
-
 function buildJsonLd(crumbs: Crumb[]): string {
   const filled = crumbs.filter((c) => c.name.trim() && isValidUrl(c.url))
   if (filled.length === 0) return ''
@@ -55,7 +50,6 @@ function buildJsonLd(crumbs: Crumb[]): string {
     2
   )
 }
-
 const SAMPLE: Crumb[] = [
   { id: 'c1', name: 'Home', url: 'https://example.com/' },
   { id: 'c2', name: 'Blog', url: 'https://example.com/blog' },
@@ -65,14 +59,11 @@ const SAMPLE: Crumb[] = [
     url: 'https://example.com/blog/sustainable-coffee',
   },
 ]
-
 export default function BreadcrumbSchemaGenerator(): React.JSX.Element {
   const [crumbs, setCrumbs] = React.useState<Crumb[]>(SAMPLE)
-
   const update = (id: string, field: 'name' | 'url', value: string): void => {
     setCrumbs((prev) => prev.map((c) => (c.id === id ? { ...c, [field]: value } : c)))
   }
-
   const add = (): void => {
     if (crumbs.length >= 30) {
       toast.error('Maximum of 30 breadcrumbs reached')
@@ -80,11 +71,9 @@ export default function BreadcrumbSchemaGenerator(): React.JSX.Element {
     }
     setCrumbs((prev) => [...prev, { id: makeId(), name: '', url: '' }])
   }
-
   const remove = (id: string): void => {
     setCrumbs((prev) => (prev.length === 1 ? prev : prev.filter((c) => c.id !== id)))
   }
-
   const move = (index: number, direction: 'up' | 'down'): void => {
     setCrumbs((prev) => {
       const target = direction === 'up' ? index - 1 : index + 1
@@ -94,11 +83,9 @@ export default function BreadcrumbSchemaGenerator(): React.JSX.Element {
       return next
     })
   }
-
   const jsonLd = React.useMemo(() => buildJsonLd(crumbs), [crumbs])
   const validCount = crumbs.filter((c) => c.name.trim() && isValidUrl(c.url)).length
   const invalidCount = crumbs.length - validCount
-
   return (
     <div className="space-y-5">
       <Card>
@@ -193,7 +180,6 @@ export default function BreadcrumbSchemaGenerator(): React.JSX.Element {
           </Button>
         </CardContent>
       </Card>
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Visual preview</CardTitle>
@@ -231,7 +217,6 @@ export default function BreadcrumbSchemaGenerator(): React.JSX.Element {
           </ScrollArea>
         </CardContent>
       </Card>
-
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat label="Total items" value={crumbs.length} />
         <Stat label="Valid items" value={validCount} accent="oklch(0.6 0.17 150)" />
@@ -242,7 +227,6 @@ export default function BreadcrumbSchemaGenerator(): React.JSX.Element {
         />
         <Stat label="Schema size" value={`${jsonLd.length} chars`} />
       </div>
-
       <ResultBox
         value={jsonLd}
         label="BreadcrumbList JSON-LD"

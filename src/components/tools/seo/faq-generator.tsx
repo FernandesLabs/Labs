@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Plus, Trash2, ArrowUp, ArrowDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -16,17 +15,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'
 import { Field, ResultBox, Stat, randomInt } from '@/lib/tools/tool-ui'
-
 interface FaqPair {
   id: string
   question: string
   answer: string
 }
-
 function makeId(): string {
   return `faq-${Date.now().toString(36)}-${randomInt(1_000_000).toString(36)}`
 }
-
 function escapeHtml(value: string): string {
   return value
     .replace(/&/g, '&amp;')
@@ -34,7 +30,6 @@ function escapeHtml(value: string): string {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
 }
-
 function buildHtml(pairs: FaqPair[]): string {
   const filled = pairs.filter((p) => p.question.trim() || p.answer.trim())
   if (filled.length === 0) return ''
@@ -48,7 +43,6 @@ function buildHtml(pairs: FaqPair[]): string {
     .join('\n')
   return `<section class="faq">\n${items}\n</section>`
 }
-
 function buildJsonLd(pairs: FaqPair[]): string {
   const filled = pairs
     .filter((p) => p.question.trim() && p.answer.trim())
@@ -68,7 +62,6 @@ function buildJsonLd(pairs: FaqPair[]): string {
   }
   return JSON.stringify(schema, null, 2)
 }
-
 const SAMPLE: FaqPair[] = [
   {
     id: 'seed-1',
@@ -83,14 +76,11 @@ const SAMPLE: FaqPair[] = [
       'Standard shipping takes 3-5 business days within the continental US. Express options are available at checkout.',
   },
 ]
-
 export default function FaqGenerator(): React.JSX.Element {
   const [pairs, setPairs] = React.useState<FaqPair[]>(SAMPLE)
-
   const update = (id: string, field: 'question' | 'answer', value: string): void => {
     setPairs((prev) => prev.map((p) => (p.id === id ? { ...p, [field]: value } : p)))
   }
-
   const addPair = (): void => {
     if (pairs.length >= 50) {
       toast.error('Maximum of 50 FAQ pairs reached')
@@ -98,11 +88,9 @@ export default function FaqGenerator(): React.JSX.Element {
     }
     setPairs((prev) => [...prev, { id: makeId(), question: '', answer: '' }])
   }
-
   const removePair = (id: string): void => {
     setPairs((prev) => (prev.length === 1 ? prev : prev.filter((p) => p.id !== id)))
   }
-
   const move = (index: number, direction: 'up' | 'down'): void => {
     setPairs((prev) => {
       const next = [...prev]
@@ -112,11 +100,9 @@ export default function FaqGenerator(): React.JSX.Element {
       return next
     })
   }
-
   const htmlOutput = React.useMemo(() => buildHtml(pairs), [pairs])
   const jsonLdOutput = React.useMemo(() => buildJsonLd(pairs), [pairs])
   const filledCount = pairs.filter((p) => p.question.trim() && p.answer.trim()).length
-
   return (
     <div className="space-y-5">
       <Card>
@@ -201,7 +187,6 @@ export default function FaqGenerator(): React.JSX.Element {
           </Button>
         </CardContent>
       </Card>
-
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat label="Total pairs" value={pairs.length} />
         <Stat label="Complete" value={filledCount} accent="oklch(0.6 0.17 150)" />
@@ -212,7 +197,6 @@ export default function FaqGenerator(): React.JSX.Element {
         />
         <Stat label="HTML size" value={`${htmlOutput.length} chars`} />
       </div>
-
       <Tabs defaultValue="html">
         <TabsList>
           <TabsTrigger value="html">HTML markup</TabsTrigger>

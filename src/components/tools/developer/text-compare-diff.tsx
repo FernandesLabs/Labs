@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Eraser, FileText, GitCompare } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -17,34 +16,26 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Field, ResultBox, Stat } from '@/lib/tools/tool-ui'
-
 type DiffOpType = 'equal' | 'add' | 'remove'
-
 interface DiffOp {
   type: DiffOpType
   value: string
 }
-
 interface DiffStats {
   added: number
   removed: number
   unchanged: number
 }
-
 interface CompareOptions {
   ignoreCase: boolean
   ignoreWhitespace: boolean
 }
-
 type DiffMode = 'line' | 'word' | 'char'
-
 // --- Tokenizers / splitters ----------------------------------------------
-
 function splitLines(text: string): string[] {
   if (text === '') return []
   return text.replace(/\r\n?/g, '\n').split('\n')
 }
-
 function splitWords(text: string, ignoreWhitespace: boolean): string[] {
   const normalized = text.replace(/\r\n?/g, '\n')
   if (ignoreWhitespace) {
@@ -59,24 +50,19 @@ function splitWords(text: string, ignoreWhitespace: boolean): string[] {
   }
   return tokens
 }
-
 function splitChars(text: string, ignoreWhitespace: boolean): string[] {
   if (ignoreWhitespace) {
     return text.replace(/\s+/g, '').split('')
   }
   return text.replace(/\r\n?/g, '\n').split('')
 }
-
 // --- Normalization --------------------------------------------------------
-
 function normalize(value: string, opts: CompareOptions): string {
   let s = value
   if (opts.ignoreCase) s = s.toLowerCase()
   return s
 }
-
 // --- LCS diff (iterative backtracking) ------------------------------------
-
 function lcsDiff(aOrig: string[], bOrig: string[], opts: CompareOptions): DiffOp[] {
   if (aOrig.length === 0) {
     return bOrig.map((v) => ({ type: 'add' as DiffOpType, value: v }))
@@ -84,12 +70,10 @@ function lcsDiff(aOrig: string[], bOrig: string[], opts: CompareOptions): DiffOp
   if (bOrig.length === 0) {
     return aOrig.map((v) => ({ type: 'remove' as DiffOpType, value: v }))
   }
-
   const a = aOrig.map((v) => normalize(v, opts))
   const b = bOrig.map((v) => normalize(v, opts))
   const m = a.length
   const n = b.length
-
   // dp[i][j] = LCS length of a[i..] and b[j..]
   const dp: Uint32Array[] = Array.from({ length: m + 1 }, () => new Uint32Array(n + 1))
   for (let i = m - 1; i >= 0; i--) {
@@ -103,7 +87,6 @@ function lcsDiff(aOrig: string[], bOrig: string[], opts: CompareOptions): DiffOp
       }
     }
   }
-
   const ops: DiffOp[] = []
   let i = 0
   let j = 0
@@ -130,7 +113,6 @@ function lcsDiff(aOrig: string[], bOrig: string[], opts: CompareOptions): DiffOp
   }
   return ops
 }
-
 function computeStats(ops: DiffOp[]): DiffStats {
   let added = 0
   let removed = 0
@@ -142,9 +124,7 @@ function computeStats(ops: DiffOp[]): DiffStats {
   }
   return { added, removed, unchanged }
 }
-
 // --- Unified diff text output (line mode) ---------------------------------
-
 function toUnifiedLineDiff(ops: DiffOp[], context = 3): string {
   const lines: string[] = ['--- a', '+++ b']
   const changeIdx: number[] = []
@@ -152,7 +132,6 @@ function toUnifiedLineDiff(ops: DiffOp[], context = 3): string {
     if (ops[i].type !== 'equal') changeIdx.push(i)
   }
   if (changeIdx.length === 0) return lines.join('\n')
-
   interface Hunk {
     start: number
     end: number
@@ -175,7 +154,6 @@ function toUnifiedLineDiff(ops: DiffOp[], context = 3): string {
     }
   }
   hunks.push(current)
-
   for (const hunk of hunks) {
     let oi = 0
     let mi = 0
@@ -214,9 +192,7 @@ function toUnifiedLineDiff(ops: DiffOp[], context = 3): string {
   }
   return lines.join('\n')
 }
-
 // --- Unified text diff for word/char modes -------------------------------
-
 function toInlineUnified(ops: DiffOp[]): string {
   // For word/char mode, emit a single-stream unified text with prefixes.
   const lines: string[] = ['--- a', '+++ b']
@@ -230,36 +206,29 @@ function toInlineUnified(ops: DiffOp[]): string {
   }
   return lines.join('\n')
 }
-
 // --- Constants ------------------------------------------------------------
-
 const SAMPLE_A = `The quick brown fox
 jumps over the lazy dog.
 A classic pangram for testing.
 Line four is unchanged.
 Line five will be removed.`
-
 const SAMPLE_B = `The quick red fox
 jumps over the sleepy dog.
 A classic pangram for testing.
 A brand new line was added here.
 Line four is unchanged.`
-
 interface DiffResult {
   ops: DiffOp[]
   stats: DiffStats
   unified: string
 }
-
 export default function TextCompareDiff(): React.JSX.Element {
   const [textA, setTextA] = React.useState<string>(SAMPLE_A)
   const [textB, setTextB] = React.useState<string>(SAMPLE_B)
   const [mode, setMode] = React.useState<DiffMode>('line')
   const [ignoreCase, setIgnoreCase] = React.useState<boolean>(false)
   const [ignoreWhitespace, setIgnoreWhitespace] = React.useState<boolean>(false)
-
   const opts: CompareOptions = { ignoreCase, ignoreWhitespace }
-
   const result = React.useMemo<DiffResult>(() => {
     let aTokens: string[]
     let bTokens: string[]
@@ -279,14 +248,12 @@ export default function TextCompareDiff(): React.JSX.Element {
       mode === 'line' ? toUnifiedLineDiff(ops, 3) : toInlineUnified(ops)
     return { ops, stats, unified }
   }, [textA, textB, mode, ignoreCase, ignoreWhitespace])
-
   const hasInput = textA.length > 0 || textB.length > 0
   const identical =
     result.stats.added === 0 &&
     result.stats.removed === 0 &&
     textA.length > 0 &&
     textB.length > 0
-
   return (
     <div className="space-y-5">
       <Card>
@@ -354,7 +321,6 @@ export default function TextCompareDiff(): React.JSX.Element {
           </div>
         </CardContent>
       </Card>
-
       <div className="grid gap-4 md:grid-cols-2">
         <Field
           label="Text A (original)"
@@ -387,13 +353,11 @@ export default function TextCompareDiff(): React.JSX.Element {
           />
         </Field>
       </div>
-
       <div className="grid grid-cols-3 gap-3">
         <Stat label="Added" value={result.stats.added} accent="#16a34a" />
         <Stat label="Removed" value={result.stats.removed} accent="#dc2626" />
         <Stat label="Unchanged" value={result.stats.unchanged} />
       </div>
-
       {identical ? (
         <div
           role="status"
@@ -408,14 +372,12 @@ export default function TextCompareDiff(): React.JSX.Element {
           </span>
         </div>
       ) : null}
-
       <Tabs value={mode} onValueChange={(v) => setMode(v as DiffMode)}>
         <TabsList>
           <TabsTrigger value="line">Line diff</TabsTrigger>
           <TabsTrigger value="word">Word diff</TabsTrigger>
           <TabsTrigger value="char">Character diff</TabsTrigger>
         </TabsList>
-
         <TabsContent value="line" className="mt-3">
           <VisualDiff ops={result.ops} mode="line" />
         </TabsContent>
@@ -426,7 +388,6 @@ export default function TextCompareDiff(): React.JSX.Element {
           <VisualDiff ops={result.ops} mode="char" />
         </TabsContent>
       </Tabs>
-
       <ResultBox
         value={result.unified}
         label="Unified diff"
@@ -437,9 +398,7 @@ export default function TextCompareDiff(): React.JSX.Element {
     </div>
   )
 }
-
 // --- Visual diff renderer -------------------------------------------------
-
 function VisualDiff({
   ops,
   mode,
@@ -454,7 +413,6 @@ function VisualDiff({
       </div>
     )
   }
-
   if (mode === 'line') {
     return (
       <ScrollArea className="max-h-96 rounded-lg border border-border">
@@ -483,7 +441,6 @@ function VisualDiff({
       </ScrollArea>
     )
   }
-
   // word / char: inline rendering
   return (
     <ScrollArea className="max-h-96 rounded-lg border border-border bg-background p-3">

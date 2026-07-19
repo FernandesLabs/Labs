@@ -1,11 +1,9 @@
 'use client'
-
 import * as React from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 function parseNum(value: string): number {
   if (value == null) return NaN
   const trimmed = value.trim()
@@ -13,7 +11,6 @@ function parseNum(value: string): number {
   const n = Number(trimmed)
   return Number.isFinite(n) ? n : NaN
 }
-
 function fmtCurrency(n: number): string {
   if (!Number.isFinite(n)) return '—'
   return new Intl.NumberFormat('en-US', {
@@ -22,7 +19,6 @@ function fmtCurrency(n: number): string {
     maximumFractionDigits: 2,
   }).format(n)
 }
-
 function monthlyPI(principal: number, annualRatePct: number, months: number): number {
   if (principal <= 0 || months <= 0 || annualRatePct < 0) return NaN
   const r = annualRatePct / 100 / 12
@@ -30,7 +26,6 @@ function monthlyPI(principal: number, annualRatePct: number, months: number): nu
   const factor = Math.pow(1 + r, months)
   return (principal * r * factor) / (factor - 1)
 }
-
 /**
  * Mortgage Calculator
  * Home price, down payment ($ or %), loan term, interest rate,
@@ -46,7 +41,6 @@ export default function MortgageCalculator() {
   const [propTax, setPropTax] = React.useState('6000')
   const [insurance, setInsurance] = React.useState('1400')
   const [pmi, setPmi] = React.useState('0.5')
-
   const priceN = parseNum(price)
   const dpRaw = parseNum(downPayment)
   const yN = parseNum(years)
@@ -54,38 +48,32 @@ export default function MortgageCalculator() {
   const ptN = parseNum(propTax)
   const insN = parseNum(insurance)
   const pmiN = parseNum(pmi)
-
   const downPaymentAmt =
     dpMode === 'percent'
       ? Number.isFinite(priceN) && Number.isFinite(dpRaw)
         ? priceN * (dpRaw / 100)
         : NaN
       : dpRaw
-
   const loanAmount =
     Number.isFinite(priceN) && Number.isFinite(downPaymentAmt)
       ? priceN - downPaymentAmt
       : NaN
-
   const months = Number.isFinite(yN) && yN > 0 ? yN * 12 : NaN
   const pi = monthlyPI(
     Number.isFinite(loanAmount) ? loanAmount : 0,
     Number.isFinite(rN) ? rN : 0,
     Number.isFinite(months) ? months : 0,
   )
-
   const monthlyTax = Number.isFinite(ptN) ? ptN / 12 : NaN
   const monthlyIns = Number.isFinite(insN) ? insN / 12 : NaN
   const monthlyPmi =
     Number.isFinite(loanAmount) && Number.isFinite(pmiN) && pmiN > 0
       ? (loanAmount * (pmiN / 100)) / 12
       : 0
-
   const piti =
     Number.isFinite(pi) && Number.isFinite(monthlyTax) && Number.isFinite(monthlyIns)
       ? pi + monthlyTax + monthlyIns + monthlyPmi
       : NaN
-
   return (
     <div className="space-y-5">
       <Card>
@@ -152,7 +140,6 @@ export default function MortgageCalculator() {
           </div>
         </CardContent>
       </Card>
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Monthly costs</CardTitle>
@@ -193,7 +180,6 @@ export default function MortgageCalculator() {
           </p>
         </CardContent>
       </Card>
-
       <Card>
         <CardContent className="space-y-4 pt-6">
           <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">

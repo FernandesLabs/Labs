@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import {
   Plus,
@@ -42,11 +41,9 @@ import {
 import { Field, Stat, downloadBlob, randomInt } from '@/lib/tools/tool-ui'
 import { useCopy } from '@/lib/tools/use-copy'
 import { toast } from 'sonner'
-
 /* ------------------------------------------------------------------ */
 /*  Types & storage                                                    */
 /* ------------------------------------------------------------------ */
-
 interface Step {
   id: string
   name: string
@@ -54,9 +51,7 @@ interface Step {
   model: string
   temperature: number
 }
-
 const STORAGE_KEY = 'fl-ai-workflow'
-
 const MODELS: { id: string; label: string; provider: string }[] = [
   { id: 'gpt-4o', label: 'GPT-4o', provider: 'OpenAI' },
   { id: 'gpt-4o-mini', label: 'GPT-4o mini', provider: 'OpenAI' },
@@ -75,11 +70,9 @@ const MODELS: { id: string; label: string; provider: string }[] = [
   { id: 'command-r-plus', label: 'Command R+', provider: 'Cohere' },
   { id: 'deepseek-v3', label: 'DeepSeek V3', provider: 'DeepSeek' },
 ]
-
 function makeId(): string {
   return `s-${Date.now().toString(36)}-${randomInt(1_000_000).toString(36)}`
 }
-
 function newStep(name = ''): Step {
   return {
     id: makeId(),
@@ -89,7 +82,6 @@ function newStep(name = ''): Step {
     temperature: 0.7,
   }
 }
-
 function loadSteps(): Step[] {
   if (typeof window === 'undefined') return []
   try {
@@ -118,7 +110,6 @@ function loadSteps(): Step[] {
     return []
   }
 }
-
 function saveSteps(steps: Step[]): void {
   if (typeof window === 'undefined') return
   try {
@@ -127,15 +118,12 @@ function saveSteps(steps: Step[]): void {
     toast.error('Could not save — localStorage quota exceeded?')
   }
 }
-
 function modelLabel(id: string): string {
   return MODELS.find((m) => m.id === id)?.label ?? id
 }
-
 function modelProvider(id: string): string {
   return MODELS.find((m) => m.id === id)?.provider ?? 'Unknown'
 }
-
 /** Extract {{variable}} placeholders from a prompt template. */
 function extractVariables(prompt: string): string[] {
   const out: string[] = []
@@ -146,47 +134,39 @@ function extractVariables(prompt: string): string[] {
   }
   return out
 }
-
 /* ------------------------------------------------------------------ */
 /*  Component                                                          */
 /* ------------------------------------------------------------------ */
-
 export default function AiWorkflowBuilder() {
   const [steps, setSteps] = React.useState<Step[]>([])
   const [hydrated, setHydrated] = React.useState(false)
   const fileInputRef = React.useRef<HTMLInputElement | null>(null)
   const { copy } = useCopy()
-
   // Hydrate from localStorage on mount (client-only).
   React.useEffect(() => {
     setSteps(loadSteps())
     setHydrated(true)
   }, [])
-
   // Persist on change (after hydration).
   React.useEffect(() => {
     if (!hydrated) return
     saveSteps(steps)
   }, [steps, hydrated])
-
   const addStep = (): void => {
     setSteps((prev) => [
       ...prev,
       newStep(`Step ${prev.length + 1}`),
     ])
   }
-
   const updateStep = (id: string, patch: Partial<Step>): void => {
     setSteps((prev) =>
       prev.map((s) => (s.id === id ? { ...s, ...patch } : s))
     )
   }
-
   const removeStep = (id: string): void => {
     setSteps((prev) => prev.filter((s) => s.id !== id))
     toast.success('Step removed')
   }
-
   const moveStep = (id: string, dir: -1 | 1): void => {
     setSteps((prev) => {
       const idx = prev.findIndex((s) => s.id === id)
@@ -200,7 +180,6 @@ export default function AiWorkflowBuilder() {
       return copyArr
     })
   }
-
   const handleExport = (): void => {
     if (steps.length === 0) {
       toast.error('Workflow is empty')
@@ -217,11 +196,9 @@ export default function AiWorkflowBuilder() {
     downloadBlob(blob, 'ai-workflow.json')
     toast.success('Workflow exported')
   }
-
   const handleImportClick = (): void => {
     fileInputRef.current?.click()
   }
-
   const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -274,7 +251,6 @@ export default function AiWorkflowBuilder() {
     reader.onerror = () => toast.error('Could not read file')
     reader.readAsText(file)
   }
-
   const copyJson = (): void => {
     if (steps.length === 0) {
       toast.error('Workflow is empty')
@@ -285,7 +261,6 @@ export default function AiWorkflowBuilder() {
       'Workflow JSON copied'
     )
   }
-
   const allVariables = React.useMemo(() => {
     const set = new Set<string>()
     for (const s of steps) {
@@ -293,7 +268,6 @@ export default function AiWorkflowBuilder() {
     }
     return Array.from(set)
   }, [steps])
-
   return (
     <div className="space-y-5">
       <Card>
@@ -320,7 +294,6 @@ export default function AiWorkflowBuilder() {
               and run it in your own pipeline.
             </AlertDescription>
           </Alert>
-
           <div className="flex flex-wrap gap-2">
             <Button
               type="button"
@@ -367,7 +340,6 @@ export default function AiWorkflowBuilder() {
           </div>
         </CardContent>
       </Card>
-
       <div
         className="grid gap-3 sm:grid-cols-3"
         role="status"
@@ -379,7 +351,6 @@ export default function AiWorkflowBuilder() {
         } />
         <Stat label="Variables" value={allVariables.length} />
       </div>
-
       {steps.length === 0 ? (
         <Card>
           <CardContent className="pt-6">
@@ -468,7 +439,6 @@ export default function AiWorkflowBuilder() {
                           </Button>
                         </div>
                       </div>
-
                       <div className="space-y-3">
                         <Field
                           label="Prompt template"
@@ -487,7 +457,6 @@ export default function AiWorkflowBuilder() {
                             aria-label="Prompt template"
                           />
                         </Field>
-
                         <div className="grid gap-3 sm:grid-cols-2">
                           <Field
                             label="Model"
@@ -540,7 +509,6 @@ export default function AiWorkflowBuilder() {
                             />
                           </Field>
                         </div>
-
                         {vars.length > 0 ? (
                           <div className="flex flex-wrap items-center gap-1.5">
                             <span className="text-xs text-muted-foreground">
@@ -574,7 +542,6 @@ export default function AiWorkflowBuilder() {
           </CardContent>
         </Card>
       )}
-
       {/* Visual flow diagram */}
       <Card>
         <CardHeader>
@@ -656,7 +623,6 @@ export default function AiWorkflowBuilder() {
           )}
         </CardContent>
       </Card>
-
       {/* Variables overview */}
       {allVariables.length > 0 ? (
         <Card>
@@ -682,9 +648,7 @@ export default function AiWorkflowBuilder() {
           </CardContent>
         </Card>
       ) : null}
-
       <Separator />
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Notes</CardTitle>
@@ -720,7 +684,6 @@ export default function AiWorkflowBuilder() {
           </ul>
         </CardContent>
       </Card>
-
       <div className="flex flex-wrap gap-2">
         <Badge variant="secondary">No API calls</Badge>
         <Badge variant="secondary">JSON export/import</Badge>

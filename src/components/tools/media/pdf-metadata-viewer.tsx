@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { PDFDocument } from 'pdf-lib'
 import { toast } from 'sonner'
@@ -24,14 +23,12 @@ import {
 } from '@/components/ui/table'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 interface PageSize {
   index: number
   widthPt: number
   heightPt: number
   rotation: number
 }
-
 interface Meta {
   title: string
   author: string
@@ -42,7 +39,6 @@ interface Meta {
   creationDate: string | null
   modificationDate: string | null
 }
-
 interface InspectResult {
   fileName: string
   fileSize: number
@@ -51,7 +47,6 @@ interface InspectResult {
   metadata: Meta
   isEncrypted: boolean
 }
-
 function formatBytes(b: number): string {
   if (!Number.isFinite(b) || b < 0) return '—'
   if (b === 0) return '0 B'
@@ -59,15 +54,12 @@ function formatBytes(b: number): string {
   if (b < 1024 * 1024) return `${(b / 1024).toFixed(1)} KB`
   return `${(b / 1024 / 1024).toFixed(2)} MB`
 }
-
 function ptToMm(pt: number): number {
   return (pt * 25.4) / 72
 }
-
 function ptToIn(pt: number): number {
   return pt / 72
 }
-
 function fmtDate(iso: string | null): string {
   if (!iso) return '—'
   try {
@@ -76,14 +68,12 @@ function fmtDate(iso: string | null): string {
     return iso
   }
 }
-
 export default function PdfMetadataViewer() {
   const [file, setFile] = React.useState<File | null>(null)
   const [result, setResult] = React.useState<InspectResult | null>(null)
   const [encrypted, setEncrypted] = React.useState(false)
   const [loading, setLoading] = React.useState(false)
   const inputRef = React.useRef<HTMLInputElement | null>(null)
-
   const loadFile = async (f: File): Promise<void> => {
     setLoading(true)
     setResult(null)
@@ -145,13 +135,11 @@ export default function PdfMetadataViewer() {
       setLoading(false)
     }
   }
-
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const f = e.target.files?.[0]
     if (f) void loadFile(f)
     e.target.value = ''
   }
-
   const metaRows: ReadonlyArray<readonly [string, string]> = result
     ? [
         ['Title', result.metadata.title],
@@ -164,7 +152,6 @@ export default function PdfMetadataViewer() {
         ['Modified', fmtDate(result.metadata.modificationDate)],
       ]
     : []
-
   return (
     <div className="space-y-5">
       <Field label="Source PDF">
@@ -204,7 +191,6 @@ export default function PdfMetadataViewer() {
           </p>
         </div>
       </Field>
-
       {encrypted ? (
         <Alert>
           <Lock className="size-4" />
@@ -217,7 +203,6 @@ export default function PdfMetadataViewer() {
           </AlertDescription>
         </Alert>
       ) : null}
-
       {result ? (
         <>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -240,7 +225,6 @@ export default function PdfMetadataViewer() {
               }
             />
           </div>
-
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Document info</CardTitle>
@@ -268,7 +252,6 @@ export default function PdfMetadataViewer() {
               </dl>
             </CardContent>
           </Card>
-
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Page sizes</CardTitle>
@@ -317,7 +300,6 @@ export default function PdfMetadataViewer() {
               </ScrollArea>
             </CardContent>
           </Card>
-
           <Alert>
             <Info className="size-4" />
             <AlertTitle>About PDF units</AlertTitle>

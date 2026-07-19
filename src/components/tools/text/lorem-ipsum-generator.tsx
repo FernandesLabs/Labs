@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -15,7 +14,6 @@ import {
 } from '@/components/ui/select'
 import { Field, ResultBox, randomInt } from '@/lib/tools/tool-ui'
 import { toast } from 'sonner'
-
 const WORDS = [
   'lorem',
   'ipsum',
@@ -99,15 +97,11 @@ const WORDS = [
   'quia',
   'voluptas',
 ]
-
 type Unit = 'paragraphs' | 'sentences' | 'words'
-
 const OPENING = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit'
-
 function randomWord(): string {
   return WORDS[randomInt(WORDS.length)] as string
 }
-
 function buildSentence(): string {
   const len = 8 + randomInt(10) // 8..17 words
   const parts: string[] = []
@@ -117,20 +111,17 @@ function buildSentence(): string {
   sentence = sentence.charAt(0).toUpperCase() + sentence.slice(1) + '.'
   return sentence
 }
-
 function buildParagraph(minSentences = 3, maxSentences = 6): string {
   const count = minSentences + randomInt(maxSentences - minSentences + 1)
   const sentences: string[] = []
   for (let i = 0; i < count; i++) sentences.push(buildSentence())
   return sentences.join(' ')
 }
-
 export default function LoremIpsumGenerator() {
   const [count, setCount] = React.useState(3)
   const [unit, setUnit] = React.useState<Unit>('paragraphs')
   const [startClassic, setStartClassic] = React.useState(true)
   const [output, setOutput] = React.useState('')
-
   const generate = React.useCallback(() => {
     const safeCount = Math.max(1, Math.min(100, count))
     if (unit === 'words') {
@@ -150,7 +141,6 @@ export default function LoremIpsumGenerator() {
       setOutput(text)
       return
     }
-
     if (unit === 'sentences') {
       const sentences: string[] = []
       if (startClassic && safeCount > 0) {
@@ -160,7 +150,6 @@ export default function LoremIpsumGenerator() {
       setOutput(sentences.slice(0, safeCount).join(' '))
       return
     }
-
     // paragraphs
     const paras: string[] = []
     if (startClassic && safeCount > 0) {
@@ -172,7 +161,6 @@ export default function LoremIpsumGenerator() {
     while (paras.length < safeCount) paras.push(buildParagraph())
     setOutput(paras.slice(0, safeCount).join('\n\n'))
   }, [count, unit, startClassic])
-
   const handleGenerate = () => {
     if (count < 1 || count > 100) {
       toast.error('Count must be between 1 and 100')
@@ -180,7 +168,6 @@ export default function LoremIpsumGenerator() {
     }
     generate()
   }
-
   return (
     <div className="space-y-5">
       <div className="grid gap-4 sm:grid-cols-2">
@@ -213,7 +200,6 @@ export default function LoremIpsumGenerator() {
           </Select>
         </Field>
       </div>
-
       <div className="flex items-center justify-between rounded-lg border border-border bg-card p-3">
         <div className="pr-3">
           <Label
@@ -232,7 +218,6 @@ export default function LoremIpsumGenerator() {
           onCheckedChange={setStartClassic}
         />
       </div>
-
       <div className="flex justify-end">
         <Button
           type="button"
@@ -243,7 +228,6 @@ export default function LoremIpsumGenerator() {
           Generate
         </Button>
       </div>
-
       <ResultBox
         value={output}
         label="Generated text"

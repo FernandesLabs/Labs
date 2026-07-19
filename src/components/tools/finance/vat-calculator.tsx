@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -12,7 +11,6 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 function parseNum(value: string): number {
   if (value == null) return NaN
   const trimmed = value.trim()
@@ -20,10 +18,8 @@ function parseNum(value: string): number {
   const n = Number(trimmed)
   return Number.isFinite(n) ? n : NaN
 }
-
 const CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'CNY', 'INR', 'BRL'] as const
 type Currency = (typeof CURRENCIES)[number]
-
 const CURRENCY_LOCALE: Record<Currency, string> = {
   USD: 'en-US',
   EUR: 'de-DE',
@@ -36,7 +32,6 @@ const CURRENCY_LOCALE: Record<Currency, string> = {
   INR: 'en-IN',
   BRL: 'pt-BR',
 }
-
 function formatCurrency(amount: number, currency: Currency): string {
   if (!Number.isFinite(amount)) return '—'
   try {
@@ -49,7 +44,6 @@ function formatCurrency(amount: number, currency: Currency): string {
     return `${amount.toFixed(2)} ${currency}`
   }
 }
-
 /**
  * VAT Calculator
  * Modes: add VAT (net → gross) or remove VAT (gross → net).
@@ -60,15 +54,12 @@ export default function VatCalculator() {
   const [amount, setAmount] = React.useState('100')
   const [rate, setRate] = React.useState('20')
   const [currency, setCurrency] = React.useState<Currency>('USD')
-
   // Live computation — runs on every render so results update instantly.
   const a = parseNum(amount)
   const r = parseNum(rate)
-
   let net = NaN
   let vat = NaN
   let gross = NaN
-
   if (Number.isFinite(a) && Number.isFinite(r)) {
     if (mode === 'add') {
       net = a
@@ -80,7 +71,6 @@ export default function VatCalculator() {
       vat = gross - net
     }
   }
-
   return (
     <div className="space-y-5">
       <Tabs value={mode} onValueChange={(v) => setMode(v as typeof mode)}>
@@ -88,7 +78,6 @@ export default function VatCalculator() {
           <TabsTrigger value="add">Add VAT</TabsTrigger>
           <TabsTrigger value="remove">Remove VAT</TabsTrigger>
         </TabsList>
-
         <TabsContent value="add">
           <p className="text-sm text-muted-foreground">
             Enter a net amount to add VAT and see the gross total.
@@ -100,7 +89,6 @@ export default function VatCalculator() {
           </p>
         </TabsContent>
       </Tabs>
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Amount &amp; rate</CardTitle>
@@ -143,7 +131,6 @@ export default function VatCalculator() {
               </Select>
             </Field>
           </div>
-
           {Number.isFinite(a) && a < 0 ? (
             <p className="text-sm text-destructive">Amount must be non-negative.</p>
           ) : null}
@@ -152,7 +139,6 @@ export default function VatCalculator() {
           ) : null}
         </CardContent>
       </Card>
-
       <Card>
         <CardContent className="space-y-4 pt-6">
           <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">

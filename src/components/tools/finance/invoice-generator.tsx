@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Plus, Trash2, Download, FileText, Printer } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -23,14 +22,12 @@ import {
 } from '@/components/ui/table'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Field, Stat, downloadBlob } from '@/lib/tools/tool-ui'
-
 interface LineItem {
   id: number
   description: string
   quantity: string
   unitPrice: string
 }
-
 interface InvoiceData {
   companyName: string
   companyAddress: string
@@ -44,10 +41,8 @@ interface InvoiceData {
   notes: string
   items: LineItem[]
 }
-
 const CURRENCIES = ['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'JPY', 'INR', 'BRL'] as const
 type Currency = (typeof CURRENCIES)[number]
-
 const CURRENCY_SYMBOL: Record<Currency, string> = {
   USD: '$',
   EUR: '€',
@@ -58,7 +53,6 @@ const CURRENCY_SYMBOL: Record<Currency, string> = {
   INR: '₹',
   BRL: 'R$',
 }
-
 const CURRENCY_LOCALE: Record<Currency, string> = {
   USD: 'en-US',
   EUR: 'de-DE',
@@ -69,21 +63,18 @@ const CURRENCY_LOCALE: Record<Currency, string> = {
   INR: 'en-IN',
   BRL: 'pt-BR',
 }
-
 const todayISO = () => new Date().toISOString().slice(0, 10)
 const addDaysISO = (days: number) => {
   const d = new Date()
   d.setDate(d.getDate() + days)
   return d.toISOString().slice(0, 10)
 }
-
 function parseNum(value: string): number {
   const trimmed = value.trim()
   if (trimmed === '') return 0
   const n = Number(trimmed)
   return Number.isFinite(n) ? n : 0
 }
-
 function formatMoney(amount: number, currency: Currency): string {
   try {
     return new Intl.NumberFormat(CURRENCY_LOCALE[currency], {
@@ -96,7 +87,6 @@ function formatMoney(amount: number, currency: Currency): string {
     return `${CURRENCY_SYMBOL[currency]}${amount.toFixed(2)}`
   }
 }
-
 function esc(s: string): string {
   return s
     .replace(/&/g, '&amp;')
@@ -105,7 +95,6 @@ function esc(s: string): string {
     .replace(/"/g, '&quot;')
     .replace(/\n/g, '<br />')
 }
-
 function formatDate(iso: string): string {
   if (!iso) return '—'
   const d = new Date(iso + 'T00:00:00')
@@ -116,7 +105,6 @@ function formatDate(iso: string): string {
     day: 'numeric',
   })
 }
-
 function buildStandaloneHtml(data: InvoiceData, totals: Totals): string {
   const cur = data.currency as Currency
   const symbol = CURRENCY_SYMBOL[cur]
@@ -131,7 +119,6 @@ function buildStandaloneHtml(data: InvoiceData, totals: Totals): string {
       </tr>`
     )
     .join('\n')
-
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -224,14 +211,12 @@ function buildStandaloneHtml(data: InvoiceData, totals: Totals): string {
 </body>
 </html>`
 }
-
 interface Totals {
   subtotal: number
   tax: number
   total: number
   taxRatePct: number
 }
-
 const DEFAULT_DATA: InvoiceData = {
   companyName: 'Fernandes Labs LLC',
   companyAddress: '123 Market Street, Suite 400\nSan Francisco, CA 94103\ncontact@fernandeslabs.com',
@@ -249,7 +234,6 @@ const DEFAULT_DATA: InvoiceData = {
     { id: 3, description: 'Frontend development', quantity: '40', unitPrice: '95' },
   ],
 }
-
 function computeTotals(data: InvoiceData): Totals {
   let subtotal = 0
   for (const item of data.items) {
@@ -260,23 +244,18 @@ function computeTotals(data: InvoiceData): Totals {
   const total = subtotal + tax
   return { subtotal, tax, total, taxRatePct }
 }
-
 export default function InvoiceGenerator() {
   const idCounter = React.useRef(100)
   const [data, setData] = React.useState<InvoiceData>(DEFAULT_DATA)
-
   const totals = React.useMemo(() => computeTotals(data), [data])
   const currency = data.currency as Currency
-
   const update = <K extends keyof InvoiceData>(key: K, value: InvoiceData[K]) =>
     setData((prev) => ({ ...prev, [key]: value }))
-
   const updateItem = (id: number, patch: Partial<LineItem>) =>
     setData((prev) => ({
       ...prev,
       items: prev.items.map((it) => (it.id === id ? { ...it, ...patch } : it)),
     }))
-
   const addItem = () =>
     setData((prev) => ({
       ...prev,
@@ -290,13 +269,11 @@ export default function InvoiceGenerator() {
         },
       ],
     }))
-
   const removeItem = (id: number) =>
     setData((prev) => ({
       ...prev,
       items: prev.items.filter((it) => it.id !== id),
     }))
-
   const handleDownload = () => {
     const html = buildStandaloneHtml(data, totals)
     downloadBlob(
@@ -304,7 +281,6 @@ export default function InvoiceGenerator() {
       `invoice-${data.invoiceNumber || 'draft'}.html`
     )
   }
-
   const handlePrint = () => {
     const html = buildStandaloneHtml(data, totals)
     const w = window.open('', '_blank')
@@ -314,7 +290,6 @@ export default function InvoiceGenerator() {
     w.focus()
     setTimeout(() => w.print(), 250)
   }
-
   return (
     <div className="space-y-5">
       <Card>
@@ -375,7 +350,6 @@ export default function InvoiceGenerator() {
               </Field>
             </div>
           </div>
-
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <Field label="Invoice #" htmlFor="inv-no">
               <Input
@@ -416,7 +390,6 @@ export default function InvoiceGenerator() {
               </select>
             </Field>
           </div>
-
           <Field label="Tax rate" htmlFor="inv-tax" hint="percent">
             <Input
               id="inv-tax"
@@ -428,7 +401,6 @@ export default function InvoiceGenerator() {
           </Field>
         </CardContent>
       </Card>
-
       <Card>
         <CardHeader className="flex-row items-center justify-between space-y-0">
           <div>
@@ -524,7 +496,6 @@ export default function InvoiceGenerator() {
               </Table>
             </ScrollArea>
           )}
-
           <div className="mt-4 flex flex-col items-end gap-1 text-sm">
             <div className="flex w-56 justify-between">
               <span className="text-muted-foreground">Subtotal</span>
@@ -549,7 +520,6 @@ export default function InvoiceGenerator() {
           </div>
         </CardContent>
       </Card>
-
       <Field label="Notes / payment terms" htmlFor="inv-notes">
         <Textarea
           id="inv-notes"
@@ -559,7 +529,6 @@ export default function InvoiceGenerator() {
           placeholder="Payment due within 30 days. Late payments subject to 1.5% monthly interest."
         />
       </Field>
-
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat label="Items" value={data.items.length} />
         <Stat
@@ -577,7 +546,6 @@ export default function InvoiceGenerator() {
           accent="#16a34a"
         />
       </div>
-
       <Card>
         <CardHeader className="flex-row items-center justify-between space-y-0">
           <div>

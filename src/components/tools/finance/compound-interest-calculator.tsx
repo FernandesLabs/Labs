@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -11,7 +10,6 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 function parseNum(value: string): number {
   if (value == null) return NaN
   const trimmed = value.trim()
@@ -19,7 +17,6 @@ function parseNum(value: string): number {
   const n = Number(trimmed)
   return Number.isFinite(n) ? n : NaN
 }
-
 function fmtCurrency(n: number): string {
   if (!Number.isFinite(n)) return '—'
   return new Intl.NumberFormat('en-US', {
@@ -28,14 +25,12 @@ function fmtCurrency(n: number): string {
     maximumFractionDigits: 2,
   }).format(n)
 }
-
 const FREQ_OPTIONS = [
   { value: '1', label: 'Annually' },
   { value: '4', label: 'Quarterly' },
   { value: '12', label: 'Monthly' },
   { value: '365', label: 'Daily' },
 ] as const
-
 /**
  * Compound Interest Calculator
  * Principal, annual rate (%), compounding frequency, years, optional
@@ -47,17 +42,14 @@ export default function CompoundInterestCalculator() {
   const [freq, setFreq] = React.useState('12')
   const [years, setYears] = React.useState('10')
   const [contribution, setContribution] = React.useState('200')
-
   const p = parseNum(principal)
   const ar = parseNum(rate)
   const n = Number.parseInt(freq, 10)
   const y = parseNum(years)
   const c = parseNum(contribution)
-
   let finalAmount = NaN
   let totalContributions = NaN
   let interestEarned = NaN
-
   if (
     Number.isFinite(p) &&
     p >= 0 &&
@@ -69,7 +61,6 @@ export default function CompoundInterestCalculator() {
     const r = ar / 100 / n
     const periods = n * y
     const principalGrowth = p * Math.pow(1 + r, periods)
-
     // Regular contribution: treat as monthly contribution converted to per-period.
     const monthly = Number.isFinite(c) && c > 0 ? c : 0
     const perPeriod = (monthly * 12) / n
@@ -81,12 +72,10 @@ export default function CompoundInterestCalculator() {
         contribGrowth = perPeriod * ((Math.pow(1 + r, periods) - 1) / r)
       }
     }
-
     finalAmount = principalGrowth + contribGrowth
     totalContributions = p + monthly * 12 * y
     interestEarned = finalAmount - totalContributions
   }
-
   return (
     <div className="space-y-5">
       <Card>
@@ -151,7 +140,6 @@ export default function CompoundInterestCalculator() {
               />
             </Field>
           </div>
-
           {Number.isFinite(ar) && ar < 0 ? (
             <p className="text-sm text-destructive">
               Interest rate cannot be negative.
@@ -164,7 +152,6 @@ export default function CompoundInterestCalculator() {
           ) : null}
         </CardContent>
       </Card>
-
       <Card>
         <CardContent className="space-y-4 pt-6">
           <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">

@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { ArrowRightLeft } from 'lucide-react'
 import {
@@ -13,7 +12,6 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 function parseNum(value: string): number {
   if (value == null) return NaN
   const trimmed = value.trim()
@@ -21,7 +19,6 @@ function parseNum(value: string): number {
   const n = Number(trimmed)
   return Number.isFinite(n) ? n : NaN
 }
-
 function fmtCurrency(n: number): string {
   if (!Number.isFinite(n)) return '—'
   return new Intl.NumberFormat('en-US', {
@@ -30,12 +27,10 @@ function fmtCurrency(n: number): string {
     maximumFractionDigits: 2,
   }).format(n)
 }
-
 function fmtPct(n: number, digits = 2): string {
   if (!Number.isFinite(n)) return '—'
   return `${n.toFixed(digits)}%`
 }
-
 /**
  * Profit Margin Calculator
  * Forward mode: revenue + cost → profit, margin %, markup %.
@@ -44,15 +39,12 @@ function fmtPct(n: number, digits = 2): string {
  */
 export default function ProfitMarginCalculator() {
   const [mode, setMode] = React.useState<'forward' | 'reverse'>('forward')
-
   // Forward inputs
   const [revenue, setRevenue] = React.useState('1000')
   const [cost, setCost] = React.useState('700')
-
   // Reverse inputs
   const [revReverse, setRevReverse] = React.useState('1000')
   const [marginPct, setMarginPct] = React.useState('30')
-
   // Forward calculations
   const revN = parseNum(revenue)
   const costN = parseNum(cost)
@@ -64,7 +56,6 @@ export default function ProfitMarginCalculator() {
   const profit = fwdValid ? revN - costN : NaN
   const margin = fwdValid ? (profit / revN) * 100 : NaN
   const markup = fwdValid && costN > 0 ? (profit / costN) * 100 : NaN
-
   // Reverse calculations
   const revRevN = parseNum(revReverse)
   const margN = parseNum(marginPct)
@@ -78,7 +69,6 @@ export default function ProfitMarginCalculator() {
   const impliedProfit = revValid ? revRevN - impliedCost : NaN
   const impliedMarkup =
     revValid && impliedCost > 0 ? (impliedProfit / impliedCost) * 100 : NaN
-
   return (
     <div className="space-y-5">
       <Tabs value={mode} onValueChange={(v) => setMode(v as typeof mode)}>
@@ -92,7 +82,6 @@ export default function ProfitMarginCalculator() {
             Reverse
           </TabsTrigger>
         </TabsList>
-
         <TabsContent value="forward">
           <Card>
             <CardHeader>
@@ -129,7 +118,6 @@ export default function ProfitMarginCalculator() {
               </div>
             </CardContent>
           </Card>
-
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
             <Stat
               label="Profit"
@@ -147,7 +135,6 @@ export default function ProfitMarginCalculator() {
               accent={Number.isFinite(markup) ? (markup >= 0 ? '#0ea5e9' : '#dc2626') : undefined}
             />
           </div>
-
           <Card className="mt-4">
             <CardHeader>
               <CardTitle className="text-base">Formulas</CardTitle>
@@ -186,7 +173,6 @@ export default function ProfitMarginCalculator() {
             </CardContent>
           </Card>
         </TabsContent>
-
         <TabsContent value="reverse">
           <Card>
             <CardHeader>
@@ -226,7 +212,6 @@ export default function ProfitMarginCalculator() {
               </div>
             </CardContent>
           </Card>
-
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
             <Stat
               label="Required cost"
@@ -244,7 +229,6 @@ export default function ProfitMarginCalculator() {
               accent="#0ea5e9"
             />
           </div>
-
           <Card className="mt-4">
             <CardHeader>
               <CardTitle className="text-base">Formula</CardTitle>
@@ -269,7 +253,6 @@ export default function ProfitMarginCalculator() {
           </Card>
         </TabsContent>
       </Tabs>
-
       <Card>
         <CardContent>
           <Button

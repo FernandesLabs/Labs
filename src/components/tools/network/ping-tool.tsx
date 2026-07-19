@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import {
   Loader2,
@@ -22,7 +21,6 @@ import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { toast } from 'sonner'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 interface PingResponse {
   ok: boolean
   error?: string
@@ -31,7 +29,6 @@ interface PingResponse {
   ttfbMs: number
   finalUrl: string
 }
-
 interface PingRun {
   index: number
   status: number | null
@@ -39,14 +36,12 @@ interface PingRun {
   finalUrl?: string
   error?: string
 }
-
 function ttfbAccent(ms: number | null | undefined): string | undefined {
   if (ms === null || ms === undefined) return undefined
   if (ms < 500) return 'oklch(0.6 0.17 150)'
   if (ms < 1500) return 'oklch(0.7 0.18 75)'
   return 'oklch(0.6 0.22 25)'
 }
-
 function ttfbBadgeClass(ms: number | null | undefined): string {
   if (ms === null || ms === undefined) return ''
   if (ms < 500)
@@ -55,7 +50,6 @@ function ttfbBadgeClass(ms: number | null | undefined): string {
     return 'border-transparent bg-amber-500/15 text-amber-700 dark:text-amber-400'
   return 'border-transparent bg-rose-500/15 text-rose-700 dark:text-rose-400'
 }
-
 async function fetchPing(
   url: string,
   signal: AbortSignal
@@ -64,13 +58,11 @@ async function fetchPing(
   const res = await fetch(api, { signal })
   return (await res.json()) as PingResponse
 }
-
 export default function PingTool(): React.JSX.Element {
   const [url, setUrl] = React.useState('https://example.com')
   const [loading, setLoading] = React.useState(false)
   const [runs, setRuns] = React.useState<PingRun[]>([])
   const controllerRef = React.useRef<AbortController | null>(null)
-
   // Single ping with a 15s timeout via AbortController.
   const pingOnce = React.useCallback(
     async (target: string): Promise<PingRun> => {
@@ -114,7 +106,6 @@ export default function PingTool(): React.JSX.Element {
     },
     []
   )
-
   const validate = (target: string): boolean => {
     if (!target) {
       toast.error('Enter a URL')
@@ -132,7 +123,6 @@ export default function PingTool(): React.JSX.Element {
       return false
     }
   }
-
   const runSingle = React.useCallback(async () => {
     if (!validate(url)) return
     setLoading(true)
@@ -147,7 +137,6 @@ export default function PingTool(): React.JSX.Element {
       setLoading(false)
     }
   }, [url, pingOnce])
-
   const runTriple = React.useCallback(async () => {
     if (!validate(url)) return
     setLoading(true)
@@ -165,17 +154,14 @@ export default function PingTool(): React.JSX.Element {
     }
     setLoading(false)
   }, [url, pingOnce])
-
   const clearRuns = () => {
     setRuns([])
   }
-
   React.useEffect(() => {
     return () => {
       if (controllerRef.current) controllerRef.current.abort()
     }
   }, [])
-
   const successful = runs.filter((r) => r.ttfbMs !== null)
   const avgTtfb =
     successful.length > 0
@@ -192,7 +178,6 @@ export default function PingTool(): React.JSX.Element {
     successful.length > 0
       ? Math.max(...successful.map((r) => r.ttfbMs ?? -Infinity))
       : null
-
   return (
     <div className="space-y-5">
       <Card>
@@ -255,7 +240,6 @@ export default function PingTool(): React.JSX.Element {
           </div>
         </CardContent>
       </Card>
-
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat
           label="Avg TTFB"
@@ -277,7 +261,6 @@ export default function PingTool(): React.JSX.Element {
           value={`${successful.length}/${runs.length}`}
         />
       </div>
-
       {runs.length > 0 ? (
         <Card>
           <CardHeader>

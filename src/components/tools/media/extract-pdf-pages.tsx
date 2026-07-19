@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { PDFDocument } from 'pdf-lib'
 import { toast } from 'sonner'
@@ -16,18 +15,15 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
 import { Field, Stat, downloadBlob } from '@/lib/tools/tool-ui'
-
 function formatBytes(b: number): string {
   if (!Number.isFinite(b) || b < 0) return '—'
   if (b < 1024) return `${b} B`
   if (b < 1024 * 1024) return `${(b / 1024).toFixed(1)} KB`
   return `${(b / 1024 / 1024).toFixed(2)} MB`
 }
-
 function baseName(name: string): string {
   return name.replace(/\.[^.]+$/, '') || 'document'
 }
-
 /** Parse "1,3,5-7" into 0-based indices. Preserves order & duplicates. */
 function parsePageList(raw: string, pageCount: number): number[] {
   const trimmed = raw.trim()
@@ -61,7 +57,6 @@ function parsePageList(raw: string, pageCount: number): number[] {
   if (out.length === 0) throw new Error('No valid pages parsed')
   return out
 }
-
 export default function ExtractPdfPages() {
   const [file, setFile] = React.useState<File | null>(null)
   const [pageCount, setPageCount] = React.useState(0)
@@ -70,7 +65,6 @@ export default function ExtractPdfPages() {
   const [extracting, setExtracting] = React.useState(false)
   const [extractedCount, setExtractedCount] = React.useState(0)
   const inputRef = React.useRef<HTMLInputElement | null>(null)
-
   const parsedPreview: number[] | { error: string } = (() => {
     if (!file || !pagesInput.trim()) return []
     try {
@@ -79,7 +73,6 @@ export default function ExtractPdfPages() {
       return { error: err instanceof Error ? err.message : 'Invalid input' }
     }
   })()
-
   const loadFile = async (f: File): Promise<void> => {
     setLoading(true)
     setExtractedCount(0)
@@ -102,13 +95,11 @@ export default function ExtractPdfPages() {
       setLoading(false)
     }
   }
-
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const f = e.target.files?.[0]
     if (f) void loadFile(f)
     e.target.value = ''
   }
-
   const extract = async (): Promise<void> => {
     if (!file) {
       toast.error('Load a PDF first')
@@ -143,7 +134,6 @@ export default function ExtractPdfPages() {
       setExtracting(false)
     }
   }
-
   return (
     <div className="space-y-5">
       <Field label="Source PDF">
@@ -183,7 +173,6 @@ export default function ExtractPdfPages() {
           </p>
         </div>
       </Field>
-
       {file ? (
         <Field
           label="Pages to extract"
@@ -200,7 +189,6 @@ export default function ExtractPdfPages() {
           />
         </Field>
       ) : null}
-
       {file ? (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           <Stat label="Source pages" value={pageCount} />
@@ -215,7 +203,6 @@ export default function ExtractPdfPages() {
           />
         </div>
       ) : null}
-
       {file && pagesInput.trim() ? (
         <Card>
           <CardHeader>
@@ -251,7 +238,6 @@ export default function ExtractPdfPages() {
           </CardContent>
         </Card>
       ) : null}
-
       <Button
         type="button"
         onClick={() => void extract()}
@@ -261,7 +247,6 @@ export default function ExtractPdfPages() {
         {extracting ? <Loader2 className="size-4 animate-spin" /> : <FileDown className="size-4" />}
         {extracting ? 'Extracting…' : 'Extract & download'}
       </Button>
-
       <p className="text-xs text-muted-foreground">
         <Download className="mr-1 inline size-3" />
         Output: <code className="font-mono">{file ? `${baseName(file.name)}-extracted.pdf` : 'document-extracted.pdf'}</code>

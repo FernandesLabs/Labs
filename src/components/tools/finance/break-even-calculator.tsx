@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { AlertCircle } from 'lucide-react'
 import {
@@ -13,7 +12,6 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Field, Stat } from '@/lib/tools/tool-ui'
-
 function parseNum(value: string): number {
   if (value == null) return NaN
   const trimmed = value.trim()
@@ -21,7 +19,6 @@ function parseNum(value: string): number {
   const n = Number(trimmed)
   return Number.isFinite(n) ? n : NaN
 }
-
 function fmtCurrency(n: number): string {
   if (!Number.isFinite(n)) return '—'
   return new Intl.NumberFormat('en-US', {
@@ -30,7 +27,6 @@ function fmtCurrency(n: number): string {
     maximumFractionDigits: 2,
   }).format(n)
 }
-
 function fmtNum(n: number, digits = 0): string {
   if (!Number.isFinite(n)) return '—'
   return n.toLocaleString(undefined, {
@@ -38,12 +34,10 @@ function fmtNum(n: number, digits = 0): string {
     minimumFractionDigits: digits,
   })
 }
-
 function fmtPct(n: number, digits = 1): string {
   if (!Number.isFinite(n)) return '—'
   return `${n.toFixed(digits)}%`
 }
-
 /**
  * Break-Even Calculator
  * Compute the break-even point (units), break-even revenue, contribution
@@ -53,11 +47,9 @@ export default function BreakEvenCalculator() {
   const [fixedCosts, setFixedCosts] = React.useState('10000')
   const [pricePerUnit, setPricePerUnit] = React.useState('50')
   const [variableCost, setVariableCost] = React.useState('30')
-
   const fixedN = parseNum(fixedCosts)
   const priceN = parseNum(pricePerUnit)
   const varN = parseNum(variableCost)
-
   const valid =
     Number.isFinite(fixedN) &&
     fixedN >= 0 &&
@@ -65,11 +57,9 @@ export default function BreakEvenCalculator() {
     priceN > 0 &&
     Number.isFinite(varN) &&
     varN >= 0
-
   const contributionMargin = valid ? priceN - varN : NaN
   const contributionMarginRatio =
     valid && priceN > 0 ? (contributionMargin / priceN) * 100 : NaN
-
   // Edge case: contribution margin must be positive to break even
   const canBreakEven = Number.isFinite(contributionMargin) && contributionMargin > 0
   const breakEvenUnits =
@@ -78,13 +68,11 @@ export default function BreakEvenCalculator() {
     Number.isFinite(breakEvenUnits) && Number.isFinite(priceN)
       ? breakEvenUnits * priceN
       : NaN
-
   // Edge case: when CM = 0 and fixed costs are 0, you "break even" at zero units
   const zeroCostEdge =
     valid &&
     fixedN === 0 &&
     contributionMargin === 0
-
   return (
     <div className="space-y-5">
       <Card>
@@ -132,7 +120,6 @@ export default function BreakEvenCalculator() {
           </div>
         </CardContent>
       </Card>
-
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Stat
           label="Break-even (units)"
@@ -171,7 +158,6 @@ export default function BreakEvenCalculator() {
           accent="#d97706"
         />
       </div>
-
       {!canBreakEven && valid && !zeroCostEdge ? (
         <div className="flex items-start gap-2 rounded-md border border-amber-300/60 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-700/60 dark:bg-amber-950/40 dark:text-amber-200">
           <AlertCircle className="mt-0.5 size-4 shrink-0" />
@@ -183,7 +169,6 @@ export default function BreakEvenCalculator() {
           </div>
         </div>
       ) : null}
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Formulas</CardTitle>
@@ -227,7 +212,6 @@ export default function BreakEvenCalculator() {
           />
         </CardContent>
       </Card>
-
       <Card>
         <CardContent className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2 text-sm">
@@ -262,7 +246,6 @@ export default function BreakEvenCalculator() {
     </div>
   )
 }
-
 function FormulaRow({
   title,
   formula,

@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import {
   Upload,
@@ -30,11 +29,9 @@ import {
 } from '@/components/ui/table'
 import { Field, Stat } from '@/lib/tools/tool-ui'
 import { toast } from 'sonner'
-
 /* ------------------------------------------------------------------ */
 /*  EXIF parser (manual, JPEG/TIFF)                                    */
 /* ------------------------------------------------------------------ */
-
 const TYPE_SIZES: Record<number, number> = {
   1: 1, // BYTE
   2: 1, // ASCII
@@ -45,13 +42,11 @@ const TYPE_SIZES: Record<number, number> = {
   9: 4, // SLONG
   10: 8, // SRATIONAL (2x SLONG)
 }
-
 interface Reader {
   data: DataView
   little: boolean
   tiffStart: number
 }
-
 interface IfdEntry {
   tag: number
   type: number
@@ -60,14 +55,12 @@ interface IfdEntry {
   /** Absolute byte offset of this entry inside the underlying ArrayBuffer. */
   entryAbs: number
 }
-
 function readUint(r: Reader, offset: number, bytes: number): number {
   if (bytes === 2) return r.data.getUint16(offset, r.little)
   if (bytes === 4) return r.data.getUint32(offset, r.little)
   if (bytes === 1) return r.data.getUint8(offset)
   return 0
 }
-
 // Tag-name maps for IFD0, Exif sub-IFD, and GPS IFD.
 const IFD0_TAGS: Record<number, string> = {
   0x010e: 'ImageDescription',
@@ -85,7 +78,6 @@ const IFD0_TAGS: Record<number, string> = {
   0x8769: 'ExifOffset',
   0x8825: 'GPSInfo',
 }
-
 const EXIF_TAGS: Record<number, string> = {
   0x829a: 'ExposureTime',
   0x829d: 'FNumber',
@@ -148,7 +140,6 @@ const EXIF_TAGS: Record<number, string> = {
   0xa434: 'LensModel',
   0xa435: 'LensSerialNumber',
 }
-
 const GPS_TAGS: Record<number, string> = {
   0x0001: 'GPSLatitudeRef',
   0x0002: 'GPSLatitude',
@@ -181,24 +172,20 @@ const GPS_TAGS: Record<number, string> = {
   0x001d: 'GPSDateStamp',
   0x001e: 'GPSDifferential',
 }
-
 const NAME_MAP: Record<number, string> = {
   ...IFD0_TAGS,
   ...EXIF_TAGS,
   ...GPS_TAGS,
 }
-
 interface ExifTag {
   tag: number
   name: string
   value: string
 }
-
 interface ParsedExif {
   tags: ExifTag[]
   gps: { lat: number; lon: number } | null
 }
-
 function parseExif(buffer: ArrayBuffer): ParsedExif | null {
   const data = new DataView(buffer)
   if (data.byteLength < 4) return null
@@ -236,7 +223,6 @@ function parseExif(buffer: ArrayBuffer): ParsedExif | null {
   }
   return null
 }
-
 function parseTiff(data: DataView, tiffStart: number): ParsedExif | null {
   if (tiffStart + 8 > data.byteLength) return null
   const bo = data.getUint16(tiffStart, false)
@@ -251,7 +237,6 @@ function parseTiff(data: DataView, tiffStart: number): ParsedExif | null {
   const tags: ExifTag[] = []
   let gpsInfoOffset = 0
   let exifOffset = 0
-
   const ifd0 = parseIfdAt(r, ifd0Offset)
   for (const entry of ifd0) {
     if (entry.tag === 0x8769) {
@@ -264,12 +249,10 @@ function parseTiff(data: DataView, tiffStart: number): ParsedExif | null {
     }
     pushTag(r, entry, tags)
   }
-
   if (exifOffset > 0) {
     const exifIfd = parseIfdAt(r, exifOffset)
     for (const entry of exifIfd) pushTag(r, entry, tags)
   }
-
   let gps: { lat: number; lon: number } | null = null
   if (gpsInfoOffset > 0) {
     const gpsIfd = parseIfdAt(r, gpsInfoOffset)
@@ -296,7 +279,6 @@ function parseTiff(data: DataView, tiffStart: number): ParsedExif | null {
   }
   return { tags, gps }
 }
-
 function parseIfdAt(r: Reader, ifdOffset: number): IfdEntry[] {
   const abs = r.tiffStart + ifdOffset
   if (abs + 2 > r.data.byteLength) return []
@@ -313,17 +295,14 @@ function parseIfdAt(r: Reader, ifdOffset: number): IfdEntry[] {
   }
   return out
 }
-
 function pushTag(r: Reader, entry: IfdEntry, tags: ExifTag[]): void {
   const name = NAME_MAP[entry.tag] ?? `Tag_0x${entry.tag.toString(16).padStart(4, '0')}`
   const value = readEntryValue(r, entry)
   tags.push({ tag: entry.tag, name, value })
 }
-
 function readEntryValue(r: Reader, entry: IfdEntry): string {
   const typeSize = TYPE_SIZES[entry.type] ?? 1
   const totalBytes = entry.count * typeSize
-
   // Determine where the value bytes live.
   let valueAbs: number
   if (totalBytes <= 4) {
@@ -331,7 +310,6 @@ function readEntryValue(r: Reader, entry: IfdEntry): string {
   } else {
     valueAbs = r.tiffStart + entry.valueOffset
   }
-
   // ASCII
   if (entry.type === 2) {
     let s = ''
@@ -343,7 +321,6 @@ function readEntryValue(r: Reader, entry: IfdEntry): string {
     }
     return s
   }
-
   // BYTE / UNDEFINED
   if (entry.type === 1 || entry.type === 7) {
     const parts: string[] = []
@@ -352,7 +329,6 @@ function readEntryValue(r: Reader, entry: IfdEntry): string {
     }
     return parts.join(', ')
   }
-
   // SHORT
   if (entry.type === 3) {
     const parts: string[] = []
@@ -361,7 +337,6 @@ function readEntryValue(r: Reader, entry: IfdEntry): string {
     }
     return parts.join(', ')
   }
-
   // LONG
   if (entry.type === 4) {
     const parts: string[] = []
@@ -370,7 +345,6 @@ function readEntryValue(r: Reader, entry: IfdEntry): string {
     }
     return parts.join(', ')
   }
-
   // RATIONAL / SRATIONAL
   if (entry.type === 5 || entry.type === 10) {
     const isSigned = entry.type === 10
@@ -390,7 +364,6 @@ function readEntryValue(r: Reader, entry: IfdEntry): string {
     }
     return parts.join(', ')
   }
-
   // SLONG
   if (entry.type === 9) {
     const parts: string[] = []
@@ -399,10 +372,8 @@ function readEntryValue(r: Reader, entry: IfdEntry): string {
     }
     return parts.join(', ')
   }
-
   return ''
 }
-
 function readRationals(r: Reader, entry: IfdEntry): number[] {
   const typeSize = TYPE_SIZES[entry.type] ?? 1
   const totalBytes = entry.count * typeSize
@@ -421,17 +392,14 @@ function readRationals(r: Reader, entry: IfdEntry): number[] {
   }
   return out
 }
-
 function dmsToDecimal(dms: number[], negative: boolean): number {
   if (dms.length < 3) return NaN
   const dec = dms[0] + dms[1] / 60 + dms[2] / 3600
   return negative ? -dec : dec
 }
-
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
 /* ------------------------------------------------------------------ */
-
 function formatBytes(bytes: number): string {
   if (!Number.isFinite(bytes) || bytes < 0) return '—'
   if (bytes === 0) return '0 B'
@@ -441,23 +409,19 @@ function formatBytes(bytes: number): string {
   const v = bytes / Math.pow(1024, safe)
   return `${v.toFixed(safe === 0 ? 0 : 2)} ${units[safe]}`
 }
-
 interface FileMeta {
   name: string
   size: number
   type: string
   lastModified: number
 }
-
 interface Dimensions {
   width: number
   height: number
 }
-
 /* ------------------------------------------------------------------ */
 /*  Component                                                          */
 /* ------------------------------------------------------------------ */
-
 export default function ImageMetadataViewer() {
   const [file, setFile] = React.useState<FileMeta | null>(null)
   const [exif, setExif] = React.useState<ParsedExif | null>(null)
@@ -468,14 +432,12 @@ export default function ImageMetadataViewer() {
   const [previewUrl, setPreviewUrl] = React.useState<string | null>(null)
   const inputRef = React.useRef<HTMLInputElement>(null)
   const objectUrlRef = React.useRef<string | null>(null)
-
   // Revoke any object URL on unmount.
   React.useEffect(() => {
     return () => {
       if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current)
     }
   }, [])
-
   const handleFile = async (f: File | null | undefined): Promise<void> => {
     if (!f) return
     if (!f.type.startsWith('image/')) {
@@ -496,7 +458,6 @@ export default function ImageMetadataViewer() {
     setExif(null)
     setExifError(null)
     setDimensions(null)
-
     // Revoke previous preview URL.
     if (objectUrlRef.current) {
       URL.revokeObjectURL(objectUrlRef.current)
@@ -505,7 +466,6 @@ export default function ImageMetadataViewer() {
     const url = URL.createObjectURL(f)
     objectUrlRef.current = url
     setPreviewUrl(url)
-
     // Load natural dimensions via an Image element.
     const img = new Image()
     img.onload = () => {
@@ -515,7 +475,6 @@ export default function ImageMetadataViewer() {
       setExifError('Could not load image dimensions.')
     }
     img.src = url
-
     try {
       const buf = await f.arrayBuffer()
       const parsed = parseExif(buf)
@@ -532,23 +491,19 @@ export default function ImageMetadataViewer() {
       setReading(false)
     }
   }
-
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     void handleFile(e.target.files?.[0])
   }
-
   const onDrop = (e: React.DragEvent): void => {
     e.preventDefault()
     setDragOver(false)
     void handleFile(e.dataTransfer.files?.[0])
   }
-
   const gpsLink = React.useMemo(() => {
     if (!exif?.gps) return null
     const { lat, lon } = exif.gps
     return `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=15/${lat}/${lon}`
   }, [exif])
-
   return (
     <div className="space-y-5">
       <Card>
@@ -610,7 +565,6 @@ export default function ImageMetadataViewer() {
           </div>
         </CardContent>
       </Card>
-
       {file ? (
         <Card>
           <CardHeader>
@@ -634,7 +588,6 @@ export default function ImageMetadataViewer() {
                 }
               />
             </div>
-
             {previewUrl ? (
               <div className="overflow-hidden rounded-lg border border-border bg-muted/20">
                 <img
@@ -647,7 +600,6 @@ export default function ImageMetadataViewer() {
           </CardContent>
         </Card>
       ) : null}
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">EXIF metadata</CardTitle>
@@ -704,7 +656,6 @@ export default function ImageMetadataViewer() {
                   </ScrollArea>
                 </div>
               </Field>
-
               {gpsLink ? (
                 <>
                   <Separator />
@@ -737,7 +688,6 @@ export default function ImageMetadataViewer() {
           )}
         </CardContent>
       </Card>
-
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
@@ -771,7 +721,6 @@ export default function ImageMetadataViewer() {
           </ul>
         </CardContent>
       </Card>
-
       <div className="flex flex-wrap gap-2">
         <Badge variant="secondary">JPEG</Badge>
         <Badge variant="secondary">EXIF / IFD0 / Exif IFD / GPS IFD</Badge>

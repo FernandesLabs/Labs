@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -8,15 +7,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import { Field, ResultBox } from '@/lib/tools/tool-ui'
-
 type EncodeMode = 'component' | 'uri'
-
 export default function UrlEncoderDecoder() {
   const [mode, setMode] = React.useState<EncodeMode>('component')
   const [encodeInput, setEncodeInput] = React.useState('')
   const [decodeInput, setDecodeInput] = React.useState('')
   const [decodeOutput, setDecodeOutput] = React.useState('')
-
   const encodeOutput = React.useMemo(() => {
     if (!encodeInput) return ''
     try {
@@ -27,7 +23,6 @@ export default function UrlEncoderDecoder() {
       return ''
     }
   }, [encodeInput, mode])
-
   React.useEffect(() => {
     if (!decodeInput) {
       setDecodeOutput('')
@@ -43,17 +38,14 @@ export default function UrlEncoderDecoder() {
       })
     }
   }, [decodeInput])
-
   const loadSample = () => {
     setEncodeInput('https://example.com/search?q=hello world&lang=en-US&safe=true')
   }
-
   const clearAll = () => {
     setEncodeInput('')
     setDecodeInput('')
     setDecodeOutput('')
   }
-
   return (
     <div className="space-y-5">
       <Tabs defaultValue="encode">
@@ -61,7 +53,6 @@ export default function UrlEncoderDecoder() {
           <TabsTrigger value="encode">Encode</TabsTrigger>
           <TabsTrigger value="decode">Decode</TabsTrigger>
         </TabsList>
-
         <TabsContent value="encode" className="space-y-4">
           <Field
             label="Input text"
@@ -77,7 +68,6 @@ export default function UrlEncoderDecoder() {
               className="font-mono"
             />
           </Field>
-
           <Field label="Encoding mode" hint="choose the encoder">
             <RadioGroup
               value={mode}
@@ -100,7 +90,6 @@ export default function UrlEncoderDecoder() {
               </div>
             </RadioGroup>
           </Field>
-
           <div className="flex flex-wrap gap-2">
             <Button
               type="button"
@@ -120,7 +109,6 @@ export default function UrlEncoderDecoder() {
               Clear
             </Button>
           </div>
-
           <ResultBox
             label="Encoded output"
             value={encodeOutput}
@@ -128,7 +116,6 @@ export default function UrlEncoderDecoder() {
             empty="Encoded text will appear here."
           />
         </TabsContent>
-
         <TabsContent value="decode" className="space-y-4">
           <Field
             label="Input text"
@@ -144,7 +131,6 @@ export default function UrlEncoderDecoder() {
               className="font-mono"
             />
           </Field>
-
           <Button
             type="button"
             variant="ghost"
@@ -157,7 +143,6 @@ export default function UrlEncoderDecoder() {
           >
             Clear
           </Button>
-
           <ResultBox
             label="Decoded output"
             value={decodeOutput}

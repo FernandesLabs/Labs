@@ -13,19 +13,15 @@
  * Tools with a score of 0 are excluded. Results are sorted by score desc,
  * then name asc.
  */
-
 import type { Tool } from './types'
-
 interface Scored {
   tool: Tool
   score: number
 }
-
 /** Normalise a string for matching: lowercase, collapse whitespace. */
 function norm(s: string): string {
   return s.toLowerCase().replace(/\s+/g, ' ').trim()
 }
-
 /**
  * Fuzzy subsequence match: does `query` appear as a subsequence of `text`?
  * Returns the tightness (0..1) — 1 = exact substring, lower = more spread out.
@@ -49,15 +45,12 @@ function subsequenceScore(query: string, text: string): number {
   const spread = totalGaps / Math.max(1, text.length)
   return Math.max(0.1, 1 - spread)
 }
-
 function scoreTool(tool: Tool, qNorm: string): number {
   if (!qNorm) return 1
   const name = norm(tool.name)
   const desc = norm(tool.description)
   const kws = (tool.keywords ?? []).map(norm)
-
   let score = 0
-
   // Exact name match
   if (name === qNorm) score += 150
   // Name starts with query
@@ -67,45 +60,38 @@ function scoreTool(tool: Tool, qNorm: string): number {
   // Word-prefix in name (e.g. "json" matches "JSON Formatter")
   const nameWords = name.split(' ')
   if (nameWords.some((w) => w.startsWith(qNorm))) score += 50
-
   // Keyword exact / prefix
   for (const k of kws) {
     if (k === qNorm) score += 35
     else if (k.startsWith(qNorm)) score += 20
     else if (k.includes(qNorm)) score += 12
   }
-
   // Description substring
   if (desc.includes(qNorm)) score += 15
-
-  // Fuzzy subsequence fallback (typo tolerance) — only if no strong match yet
+  // Fuzzy subsequence fallback (typo tolerance) — only if no strong match yet.
+  // Require a minimum tightness (0.5) so that short, scattered queries like
+  // "zzz" or "qxz" don't match every tool and actually show the empty state.
   if (score < 30) {
     const fuzzy = subsequenceScore(qNorm, name)
-    if (fuzzy > 0) score += Math.round(fuzzy * 25)
+    if (fuzzy >= 0.5) score += Math.round(fuzzy * 25)
   }
-
   return score
 }
-
 /** Fuzzy-filter and rank tools by query. Returns tools with score > 0, sorted. */
 export function fuzzySearchTools(tools: Tool[], query: string): Tool[] {
   const q = norm(query)
   if (!q) return tools
-
   const scored: Scored[] = []
   for (const tool of tools) {
     const s = scoreTool(tool, q)
     if (s > 0) scored.push({ tool, score: s })
   }
-
   scored.sort((a, b) => {
     if (b.score !== a.score) return b.score - a.score
     return a.tool.name.localeCompare(b.tool.name)
   })
-
   return scored.map((s) => s.tool)
 }
-
 /** Quick boolean: does the tool match the query (fuzzy)? */
 export function fuzzyMatch(tool: Tool, query: string): boolean {
   return scoreTool(tool, norm(query)) > 0

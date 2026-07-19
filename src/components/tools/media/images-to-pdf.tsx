@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { PDFDocument } from 'pdf-lib'
 import { toast } from 'sonner'
@@ -26,7 +25,6 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
 import { Field, Stat, downloadBlob } from '@/lib/tools/tool-ui'
-
 interface ImageItem {
   id: string
   file: File
@@ -36,21 +34,18 @@ interface ImageItem {
   status: 'pending' | 'loaded' | 'error'
   kind: 'png' | 'jpg'
 }
-
 function formatBytes(b: number): string {
   if (!Number.isFinite(b) || b < 0) return '—'
   if (b < 1024) return `${b} B`
   if (b < 1024 * 1024) return `${(b / 1024).toFixed(1)} KB`
   return `${(b / 1024 / 1024).toFixed(2)} MB`
 }
-
 function uid(): string {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
     return crypto.randomUUID()
   }
   return `img-${Date.now()}-${Math.floor(performance.now() * 1000)}`
 }
-
 function detectKind(file: File): 'png' | 'jpg' | null {
   if (file.type === 'image/png' || /\.png$/i.test(file.name)) return 'png'
   if (
@@ -62,13 +57,11 @@ function detectKind(file: File): 'png' | 'jpg' | null {
   }
   return null
 }
-
 export default function ImagesToPdf() {
   const [items, setItems] = React.useState<ImageItem[]>([])
   const [building, setBuilding] = React.useState(false)
   const [fitPage, setFitPage] = React.useState(true)
   const inputRef = React.useRef<HTMLInputElement | null>(null)
-
   const addFiles = async (fileList: FileList | null): Promise<void> => {
     if (!fileList || fileList.length === 0) return
     const incoming: ImageItem[] = []
@@ -91,7 +84,6 @@ export default function ImagesToPdf() {
     }
     if (incoming.length === 0) return
     setItems((prev) => [...prev, ...incoming])
-
     for (const item of incoming) {
       const img = new Image()
       img.onload = () => {
@@ -128,14 +120,12 @@ export default function ImagesToPdf() {
       img.src = item.url
     }
   }
-
   React.useEffect(() => {
     return () => {
       for (const item of items) URL.revokeObjectURL(item.url)
     }
     // Only run on unmount; items revoke individually in removeItem.
   }, [])
-
   const removeItem = (id: string): void => {
     setItems((prev) => {
       const target = prev.find((p) => p.id === id)
@@ -143,7 +133,6 @@ export default function ImagesToPdf() {
       return prev.filter((p) => p.id !== id)
     })
   }
-
   const move = (id: string, dir: -1 | 1): void => {
     setItems((prev) => {
       const idx = prev.findIndex((p) => p.id === id)
@@ -156,14 +145,11 @@ export default function ImagesToPdf() {
       return copy
     })
   }
-
   const clearAll = (): void => {
     for (const item of items) URL.revokeObjectURL(item.url)
     setItems([])
   }
-
   const ready = items.filter((i) => i.status === 'loaded')
-
   const build = async (): Promise<void> => {
     if (ready.length === 0) {
       toast.error('Add at least one valid image')
@@ -217,7 +203,6 @@ export default function ImagesToPdf() {
       setBuilding(false)
     }
   }
-
   return (
     <div className="space-y-5">
       <Field label="Source images">
@@ -253,7 +238,6 @@ export default function ImagesToPdf() {
           </p>
         </div>
       </Field>
-
       {items.length > 0 ? (
         <div className="flex items-center justify-between gap-3 rounded-lg border border-border bg-card p-3">
           <div className="flex items-center gap-3">
@@ -277,7 +261,6 @@ export default function ImagesToPdf() {
           </Button>
         </div>
       ) : null}
-
       {!fitPage ? (
         <p className="rounded-md bg-muted/30 p-3 text-xs text-muted-foreground">
           A4-page mode places each image centred on an A4 page (595×842 pt).
@@ -285,7 +268,6 @@ export default function ImagesToPdf() {
           exactly — no whitespace, no scaling.
         </p>
       ) : null}
-
       {items.length > 0 ? (
         <Card>
           <CardHeader>
@@ -371,7 +353,6 @@ export default function ImagesToPdf() {
           </CardContent>
         </Card>
       ) : null}
-
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         <Stat label="Images" value={items.length} />
         <Stat
@@ -381,7 +362,6 @@ export default function ImagesToPdf() {
         />
         <Stat label="Output pages" value={ready.length} />
       </div>
-
       <Button
         type="button"
         onClick={() => void build()}
@@ -391,7 +371,6 @@ export default function ImagesToPdf() {
         {building ? <Loader2 className="size-4 animate-spin" /> : <FilePlus2 className="size-4" />}
         {building ? 'Building…' : 'Build PDF'}
       </Button>
-
       <p className="text-xs text-muted-foreground">
         <Badge variant="outline" className="mr-2">client-side</Badge>
         <ImagePlus className="mr-1 inline size-3" />
