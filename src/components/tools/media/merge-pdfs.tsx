@@ -110,7 +110,7 @@ export default function MergePdfs() {
       }
       const saved = await out.save()
       downloadBlob(
-        new Blob([saved], { type: 'application/pdf' }),
+        new Blob([saved as BlobPart], { type: 'application/pdf' }),
         'merged.pdf'
       )
       toast.success(`Merged ${readyItems.length} PDF${readyItems.length === 1 ? '' : 's'} (${totalPages} pages)`)

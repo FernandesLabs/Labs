@@ -15,11 +15,13 @@ interface Stop {
 }
 function newStopId(): string {
   // Use crypto.randomUUID if available, fallback otherwise (no Math.random)
-  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
-    return crypto.randomUUID()
+  const c: Crypto | undefined =
+    typeof crypto !== 'undefined' ? crypto : undefined
+  if (c && typeof c.randomUUID === 'function') {
+    return c.randomUUID()
   }
   const arr = new Uint8Array(8)
-  crypto.getRandomValues(arr)
+  c?.getRandomValues(arr)
   return Array.from(arr, (b) => b.toString(16).padStart(2, '0')).join('')
 }
 function clamp(n: number, min: number, max: number): number {

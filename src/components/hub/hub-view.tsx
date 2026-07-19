@@ -99,7 +99,7 @@ export function HubView({
   tools: Tool[]
   toolsBySlug: Map<string, Tool>
   onSelect: (slug: string) => void
-  searchRef: React.RefObject<HTMLInputElement>
+  searchRef: React.RefObject<HTMLInputElement | null>
   onOpenPalette: () => void
   initialCategory?: string
   initialQuery?: string

@@ -121,7 +121,6 @@ export default function Home() {
       />
       <SiteFooter />
       <CommandPalette
-        tools={tools}
         open={paletteOpen}
         onOpenChange={setPaletteOpen}
         onSelect={openTool}

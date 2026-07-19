@@ -347,7 +347,6 @@ export default function FontAccessibilityChecker() {
         <Stat
           label="x-height ratio"
           value={metrics.xHeightRatio.toFixed(2)}
-          hint="estimated"
         />
       </div>
       <Card>

@@ -143,7 +143,7 @@ export default function PdfToImages() {
       const loadingTask = pdfjs.getDocument({
         data: pdfBytesRef.current.slice(0),
       })
-      const pdf = await loadingTask
+      const pdf = await loadingTask.promise
       const rendered: string[] = []
       for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i)

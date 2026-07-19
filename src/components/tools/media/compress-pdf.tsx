@@ -105,7 +105,7 @@ export default function CompressPdf() {
       return
     }
     downloadBlob(
-      new Blob([compressedBytes], { type: 'application/pdf' }),
+      new Blob([compressedBytes as BlobPart], { type: 'application/pdf' }),
       `${baseName(file.name)}-compressed.pdf`
     )
   }

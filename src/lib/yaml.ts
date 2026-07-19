@@ -8,4 +8,4 @@
 // one file triggers the warning.
 import { dump, load, YAMLException } from 'js-yaml'
 export { dump, load, YAMLException }
-export type { ParseOptions, DumpOptions } from 'js-yaml'
+export type { ParserOptions as ParseOptions, DumpOptions } from 'js-yaml'

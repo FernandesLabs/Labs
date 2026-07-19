@@ -192,7 +192,7 @@ export default function ImagesToPdf() {
       }
       const saved = await pdf.save()
       downloadBlob(
-        new Blob([saved], { type: 'application/pdf' }),
+        new Blob([saved as BlobPart], { type: 'application/pdf' }),
         'images.pdf'
       )
       toast.success(`Built PDF with ${ready.length} page${ready.length === 1 ? '' : 's'}`)

@@ -22,6 +22,7 @@ import { FavoriteButton } from './favorite-button'
 import { ToolContent } from './tool-content'
 import { ToolJsonLd } from './tool-json-ld'
 import { BackToTop } from './back-to-top'
+import { CommandPalette } from './command-palette'
 import { MobileSidebar } from './mobile-sidebar'
 import { OnThisPage } from './on-this-page'
 import { ReadingProgress } from './reading-progress'
@@ -69,11 +70,32 @@ export function ToolView({
   const cat = CATEGORY_META[tool.category]
   const { recent, recordUse } = useToolHistory()
 
+  // Command palette state — Ctrl+K / ⌘K opens it inline so users can jump
+  // to another tool without navigating back to the hub first.
+  const [paletteOpen, setPaletteOpen] = React.useState(false)
+
   // Record this tool as recently-used on mount + scroll to top on tool change.
   React.useEffect(() => {
     recordUse(tool.slug)
     window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
   }, [tool.slug, recordUse])
+
+  // Global keyboard shortcuts:
+  //   ⌘K / Ctrl+K → toggle the command palette
+  //   Esc         → close the palette (if open)
+  React.useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault()
+        setPaletteOpen((v) => !v)
+      }
+      if (e.key === 'Escape' && paletteOpen) {
+        setPaletteOpen(false)
+      }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [paletteOpen])
 
   // Related tools — same category, excluding the current tool (max 6).
   const related = React.useMemo(() => {
@@ -99,7 +121,7 @@ export function ToolView({
       <SiteHeader
         onHome={() => router.push('/')}
         toolCount={tools.length}
-        onOpenPalette={() => router.push('/')}
+        onOpenPalette={() => setPaletteOpen(true)}
       />
 
       <ToolJsonLd tool={tool} />
@@ -303,6 +325,15 @@ export function ToolView({
 
       <SiteFooter />
       <BackToTop />
+      {/* Command palette — ⌘K / Ctrl+K opens it inline on tool pages too */}
+      <CommandPalette
+        open={paletteOpen}
+        onOpenChange={setPaletteOpen}
+        onSelect={(slug) => {
+          setPaletteOpen(false)
+          onSelect(slug)
+        }}
+      />
     </div>
   )
 }

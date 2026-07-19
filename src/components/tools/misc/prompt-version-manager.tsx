@@ -275,7 +275,7 @@ export default function PromptVersionManager() {
               name: v.name,
               text: v.text,
               message: typeof v.message === 'string' ? v.message : '',
-              createdAt: v.createdAt,
+              createdAt: v.createdAt ?? Date.now(),
             })
           }
         }
