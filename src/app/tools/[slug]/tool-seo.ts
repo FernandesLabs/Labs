@@ -13,6 +13,58 @@ export interface FaqItem {
   q: string
   a: string
 }
+
+/**
+ * Generate a unique, keyword-rich <title> for a tool page.
+ *
+ * Format: "{ToolName} — Free Online {CategoryLabel} Tool | Fernandes Labs"
+ *
+ * Why this is better than the old "{ToolName} — Free Online Tool — Fernandes Labs":
+ *   - Includes the category label (e.g. "Developer", "SEO") → adds a secondary
+ *     keyword and helps Google understand topical relevance.
+ *   - Uses a single em-dash + pipe separator for cleaner SERP display.
+ *   - Stays within 50–60 characters for most tools (the brand tail is trimmed
+ *     automatically if the total would exceed 62 chars).
+ *
+ * Example: "JSON Formatter — Free Online Developer Tool | Fernandes Labs"
+ */
+export function generateToolTitle(tool: ToolMeta): string {
+  const catLabel = CATEGORY_META[tool.category]?.label ?? 'Utility'
+  const brand = 'Fernandes Labs'
+  const full = `${tool.name} — Free Online ${catLabel} Tool | ${brand}`
+  // If the title is too long (> 62 chars), drop the category word to keep it
+  // within Google's display limit. The brand stays so users recognise the
+  // result in the SERP.
+  if (full.length > 62) {
+    const short = `${tool.name} — Free Online Tool | ${brand}`
+    return short
+  }
+  return full
+}
+
+/**
+ * Generate a unique, keyword-rich meta description for a tool page.
+ *
+ * Target length: 120–160 characters.
+ *
+ * Structure:
+ *   "{activeVerb} {primaryKeyword} {detail}. Free, online, no sign-up — runs
+ *    entirely in your browser. {categoryContext} tool by Fernandes Labs."
+ *
+ * This is richer than the raw `tool.description` (which averages only ~59
+ * chars and lacks value props like "free", "no sign-up", "in your browser").
+ */
+export function generateToolDescription(tool: ToolMeta): string {
+  const catLabel = CATEGORY_META[tool.category]?.label ?? 'utility'
+  const primaryKw = tool.keywords?.[0] ?? tool.name.toLowerCase()
+  // Start from the base description (already specific per tool), then append
+  // the value-proposition tail.
+  const base = tool.description.replace(/\.$/, '')
+  const desc = `${base}. Free online ${primaryKw} tool — no sign-up, no tracking, runs entirely in your browser. ${catLabel} tool by Fernandes Labs.`
+  // Truncate to 160 chars on a word boundary if needed.
+  if (desc.length <= 160) return desc
+  return desc.slice(0, 157).replace(/\s+\S*$/, '') + '…'
+}
 /** Longer, more specific intro paragraph (Priority 7 — improve content). */
 export function generateToolIntro(tool: ToolMeta): string {
   const cat = CATEGORY_META[tool.category]

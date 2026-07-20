@@ -104,6 +104,12 @@ export function CategoryPageClient({
                 <p className="mt-1.5 max-w-2xl text-sm text-foreground/80 sm:text-base">
                   {cat.blurb}
                 </p>
+                {/* Expanded SEO intro — 2–4 sentences with keywords + value props.
+                    Renders below the short blurb for crawlers and users who want
+                    more context about what this category covers. */}
+                <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+                  {cat.seoIntro}
+                </p>
                 <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
                   <span className="inline-flex items-center gap-1 rounded-full bg-muted/70 px-2.5 py-1 font-medium text-foreground">
                     <Layers className="size-3 text-primary" />

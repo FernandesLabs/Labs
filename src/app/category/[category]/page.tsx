@@ -50,7 +50,10 @@ export async function generateMetadata({
   const canonical = `${baseUrl}/category/${cat}`
   const tools = toolsByCategory(cat)
   const title = `${meta.label} Tools — ${tools.length} Free Online Tools | Fernandes Labs`
-  const description = `${meta.blurb} Browse ${tools.length} free ${meta.label.toLowerCase()} tools — all privacy-first, client-side, no sign-up. ${meta.label === 'Developer' ? 'JSON, encoders, hashes, regex, and code utilities.' : meta.label === 'Finance' ? 'Calculators for money, health, and school.' : ''}`
+  // Unique, keyword-rich description. The blurb is used ONCE (not duplicated
+  // as in the old version). Includes the tool count, category keyword, and
+  // the core value props (free, no sign-up, client-side, offline).
+  const description = `Browse ${tools.length} free ${meta.label.toLowerCase()} tools — ${meta.blurb.toLowerCase().replace(/\.$/, '')}. All privacy-first, run client-side in your browser, no sign-up. Works offline.`
   return {
     title,
     description,
