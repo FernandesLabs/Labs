@@ -1,4 +1,4 @@
-import type { ToolMeta } from '@/lib/tools/types'
+import type { ToolCategory } from '@/lib/tools/types'
 import { CATEGORY_META } from '@/lib/tools/types'
 /**
  * SEO content generators shared by:
@@ -9,6 +9,27 @@ import { CATEGORY_META } from '@/lib/tools/types'
  * stay in sync — Google sees the same Q&A in the rendered HTML and in the
  * FAQPage JSON-LD.
  */
+
+/**
+ * Local type accepted by all generator functions below.
+ *
+ * Uses `category: string` (not the strict `ToolCategory` union) so that both
+ * the loose `ToolMeta` from `tool-metadata.ts` (which types category as
+ * `string`) and the strict `Tool` from the registry (which types it as
+ * `ToolCategory`) are accepted. `ToolCategory` is assignable to `string`, so
+ * both call-sites compile without a cast.
+ *
+ * Internally, the functions cast `category` back to `ToolCategory` when
+ * indexing `CATEGORY_META` (which is keyed by the union).
+ */
+interface ToolLike {
+  slug: string
+  category: string
+  name: string
+  description: string
+  keywords?: string[]
+}
+
 export interface FaqItem {
   q: string
   a: string
@@ -28,8 +49,8 @@ export interface FaqItem {
  *
  * Example: "JSON Formatter — Free Online Developer Tool | Fernandes Labs"
  */
-export function generateToolTitle(tool: ToolMeta): string {
-  const catLabel = CATEGORY_META[tool.category]?.label ?? 'Utility'
+export function generateToolTitle(tool: ToolLike): string {
+  const catLabel = CATEGORY_META[tool.category as ToolCategory]?.label ?? 'Utility'
   const brand = 'Fernandes Labs'
   const full = `${tool.name} — Free Online ${catLabel} Tool | ${brand}`
   // If the title is too long (> 62 chars), drop the category word to keep it
@@ -54,8 +75,8 @@ export function generateToolTitle(tool: ToolMeta): string {
  * This is richer than the raw `tool.description` (which averages only ~59
  * chars and lacks value props like "free", "no sign-up", "in your browser").
  */
-export function generateToolDescription(tool: ToolMeta): string {
-  const catLabel = CATEGORY_META[tool.category]?.label ?? 'utility'
+export function generateToolDescription(tool: ToolLike): string {
+  const catLabel = CATEGORY_META[tool.category as ToolCategory]?.label ?? 'utility'
   const primaryKw = tool.keywords?.[0] ?? tool.name.toLowerCase()
   // Start from the base description (already specific per tool), then append
   // the value-proposition tail.
@@ -66,8 +87,8 @@ export function generateToolDescription(tool: ToolMeta): string {
   return desc.slice(0, 157).replace(/\s+\S*$/, '') + '…'
 }
 /** Longer, more specific intro paragraph (Priority 7 — improve content). */
-export function generateToolIntro(tool: ToolMeta): string {
-  const cat = CATEGORY_META[tool.category]
+export function generateToolIntro(tool: ToolLike): string {
+  const cat = CATEGORY_META[tool.category as ToolCategory]
   const kws = tool.keywords?.slice(0, 3).join(', ') || tool.name.toLowerCase()
   const kwsList = tool.keywords?.slice(0, 3).join(', ') || 'this task'
   return (
@@ -79,7 +100,7 @@ export function generateToolIntro(tool: ToolMeta): string {
   )
 }
 /** "Common use cases" bullets — Priority 7. */
-export function generateToolUseCases(tool: ToolMeta): string[] {
+export function generateToolUseCases(tool: ToolLike): string[] {
   const kws = tool.keywords ?? []
   const base: string[] = []
   if (kws.length > 0) {
@@ -116,7 +137,7 @@ export function generateToolUseCases(tool: ToolMeta): string[] {
   return base.slice(0, 5)
 }
 /** "Tips" — Priority 7. */
-export function generateToolTips(tool: ToolMeta): string[] {
+export function generateToolTips(tool: ToolLike): string[] {
   const tips: string[] = [
     `Press the Copy button (or ⌘C / Ctrl+C in the result area) to grab the output without selecting it manually.`,
     `Use the command palette (⌘K / Ctrl+K) to jump between tools instantly — no need to scroll back to the hub.`,
@@ -145,7 +166,7 @@ export function generateToolTips(tool: ToolMeta): string[] {
   return tips
 }
 /** How-to steps (Priority 6 — HowTo JSON-LD). */
-export function generateToolHowTo(tool: ToolMeta): string[] {
+export function generateToolHowTo(tool: ToolLike): string[] {
   const cat = tool.category
   const steps: string[] = []
   steps.push(
@@ -173,8 +194,8 @@ export function generateToolHowTo(tool: ToolMeta): string[] {
   return steps
 }
 /** FAQs (Priority 5 — FAQPage JSON-LD). */
-export function generateToolFaq(tool: ToolMeta): FaqItem[] {
-  const cat = CATEGORY_META[tool.category]
+export function generateToolFaq(tool: ToolLike): FaqItem[] {
+  const cat = CATEGORY_META[tool.category as ToolCategory]
   const kws = tool.keywords || []
   const faqs: FaqItem[] = [
     {
