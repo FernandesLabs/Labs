@@ -46,7 +46,7 @@ export function BlogIndexClient() {
           <Link href="/" className="inline-flex items-center gap-1 transition hover:text-foreground">
             Home
           </Link>
-          <span className="text-muted-foreground/50">/</span>
+          <span className="text-muted-foreground/80">/</span>
           <span className="font-medium text-foreground">Blog</span>
         </nav>
 
@@ -62,7 +62,7 @@ export function BlogIndexClient() {
 
         {POSTS.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border/70 bg-muted/20 p-12 text-center">
-            <FileText className="h-10 w-10 text-muted-foreground/50" />
+            <FileText className="h-10 w-10 text-muted-foreground/80" />
             <p className="mt-3 text-base font-medium text-foreground">
               Articles coming soon
             </p>

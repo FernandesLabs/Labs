@@ -74,7 +74,7 @@ export function CategoryPageClient({
               <Home className="size-3.5" />
               <span>Tools</span>
             </Link>
-            <ChevronRight className="size-3.5 text-muted-foreground/50" />
+            <ChevronRight className="size-3.5 text-muted-foreground/80" />
             <span className="font-medium text-foreground" aria-current="page">
               {cat.label}
             </span>
@@ -157,7 +157,7 @@ export function CategoryPageClient({
         <section className="mx-auto max-w-6xl px-4 py-10">
           {filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border py-20 text-center">
-              <Search className="size-8 text-muted-foreground/50" />
+              <Search className="size-8 text-muted-foreground/80" />
               <p className="mt-3 text-sm font-medium">No tools match your search</p>
               <button
                 type="button"

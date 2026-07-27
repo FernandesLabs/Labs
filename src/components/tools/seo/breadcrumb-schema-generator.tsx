@@ -204,7 +204,7 @@ export default function BreadcrumbSchemaGenerator(): React.JSX.Element {
                       {crumb.name.trim()}
                     </span>
                     {index < arr.length - 1 ? (
-                      <ChevronRight className="size-3.5 text-muted-foreground/60" aria-hidden="true" />
+                      <ChevronRight className="size-3.5 text-muted-foreground/80" aria-hidden="true" />
                     ) : null}
                   </React.Fragment>
                 ))}

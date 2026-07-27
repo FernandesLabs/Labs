@@ -70,7 +70,7 @@ export function AdUnit({
         className={`flex w-full items-center justify-center rounded-lg border border-dashed border-border/70 bg-muted/30 px-4 py-6 text-center ${className ?? ''}`}
         aria-label="Advertisement placeholder"
       >
-        <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground/60">
+        <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground/80">
           Advertisement
           {slot ? ` · ${slot}` : ''}
         </span>

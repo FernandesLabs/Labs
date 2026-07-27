@@ -109,7 +109,7 @@ export function AffiliateLinks({ category }: { category: ToolCategory }) {
           </a>
         ))}
       </div>
-      <p className="mt-2 text-[10px] text-muted-foreground/60">
+      <p className="mt-2 text-[10px] text-muted-foreground/80">
         Affiliate links — we may earn a commission if you sign up.
       </p>
     </div>

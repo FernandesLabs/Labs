@@ -100,7 +100,7 @@ export function SiteFooter() {
                         aria-hidden
                       />
                       {meta.label}
-                      <span className="text-[10px] text-muted-foreground/60">
+                      <span className="text-[10px] text-muted-foreground/80">
                         {count}
                       </span>
                     </Link>
@@ -270,7 +270,7 @@ function NewsletterForm() {
         aria-label="Email address"
         placeholder="you@example.com"
         disabled={status === 'loading' || status === 'done'}
-        className="h-9 min-w-0 flex-1 rounded-md border border-border/70 bg-background px-3 text-xs text-foreground placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:opacity-60"
+        className="h-9 min-w-0 flex-1 rounded-md border border-border/70 bg-background px-3 text-xs text-foreground placeholder:text-muted-foreground/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:opacity-60"
       />
       <button
         type="submit"

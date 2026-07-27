@@ -58,7 +58,7 @@ export function LegalPage({
               <Home className="size-3.5" />
               <span>Home</span>
             </Link>
-            <ChevronRight className="size-3.5 text-muted-foreground/50" />
+            <ChevronRight className="size-3.5 text-muted-foreground/80" />
             <span className="inline-flex items-center gap-1 font-medium text-foreground">
               <FileText className="size-3.5" />
               {title}

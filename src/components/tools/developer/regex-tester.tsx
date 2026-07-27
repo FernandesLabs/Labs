@@ -232,7 +232,7 @@ export default function RegexTester() {
           aria-live="polite"
         >
           {pieces.length === 0 ? (
-            <span className="text-muted-foreground/50">
+            <span className="text-muted-foreground/80">
               Test text will appear here with matches highlighted.
             </span>
           ) : (

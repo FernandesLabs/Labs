@@ -168,7 +168,7 @@ export default function SecurePassphraseGenerator() {
             className="fl-scroll min-h-[3.5rem] overflow-auto rounded-lg border border-border bg-muted/40 p-4 font-mono text-xl break-all sm:text-2xl"
           >
             {passphrase || (
-              <span className="text-sm text-muted-foreground/60">
+              <span className="text-sm text-muted-foreground/80">
                 Adjust options below to generate a passphrase.
               </span>
             )}

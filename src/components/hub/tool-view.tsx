@@ -3,6 +3,7 @@
 import * as React from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import dynamic from 'next/dynamic'
 import {
   ArrowLeft,
   ChevronRight,
@@ -22,15 +23,30 @@ import { FavoriteButton } from './favorite-button'
 import { ToolContent } from './tool-content'
 import { ToolJsonLd } from './tool-json-ld'
 import { BackToTop } from './back-to-top'
-import { CommandPalette } from './command-palette'
 import { MobileSidebar } from './mobile-sidebar'
-import { OnThisPage } from './on-this-page'
 import { ReadingProgress } from './reading-progress'
-import { ShareButton } from './share-button'
 import { SkipToContent } from './skip-to-content'
 import { useToolHistory } from '@/lib/tools/use-tool-history'
 import { preloadTool } from '@/lib/tools/preload'
 import { toolMetaList } from '@/lib/tools/tool-meta'
+
+// Lazy-load heavy components that aren't needed on initial render:
+//   - CommandPalette (cmdk + Dialog) — only needed when ⌘K is pressed (~40KB)
+//   - ShareButton (DropdownMenu) — only needed when the user clicks Share (~20KB)
+//   - OnThisPage (IntersectionObserver) — only needed after scroll (~5KB)
+// This saves ~65KB of JS on the initial tool page load, improving LCP + TBT.
+const CommandPalette = dynamic(
+  () => import('./command-palette').then((m) => m.CommandPalette),
+  { ssr: false }
+)
+const ShareButton = dynamic(
+  () => import('./share-button').then((m) => m.ShareButton),
+  { ssr: false }
+)
+const OnThisPage = dynamic(
+  () => import('./on-this-page').then((m) => m.OnThisPage),
+  { ssr: false }
+)
 
 /**
  * ToolView — the individual tool page shell.
@@ -139,7 +155,7 @@ export function ToolView({
             <Home className="size-3.5" />
             Home
           </Link>
-          <ChevronRight className="size-3 text-muted-foreground/60" />
+          <ChevronRight className="size-3 text-muted-foreground/80" />
           <Link
             href={`/category/${tool.category}`}
             className="inline-flex items-center gap-1.5 transition hover:text-foreground"
@@ -151,7 +167,7 @@ export function ToolView({
             />
             {cat.label}
           </Link>
-          <ChevronRight className="size-3 text-muted-foreground/60" />
+          <ChevronRight className="size-3 text-muted-foreground/80" />
           <span className="font-medium text-foreground">{tool.name}</span>
         </nav>
 
@@ -271,7 +287,7 @@ export function ToolView({
                         <span className="min-w-0 flex-1 truncate text-foreground/90 group-hover:text-foreground">
                           {t.name}
                         </span>
-                        <ChevronRight className="size-3.5 shrink-0 text-muted-foreground/50 transition group-hover:translate-x-0.5 group-hover:text-foreground" />
+                        <ChevronRight className="size-3.5 shrink-0 text-muted-foreground/80 transition group-hover:translate-x-0.5 group-hover:text-foreground" />
                       </button>
                     </li>
                   ))}

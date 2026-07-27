@@ -34,7 +34,7 @@ export function FavoriteButton({
         size === 'sm' ? 'size-7' : 'size-8',
         isFav
           ? 'text-amber-500 hover:text-amber-600'
-          : 'text-muted-foreground/50 hover:bg-muted hover:text-foreground',
+          : 'text-muted-foreground/80 hover:bg-muted hover:text-foreground',
         className
       )}
     >

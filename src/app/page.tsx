@@ -1,17 +1,28 @@
 'use client'
 import * as React from 'react'
 import { useRouter } from 'next/navigation'
+import dynamic from 'next/dynamic'
 import { SiteHeader } from '@/components/hub/site-header'
 import { SiteFooter } from '@/components/hub/site-footer'
 import { HubView } from '@/components/hub/hub-view'
-import { CommandPalette } from '@/components/hub/command-palette'
-import { ShortcutsHelp } from '@/components/hub/shortcuts-help'
 import { BackToTop } from '@/components/hub/back-to-top'
 import { SkipToContent } from '@/components/hub/skip-to-content'
 import { HomeJsonLd } from '@/components/hub/home-json-ld'
 import { tools } from '@/lib/tools/registry'
 import { toolMetaList } from '@/lib/tools/tool-meta'
 import { CATEGORY_META, CATEGORY_ORDER } from '@/lib/tools/types'
+
+// Lazy-load dialog-heavy components that only open on user interaction.
+// This saves ~60KB of JS (cmdk + Dialog x2) on the initial page load,
+// significantly improving LCP and TBT.
+const CommandPalette = dynamic(
+  () => import('@/components/hub/command-palette').then((m) => m.CommandPalette),
+  { ssr: false }
+)
+const ShortcutsHelp = dynamic(
+  () => import('@/components/hub/shortcuts-help').then((m) => m.ShortcutsHelp),
+  { ssr: false }
+)
 /**
  * Home page (the hub).
  *

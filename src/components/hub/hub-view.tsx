@@ -2,7 +2,6 @@
 'use client'
 import * as React from 'react'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
 import {
   Search,
   X,
@@ -188,29 +187,14 @@ export function HubView({
       <div className="relative mb-8 flex flex-col items-center overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-b from-muted/40 to-background px-6 py-10 text-center sm:py-12">
         <div className="fl-grid-bg pointer-events-none absolute inset-0 opacity-70" aria-hidden />
         <div className="relative z-10 flex flex-col items-center">
-          <motion.h1
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, delay: 0.05 }}
-            className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl"
-          >
+          <h1 className="fl-fade-in text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
             Free Online <span className="text-primary">Tools</span>
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, delay: 0.12 }}
-            className="mt-3 max-w-2xl text-base text-muted-foreground sm:text-lg"
-          >
+          </h1>
+          <p className="fl-fade-in mt-3 max-w-2xl text-base text-muted-foreground sm:text-lg" style={{ animationDelay: '0.05s' }}>
             A growing collection of {tools.length} fast, privacy-first tools for developers,
             designers, and marketers. No sign-up. No tracking. Works offline.
-          </motion.p>
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, delay: 0.18 }}
-            className="mt-6 w-full max-w-xl"
-          >
+          </p>
+          <div className="fl-fade-in mt-6 w-full max-w-xl" style={{ animationDelay: '0.1s' }}>
             {/* Search input — wrapped in a relative container so the icon and
                 the ⌘K / clear button are centered against the input itself,
                 not the whole block (which also contains the tip text below). */}
@@ -251,14 +235,9 @@ export function HubView({
               Tip: press <kbd className="rounded border bg-muted px-1">/</kbd> to search,{' '}
               <kbd className="rounded border bg-muted px-1">⌘K</kbd> for the command palette
             </p>
-          </motion.div>
+          </div>
           {/* Trust badges */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.4, delay: 0.25 }}
-            className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-muted-foreground"
-          >
+          <div className="fl-fade-in mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-muted-foreground" style={{ animationDelay: '0.15s' }}>
             <span className="inline-flex items-center gap-1.5">
               <Lock className="size-3.5 text-emerald-500" />
               100% client-side
@@ -275,7 +254,7 @@ export function HubView({
               <TrendingUp className="size-3.5 text-primary" />
               {CATEGORY_ORDER.length} categories
             </span>
-          </motion.div>
+          </div>
         </div>
       </div>
 
@@ -462,7 +441,7 @@ function CategoryChip({
     >
       {color ? <span className="h-2 w-2 rounded-full" style={{ backgroundColor: color }} /> : null}
       {label}
-      <span className={`text-[10px] ${active ? 'text-primary-foreground/70' : 'text-muted-foreground/70'}`}>
+      <span className={`text-[10px] ${active ? 'text-primary-foreground/90' : 'text-muted-foreground/90'}`}>
         {count}
       </span>
     </button>
@@ -482,12 +461,7 @@ function ToolCard({
   const preloadProps = usePreloadOnHover(tool.slug)
   const cat = CATEGORY_META[tool.category]
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.25 }}
-      className="relative h-full"
-    >
+    <div className="fl-fade-in relative h-full">
       <button
         type="button"
         {...preloadProps}
@@ -533,7 +507,7 @@ function ToolCard({
         <p className="text-xs text-muted-foreground line-clamp-2">
           <Highlight text={tool.description} query={query} />
         </p>
-        <span className="mt-auto flex items-center gap-1 pt-1 text-[10px] font-medium text-muted-foreground/70 transition group-hover:text-primary">
+        <span className="mt-auto flex items-center gap-1 pt-1 text-[10px] font-medium text-muted-foreground/90 transition group-hover:text-primary">
           {cat.label}
           <ArrowRight className="size-3 opacity-0 transition group-hover:translate-x-0.5 group-hover:opacity-100" />
         </span>
@@ -542,7 +516,7 @@ function ToolCard({
       <div className="absolute right-1.5 top-1.5">
         <FavoriteButton slug={tool.slug} size="sm" />
       </div>
-    </motion.div>
+    </div>
   )
 }
 
@@ -579,7 +553,7 @@ function EmptyState({
   )
   return (
     <div className="fl-fade-in flex flex-col items-center justify-center rounded-2xl border border-dashed border-border/70 bg-muted/20 p-8 text-center sm:p-12">
-      <Layers className="h-10 w-10 text-muted-foreground/50" />
+      <Layers className="h-10 w-10 text-muted-foreground/80" />
       <p className="mt-3 text-base font-medium text-foreground">
         No tools match{query.trim() ? (
           <>
@@ -636,7 +610,7 @@ function EmptyState({
                 aria-hidden
               />
               {meta.label}
-              <span className="text-[10px] text-muted-foreground/70">{count}</span>
+              <span className="text-[10px] text-muted-foreground/90">{count}</span>
             </Link>
           ))}
         </div>

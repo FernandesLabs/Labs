@@ -265,7 +265,7 @@ export default function RedirectChecker(): React.JSX.Element {
                         </div>
                         {!isLast ? (
                           <div className="flex justify-center py-0.5">
-                            <ArrowDown className="size-3.5 text-muted-foreground/60" />
+                            <ArrowDown className="size-3.5 text-muted-foreground/80" />
                           </div>
                         ) : null}
                       </li>

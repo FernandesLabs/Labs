@@ -108,7 +108,7 @@ export function ResultBox({
           mono ? 'font-mono' : 'font-sans'
         } whitespace-pre-wrap break-words`}
       >
-        {hasValue ? value : <span className="text-muted-foreground/50">{empty}</span>}
+        {hasValue ? value : <span className="text-muted-foreground/80">{empty}</span>}
       </pre>
     </div>
   )
