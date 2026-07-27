@@ -25,10 +25,12 @@ function nullableStr(value: string | undefined): string | null {
 export const siteConfig = {
   site: {
     name: str(process.env.NEXT_PUBLIC_SITE_NAME, 'Fernandes Labs'),
-    domain: str(process.env.NEXT_PUBLIC_SITE_DOMAIN, 'fernandeslabs.com'),
+    // Use www. consistently — the live site redirects non-www → www, so all
+    // canonical URLs, sitemap entries, and OG metadata must point to www.
+    domain: str(process.env.NEXT_PUBLIC_SITE_DOMAIN, 'www.fernandeslabs.com'),
     url: str(
       process.env.NEXT_PUBLIC_SITE_URL,
-      `https://${str(process.env.NEXT_PUBLIC_SITE_DOMAIN, 'fernandeslabs.com')}`
+      `https://${str(process.env.NEXT_PUBLIC_SITE_DOMAIN, 'www.fernandeslabs.com')}`
     ),
     description: str(
       process.env.NEXT_PUBLIC_SITE_DESCRIPTION,

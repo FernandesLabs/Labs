@@ -265,6 +265,199 @@ const OVERRIDES: Record<string, ContentOverride> = {
       'If you add a logo, use error-correction level H and keep the center logo under 30% of the code’s area.',
     ],
   },
+  // ── ip-lookup (618 impressions in first week — highest-traffic tool) ──
+  'ip-lookup': {
+    intro:
+      'The IP Lookup tool finds your public IP address and looks up geolocation, ISP, and ASN details for any IPv4 or IPv6 address. Your own IP is detected automatically when the page loads — no need to search for "what is my IP". To look up a different address, paste it into the input field and get instant results showing the country, region, city, timezone, coordinates, ISP/organization, and ASN (Autonomous System Number). All lookups go through our server-side proxy (to bypass CORS) but we do not log or store the addresses you search — making this safe for investigating suspicious IPs, verifying your VPN, or debugging network issues.',
+    examples: [
+      {
+        input: '8.8.8.8',
+        output: 'Country: United States, Region: California, City: Mountain View, ISP: Google LLC, ASN: AS15169',
+        note: 'Google\'s public DNS resolver. One of the most-looked-up IPs in the world.',
+      },
+      {
+        input: '1.1.1.1',
+        output: 'Country: Australia, Region: New South Wales, City: Sydney, ISP: Cloudflare, Inc., ASN: AS13335',
+        note: 'Cloudflare\'s public DNS resolver. Often used as a fast, privacy-focused alternative to Google DNS.',
+      },
+      {
+        input: '(your own IP — auto-detected on page load)',
+        output: 'Shows your current public IP, ISP, and approximate location.',
+        note: 'Useful for verifying your VPN is working — the location should match your VPN exit server, not your real location.',
+      },
+    ],
+    howTo: [
+      'When the page loads, your own public IP address is displayed automatically at the top of the tool card. You don\'t need to do anything to see "what is my IP".',
+      'To look up a different IP, paste it into the input field (e.g. 8.8.8.8, 2606:4700:4700::1111, or a suspicious IP from your server logs). Both IPv4 and IPv6 are supported.',
+      'Click Lookup (or press Enter). The results appear instantly, showing: country, region, city, timezone, latitude/longitude, ISP/organization, and ASN.',
+      'Use the Copy button to copy any field\'s value, or use the map link to open the approximate location in Google Maps.',
+      'All lookups are processed through our server-side proxy to bypass browser CORS restrictions, but we do not log or store the IPs you search.',
+    ],
+    faqs: [
+      {
+        q: 'What is an IP address?',
+        a: 'An IP (Internet Protocol) address is a unique number assigned to every device on the internet. It\'s like a phone number for your computer — when you visit a website, your device sends its IP so the server knows where to send the response. There are two versions: IPv4 (e.g. 192.168.1.1, about 4 billion addresses) and IPv6 (e.g. 2001:db8::1, effectively unlimited). Your "public" IP is the one visible to the outside world (assigned by your ISP); your "private" IP is the one on your local network (assigned by your router).',
+      },
+      {
+        q: 'How accurate is IP geolocation?',
+        a: 'IP geolocation is typically accurate to the country level (~99%) and region/city level (~50–80%). It cannot pinpoint a street address — that level of precision requires GPS or WiFi triangulation. The accuracy depends on how up-to-date the ISP\'s ASN database is. If you\'re behind a VPN or proxy, the lookup will show the VPN server\'s location, not your real location. Databases like MaxMind and IPinfo (which this tool uses) are the industry standard and are updated daily.',
+      },
+      {
+        q: 'Can someone find my exact location from my IP address?',
+        a: 'No. An IP address can reveal your approximate city or region, but not your street address. ISPs assign IP addresses in blocks to broad geographic areas, so the most someone can determine is "this IP is somewhere in Lisbon, Portugal" — not "this IP is at Rua Augusta 123". Your ISP holds the exact mapping between your IP and your billing address, but they don\'t share that with the public or with IP lookup services. Law enforcement can subpoena your ISP for that information.',
+      },
+      {
+        q: 'What is an ASN (Autonomous System Number)?',
+        a: 'An ASN (Autonomous System Number) is a unique identifier assigned to a network that controls its own routing policy — typically an ISP, a large company, or a cloud provider (e.g. AS15169 = Google, AS13335 = Cloudflare, AS32934 = Meta/Facebook). The ASN tells you which organisation owns the IP address. This is useful for identifying whether traffic comes from a residential ISP, a cloud provider (bot/scraper?), or a known company.',
+      },
+      {
+        q: 'Why does my IP show a different city than where I actually am?',
+        a: 'This is common and happens because IP geolocation databases map IPs to the city where the ISP has registered the IP block, not where the device physically is. If your ISP is headquartered in City A but you live in City B, your IP may show City A. VPNs and mobile networks (which route traffic through centralised gateways) also cause this. It\'s not a bug in the tool — it\'s a fundamental limitation of IP-based geolocation.',
+      },
+      {
+        q: 'Is it safe to look up suspicious IP addresses from my server logs?',
+        a: 'Yes. This tool sends the IP address to our server-side proxy, which queries a geolocation API and returns the result. We do not log, store, or share the IPs you look up. The IP address you search is processed in memory and discarded immediately. However, if you\'re investigating a serious security incident, you should also check the IP against threat-intelligence databases like AbuseIPDB or AlienVault OTX for known malicious activity.',
+      },
+    ],
+    useCases: [
+      'Find your own public IP address quickly (no need to search "what is my IP" on Google).',
+      'Verify your VPN or proxy is working — the location should match your VPN exit server, not your real location.',
+      'Investigate suspicious IPs from your server logs, firewall alerts, or email headers.',
+      'Identify the ISP and ASN of a website visitor or a server you\'re connecting to.',
+      'Debug network issues by checking whether an IP resolves to the expected country/ISP.',
+      'Check if a cloud provider (AWS, GCP, Azure) or a residential ISP owns an IP address.',
+    ],
+    tips: [
+      'Your public IP changes when you restart your router (on most residential ISPs). Use a dynamic DNS service if you need a stable hostname.',
+      'IPv6 addresses are much longer than IPv4 and use colons (e.g. 2606:4700:4700::1111). Both formats work in this tool.',
+      'If the geolocation shows a country you don\'t expect, check whether your ISP uses CGNAT (Carrier-Grade NAT), which routes your traffic through a shared IP.',
+      'The ASN is the fastest way to tell if an IP belongs to a cloud provider (bot/scraper) vs a residential ISP (real user).',
+    ],
+  },
+  // ── email-signature-generator (124 impressions) ──
+  'email-signature-generator': {
+    intro:
+      'The Email Signature Generator creates professional, responsive email signatures that work in Gmail, Outlook, Apple Mail, and other major email clients. Fill in your name, title, company, contact details, and social links — then copy the rendered HTML directly into your email client\'s signature settings. The signature uses inline CSS (required by most email clients — Gmail strips <style> tags) and table-based layout for maximum compatibility. Everything is generated in your browser; your contact details are never sent to a server, making this safe for work email addresses.',
+    examples: [
+      {
+        input: 'Name: John Doe, Title: Software Engineer, Company: Fernandes Labs, Email: john@fernandeslabs.com',
+        output: '[ HTML signature with name in bold, title in grey, company link, and contact row ]',
+        note: 'Inline CSS + table layout — renders correctly in Gmail, Outlook, and Apple Mail.',
+      },
+      {
+        input: 'Add social links: LinkedIn, GitHub, Twitter',
+        output: '[ Signature with social icons row, linked to profiles ]',
+        note: 'Icons are inline SVGs — no external images that might be blocked by email clients.',
+      },
+    ],
+    howTo: [
+      'Fill in the form fields: your name, job title, company name, email, phone, website, and any social profile URLs you want to include.',
+      'Optionally upload a profile photo or company logo — it\'s embedded as a base64 data URI so it doesn\'t depend on an external image host.',
+      'Choose a colour scheme (primary colour for links and accents) and a layout style (stacked or side-by-side).',
+      'Click "Copy HTML" to copy the generated signature to your clipboard.',
+      'Paste it into your email client\'s signature editor (Gmail: Settings → General → Signature; Outlook: Settings → Mail → Compose and reply).',
+    ],
+    faqs: [
+      {
+        q: 'Why does my email signature look broken in Gmail?',
+        a: 'Gmail strips <style> tags and external CSS, so all styling must be inline (style="..." on each element). It also blocks external images unless the user clicks "Allow images". This tool generates signatures with inline CSS and embeds images as base64 data URIs, so they render correctly in Gmail without any external dependencies. If you copied HTML from another tool that uses <style> tags, Gmail will strip the styling and your signature will appear as plain text.',
+      },
+      {
+        q: 'How do I add my email signature to Gmail?',
+        a: '1. Generate your signature and click "Copy HTML". 2. Open Gmail → Settings (gear icon) → See all settings. 3. Scroll to the "Signature" section and click "Create new". 4. Give it a name. 5. Click in the signature editor box and paste (Ctrl+V / Cmd+V). 6. Scroll to the bottom and click "Save Changes". The signature will now appear on all new emails.',
+      },
+      {
+        q: 'How do I add my email signature to Outlook?',
+        a: '1. Generate your signature and click "Copy HTML". 2. Open Outlook → Settings (gear icon) → Mail → Compose and reply. 3. Scroll to the "Email signature" section. 4. Click in the editor box and paste (Ctrl+V / Cmd+V). 5. Click "Save". Note: Outlook desktop (Windows) may render some CSS differently than Outlook web — test by sending yourself an email.',
+      },
+      {
+        q: 'Can I use an image or logo in my signature?',
+        a: 'Yes. This tool embeds images as base64 data URIs, which means the image data is encoded directly in the HTML — no external image host needed. This is important because many email clients block external images by default for privacy. However, some older email clients (Outlook 2016 on Windows) may not render data URI images — in that case, host the image on your website and link to it with an <img src="https://..."> tag instead.',
+      },
+      {
+        q: 'Why are inline SVG icons better than image icons in email signatures?',
+        a: 'Inline SVG icons (used by this tool for social media icons) are vector-based, so they\'re sharp at any size and any screen resolution (including Retina displays). They\'re embedded in the HTML, so they don\'t require external requests and can\'t be blocked by email clients. Image-based icons (PNG/JPG) need to be hosted somewhere, may be blocked, and can appear blurry on high-DPI screens. The downside: SVGs don\'t render in Outlook desktop (Windows) — they\'ll show as empty space. For maximum compatibility, the tool includes PNG fallbacks.',
+      },
+    ],
+    useCases: [
+      'Create a professional email signature for your work email.',
+      'Generate consistent signatures for your whole team (everyone uses the same template, just different details).',
+      'Add social media links to your signature to grow your LinkedIn/Twitter following.',
+      'Include a company logo or headshot for brand recognition.',
+      'Create a minimal signature for personal email and a detailed one for business email.',
+    ],
+    tips: [
+      'Keep your signature under 650px wide — most email clients display at that width on desktop.',
+      'Use a 12–14px font size for the signature body — smaller looks cramped, larger looks unprofessional.',
+      'Test your signature by sending an email to yourself and checking it on both desktop and mobile.',
+      'Avoid animated GIFs — many email clients don\'t play them, and they can make your signature look unprofessional.',
+    ],
+  },
+  // ── redirect-checker (49 impressions) ──
+  'redirect-checker': {
+    intro:
+      'The Redirect Checker traces the full HTTP redirect chain for any URL — from the initial request to the final destination — showing every 301, 302, 307, or 308 hop along the way. This is essential for SEO (Google needs to follow redirects to pass link equity), for debugging URL shorteners, and for verifying that old URLs redirect to the right new URLs after a site migration. The tool sends a real HTTP request from the server (bypassing browser CORS) and reports the status code, redirect location, and response headers at each step. No data is stored — your URL lookups are private.',
+    examples: [
+      {
+        input: 'http://fernandeslabs.com',
+        output: 'Step 1: 308 → https://fernandeslabs.com\nStep 2: 308 → https://www.fernandeslabs.com\nFinal: 200 OK',
+        note: 'Permanent redirect from HTTP to HTTPS, then non-www to www. Both use 308 (permanent).',
+      },
+      {
+        input: 'bit.ly/fernandes',
+        output: 'Step 1: 301 → https://fernandeslabs.com\nStep 2: 308 → https://www.fernandeslabs.com\nFinal: 200 OK',
+        note: 'URL shortener uses 301 (permanent). The destination then redirects HTTP→HTTPS→www.',
+      },
+      {
+        input: 'old-site.com/old-page',
+        output: 'Step 1: 302 → /new-page\nStep 2: 301 → https://new-site.com/new-page\nFinal: 200 OK',
+        note: '302 (temporary) then 301 (permanent). Mixed redirect chains are common after migrations.',
+      },
+    ],
+    howTo: [
+      'Paste the URL you want to check into the input field (e.g. http://example.com/old-page).',
+      'Click "Check redirects" or press Enter. The tool sends a real HTTP HEAD request and follows the redirect chain.',
+      'Review the results: each step shows the status code (301/302/307/308), the redirect target, and key response headers.',
+      'Check the final destination — is it the URL you expected? If not, there\'s a misconfigured redirect somewhere in the chain.',
+      'Look for redirect chains (more than 2 hops) — these slow down page load and dilute SEO link equity. Ideally, redirect directly A→C, not A→B→C.',
+    ],
+    faqs: [
+      {
+        q: 'What is the difference between 301, 302, 307, and 308 redirects?',
+        a: '301 (Moved Permanently) and 308 (Permanent Redirect) both tell search engines "this page has permanently moved — pass all link equity to the new URL". The difference: 308 preserves the HTTP method (POST stays POST), while 301 may convert POST to GET. 302 (Found) and 307 (Temporary Redirect) both mean "this page is temporarily elsewhere — keep the old URL indexed". 307 preserves the method, 302 may not. For SEO: always use 301/308 for permanent moves, 302/307 only for temporary maintenance or A/B tests.',
+      },
+      {
+        q: 'Do redirects hurt SEO?',
+        a: 'A single 301 redirect passes ~100% of link equity to the destination (Google confirmed this in 2016 — previously it was believed to lose "PageRank"). However, redirect CHAINS (A→B→C) are bad: each hop adds latency (each request takes 100–500ms) and Google may stop following after 5 hops. If you have a chain, collapse it to a single direct redirect (A→C). Use this tool to check for chains after a site migration.',
+      },
+      {
+        q: 'Why is my redirect not showing up in the checker?',
+        a: 'The checker sends an HTTP HEAD request (not GET) to save bandwidth. Some servers are configured to respond differently to HEAD vs GET (e.g. they may not send redirect headers for HEAD). If you see "No redirect found" but you know there should be one, try opening the URL in a browser — if the browser redirects but the tool doesn\'t, the server may be doing a JavaScript redirect (which this tool doesn\'t follow) or a user-agent-based redirect.',
+      },
+      {
+        q: 'What is a redirect chain and why is it bad?',
+        a: 'A redirect chain is when URL A redirects to B, which redirects to C (or more). Each hop adds latency (100–500ms per redirect), and Google may stop following after 5 hops — leaving your final page unindexed. Chains often happen after multiple site migrations. Fix them by redirecting A directly to C (skip B). This tool shows you the full chain so you can identify and collapse unnecessary hops.',
+      },
+      {
+        q: 'Can this tool check JavaScript redirects?',
+        a: 'No. This tool follows HTTP-level redirects (301/302/307/308) which are sent by the server in the response headers. JavaScript redirects (window.location = "...") happen after the page loads in a browser — they\'re invisible to HTTP-level tools. If a URL doesn\'t redirect in this tool but does redirect in your browser, it\'s likely a JavaScript or meta-refresh redirect. For those, use a browser-based tool or check the page source for <meta http-equiv="refresh">.',
+      },
+    ],
+    useCases: [
+      'Verify your HTTP→HTTPS redirect is working after enabling SSL.',
+      'Check that old URLs redirect to the right new URLs after a site migration.',
+      'Debug URL shortener redirects (bit.ly, tinyurl, etc.).',
+      'Find and fix redirect chains (A→B→C should be A→C).',
+      'Verify that 301 (permanent) redirects are used for SEO, not 302 (temporary).',
+      'Check affiliate links to see where they ultimately land.',
+    ],
+    tips: [
+      'After a site migration, check your top 10 old URLs with this tool to ensure they 301-redirect to the correct new URLs.',
+      'Redirect chains (A→B→C) waste crawl budget and add latency. Collapse them to A→C.',
+      'Use 301/308 for permanent redirects (passes SEO link equity). Use 302/307 only for temporary maintenance.',
+      'Google stops following redirects after ~5 hops. If your chain is longer, the final page may not get indexed.',
+    ],
+  },
 }
 /**
  * Get a hand-written content override for a tool, or null if none exists.
