@@ -74,12 +74,12 @@ export function ToolJsonLd({ tool }: { tool: Tool }) {
           author: {
             '@type': 'Organization',
             name: 'Fernandes Labs',
-            url: 'https://fernandeslabs.com',
+            url: siteConfig.site.url,
           },
           publisher: {
             '@type': 'Organization',
             name: 'Fernandes Labs',
-            url: 'https://fernandeslabs.com',
+            url: siteConfig.site.url,
           },
           inLanguage: 'en',
           category: cat.label,
