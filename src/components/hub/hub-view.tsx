@@ -277,6 +277,11 @@ export function HubView({
           />
         ))}
       </div>
+
+      {/* Above-the-fold ad unit (below hero, before the tool grid) */}
+      <div className="mb-8" aria-hidden={false}>
+        <AdUnit slot="horizontal" />
+      </div>
       {/* Tools */}
       <div className="space-y-8">
         {/* Quick-access rows (only when not filtering) */}
@@ -354,14 +359,14 @@ export function HubView({
           ))
         )}
       </div>
-      {/* Donation + ad strip */}
+      {/* Full-width ad strip */}
       {!isFiltering ? (
-        <div className="mt-12 flex flex-col gap-4 sm:flex-row">
-          <div className="flex-1">
-            <AdUnit slot="horizontal" />
-          </div>
-          <div className="w-full sm:w-80">
-            <CryptoDonate />
+        <div className="mt-12 space-y-4">
+          <AdUnit slot="horizontal" />
+          <div className="flex justify-center">
+            <div className="w-full max-w-sm">
+              <CryptoDonate />
+            </div>
           </div>
         </div>
       ) : null}

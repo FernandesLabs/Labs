@@ -32,7 +32,14 @@ import { siteConfig } from '@/lib/site-config'
  *  6. Bottom bar: copyright + legal links + "all client-side" badge
  */
 export function SiteFooter() {
-  const year = new Date().getFullYear()
+  // The year is fixed at build time (2026) and only updated client-side after
+  // hydration. `new Date()` directly in the render would make the server HTML
+  // and the hydrated client differ (e.g. across year boundaries), which
+  // throws a hydration mismatch on every page.
+  const [year, setYear] = React.useState(2026)
+  React.useEffect(() => {
+    setYear(new Date().getFullYear())
+  }, [])
   return (
     <footer className="mt-auto border-t border-border/70 bg-muted/30">
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">

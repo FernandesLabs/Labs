@@ -1,11 +1,27 @@
 // src/app/layout.tsx
 import type { Metadata } from "next";
-import { GeistSans, GeistMono } from "geist/font";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { ServiceWorkerRegister } from "@/components/hub/service-worker-register";
 import { siteConfig } from "@/lib/site-config";
+
+// Only the weights actually used across the app (normal/medium/semibold/bold/
+// extrabold) are loaded — the old `geist/font` package preloaded ALL weights
+// (26 woff2 files per page), which hurt LCP and wasted bandwidth.
+const geistSans = Geist({
+  subsets: ["latin"],
+  variable: "--font-geist-sans",
+  display: "swap",
+  weight: ["400", "500", "600", "700", "800"],
+});
+const geistMono = Geist_Mono({
+  subsets: ["latin"],
+  variable: "--font-geist-mono",
+  display: "swap",
+  weight: ["400", "500", "600", "700"],
+});
 export const metadata: Metadata = {
   metadataBase: new URL(`https://${siteConfig.site.domain}`),
   title: "Fernandes Labs — Free Online Tools",
@@ -72,7 +88,7 @@ export default function RootLayout({
         ) : null}
       </head>
       <body
-        className={`${GeistSans.variable} ${GeistMono.variable} antialiased bg-background text-foreground`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >
         <ThemeProvider>{children}</ThemeProvider>
         <ServiceWorkerRegister />

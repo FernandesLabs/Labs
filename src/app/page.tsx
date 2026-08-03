@@ -8,6 +8,7 @@ import { HubView } from '@/components/hub/hub-view'
 import { BackToTop } from '@/components/hub/back-to-top'
 import { SkipToContent } from '@/components/hub/skip-to-content'
 import { HomeJsonLd } from '@/components/hub/home-json-ld'
+import { AdblockBanner } from '@/components/ads/adblock-banner'
 import { tools } from '@/lib/tools/registry'
 import { toolMetaList } from '@/lib/tools/tool-meta'
 import { CATEGORY_META, CATEGORY_ORDER } from '@/lib/tools/types'
@@ -115,6 +116,7 @@ export default function Home() {
   return (
     <div className="flex min-h-screen flex-col">
       <SkipToContent />
+      <AdblockBanner />
       <HomeJsonLd />
       <SiteHeader
         onHome={() => router.push('/')}

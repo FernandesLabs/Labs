@@ -47,11 +47,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       url,
       siteName: siteConfig.site.name,
       type: 'website',
+      images: [
+        {
+          url: `/api/og?slug=${encodeURIComponent(tool.slug)}`,
+          width: 1200,
+          height: 630,
+          alt: tool.name,
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
+      images: [`/api/og?slug=${encodeURIComponent(tool.slug)}`],
     },
     robots: {
       index: true,

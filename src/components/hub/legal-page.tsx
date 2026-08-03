@@ -34,6 +34,12 @@ export function LegalPage({
 }) {
   const router = useRouter()
   const hasToc = sections.length >= 2
+  // Year is fixed at build time and updated only after hydration — rendering
+  // `new Date()` directly causes a server/client mismatch.
+  const [year, setYear] = React.useState(2026)
+  React.useEffect(() => {
+    setYear(new Date().getFullYear())
+  }, [])
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -82,7 +88,7 @@ export function LegalPage({
               {children}
             </div>
             <p className="mt-12 border-t border-border/60 pt-4 text-xs text-muted-foreground">
-              © {new Date().getFullYear()} Fernandes Labs. All rights reserved.
+              © {year} Fernandes Labs. All rights reserved.
             </p>
           </article>
 

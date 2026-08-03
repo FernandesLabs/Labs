@@ -7,8 +7,10 @@ import { SiteFooter } from '@/components/hub/site-footer'
 import { BackToTop } from '@/components/hub/back-to-top'
 import { ReadingProgress } from '@/components/hub/reading-progress'
 import { SkipToContent } from '@/components/hub/skip-to-content'
-import { FileText, ArrowRight } from 'lucide-react'
+import { AdblockBanner } from '@/components/ads/adblock-banner'
+import { CalendarDays, FileText, ArrowRight } from 'lucide-react'
 import { toolMetaList } from '@/lib/tools/tool-meta'
+import { blogPosts } from '@/lib/blog/posts'
 
 /**
  * BlogIndexClient — client-side wrapper for the blog index.
@@ -16,12 +18,31 @@ import { toolMetaList } from '@/lib/tools/tool-meta'
  * The blog page itself (`page.tsx`) is a server component that exports the
  * `metadata` (title, description, canonical). This client component handles
  * the interactive parts: the SiteHeader navigation (needs `router.push`) and
- * the post list.
+ * the post list (read from `src/lib/blog/posts.ts`).
  */
-const POSTS: { slug: string; title: string; excerpt: string; category: string }[] = [
-  // Posts will be added here as content is written.
-  // See /home/z/my-project/SEO-BLOG-PLAN.md for the content plan.
-]
+const POSTS = blogPosts.map((p) => ({
+  slug: p.slug,
+  title: p.title,
+  excerpt: p.description,
+  category: p.category,
+  date: p.date,
+}))
+
+/**
+ * Formats an ISO date string ("2026-08-03") deterministically — no Date
+ * object, no timezone parsing. Server and client always produce identical
+ * output, which prevents hydration mismatches for users in timezones west
+ * of UTC (parsing "2026-08-03" as a Date shifts it to the previous day).
+ */
+function formatIsoDate(iso: string): string {
+  const [y, m, d] = iso.split('-').map(Number)
+  const MONTHS = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December',
+  ]
+  if (!y || !m || !d || m < 1 || m > 12 || d < 1 || d > 31) return iso
+  return `${MONTHS[m - 1]} ${d}, ${y}`
+}
 
 export function BlogIndexClient() {
   const router = useRouter()
@@ -29,6 +50,7 @@ export function BlogIndexClient() {
     <div className="flex min-h-screen flex-col">
       <ReadingProgress />
       <SkipToContent />
+      <AdblockBanner />
       <SiteHeader
         onHome={() => router.push('/')}
         toolCount={toolMetaList.length}
@@ -92,7 +114,11 @@ export function BlogIndexClient() {
                 <p className="mt-1.5 flex-1 text-sm leading-relaxed text-muted-foreground">
                   {post.excerpt}
                 </p>
-                <span className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-primary">
+                <span className="mt-3 inline-flex items-center gap-2 text-xs text-muted-foreground">
+                  <CalendarDays className="size-3" />
+                  {formatIsoDate(post.date)}
+                </span>
+                <span className="mt-1.5 inline-flex items-center gap-1 text-sm font-medium text-primary">
                   Read more
                   <ArrowRight className="size-3.5 transition group-hover:translate-x-0.5" />
                 </span>

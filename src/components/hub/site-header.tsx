@@ -1,5 +1,6 @@
 'use client'
-import { Github, Sparkles, Search } from 'lucide-react'
+import { Github, Sparkles, Search, BookOpen } from 'lucide-react'
+import Link from 'next/link'
 import { ThemeToggle } from './theme-toggle'
 import { Button } from '@/components/ui/button'
 export function SiteHeader({
@@ -69,6 +70,14 @@ export function SiteHeader({
           >
             <Search className="size-4" />
           </Button>
+          <Link
+            href="/blog"
+            className="hidden h-8 items-center gap-1.5 rounded-md px-2.5 text-xs font-medium text-muted-foreground transition hover:text-foreground lg:inline-flex"
+            aria-label="Blog — guides and tutorials"
+          >
+            <BookOpen className="size-3.5" />
+            <span>Blog</span>
+          </Link>
           <Button
             variant="ghost"
             size="sm"

@@ -11,9 +11,29 @@ declare global {
 }
 
 /**
+ * Reserved heights per slot type.
+ *
+ * Google's AdSense documentation recommends reserving space for ad units
+ * (min-height) so ads don't cause layout shift (CLS) — and so Auto ads fill
+ * the space with larger, higher-paying creatives. Without a reserved height
+ * the units render as small banners (or nothing at all), which is what
+ * happened before: ad areas looked as small as a single tool card.
+ *
+ *  - horizontal → medium-rectangle sized on desktop (250px), leaderboard on
+ *    mobile (90px). The most profitable in-content format.
+ *  - vertical   → half-page size (600px). Only shown in the desktop sidebar.
+ *  - footer     → leaderboard (90px mobile / 120px desktop).
+ */
+const SLOT_MIN_HEIGHT: Record<'horizontal' | 'vertical' | 'footer', string> = {
+  horizontal: 'min-h-[90px] sm:min-h-[250px]',
+  vertical: 'min-h-[600px]',
+  footer: 'min-h-[90px] sm:min-h-[120px]',
+}
+
+/**
  * AdUnit — renders a Google AdSense ad slot, or a tasteful branded
  * placeholder when AdSense is not yet configured (e.g. in development or
- * before the user has created ad units in their AdSense dashboard).
+ * before the AdSense account is approved).
  *
  * Slots:
  *  - "horizontal" — banner ad shown at the top/bottom of tool pages and the
@@ -21,6 +41,12 @@ declare global {
  *  - "vertical" — sidebar ad (desktop only). Uses
  *    `data-ad-format="vertical"`.
  *  - "footer" — full-width ad above the site footer.
+ *
+ * IMPORTANT: when a `clientId` is configured but NO slot ID is set (the
+ * common case before the publisher creates ad units in the AdSense
+ * dashboard), the unit is rendered WITHOUT `data-ad-slot`. Google's
+ * "Auto ads" then fills these units with automatically matched ads — this
+ * guarantees the site monetizes from day one even with zero manual setup.
  *
  * Configuration: set the following env vars (see `.env.example`):
  *   NEXT_PUBLIC_ADSENSE_ENABLED=true
@@ -40,14 +66,34 @@ export function AdUnit({
   className?: string
 }) {
   const configured = isAdsenseConfigured()
-  const adSlot =
-    siteConfig.adsense.slots[slot] || siteConfig.adsense.slots.horizontal
+  const clientId = siteConfig.adsense.clientId
+  const adSlot = siteConfig.adsense.slots[slot]
+  const [mounted, setMounted] = React.useState(false)
   const [pushed, setPushed] = React.useState(false)
+  const minHeight = SLOT_MIN_HEIGHT[slot]
+
+  // The real <ins> is mounted ONLY on the client, AFTER hydration.
+  //
+  // WHY (critical): the <ins> must never appear in the server-rendered HTML.
+  // Google's AdSense loader mutates every `ins.adsbygoogle` in the DOM as
+  // soon as it runs — adding data-adsbygoogle-status / data-ad-status and
+  // injecting the ad <iframe>. When the loader is cached (returning
+  // visitors), it executes between HTML parse and React hydration, so the
+  // client DOM never matches the server HTML and React throws
+  // "Hydration failed because the server rendered HTML didn't match the
+  // client" for every ad on the page.
+  //
+  // Rendering the <ins> after hydration (this effect) means React never
+  // hydrates it — the mismatch is impossible. The reserved-space <div>
+  // below keeps the exact same layout, so there is no layout shift.
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // Push the ad into the AdSense queue once the <ins> is in the DOM.
   // Retries every 500ms if the AdSense script hasn't loaded yet.
   React.useEffect(() => {
-    if (!configured || !adSlot || pushed) return
+    if (!configured || !clientId || !mounted || pushed) return
     const tryPush = () => {
       try {
         ;(window.adsbygoogle = window.adsbygoogle || []).push({})
@@ -59,15 +105,15 @@ export function AdUnit({
     }
     const timer = setTimeout(tryPush, 100)
     return () => clearTimeout(timer)
-  }, [configured, adSlot, pushed])
+  }, [configured, clientId, mounted, pushed])
 
-  // Not configured or no slot ID → show a professional branded placeholder.
-  // This keeps the layout stable (no layout shift when ads are enabled later)
-  // and signals to the user where ads will appear.
-  if (!configured || !adSlot) {
+  // AdSense not configured at all (no client ID) → show a professional
+  // branded placeholder. This keeps the layout stable (no layout shift when
+  // ads are enabled later) and signals where ads will appear.
+  if (!configured || !clientId) {
     return (
       <div
-        className={`flex w-full items-center justify-center rounded-lg border border-dashed border-border/70 bg-muted/30 px-4 py-6 text-center ${className ?? ''}`}
+        className={`flex w-full items-center justify-center rounded-lg border border-dashed border-border/70 bg-muted/30 px-4 text-center ${minHeight} ${className ?? ''}`}
         aria-label="Advertisement placeholder"
       >
         <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground/80">
@@ -78,15 +124,28 @@ export function AdUnit({
     )
   }
 
-  // Real AdSense ad unit.
+  // Server render + first client render: reserved space only — no <ins> in
+  // the HTML, so hydration always succeeds.
+  if (!mounted) {
+    return (
+      <div
+        className={`block w-full ${minHeight} ${className ?? ''}`}
+        aria-hidden="true"
+      />
+    )
+  }
+
+  // Client-only: real AdSense ad unit. `data-ad-slot` is omitted when no
+  // slot ID exists — Auto ads match the best available ad to this unit.
   const isVertical = slot === 'vertical'
   const format = isVertical ? 'vertical' : 'auto'
   return (
     <ins
-      className={`adsbygoogle ${className ?? ''}`}
+      suppressHydrationWarning
+      className={`adsbygoogle block w-full ${minHeight} ${className ?? ''}`}
       style={{ display: 'block' }}
-      data-ad-client={siteConfig.adsense.clientId}
-      data-ad-slot={adSlot}
+      data-ad-client={clientId}
+      {...(adSlot ? { 'data-ad-slot': adSlot } : {})}
       data-ad-format={format}
       data-full-width-responsive="true"
     />
