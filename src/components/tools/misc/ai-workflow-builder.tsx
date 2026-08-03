@@ -355,7 +355,7 @@ export default function AiWorkflowBuilder() {
         <Card>
           <CardContent className="pt-6">
             <div className="rounded-lg border border-dashed border-border bg-muted/20 p-10 text-center text-sm text-muted-foreground">
-              <Workflow className="mx-auto mb-3 size-6 text-muted-foreground/60" />
+              <Workflow className="mx-auto mb-3 size-6 text-muted-foreground/80" />
               <div className="font-medium text-foreground">
                 No steps yet
               </div>

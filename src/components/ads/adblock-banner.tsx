@@ -36,8 +36,8 @@ export function AdblockBanner() {
   }
   if (!visible) return null
   return (
-    <div className="fixed inset-x-0 top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="mx-auto flex max-w-5xl items-center gap-4 px-4 py-3 text-sm">
+    <div className="relative z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3 text-sm">
         <p className="flex-1">
           Ads help pay for the <strong>fernandeslabs.com</strong> domain and server costs,
           keeping all 132 tools 100% free and private. Please whitelist us or disable your

@@ -7,8 +7,11 @@ import { SiteHeader } from '@/components/hub/site-header'
 import { SiteFooter } from '@/components/hub/site-footer'
 import { BackToTop } from '@/components/hub/back-to-top'
 import { SkipToContent } from '@/components/hub/skip-to-content'
+import { AdblockBanner } from '@/components/ads/adblock-banner'
 import { FavoriteButton } from '@/components/hub/favorite-button'
 import { Input } from '@/components/ui/input'
+import { AdUnit } from '@/components/ads/ad-unit'
+import { toolMetaList } from '@/lib/tools/tool-meta'
 import { fuzzyMatch } from '@/lib/tools/fuzzy-search'
 import { usePreloadOnHover } from '@/lib/tools/preload'
 import type { ToolMeta, ToolCategory } from '@/lib/tools/types'
@@ -58,9 +61,10 @@ export function CategoryPageClient({
   return (
     <div className="flex min-h-screen flex-col">
       <SkipToContent />
+      <AdblockBanner />
       <SiteHeader
         onHome={() => router.push('/')}
-        toolCount={132}
+        toolCount={toolMetaList.length}
         onOpenPalette={() => router.push('/')}
       />
       <main id="main-content" className="flex-1">
@@ -74,7 +78,7 @@ export function CategoryPageClient({
               <Home className="size-3.5" />
               <span>Tools</span>
             </Link>
-            <ChevronRight className="size-3.5 text-muted-foreground/50" />
+            <ChevronRight className="size-3.5 text-muted-foreground/80" />
             <span className="font-medium text-foreground" aria-current="page">
               {cat.label}
             </span>
@@ -153,11 +157,15 @@ export function CategoryPageClient({
             </div>
           </div>
         </section>
+        {/* Ad unit below the category hero */}
+        <div className="mx-auto max-w-6xl px-4" aria-hidden={false}>
+          <AdUnit slot="horizontal" />
+        </div>
         {/* Tools grid */}
         <section className="mx-auto max-w-6xl px-4 py-10">
           {filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border py-20 text-center">
-              <Search className="size-8 text-muted-foreground/50" />
+              <Search className="size-8 text-muted-foreground/80" />
               <p className="mt-3 text-sm font-medium">No tools match your search</p>
               <button
                 type="button"

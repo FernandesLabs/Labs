@@ -80,7 +80,7 @@ export default function TokenCounter() {
           <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
             Estimated inference cost (per request, same token count)
           </div>
-          <div className="mt-3 overflow-hidden rounded-lg border border-border">
+          <div className="mt-3 overflow-x-auto rounded-lg border border-border">
             <table className="w-full text-sm">
               <thead className="bg-muted/40">
                 <tr>

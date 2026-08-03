@@ -478,7 +478,7 @@ export default function PromptVersionManager() {
         <CardContent>
           {versions.length === 0 ? (
             <div className="rounded-lg border border-dashed border-border bg-muted/20 p-8 text-center text-sm text-muted-foreground">
-              <FileJson className="mx-auto mb-2 size-6 text-muted-foreground/60" />
+              <FileJson className="mx-auto mb-2 size-6 text-muted-foreground/80" />
               No versions saved yet. Enter a prompt name and text above,
               then click <strong>Save version</strong> to create the first
               snapshot.
@@ -504,7 +504,7 @@ export default function PromptVersionManager() {
                           >
                             <span
                               className={`absolute -left-[1.40rem] top-1 size-2.5 rounded-full ring-2 ring-background ${
-                                isLatest ? 'bg-primary' : 'bg-muted-foreground/50'
+                                isLatest ? 'bg-primary' : 'bg-muted-foreground/80'
                               }`}
                               aria-hidden="true"
                             />
@@ -718,7 +718,7 @@ export default function PromptVersionManager() {
                               : 'text-foreground'
                         }`}
                       >
-                        <span className="select-none pr-2 text-muted-foreground/50">
+                        <span className="select-none pr-2 text-muted-foreground/80">
                           {l.type === 'add' ? '+' : l.type === 'remove' ? '−' : ' '}
                         </span>
                         {l.text || '\u00A0'}

@@ -210,7 +210,7 @@ export default function PasswordGenerator() {
                 {password ? (
                   password
                 ) : (
-                  <span className="text-sm text-muted-foreground/60">
+                  <span className="text-sm text-muted-foreground/80">
                     Select at least one character set to generate a password.
                   </span>
                 )}

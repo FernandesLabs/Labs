@@ -281,7 +281,7 @@ export function AdblockBanner({ enabled }: { enabled: boolean }) {
               >
                 Maybe later
               </button>
-              <span className="ml-auto inline-flex items-center gap-1 text-[10px] text-muted-foreground/70">
+              <span className="ml-auto inline-flex items-center gap-1 text-[10px] text-muted-foreground/80">
                 <ShieldCheck className="size-3" />
                 We never sell your data
               </span>

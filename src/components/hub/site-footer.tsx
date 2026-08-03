@@ -32,7 +32,14 @@ import { siteConfig } from '@/lib/site-config'
  *  6. Bottom bar: copyright + legal links + "all client-side" badge
  */
 export function SiteFooter() {
-  const year = new Date().getFullYear()
+  // The year is fixed at build time (2026) and only updated client-side after
+  // hydration. `new Date()` directly in the render would make the server HTML
+  // and the hydrated client differ (e.g. across year boundaries), which
+  // throws a hydration mismatch on every page.
+  const [year, setYear] = React.useState(2026)
+  React.useEffect(() => {
+    setYear(new Date().getFullYear())
+  }, [])
   return (
     <footer className="mt-auto border-t border-border/70 bg-muted/30">
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
@@ -100,7 +107,7 @@ export function SiteFooter() {
                         aria-hidden
                       />
                       {meta.label}
-                      <span className="text-[10px] text-muted-foreground/60">
+                      <span className="text-[10px] text-muted-foreground/80">
                         {count}
                       </span>
                     </Link>
@@ -270,7 +277,7 @@ function NewsletterForm() {
         aria-label="Email address"
         placeholder="you@example.com"
         disabled={status === 'loading' || status === 'done'}
-        className="h-9 min-w-0 flex-1 rounded-md border border-border/70 bg-background px-3 text-xs text-foreground placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:opacity-60"
+        className="h-9 min-w-0 flex-1 rounded-md border border-border/70 bg-background px-3 text-xs text-foreground placeholder:text-muted-foreground/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:opacity-60"
       />
       <button
         type="submit"

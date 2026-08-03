@@ -458,6 +458,1071 @@ const OVERRIDES: Record<string, ContentOverride> = {
       'Google stops following redirects after ~5 hops. If your chain is longer, the final page may not get indexed.',
     ],
   },
+  'canonical-url-checker': {
+    intro:
+      'The Canonical URL Checker fetches any URL and tells you exactly which canonical URL the page declares — either in its <link rel="canonical"> tag or via the HTTP Link header. Canonical tags are how you tell Google which version of a page is the "master" when duplicates exist (HTTP vs HTTPS, with/without trailing slash, www vs non-www, session IDs, print versions). If your canonical points to the wrong URL, Google may index the wrong version or drop your page entirely. This tool is the fastest way to audit your own canonicals and diagnose why a page is losing rankings to a duplicate. All checks run through our server-side proxy, and we do not log the URLs you check.',
+    examples: [
+      {
+        input: 'https://www.fernandeslabs.com/tools/json-formatter',
+        output: 'Canonical: https://www.fernandeslabs.com/tools/json-formatter\nStatus: Self-canonical (OK)',
+        note: 'A self-referencing canonical is the healthiest case — the page points to itself.',
+      },
+      {
+        input: 'https://fernandeslabs.com/tools/json-formatter',
+        output: 'Canonical: https://www.fernandeslabs.com/tools/json-formatter\nStatus: Different canonical (redirects equity to www version)',
+        note: 'The non-www version defers to www. This is correct — but both versions should 301-redirect too.',
+      },
+    ],
+    howTo: [
+      'Paste the full URL you want to audit into the input field (include https://).',
+      'Click Check. The tool fetches the page\'s HTML and HTTP headers and extracts the canonical declaration.',
+      'Review the result: the canonical URL, whether it\'s self-canonical or points elsewhere, and any warnings (missing canonical, multiple canonicals, conflicting headers).',
+      'Fix any issues on your site: every page should have exactly one self-referencing canonical (or one pointing to the master version of the duplicate).',
+    ],
+    faqs: [
+      {
+        q: 'What is a canonical URL and why does it matter?',
+        a: 'A canonical URL is the preferred version of a page that you want search engines to index when duplicates exist. You declare it with <link rel="canonical" href="..." /> in the <head>. Without it, Google must guess which version to index — and it often guesses wrong, splitting ranking signals between duplicates and diluting both.',
+      },
+      {
+        q: 'What happens if a page has no canonical tag?',
+        a: 'Google will usually pick the URL it considers the best representation — often the one with the most links or the one in your sitemap. For most sites, the fix is simple: add a self-referencing canonical to every page so there is no ambiguity.',
+      },
+      {
+        q: 'Do canonical tags work across domains?',
+        a: 'Yes. Google supports cross-domain canonicals — you can point a page on domain A to its equivalent on domain B (for example, syndicated content or CDN versions). However, the tag is a strong hint, not a directive: Google must be able to crawl the canonical URL to consolidate the signals.',
+      },
+      {
+        q: 'Canonical vs redirect — which should I use?',
+        a: 'If both versions are live and loadable, use a canonical tag to hint at the preferred version. If the duplicate genuinely shouldn\'t exist (old URLs after a migration), use a 301 redirect instead — it\'s stronger. The canonical tag should never be used on a page that redirects anyway, as the redirect makes it unreachable.',
+      },
+    ],
+    useCases: [
+      'Audit all pages on your site to ensure every one has a self-referencing canonical.',
+      'Diagnose why Google is ranking a duplicate (e.g. ?ref= tracking URLs) instead of your main page.',
+      'Verify that WordPress, Shopify, or other CMSes generate correct canonicals for your templates.',
+      'Check that cross-domain canonicals (e.g. print versions or AMP pages) point where you expect.',
+    ],
+    tips: [
+      'Common canonical mistakes: multiple canonical tags, relative canonical URLs, and canonicals pointing to URLs that 404.',
+      'Google uses the HTTP Link header as an alternative to the HTML tag — this tool checks both.',
+      'If you see conflicting canonicals in the <head> and the HTTP header, the page will likely be indexed inconsistently. Fix the duplication.',
+    ],
+  },
+  'robots-txt-generator': {
+    intro:
+      'The Robots.txt Generator builds a standards-compliant robots.txt file in seconds. Your robots.txt tells search engines which parts of your site they may crawl — blocking crawl-heavy or low-value paths saves your crawl budget, and the file is also the standard place to declare your XML sitemap location. The generator walks you through the common rules: allow everything, block specific folders, add a crawl delay (for search engines that honor it), and reference your sitemap. The output is valid plain text you can paste directly into your site\'s /robots.txt file — it even includes the correct user-agent syntax for Googlebot, Bingbot, and others.',
+    examples: [
+      {
+        input: 'Sitemap URL: https://example.com/sitemap.xml\nBlock: /admin/, /private/',
+        output: `User-agent: *
+Disallow: /admin/
+Disallow: /private/
+
+Sitemap: https://example.com/sitemap.xml`,
+        note: 'A single User-agent: * rule applies to all crawlers.',
+      },
+      {
+        input: 'Disallow Googlebot from /search? and Bing from /old/',
+        output: `User-agent: Googlebot
+Disallow: /search
+
+User-agent: Bingbot
+Disallow: /old/`,
+        note: 'Rules are case-sensitive and are matched by URL prefix.',
+      },
+    ],
+    howTo: [
+      'Choose whether to allow all crawlers (empty Disallow) or block specific paths.',
+      'Add the directories or URL prefixes you want to block — for example /admin/, /api/, /private/ or parameter-heavy URLs like /search?.',
+      'Enter your sitemap URL so the file declares it for all crawlers.',
+      'Preview the generated robots.txt and copy it, then upload it to the root of your domain (public_html/robots.txt or equivalent).',
+    ],
+    faqs: [
+      {
+        q: 'Does robots.txt stop Google from indexing a page?',
+        a: 'No — this is the most common misunderstanding. Robots.txt only controls crawling. If Google can\'t crawl a page, it can still index it from other signals (links, sitemaps, external copies) and may show a snippet without content. To prevent indexing, use a meta robots noindex tag or HTTP header instead. Never put a noindex URL only in robots.txt and expect it to disappear.',
+      },
+      {
+        q: 'How do I block Googlebot but allow other search engines?',
+        a: 'Use separate User-agent lines. A rule for Googlebot applies only to Googlebot; a "User-agent: *" block applies to everyone else. Order matters only within the same user-agent group, where the most specific match wins.',
+      },
+      {
+        q: 'Where do I put my robots.txt file?',
+        a: 'At the root of your domain: https://yourdomain.com/robots.txt. For a site served from a subfolder, it goes in that folder\'s root. You can verify it\'s live by visiting the URL directly in a browser — and remember to resubmit the URL in Google Search Console after changes.',
+      },
+      {
+        q: 'Can robots.txt block one page but not the rest of a folder?',
+        a: 'Yes. Disallow rules are prefix matches: /private blocks /private and everything below it, while a rule like /private/offers.html blocks only that exact file. Allow rules can re-enable specific pages inside a disallowed folder, though Google\'s support for Allow/Disallow precedence can be surprising — when in doubt, test with the robots.txt Tester in Search Console.',
+      },
+    ],
+    useCases: [
+      'Prevent search engines from wasting crawl budget on admin panels and staging directories.',
+      'Block parameterized URLs (search, filters, pagination) that create duplicate content.',
+      'Declare your sitemap location in one centralized place.',
+      'Temporarily stop crawlers while a site is under maintenance or being rebuilt.',
+    ],
+    tips: [
+      'Robots.txt supports the wildcard * and end-of-URL $ in most crawlers, e.g. Disallow: /*?* to block all URLs with query strings.',
+      'Google typically honors a 60-day TTL for cached robots.txt — after an update, expect changes to take effect within that window.',
+      'Keep the file small. Bloated robots.txt files (500 KB+) may be fully ignored.',
+    ],
+  },
+  'image-metadata-viewer': {
+    intro:
+      'The Image Metadata Viewer reads and displays all the metadata embedded in your images — EXIF, IPTC, XMP, and generic file properties — directly in your browser. It shows camera settings (make, model, lens, ISO, shutter speed, aperture), capture date, GPS coordinates, copyright and author info, and software history. This is the tool to use before publishing photos online: if you don\'t want the world to know where and with what camera a photo was taken, this viewer tells you exactly what\'s embedded. Everything is processed locally — your images are never uploaded, so you can safely inspect private or unpublished photos.',
+    examples: [
+      {
+        input: 'A photo taken on an iPhone 15 Pro',
+        output: 'Make: Apple\nModel: iPhone 15 Pro\nLens: iPhone 15 Pro back dual camera 6.86mm f/1.78\nISO: 80\nExposure: 1/120s\nGPS: 38.7223° N, 9.1393° W (Lisbon, PT)\nSoftware: 17.2',
+        note: 'Modern phones embed GPS and a surprising amount of detail.',
+      },
+      {
+        input: 'An image exported from Photoshop',
+        output: 'Software: Adobe Photoshop 25.0\nCopyright: © 2024 Example Studio\nCreation Date: 2024-03-12 14:22:07\nColor Profile: sRGB IEC61966-2.1',
+        note: 'Editing software stamps its history into the metadata.',
+      },
+    ],
+    howTo: [
+      'Drag an image onto the page or click to select one from your device.',
+      'The viewer lists every metadata field found in the file — camera settings, dates, GPS, copyright, and more.',
+      'Look for the GPS coordinates block if you want to know where the photo was taken (you can search the coordinates on a map).',
+      'If you\'re publishing the image and want to remove this data, strip it with a metadata-removal tool before uploading.',
+    ],
+    faqs: [
+      {
+        q: 'What is EXIF data?',
+        a: 'EXIF (Exchangeable Image File Format) is metadata embedded by cameras and phones at capture time. It typically includes make/model, lens, focal length, aperture, shutter speed, ISO, date and time, and often GPS coordinates. Social platforms and messaging apps usually strip it automatically — but direct file uploads (e.g. a web form or email) often do not.',
+      },
+      {
+        q: 'Can this tool see metadata in PNG or WebP files?',
+        a: 'Yes. PNG files use the text chunks or eXIf chunks, and WebP supports EXIF/XMP metadata too. The viewer reports whatever structured metadata exists in the file — images with none simply show the basic file properties.',
+      },
+      {
+        q: 'Is my photo uploaded to a server?',
+        a: 'No. Everything runs locally in your browser using the File API and client-side parsing. Your image never leaves your device — you can safely inspect personal photos, screenshots of private dashboards, or images you received from others.',
+      },
+      {
+        q: 'How do I remove metadata before sharing an image?',
+        a: 'You can remove metadata by opening the image in an editor and re-saving ("Export as…" in most tools), using a dedicated metadata-stripping tool, or on macOS, the built-in Preview app under Tools → Remove Metadata (when available). After stripping, re-check the file with this viewer to confirm nothing remains.',
+      },
+    ],
+    useCases: [
+      'Check what personal data (GPS, camera, date) is embedded before publishing photos.',
+      'Audit images received from clients or colleagues for hidden metadata.',
+      'Extract the GPS coordinates of a photo you took, when you forgot the exact spot.',
+      'Verify that a metadata-stripping workflow actually removed everything.',
+    ],
+    tips: [
+      'GPS metadata is the most privacy-sensitive field — it reveals exactly where a photo was taken, often at street-level accuracy.',
+      'Screenshots taken on a phone also carry metadata, including (on some devices) the app that created them.',
+      'If no metadata appears, the image may have been stripped already, or was exported from software that writes minimal headers.',
+    ],
+  },
+  'citation-generator': {
+    intro:
+      'The Citation Generator creates properly formatted citations and references for your bibliography. It supports the most common source types — websites, articles, books, and more — and formats them in the styles used by schools and journals: APA, MLA, and Harvard. Instead of memorizing the exact punctuation rules (which differ per style), you fill in the source details and the generator produces a copy-paste-ready reference. Citations are generated locally in your browser, so none of your sources are transmitted anywhere. Perfect for students finishing essays, researchers compiling bibliographies, and writers double-checking their reference lists.',
+    examples: [
+      {
+        input: 'Website: Fernandes Labs (2026). IP Address Lookup. Available at: https://www.fernandeslabs.com/tools/ip-lookup',
+        output: 'APA: Fernandes Labs. (2026). IP Address Lookup. Retrieved from https://www.fernandeslabs.com/tools/ip-lookup\nMLA: "IP Address Lookup." Fernandes Labs, 2026, www.fernandeslabs.com/tools/ip-lookup.\nHarvard: Fernandes Labs (2026) IP Address Lookup. Available at: https://www.fernandeslabs.com/tools/ip-lookup (Accessed: 3 August 2026).',
+        note: 'Each style has different punctuation, italics rules, and access-date requirements.',
+      },
+    ],
+    howTo: [
+      'Choose the source type (website, book, journal article, etc.).',
+      'Select the citation style — APA, MLA, or Harvard.',
+      'Fill in the details: author(s), title, publisher, date, and URL where applicable.',
+      'Copy the generated citation directly into your bibliography. For in-text citations, use the separate in-text format shown alongside the full reference.',
+    ],
+    faqs: [
+      {
+        q: 'Which citation style should I use?',
+        a: 'Use whatever your instructor, journal, or publication requires. APA is standard in psychology, education, and social sciences; MLA in humanities and literature; Harvard is common across UK and Australian universities. If you\'re not sure, ask — a wrong citation style is often grounds for point deductions.',
+      },
+      {
+        q: 'Is citing a website the same as citing an article?',
+        a: 'No. Websites are cited with the page title, site name, publication date, URL and access date. Journal articles require volume, issue, page numbers, and DOI. The generator prompts for the correct fields depending on the source type you pick, so you can\'t forget the required parts.',
+      },
+      {
+        q: 'Does this citation generator check my sources are real?',
+        a: 'No — the generator formats the information you provide; it doesn\'t verify the source exists. Always double-check URLs and DOIs before submitting. Many universities also use plagiarism/citation checkers, so keep your original source material handy.',
+      },
+      {
+        q: 'Why do my citations need an access date?',
+        a: 'Online content changes. Styles like APA and Harvard require the date you accessed a page so readers can account for edits. If you accessed the page on different days, use the most recent access date.',
+      },
+    ],
+    useCases: [
+      'Format the bibliography of an academic essay or dissertation.',
+      'Create references for a research paper submission to a journal.',
+      'Cite sources correctly for a school report at the last minute.',
+      'Standardize the reference format across a team\'s shared document.',
+    ],
+    tips: [
+      'APA 7th edition requires italics for the source title — apply it after pasting if your editor doesn\'t keep formatting.',
+      'When a website has no author, start the citation with the site name or page title instead.',
+      'In-text citations are just as important as the reference list — the generator provides both formats.',
+    ],
+  },
+  'color-contrast-checker': {
+    intro:
+      'The Color Contrast Checker measures the contrast ratio between two colors and tells you whether the combination passes WCAG 2.1 accessibility guidelines — for normal text, large text, and UI components. Contrast is the single most common accessibility failure on the web, and it\'s also a ranking-relevant quality signal: pages that are unreadable for the 1 in 12 men with color vision deficiency bounce visitors. Pick two colors (hex, or with the color picker), and the tool instantly shows the ratio, a pass/fail verdict for AA and AAA levels, and suggested fixes. Everything runs in your browser.',
+    examples: [
+      {
+        input: 'Foreground: #ffffff, Background: #000000',
+        output: 'Contrast ratio: 21.0:1\nAAA pass — normal text (7.0+ required)',
+        note: 'Pure black on pure white is the strongest contrast possible.',
+      },
+      {
+        input: 'Foreground: #999999, Background: #ffffff',
+        output: 'Contrast ratio: 2.85:1\nFail — AA requires 4.5:1 for normal text',
+        note: 'Gray-on-white looks "clean" but fails even the AA minimum. Darken the gray.',
+      },
+    ],
+    howTo: [
+      'Enter the foreground (text) color and background color — hex values, or use the color picker.',
+      'The tool calculates the WCAG contrast ratio (from 1:1 to 21:1) instantly.',
+      'Check the verdicts: AA and AAA pass/fail for normal text, large text (18pt+ or 14pt bold), and UI components.',
+      'Adjust the colors until they pass the level you need — the checker updates live as you tweak.',
+    ],
+    faqs: [
+      {
+        q: 'What contrast ratio do I need for WCAG compliance?',
+        a: 'For normal text (under 18pt, or 14pt bold): 4.5:1 for AA and 7:1 for AAA. For large text (18pt+ or 14pt+ bold): 3:1 for AA and 4.5:1 for AAA. UI components and graphics need 3:1. If you\'re targeting WCAG 2.1 AA — the legal standard in the EU and for many US public sites — aim for 4.5:1 on body text.',
+      },
+      {
+        q: 'How is the contrast ratio calculated?',
+        a: 'The ratio compares the relative luminance of the two colors: (L1 + 0.05) / (L2 + 0.05), where L1 is the lighter color. This is the formula from the WCAG specification — it accounts for human perception, not just brightness, so pure luminance differences (like red/green) matter less than you\'d expect.',
+      },
+      {
+        q: 'Why does my brand color fail on white?',
+        a: 'Many brand palettes use medium saturation colors that fall below 4.5:1 on white. Common fixes: darken the text color slightly, use the brand color only for large headings (3:1 requirement), or pair the brand color with a dark shade for body text.',
+      },
+      {
+        q: 'Does this checker handle transparency?',
+        a: 'For accurate results with semi-transparent elements, the effective color is the result of blending with the background. This tool evaluates the two solid colors you pick — if your design uses opacity, blend the colors first and check the resulting hex.',
+      },
+    ],
+    useCases: [
+      'Check text legibility before publishing a design system or brand guidelines.',
+      'Ensure your site passes WCAG 2.1 AA for accessibility compliance audits.',
+      'Pick accessible color pairs for charts, buttons, and form labels.',
+      'Audit existing pages where users report hard-to-read text.',
+    ],
+    tips: [
+      'The most common failure is low-contrast placeholder text and disabled buttons — check those specifically.',
+      'A 4.5:1 ratio on white is roughly #767676 in gray — a useful mental benchmark.',
+      'Don\'t rely on color alone to convey meaning (e.g. red for errors): pair color with an icon or text label.',
+    ],
+  },
+  'jwt-decoder': {
+    intro:
+      'The JWT Decoder unpacks any JSON Web Token into its readable header and payload instantly. A JWT looks like a long string of three dot-separated parts: header.payload.signature. This tool decodes the first two parts (Base64Url) so you can inspect the algorithm, issuer, subject, expiration, and custom claims — without ever sending the token anywhere. All decoding happens locally in your browser, which matters for security testing: you can safely decode tokens from staging environments, OAuth flows, and customer bug reports without leaking secrets. The signature portion is preserved but not verified (verification requires the secret or public key, which only you should hold).',
+    examples: [
+      {
+        input: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.<signature>',
+        output: 'Header: {"alg":"HS256","typ":"JWT"}\nPayload: {"sub":"1234567890","name":"John Doe","admin":true}',
+        note: 'The signature is never touched — decoding requires only the header and payload.',
+      },
+      {
+        input: 'A token with an exp claim',
+        output: 'Payload: {"iss":"fernandeslabs.com","sub":"user_42","exp":1770000000}\nexp (epoch): 2026-02-04 16:00:00 UTC',
+        note: 'The decoder converts epoch timestamps into readable dates automatically.',
+      },
+    ],
+    howTo: [
+      'Paste the full JWT into the input field — the three dot-separated segments.',
+      'The header and payload are decoded and displayed as formatted JSON.',
+      'Epoch timestamp claims (exp, iat, nbf) are converted to human-readable dates.',
+      'Copy the decoded payload or the raw token back out as needed.',
+    ],
+    faqs: [
+      {
+        q: 'Is it safe to decode a JWT on this website?',
+        a: 'Yes. The token is decoded entirely in your browser — no data is transmitted to any server. This is especially important when auditing tokens from production or client systems. That said, treat tokens like passwords: don\'t paste them into chat tools or untrusted services that do decode them server-side.',
+      },
+      {
+        q: 'What do the three parts of a JWT mean?',
+        a: 'Header: the signing algorithm (e.g. HS256, RS256) and token type. Payload: the claims — identity, permissions, expiry. Signature: a cryptographic check that the token wasn\'t tampered with. This tool decodes the header and payload; verifying the signature requires the key and is best done in your own code.',
+      },
+      {
+        q: 'Why is my token showing "Invalid token"?',
+        a: 'The token must be a valid Base64Url-encoded JSON with exactly two dots separating three parts. Common causes: copying an access token with extra whitespace, using a token from a non-JWT scheme (like an opaque OAuth token), or a truncated string.',
+      },
+      {
+        q: 'Can I decode JWTs that use RS256 or ES256?',
+        a: 'Yes — decoding only reads the header and payload, which are Base64Url-encoded JSON regardless of the algorithm. Only the signature differs, and this tool doesn\'t verify it.',
+      },
+    ],
+    useCases: [
+      'Debug why a user\'s session expired — inspect the exp and iat claims.',
+      'Audit the claims your own backend issues, during development.',
+      'Inspect third-party identity tokens (OAuth, OpenID Connect) to see what data they share.',
+      'Verify a JWT library or SDK is generating the expected claims before deploying.',
+    ],
+    tips: [
+      'If a decoded token\'s exp is in the past, the token is expired — refresh or re-authenticate.',
+      'The alg "none" in a header is a red flag: tokens with alg:none must never be accepted by a server.',
+      'JWT payloads are Base64-encoded, not encrypted — anyone can read them. Never put secrets in a JWT.',
+    ],
+  },
+  'jwt-generator': {
+    intro:
+      'The JWT Generator creates signed JSON Web Tokens (HS256) with your own claims, secret, and expiry — perfect for testing APIs, building demos, and learning how JWTs work. You define the payload claims (issuer, subject, audience, custom fields), choose the expiry, and the tool signs the token with your secret key using HMAC-SHA256. The generated token is fully compatible with any standard JWT library (jsonwebtoken, PyJWT, jose). Because signing happens in your browser, your secret never leaves your device — you can safely use real secrets from staging environments.',
+    examples: [
+      {
+        input: 'Secret: my-staging-secret\nClaims: {"sub":"user_42","role":"admin"}\nExpiry: 1 hour',
+        output: 'Header: {"alg":"HS256","typ":"JWT"}\nPayload: {"sub":"user_42","role":"admin","exp":1770000000}\nToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.<payload>.<signature>',
+        note: 'The exp claim is computed from the expiry you choose and added automatically.',
+      },
+    ],
+    howTo: [
+      'Enter the payload claims as JSON — for example {"sub":"user_42","role":"admin"}.',
+      'Set the secret key used for signing (HMAC-SHA256).',
+      'Choose the token lifetime or a fixed expiration timestamp.',
+      'Copy the generated token and use it in Authorization: Bearer <token> headers when testing your API.',
+    ],
+    faqs: [
+      {
+        q: 'Is it safe to paste my JWT secret here?',
+        a: 'Yes — the signing runs entirely in your browser using the Web Crypto API. Your secret never leaves your device. Still, use a throwaway or staging secret if you\'re on a shared computer, and never share secrets with anyone.',
+      },
+      {
+        q: 'What is the difference between HS256 and RS256?',
+        a: 'HS256 is symmetric: the same secret signs and verifies the token, which makes it fast and simple for one service (or a shared secret between two). RS256 is asymmetric: a private key signs, a public key verifies. For production APIs with multiple services, RS256 (or ES256) is recommended so verifiers never need the signing key. This generator produces HS256 tokens.',
+      },
+      {
+        q: 'Why does my API reject the token?',
+        a: 'Most commonly: the secret doesn\'t match (check for trailing whitespace), the clock of your API server differs from the expiry, or the audience/issuer claims don\'t match what the API validates. Verify the token with your backend library using the exact same secret string.',
+      },
+      {
+        q: 'Can I generate tokens with custom algorithms?',
+        a: 'This tool signs with HS256, which covers the vast majority of testing needs. For RS256/ES256 development, use your language\'s JWT library — the process (header + payload + signature) is the same.',
+      },
+    ],
+    useCases: [
+      'Generate test tokens for your API without writing code.',
+      'Create demo tokens for documentation examples and screenshots.',
+      'Learn how JWT signing works by tweaking claims and inspecting the output.',
+      'Reproduce and debug an authentication bug with a controlled token.',
+    ],
+    tips: [
+      'Always include an exp claim in production tokens — tokens without expiry are a security liability.',
+      'Test that your API rejects an expired token by generating one with a 1-second expiry.',
+      'Keep secrets in your .env file; never commit them or paste them into documentation.',
+    ],
+  },
+  'capitalization-tool': {
+    intro:
+      'The Capitalization Tool instantly converts any text between Title Case, Sentence case, UPPERCASE, lowercase, camelCase, PascalCase, snake_case, and kebab-case. Writers use it to standardize headlines and headings, developers use it to fix variable naming, and marketers use it to clean up pasted content. The Title Case engine follows the standard AP-style rules — major words capitalized, small words (a, an, the, and, or, of, for, in, on, with, to) kept lowercase unless they start or end the title. Everything is processed locally; your text never leaves your browser.',
+    examples: [
+      {
+        input: 'how to use the json formatter tool',
+        output: 'Title Case: How to Use the JSON Formatter Tool\nUPPERCASE: HOW TO USE THE JSON FORMATTER TOOL\ncamelCase: howToUseTheJsonFormatterTool\nsnake_case: how_to_use_the_json_formatter_tool',
+        note: 'All 8 cases generated from one input in a single click.',
+      },
+    ],
+    howTo: [
+      'Paste your text into the input box.',
+      'Choose the capitalization style you need — Title Case, Sentence case, UPPERCASE, lowercase, camelCase, PascalCase, snake_case, kebab-case, or a custom mapping.',
+      'The converted text appears instantly in the output area.',
+      'Copy the result — the tool also shows a diff-style preview of what changed, so you can verify the transformation.',
+    ],
+    faqs: [
+      {
+        q: 'What are the Title Case rules?',
+        a: 'Capitalize the first and last words, and all nouns, verbs, adjectives, and adverbs. Articles (a, an, the), coordinating conjunctions (and, but, or), and short prepositions (of, in, on, to) stay lowercase unless they are the first or last word. The tool applies these rules automatically.',
+      },
+      {
+        q: 'Why would I use camelCase instead of Title Case?',
+        a: 'camelCase and PascalCase are used in programming — variable names, function names, and identifiers must often avoid spaces. camelCase (first word lowercase) is the JavaScript/Python convention; PascalCase (first word capitalized) is used for classes and React component names.',
+      },
+      {
+        q: 'Does it work with punctuation and numbers?',
+        a: 'Yes. Punctuation is preserved, and words containing numbers or special characters are handled sensibly — for example "iPhone" isn\'t force-lowercased in camelCase conversions where it would change meaning. Test your edge cases in the preview before copying.',
+      },
+    ],
+    useCases: [
+      'Standardize headline casing across a blog or newsletter.',
+      'Convert pasted product names to the correct brand casing.',
+      'Fix ALL-CAPS content pasted from legacy systems into normal sentence case.',
+      'Generate consistent variable names from arbitrary strings when coding.',
+    ],
+    tips: [
+      'For headlines, pick one case style and stick to it across your whole site — mixed casing looks unprofessional.',
+      'In title case, keep brand names and acronyms as-is: "How to Use the API" not "How to Use The Api".',
+      'Use the UPPERCASE output for CSS class names you then convert to kebab-case manually — most style guides recommend lowercase-kebab.',
+    ],
+  },
+  'file-signature-inspector': {
+    intro:
+      'The File Signature Inspector identifies the true type of any file by reading its magic bytes — the first few bytes of binary data that every file format carries. A file can claim to be a PDF in its extension while actually being a ZIP archive, an executable, or something else entirely. This inspector reads the header bytes and matches them against a database of known signatures (PDF, ZIP, PNG, JPEG, GIF, WebP, MP4, ELF, EXE, and more), revealing the file\'s real format. It\'s a standard security and QA tool: verify uploads, investigate suspicious files, and debug mislabeled exports. The inspection is 100% local.',
+    examples: [
+      {
+        input: 'A file named "report.pdf"',
+        output: 'Magic bytes: 50 4B 03 04\nDetected: ZIP archive (not PDF!)',
+        note: 'A file that says .pdf but starts with PK is actually a ZIP — a classic spoof pattern.',
+      },
+      {
+        input: 'A file named "photo.jpg"',
+        output: 'Magic bytes: 89 50 4E 47 0D 0A 1A 0A\nDetected: PNG image (not JPEG!)',
+        note: 'PNG files start with a distinctive 8-byte signature.',
+      },
+    ],
+    howTo: [
+      'Click to select a file, or drag and drop one onto the page.',
+      'The inspector reads the first bytes and displays them as hex.',
+      'The detected file type is shown with confidence — compare it against the file\'s extension.',
+      'If they don\'t match, you\'ve found a spoofed or mislabeled file.',
+    ],
+    faqs: [
+      {
+        q: 'What are magic bytes and why do they matter?',
+        a: 'Magic bytes are the fixed sequence of bytes at the start of a file that identify its format — for example, PDFs always start with %PDF, PNGs with an 8-byte signature beginning 89 50 4E 47, and ZIPs with PK. Extensions can be changed trivially, but magic bytes can\'t, so they\'re the ground truth for file identification.',
+      },
+      {
+        q: 'Why would someone rename a file with a fake extension?',
+        a: 'Attackers rename executables or archives to look like documents to bypass filters and trick users ("invoice.pdf" that\'s actually an executable). Security software checks magic bytes precisely for this reason. This tool gives you the same check locally.',
+      },
+      {
+        q: 'Does this work for files with no extension?',
+        a: 'Yes — that\'s the whole point. The inspector identifies files purely by their binary content, so files without extensions (or with wrong ones) are identified correctly.',
+      },
+      {
+        q: 'Is my file uploaded anywhere?',
+        a: 'No. The file is read locally in your browser via the File API — nothing is transmitted. You can inspect private documents and suspicious files safely.',
+      },
+    ],
+    useCases: [
+      'Verify that uploaded files in your app actually have the type they claim.',
+      'Investigate suspicious email attachments before opening them.',
+      'Debug why a file won\'t open — it may have the wrong extension.',
+      'Identify unknown files you received without extensions.',
+    ],
+    tips: [
+      'The first 4-8 bytes are usually enough to identify a format — longer signatures are used for ambiguous cases.',
+      'A PDF that starts with %PDF-1.7 declares its version in the signature itself.',
+      'When your app validates uploads, always check magic bytes server-side, not just the extension or MIME type from the client.',
+    ],
+  },
+  'lorem-ipsum-generator': {
+    intro:
+      'The Lorem Ipsum Generator produces classic Latin placeholder text in exactly the amount you need — paragraphs, sentences, or words. Designers and developers use placeholder text to fill layouts before real copy arrives, so clients can judge the typography, spacing, and balance without being distracted by content. Choose the amount, or select from alternatives like "start with Lorem ipsum dolor sit amet…", and copy the output in one click. The text is generated locally, so it works offline and is always available.',
+    examples: [
+      {
+        input: '3 paragraphs, start with "Lorem ipsum dolor sit amet"',
+        output: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat…\n\n[Paragraph 2]…\n\n[Paragraph 3]…',
+        note: 'The classic opening phrase is used for the first paragraph.',
+      },
+    ],
+    howTo: [
+      'Choose whether you want paragraphs, sentences, or words.',
+      'Set the amount — the output updates instantly.',
+      'Optionally check "Start with classic opening" to begin with "Lorem ipsum dolor sit amet…".',
+      'Copy the generated text and paste it into your mockup, prototype, or design file.',
+    ],
+    faqs: [
+      {
+        q: 'What does lorem ipsum mean?',
+        a: 'Nothing — it\'s deliberately scrambled Latin derived from Cicero\'s "De finibus bonorum et malorum" (45 BC). The text has no meaning, which is exactly why it\'s used for placeholders: readers can\'t get distracted by the words, so they judge the design itself.',
+      },
+      {
+        q: 'Is lorem ipsum the right choice for my mockup?',
+        a: 'For layouts and typography tests, yes. But for UX research and usability testing, real content is much better — users read real text differently. A common compromise: use lorem ipsum for structure, then swap in realistic sample copy for user tests.',
+      },
+      {
+        q: 'How much placeholder text should I use?',
+        a: 'Match the target content volume. For a blog post card, 2-4 lines is enough; for a landing page hero, a paragraph of 3-5 sentences. Overfilling a layout with text gives clients the wrong impression of the final density.',
+      },
+    ],
+    useCases: [
+      'Fill a webpage or app layout during front-end development.',
+      'Create realistic-looking mockups for client proposals.',
+      'Test typography, line height, and spacing in a design tool.',
+      'Populate form placeholders and empty states during QA.',
+    ],
+    tips: [
+      'Clients frequently mistake lorem ipsum for final copy — label placeholder areas clearly in presentations.',
+      'For wireframes, use short "Content goes here" blocks instead; reserve lorem ipsum for visual design.',
+      'If you need to match a specific word count, the generator\'s word mode gets you close instantly.',
+    ],
+  },
+  'regex-tester': {
+    intro:
+      'The Regex Tester lets you build and debug regular expressions with live match highlighting. Type a pattern and your test text, and every match is highlighted in real time — with per-group highlighting so you can see exactly what each capturing group grabs. It supports the JavaScript flavor of regex with all common flags (g, i, m, s, u) and shows a breakdown of the match details: index, captured groups, and full match. This instant feedback loop is far faster than writing a quick test file every time you need to verify a pattern — and since everything runs locally, you can test patterns containing sensitive data like emails or API keys without sending them anywhere.',
+    examples: [
+      {
+        input: 'Pattern: /\\b\\w+@\\w+\\.\\w+\\b/g\nText: "Contact support@example.com or sales@example.org"',
+        output: 'Match 1: support@example.com (index 8)\nMatch 2: sales@example.org (index 34)',
+        note: 'The g flag returns every match, not just the first.',
+      },
+      {
+        input: 'Pattern: /(\\d{4})[-\\s](\\d{4})[-\\s](\\d{4})[-\\s](\\d{4})/i\nText: "Card: 4111-2222-3333-4444"',
+        output: 'Group 1: 4111 | Group 2: 2222 | Group 3: 3333 | Group 4: 4444',
+        note: 'Capturing groups are highlighted separately for easy extraction.',
+      },
+    ],
+    howTo: [
+      'Type or paste your regex pattern into the pattern field (with or without the surrounding slashes and flags).',
+      'Paste your test text below.',
+      'Every match is highlighted instantly — move your cursor over matches to see the group breakdown.',
+      'Adjust flags (global, case-insensitive, multiline) and watch the matches update live.',
+    ],
+    faqs: [
+      {
+        q: 'Which regex flavor does this use?',
+        a: 'JavaScript (ECMAScript) — the flavor used by Node.js, browsers, and modern front-end code. It supports lookaheads, named groups, Unicode properties (\p{L} etc. with the u flag), and all standard flags. For PCRE/Python-specific features, consult their documentation — most patterns translate directly.',
+      },
+      {
+        q: 'Why is my regex matching more (or less) than expected?',
+        a: 'The three classic culprits: greedy quantifiers (* and + consume as much as possible — add ? for lazy), missing word boundaries (\\b), and forgetting that . doesn\'t match newlines by default (add the s flag). The live highlighting shows exactly where the match extends, which makes these bugs obvious in seconds.',
+      },
+      {
+        q: 'Can I save my regex for later?',
+        a: 'Your pattern and test text persist in the tool during your session (localStorage). For permanent storage, keep patterns in your codebase or a notes app — the tool focuses on fast iteration.',
+      },
+    ],
+    useCases: [
+      'Validate user input patterns (emails, phone numbers, postal codes) during development.',
+      'Extract structured data from logs or plain text.',
+      'Refine a search-and-replace before running it on production files.',
+      'Learn regex by experimenting with a live sandbox.',
+    ],
+    tips: [
+      'Anchors are cheap and prevent surprises: use ^...$ to match the whole string when validating.',
+      'Named groups (?<name>...) make your regexes readable and your extraction code maintainable.',
+      'The s flag makes . match newlines — essential for multi-line log parsing.',
+    ],
+  },
+  'dns-lookup': {
+    intro:
+      'The DNS Lookup tool queries the Domain Name System and returns the records for any domain — A, AAAA, MX, TXT, NS, CNAME, SOA, and more. It answers questions like "which server does this domain point to?", "who is the mail provider?", "is SPF configured?", and "where are the nameservers?". The queries run through our server-side proxy so you can look up domains without CORS issues or local DNS caching — the response shows the records exactly as the authoritative servers publish them, with TTLs. This is the first diagnostic for email deliverability, CDN misconfigurations, and domain migration checks.',
+    examples: [
+      {
+        input: 'google.com — A record',
+        output: 'A: 142.250.74.14 (TTL 300)\nA: 142.250.74.142 (TTL 300)',
+        note: 'Most domains return multiple A records for load balancing.',
+      },
+      {
+        input: 'google.com — MX record',
+        output: 'MX: 10 smtp.google.com\nMX: 20 alt1.smtp.google.com',
+        note: 'Lower MX priority numbers are tried first.',
+      },
+    ],
+    howTo: [
+      'Enter the domain name (without https://) — for example fernandeslabs.com.',
+      'Select the record type you need: A, AAAA, MX, TXT, NS, CNAME, SOA, or All.',
+      'The records are returned with their TTL values and exact values.',
+      'Run multiple record types to build a complete picture of the domain\'s DNS.',
+    ],
+    faqs: [
+      {
+        q: 'What is a DNS lookup?',
+        a: 'DNS (Domain Name System) is the phonebook of the internet: it translates human-readable domains (fernandeslabs.com) into IP addresses that servers use. A DNS lookup queries the public DNS hierarchy to return the records associated with a domain — A (IPv4), AAAA (IPv6), MX (mail), TXT (verification/SPF), NS (nameservers), and more.',
+      },
+      {
+        q: 'Why do I see different results than my own computer?',
+        a: 'DNS has multiple layers of caching — your ISP, your router, and your OS each cache results for the record\'s TTL. This tool queries the public resolver hierarchy directly, so it reflects the published records, not a cached snapshot. If you changed a record and still see old values, wait for the TTL to expire (check the TTL shown here).',
+      },
+      {
+        q: 'What are MX records and why do they matter for email?',
+        a: 'MX (Mail Exchange) records tell other servers where to deliver email for your domain. If they\'re missing or wrong, your mail bounces. Each MX record has a priority: lower numbers are contacted first. When diagnosing email issues, verify the MX records match what your mail provider publishes.',
+      },
+      {
+        q: 'How do I check if SPF or DKIM is configured?',
+        a: 'Query the TXT records for your domain — SPF appears as a "v=spf1 ..." TXT record at the root domain. DKIM is stored per-selector: query TXT for <selector>._domainkey.<domain>. Both are essential for email deliverability, and this tool shows them instantly.',
+      },
+    ],
+    useCases: [
+      'Verify that a domain\'s A records point to the correct server after a migration.',
+      'Check whether SPF and MX records are configured for a new email setup.',
+      'Confirm nameservers moved to the new provider during a domain transfer.',
+      'Debug CDN and DNS propagation issues with the authoritative view.',
+    ],
+    tips: [
+      'After changing DNS, use this tool\'s TTL values to estimate how long propagation will take.',
+      'TXT records are also used for domain verification (Google, GitHub, etc.) — check they\'re published before contacting support.',
+      'For security checks, review CNAME records: a stale CNAME to a de-registered domain can be hijacked.',
+    ],
+  },
+  'mime-detector': {
+    intro:
+      'The MIME Type Detector identifies the MIME type of any file — both from its magic bytes (content signature) and its extension. MIME types (like image/png, application/pdf, text/csv) tell browsers and servers how to handle a file, and mismatches cause broken downloads, upload failures, and security filters rejecting valid files. This detector reads the file\'s actual content to determine the true MIME type, then compares it with what the extension claims. All detection happens locally in your browser — nothing is uploaded, so it\'s safe to check confidential exports.',
+    examples: [
+      {
+        input: 'A file named "data.csv"',
+        output: 'Detected (by content): text/csv\nDetected (by extension): text/csv\nMatch: Yes',
+        note: 'CSV is a text format — the detector confirms both signals agree.',
+      },
+      {
+        input: 'A file named "document.pdf"',
+        output: 'Detected (by content): application/pdf\nDetected (by extension): application/pdf\nMatch: Yes',
+        note: 'PDFs are identified by the %PDF magic bytes at the start of the file.',
+      },
+    ],
+    howTo: [
+      'Drag a file onto the page or select it with the file picker.',
+      'The detector reads the first bytes of the file and determines the MIME type from content.',
+      'The extension-based MIME type is shown alongside for comparison.',
+      'A match/mismatch indicator tells you whether the file is labeled correctly.',
+    ],
+    faqs: [
+      {
+        q: 'What is a MIME type?',
+        a: 'A MIME type (Multipurpose Internet Mail Extensions) is a standardized label like text/html or application/pdf that describes the format of a file or document. Browsers and servers use it to decide how to render, download, or process content — which is why an incorrect MIME type breaks uploads, previews, and downloads.',
+      },
+      {
+        q: 'Why detect MIME from content instead of the extension?',
+        a: 'Extensions are unreliable: they can be renamed, stripped, or spoofed. Content detection reads the file\'s magic bytes, which are fixed by the format itself. For security-conscious applications (upload filters, email gateways), content detection is the only trustworthy method.',
+      },
+      {
+        q: 'What happens if a file\'s content and extension disagree?',
+        a: 'The detector flags a mismatch. Depending on the context this could be innocent (a renamed export) or malicious (an executable disguised as a document). Always verify mismatched files before opening or serving them.',
+      },
+    ],
+    useCases: [
+      'Troubleshoot upload failures caused by incorrect MIME detection.',
+      'Check that exported files have the right content type before distributing them.',
+      'Validate files received from external sources in a security review.',
+      'Learn the MIME types of unfamiliar file formats.',
+    ],
+    tips: [
+      'When serving files, set the Content-Type header from the file content, not the extension.',
+      'Common mismatches: .html files served as text/plain, .json served as text/html, and .js served as text/plain (blocks modern module loading).',
+      'For batch checks, keep a local copy of this page — it works fully offline.',
+    ],
+  },
+  'headline-analyzer': {
+    intro:
+      'The Headline Analyzer scores your headlines and subject lines against the factors that drive clicks: emotional resonance, power words, length, and clarity. It gives each headline a score, breaks down what\'s working (strong words, specific numbers, emotional triggers), and suggests where it falls short — for example, a headline that\'s too long to display fully in search results, or one that\'s too vague to promise a specific benefit. It\'s a quick sanity check before publishing blog posts, email subject lines, and ad copy. Everything runs locally, so your unpublished ideas stay private.',
+    examples: [
+      {
+        input: 'How to make your website faster',
+        output: 'Score: 62/100\nStrengths: clear benefit, action verb\nImprovements: add a number ("7 ways"), add a power word ("instantly"), target 50-60 chars for search display',
+        note: 'Generic headlines score lower than specific, quantified ones.',
+      },
+    ],
+    howTo: [
+      'Type or paste your headline into the input.',
+      'The analyzer shows a score and a breakdown: emotional value, power words, length, clarity, and specificity.',
+      'Read the improvement suggestions and adjust the headline.',
+      'Re-run until the score improves — iterate 2-3 times for the best version.',
+    ],
+    faqs: [
+      {
+        q: 'What makes a headline perform well?',
+        a: 'Research consistently shows that headlines with numbers, power words (free, instantly, proven, secret), emotional triggers, and a clear promise outperform vague ones. Length matters too: Google truncates titles around 60 characters, so the critical keywords must fit up front.',
+      },
+      {
+        q: 'Is a high score a guarantee of clicks?',
+        a: 'No — scoring is a heuristic, not a formula. The score measures well-studied copywriting factors, but real performance depends on your audience, the content\'s quality, and the context (search results, inbox, feed). Use the score to catch obvious weaknesses, then A/B test your top candidates.',
+      },
+      {
+        q: 'What is the ideal headline length?',
+        a: 'For search results, aim for 50-60 characters so the full title displays on most devices (Google truncates around 600px width). For email subjects, 30-50 characters works best on mobile. For social posts, shorter (under 80 characters) tends to perform better.',
+      },
+    ],
+    useCases: [
+      'Improve blog post titles before publishing to boost organic CTR.',
+      'Draft email subject lines with higher open rates.',
+      'Test ad headlines against proven copywriting patterns.',
+      'Teach content marketing basics with measurable examples.',
+    ],
+    tips: [
+      'Use odd numbers (7, 11, 21) — they consistently outperform even ones in testing.',
+      'Put the primary keyword in the first 50 characters of a title tag.',
+      'Avoid clickbait overpromising: headlines that under-deliver destroy trust and hurt repeat traffic.',
+    ],
+  },
+  'color-palette-extractor': {
+    intro:
+      'The Color Palette Extractor pulls the dominant colors out of any image and turns them into a ready-to-use palette with hex codes. Upload a brand photo, screenshot, or design reference, and the extractor analyzes the pixels to find the most representative colors — with an adjustable count (5-16 colors). Every hex code is one click to copy, so you can drop the palette straight into CSS, Figma, or a design system. Processing happens entirely in your browser: your images are never uploaded, making this safe for unreleased brand materials.',
+    examples: [
+      {
+        input: 'A photo of a sunset',
+        output: '#FF6B35 (orange)\n#F7C873 (yellow)\n#5C4D7D (purple)\n#2D3142 (dark blue)\n#FFD166 (light amber)',
+        note: 'The extractor finds the colors that represent the image best, not just the most frequent pixels.',
+      },
+    ],
+    howTo: [
+      'Drag an image onto the page or select one from your device.',
+      'Adjust the number of colors to extract (5-16).',
+      'The palette is generated instantly with hex codes for each color.',
+      'Click any color to copy its hex code, or copy the whole palette as a list.',
+    ],
+    faqs: [
+      {
+        q: 'How does the extractor choose colors?',
+        a: 'It clusters the image\'s pixels by color similarity and picks the most representative cluster centers — weighted by how much of the image each color occupies. This is more accurate than simply picking the most frequent pixels, which would over-represent tiny noisy areas.',
+      },
+      {
+        q: 'Can I extract colors from any image format?',
+        a: 'Yes — JPG, PNG, WebP, GIF, and most other common formats work. The image is decoded locally in your browser and analyzed pixel by pixel. Large images are downsampled for analysis so the extraction stays fast.',
+      },
+      {
+        q: 'What is a hex color code?',
+        a: 'A hex code is a 6-digit representation of a color in red, green, and blue channels — like #FF6B35. It\'s the standard way to reference colors in CSS, HTML, and most design tools. The palette provides hex codes for every extracted color, ready to paste.',
+      },
+    ],
+    useCases: [
+      'Build a color palette from brand assets or competitor designs.',
+      'Match CSS colors to an image for a cohesive landing page.',
+      'Create accessibility-aware palettes by extracting and then checking contrast.',
+      'Quickly find the dominant colors of a screenshot for design references.',
+    ],
+    tips: [
+      'Extract 5 colors for a clean palette; 10+ for nuanced gradients and data-viz work.',
+      'For contrast-safe palettes, run the extracted hex codes through the Color Contrast Checker.',
+      'Averaging works best on photos with clear subject colors — busy images produce muddier palettes.',
+    ],
+  },
+  'css-gradient-generator': {
+    intro:
+      'The CSS Gradient Generator creates linear, radial, and conic gradients with a live preview and copy-ready CSS. Pick two or more colors, adjust the angle and position, and the generator writes the cross-browser CSS for you — including the vendor prefixes older browsers need. Gradients are one of the most-used CSS features for buttons, hero backgrounds, and subtle surfaces, but getting the syntax right (and the fallback for older browsers) is fiddly. This tool removes the guesswork: you design visually and copy the final CSS. Everything runs locally.',
+    examples: [
+      {
+        input: 'Linear gradient, 135°, #667eea → #764ba2',
+        output: `background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+background: -webkit-linear-gradient(135deg, #667eea, #764ba2);`,
+        note: 'The generator outputs modern + prefixed syntax for maximum compatibility.',
+      },
+    ],
+    howTo: [
+      'Choose the gradient type: linear, radial, or conic.',
+      'Add color stops (two or more) — pick colors with the picker or paste hex codes.',
+      'Adjust the angle (linear) or position (radial) with the sliders.',
+      'Copy the generated CSS and paste it into your stylesheet.',
+    ],
+    faqs: [
+      {
+        q: 'What is the difference between linear and radial gradients?',
+        a: 'A linear gradient transitions colors along a straight line (defined by an angle, e.g. 135deg goes bottom-left to top-right). A radial gradient transitions colors outward from a center point — by default the center of the element. Conic gradients wrap colors around a circle, like a color wheel, and are used for pie-chart effects.',
+      },
+      {
+        q: 'Why are there two background lines in the output?',
+        a: 'The -webkit- prefixed line covers older Safari and Chrome versions (mostly iOS < 12.2) that don\'t support the standard syntax. Modern browsers use the unprefixed line. Including both guarantees the gradient renders everywhere — and the fallback background-color (the first color) covers browsers with no gradient support at all.',
+      },
+      {
+        q: 'Can I use gradients for text?',
+        a: 'Yes — with background-clip: text. Apply the gradient to a text element, set background-clip: text, and color: transparent. This generator focuses on the gradient syntax itself; pair it with the background-clip technique for gradient text.',
+      },
+    ],
+    useCases: [
+      'Design hero section backgrounds and button styles.',
+      'Create subtle UI gradients for cards and overlays.',
+      'Prototype brand gradient themes before writing production CSS.',
+      'Generate gradient textures for data visualizations.',
+    ],
+    tips: [
+      'Use gradients sparingly — too many competing gradients make a design feel dated.',
+      'For accessible text over gradients, darken the gradient\'s darker stop or add an overlay.',
+      'Test your gradient with the Color Contrast Checker when text sits on top of it.',
+    ],
+  },
+  'bmr-calculator': {
+    intro:
+      'The BMR Calculator estimates your Basal Metabolic Rate — the number of calories your body burns at complete rest just to keep you alive (breathing, heart rate, cell repair). It uses the Mifflin-St Jeor equation, the most widely accepted formula for adults, and then scales the result by your activity level to estimate your Total Daily Energy Expenditure (TDEE) — the calories needed to maintain your current weight. This is the starting point for any diet or fitness plan: eat below your TDEE to lose weight, above to gain. Everything is calculated locally and instantly.',
+    examples: [
+      {
+        input: 'Male, 30 years, 80 kg, 180 cm, light exercise (1-3 days/week)',
+        output: 'BMR: 1,793 kcal/day\nTDEE (maintenance): 2,466 kcal/day\nFor weight loss (deficit 500): ~1,966 kcal/day',
+        note: 'A 500 kcal/day deficit typically yields ~0.5 kg/week of fat loss.',
+      },
+    ],
+    howTo: [
+      'Enter your sex, age, weight (kg or lb), and height (cm or ft/in).',
+      'Select your activity level — from sedentary to very active.',
+      'Your BMR and TDEE are calculated instantly.',
+      'Adjust the calorie goal (deficit/surplus) to see the recommended daily intake.',
+    ],
+    faqs: [
+      {
+        q: 'What is the Mifflin-St Jeor equation?',
+        a: 'For men: 10 × weight(kg) + 6.25 × height(cm) − 5 × age + 5. For women: 10 × weight(kg) + 6.25 × height(cm) − 5 × age − 161. It estimates the calories burned at rest and is considered the most accurate formula for the general adult population — within about ±200 kcal/day for most people.',
+      },
+      {
+        q: 'How accurate is this BMR calculator?',
+        a: 'Good enough for planning: the equation is within ~10% of lab-measured values for most adults. Individual variation (muscle mass, genetics, hormones) means treat the number as a starting estimate — track your weight for 2-3 weeks and adjust by ~200 kcal if your weight isn\'t moving as expected.',
+      },
+      {
+        q: 'Is BMR the same as TDEE?',
+        a: 'No. BMR is resting metabolism only. TDEE (Total Daily Energy Expenditure) adds the calories burned through daily activity and exercise — estimated by multiplying BMR by an activity factor (1.2 sedentary up to 1.9 very active). For weight management, TDEE is the number that matters.',
+      },
+      {
+        q: 'Should I eat exactly at my BMR to lose weight?',
+        a: 'No — eating at your BMR can be an extreme deficit that risks muscle loss and metabolic adaptation. A moderate deficit of 300-500 kcal below your TDEE is sustainable for most people. For anything dramatic, consult a professional.',
+      },
+    ],
+    useCases: [
+      'Find your maintenance calories to plan a cut or bulk.',
+      'Estimate protein and macro targets from a daily calorie goal.',
+      'Understand how much your resting metabolism contributes to daily burn.',
+      'Baseline tracking for fitness apps and wearable data.',
+    ],
+    tips: [
+      'Recalculate after significant weight changes (every 5 kg or so) — your BMR moves with your weight.',
+      'Activity multipliers assume honest self-assessment; most people overestimate activity level.',
+      'Combine with the Macro Calculator for a complete daily nutrition plan.',
+    ],
+  },
+  'unicode-inspector': {
+    intro:
+      'The Unicode Inspector reveals what\'s actually inside any text: every character\'s codepoint, name, category, and encoding. It surfaces invisible characters — zero-width spaces, non-breaking spaces, directional marks — that cause layout bugs and copy-paste issues, and it decodes emoji into their component codepoints (including ZWJ sequences). For developers debugging encoding problems, and for anyone who received text that looks right but isn\'t, this tool shows the hidden truth. Analysis is entirely local.',
+    examples: [
+      {
+        input: 'A string with a zero-width space: "he\u200Bllo"',
+        output: 'he [U+200B ZERO WIDTH SPACE] llo\nCharacter count: 6 (you only see 5)',
+        note: 'Invisible characters change text length and break search and validation.',
+      },
+      {
+        input: 'The emoji 👨‍👩‍👧',
+        output: '👨 U+1F468 (MAN)\nZWJ U+200D (ZERO WIDTH JOINER)\n👩 U+1F469 (WOMAN)\nZWJ U+200D\n👧 U+1F467 (GIRL)',
+        note: 'Family emoji are sequences of multiple codepoints joined by ZWJ.',
+      },
+    ],
+    howTo: [
+      'Paste any text into the input.',
+      'Each character is listed with its codepoint (U+XXXX), Unicode name, and category.',
+      'Invisible characters are highlighted visually so they can\'t hide.',
+      'Copy individual characters or the full analysis as needed.',
+    ],
+    faqs: [
+      {
+        q: 'What is a Unicode codepoint?',
+        a: 'Every character in Unicode has a unique codepoint — a number written in hex like U+0041 for the letter A. Some characters that look identical are different codepoints (e.g. the Latin "A" U+0041 vs the Cyrillic "А" U+0410), which is a common source of "why doesn\'t my search match?" bugs.',
+      },
+      {
+        q: 'What are zero-width characters and why do they matter?',
+        a: 'Zero-width characters (like U+200B ZERO WIDTH SPACE) take up no visible space but exist in the text. They sneak into content via copy-paste from documents and websites, then break word counts, validation, and searches. This inspector highlights them so you can see and remove them.',
+      },
+      {
+        q: 'Why do emoji have multiple codepoints?',
+        a: 'Many emoji are sequences: a base character plus variation selectors and/or ZERO WIDTH JOINERS (e.g. family emoji or skin-tone modifiers). A single visible emoji can contain 5+ codepoints, which affects length limits in databases, SMS, and APIs — the inspector shows the real byte count.',
+      },
+    ],
+    useCases: [
+      'Find and remove invisible characters breaking your forms or database queries.',
+      'Debug why two strings that look identical fail equality checks.',
+      'Understand emoji length limits in SMS, tweets, and APIs.',
+      'Audit user-generated content for hidden characters and homoglyph attacks.',
+    ],
+    tips: [
+      'Normalize text with NFC normalization to merge equivalent codepoints before comparison.',
+      'Check byte length, not character count, when storing Unicode in fixed-length fields.',
+      'Beware lookalike homoglyphs in usernames — this tool\'s codepoint view exposes them.',
+    ],
+  },
+  'http-header-checker': {
+    intro:
+      'The HTTP Header Checker fetches any URL and shows you the full response headers the server returns: status code, caching directives, security headers (HSTS, CSP, X-Frame-Options), content type, server software, and more. Headers control everything from page speed (caching) to security (clickjacking protection), so a quick header audit reveals misconfigurations in seconds. The request runs through our server-side proxy, and we don\'t log the URLs you check.',
+    examples: [
+      {
+        input: 'https://example.com',
+        output: 'HTTP/1.1 200 OK\nserver: nginx\ncache-control: public, max-age=31536000\nstrict-transport-security: max-age=63072000\ncontent-type: text/html; charset=UTF-8',
+        note: 'A healthy response shows caching + HSTS + correct content type.',
+      },
+    ],
+    howTo: [
+      'Enter the full URL (with https://) and click Check.',
+      'The tool displays the HTTP status code and every response header.',
+      'Key headers are highlighted and annotated: security, caching, and content-type.',
+      'Compare headers across URLs (e.g. http vs https, www vs non-www) to catch inconsistencies.',
+    ],
+    faqs: [
+      {
+        q: 'Which security headers should every site have?',
+        a: 'At minimum: strict-transport-security (HSTS), x-content-type-options: nosniff, and x-frame-options (or a CSP with frame-ancestors). Content-Security-Policy is strongly recommended. Their absence doesn\'t break a site — it silently removes protection against common attack classes.',
+      },
+      {
+        q: 'What do caching headers tell me?',
+        a: 'cache-control and expires tell browsers and CDNs how long to store a resource. Correct caching (e.g. long max-age for static assets, no-cache for HTML) is one of the biggest speed wins available — and it\'s free. This tool shows exactly what your server is declaring.',
+      },
+      {
+        q: 'Why does the same URL return different headers from this tool?',
+        a: 'Headers can vary by region (CDN edges), cookie state, user-agent, and load. This tool sends a plain desktop user-agent without cookies, so it shows the "clean" response. If you see differences in production, compare against a curl with your exact user-agent.',
+      },
+    ],
+    useCases: [
+      'Audit your site\'s security headers before a penetration test or compliance review.',
+      'Verify that caching is configured correctly for static assets.',
+      'Confirm HSTS is set before enabling it globally.',
+      'Compare headers of your main domain vs www vs staging to catch drift.',
+    ],
+    tips: [
+      'Use the Security Headers grading sites as a checklist, then verify each header with this tool.',
+      'HSTS only applies over HTTPS — check the https:// version of your URL.',
+      'A 301/302 status with a Location header tells you where a URL actually lands before you link to it.',
+    ],
+  },
+  'campaign-url-builder': {
+    intro:
+      'The Campaign URL Builder creates tracking URLs with UTM parameters for Google Analytics — so you can see exactly which campaigns drive your traffic. Fill in the campaign source, medium, name, and (optionally) content and term, and the builder appends the parameters in the correct order and URL-encoded format. Paste the resulting link into ads, email campaigns, social bios, or partner placements. Without UTM parameters, all your traffic shows up as "direct" or misattributed in Analytics — this tool fixes that in seconds. The builder runs entirely in your browser.',
+    examples: [
+      {
+        input: 'URL: https://fernandeslabs.com\nSource: newsletter\nMedium: email\nCampaign: august-sale',
+        output: 'https://fernandeslabs.com/?utm_source=newsletter&utm_medium=email&utm_campaign=august-sale',
+        note: 'The standard three parameters — source, medium, campaign — are required for clean attribution.',
+      },
+    ],
+    howTo: [
+      'Enter the base URL of the page you\'re linking to.',
+      'Fill in the campaign source (e.g. newsletter, facebook), medium (email, cpc), and campaign name (e.g. summer-sale).',
+      'Optionally add content (to distinguish identical links) and term (for paid keywords).',
+      'Copy the generated URL and use it in your campaign — the parameters auto-encode spaces and special characters.',
+    ],
+    faqs: [
+      {
+        q: 'What are UTM parameters?',
+        a: 'UTM parameters are query strings appended to URLs that analytics platforms (Google Analytics, Matomo, etc.) read to attribute traffic: utm_source (where the link appears), utm_medium (the channel type), utm_campaign (the specific campaign), utm_content (which link variant), and utm_term (paid keywords).',
+      },
+      {
+        q: 'Do UTM parameters affect SEO?',
+        a: 'Parameters in URLs can create near-duplicate pages that confuse search engines — which is why the same campaign URL should redirect (or canonicalize) to the clean version. For most sites the parameters are harmless if Google has a canonical signal. Better practice: don\'t put campaign URLs in your own public navigation.',
+      },
+      {
+        q: 'What\'s the difference between source and medium?',
+        a: 'Source is where the traffic came from (the specific website or tool: google, newsletter, partner-site). Medium is the channel type: organic, cpc, email, social, referral. A consistent naming convention (e.g. always lowercase, always use "email" for newsletters) keeps Analytics reports clean and comparable.',
+      },
+    ],
+    useCases: [
+      'Track the performance of email newsletters with clean attribution.',
+      'Measure the ROI of paid ads by campaign and keyword.',
+      'Attribute social media and influencer traffic correctly.',
+      'A/B test link variants using utm_content.',
+    ],
+    tips: [
+      'Use a consistent naming convention: lowercase, hyphen-separated (e.g. summer-sale-2026).',
+      'Create a shared spreadsheet of standard values so your whole team uses the same labels.',
+      'Test the built URL in the browser before launching a campaign — a typo in a UTM parameter can\'t be retro-fixed.',
+    ],
+  },
+  'image-resizer': {
+    intro:
+      'The Image Resizer scales your images to exact dimensions or a target percentage — with quality controls for web-ready output. Choose the output format (JPG, PNG, WebP), a width, height, or both, and the resizer produces a downloadable image at the size you need. Resizing is the fastest way to improve page speed: serving images at their displayed size instead of a 4000px source file often cuts page weight by 80%+. Processing is fully local — your images never leave your device, so you can resize private photos and product shots safely.',
+    examples: [
+      {
+        input: 'A 4000×3000 photo → 800px wide, WebP, quality 80',
+        output: 'Output: 800×600, WebP, ~180 KB (original ~4.2 MB)',
+        note: 'A 95% size reduction with no visible quality loss on screen.',
+      },
+    ],
+    howTo: [
+      'Select or drag an image onto the page.',
+      'Set the output width/height — use "keep aspect ratio" to avoid distortion.',
+      'Choose the output format (WebP recommended for web) and quality.',
+      'Download the resized image — it\'s rendered locally at full quality.',
+    ],
+    faqs: [
+      {
+        q: 'What is the best format for web images?',
+        a: 'WebP delivers the best quality-per-byte for photos and graphics on the modern web (supported everywhere since 2020). PNG for transparency-heavy graphics, JPEG as a widely compatible fallback. This resizer outputs all three.',
+      },
+      {
+        q: 'Will resizing lose quality?',
+        a: 'Downscaling loses some detail by definition, but a well-resized image (using high-quality resampling, which this tool does) looks identical at screen size. The bigger win: you\'re no longer shipping megabytes for pixels nobody can see. Keep the original file as your master copy.',
+      },
+      {
+        q: 'Is there a file size limit?',
+        a: 'Large images (50+ MP) may take a few seconds to process, since everything runs on your device. For typical photos (12-48 MP) resizing completes in under a second.',
+      },
+    ],
+    useCases: [
+      'Right-size hero and gallery images before publishing to improve Core Web Vitals.',
+      'Create consistent thumbnails for a product catalog.',
+      'Reduce image weight for email attachments and shared galleries.',
+      'Prepare images for platforms with size limits (some CMS, marketplaces).',
+    ],
+    tips: [
+      'Export at exactly the displayed width — never larger than the layout needs.',
+      'Use lazy loading (loading="lazy") for below-the-fold images in addition to resizing.',
+      'WebP at quality 75-85 is the sweet spot for photos; below 70 artifacts appear quickly.',
+    ],
+  },
+  'ai-cost-calculator': {
+    intro:
+      'The AI Cost Calculator estimates how much an LLM API actually costs to run. Enter your estimated token volumes — tokens per request, requests per day — and pick your models, and the calculator computes daily and monthly spend across providers. It covers the leading models (GPT, Claude, Gemini, and more) with current input/output pricing, and it warns about common surprises: long context windows, tool-calling overhead, and cached token pricing. For developers building on LLM APIs, this is the budgeting tool you reach for before launch — every calculation runs locally.',
+    examples: [
+      {
+        input: 'GPT-4o-mini, 2,000 input tokens + 500 output tokens per request, 10,000 requests/day',
+        output: 'Per request: $0.000065\nPer day: $0.65\nPer month (30d): $19.50',
+        note: 'Small models at high volume are cheap — but costs explode with long contexts.',
+      },
+    ],
+    howTo: [
+      'Select the models you\'re using (or considering).',
+      'Estimate tokens per request and the number of requests per day/week/month.',
+      'The calculator breaks down cost per request, per day, and per month.',
+      'Compare multiple model configurations side by side to choose the cheapest sufficient option.',
+    ],
+    faqs: [
+      {
+        q: 'How are LLM API costs calculated?',
+        a: 'Providers charge per token separately for input and output (output is typically 2-5x more expensive). Total cost = (input tokens × input price) + (output tokens × output price). This calculator applies each model\'s published prices to your volumes.',
+      },
+      {
+        q: 'Why do my actual bills exceed my estimates?',
+        a: 'Three common causes: (1) prompts are longer than expected once system prompts and tool schemas are included; (2) large output token limits are hit on chatty use cases; (3) cached tokens or prompt caching changes effective prices. Measure real token usage from your provider dashboard and feed the real numbers back in.',
+      },
+      {
+        q: 'Are there ways to reduce LLM costs?',
+        a: 'Yes: use the smallest capable model, trim system prompts, cache repetitive prompt prefixes, batch requests, and cap max_tokens. The calculator makes each option\'s savings visible, so you can prioritize the highest-impact changes.',
+      },
+    ],
+    useCases: [
+      'Estimate the API budget for a new AI feature before pitching it.',
+      'Compare model providers by real cost, not just per-token price.',
+      'Tune prompts and parameters to stay within a monthly budget.',
+      'Forecast scaling costs as user volume grows.',
+    ],
+    tips: [
+      'Output tokens are the expensive part — cap max_tokens aggressively.',
+      'A long system prompt costs money on every single request: keep it tight.',
+      'Re-check model pricing monthly; providers change prices and add cheaper tiers regularly.',
+    ],
+  },
+  'ai-persona-generator': {
+    intro:
+      'The AI Persona Generator builds detailed, ready-to-use persona prompts for ChatGPT, Claude, Gemini, and other AI assistants. Choose a role, tone, audience, and goals — the generator assembles a complete system prompt with role definition, behavior guidelines, boundaries, and output format. The result is a professional prompt you can paste directly into any LLM\'s custom instructions or system prompt field. Personas turn generic AI responses into consistent, on-brand output — and this generator does the prompt engineering for you. It runs entirely in your browser.',
+    examples: [
+      {
+        input: 'Role: Customer support agent | Tone: friendly and concise | Audience: SaaS users',
+        output: 'You are a customer support agent for a SaaS company. Your tone is friendly, concise, and action-oriented… (full persona prompt generated)',
+        note: 'The full prompt includes boundaries, escalation rules, and response format.',
+      },
+    ],
+    howTo: [
+      'Select a base role — support, writer, developer, marketer, or custom.',
+      'Configure the tone, audience, and specific goals for the persona.',
+      'The generator produces a complete system prompt.',
+      'Copy it into your AI tool\'s custom instructions or paste it at the start of your chat.',
+    ],
+    faqs: [
+      {
+        q: 'What makes a good AI persona prompt?',
+        a: 'Four elements: a clear role ("you are…"), behavior rules (tone, length, style), boundaries (what it should refuse or avoid), and a consistent output format. This generator encodes all four from your selections — the difference between a good and a great persona is specificity in each.',
+      },
+      {
+        q: 'Can I use the same persona in different AI tools?',
+        a: 'Yes. The generated prompt uses plain language compatible with ChatGPT custom instructions, Claude system prompts, Gemini instructions, and open-source models. Minor differences in how tools interpret system prompts won\'t change the persona\'s effectiveness.',
+      },
+      {
+        q: 'Should personas have restrictions?',
+        a: 'Definitely. Boundaries prevent the AI from inventing policies, promising refunds it can\'t authorize, or drifting off-topic. Strong personas define what NOT to do as clearly as what to do.',
+      },
+    ],
+    useCases: [
+      'Create consistent customer support replies with a branded tone.',
+      'Build a writing assistant that matches your style guide.',
+      'Define a technical reviewer persona for code and documentation reviews.',
+      'Prototype different brand voices in marketing chats.',
+    ],
+    tips: [
+      'Iterate: run the persona for a week, collect weak responses, and refine the prompt.',
+      'Include 1-2 example exchanges in the persona for the best tone matching.',
+      'Keep the persona prompt under ~500 words — most AI tools lose focus on very long instructions.',
+    ],
+  },
 }
 /**
  * Get a hand-written content override for a tool, or null if none exists.

@@ -74,7 +74,7 @@ export function CryptoDonate() {
               </button>
             </div>
           ))}
-          <p className="pt-1 text-[10px] text-muted-foreground/60">
+          <p className="pt-1 text-[10px] text-muted-foreground/80">
             Transactions are public on the blockchain. Thanks for your support!
           </p>
         </div>

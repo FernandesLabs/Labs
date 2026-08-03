@@ -18,8 +18,11 @@ import {
   generateToolIntro,
   generateToolTips,
   generateToolUseCases,
+  getRelatedTools,
 } from '@/app/tools/[slug]/tool-seo'
 import { getToolContentOverride } from '@/app/tools/[slug]/tool-content-overrides'
+import { AdUnit } from '@/components/ads/ad-unit'
+import { toolMetaList } from '@/lib/tools/tool-meta'
 /**
  * Generates SEO content for a tool page: an intro paragraph, concrete
  * input→output examples, "how to use" steps, "common use cases", "tips",
@@ -63,6 +66,13 @@ export function ToolContent({ tool }: { tool: Tool }) {
   const examples = override?.examples ?? []
   const [openFaq, setOpenFaq] = React.useState<number | null>(0)
   const cat = CATEGORY_META[tool.category]
+  const crossLinks = React.useMemo(() => {
+    const slugs = getRelatedTools(tool.slug, tool.category)
+    return slugs
+      .map((s) => toolMetaList.find((t) => t.slug === s))
+      .filter((t): t is NonNullable<typeof t> => Boolean(t))
+      .slice(0, 8)
+  }, [tool.slug, tool.category])
   return (
     <div className="mt-12 space-y-10">
       {/* Intro */}
@@ -193,6 +203,10 @@ export function ToolContent({ tool }: { tool: Tool }) {
           ))}
         </ul>
       </section>
+      {/* In-article ad unit (in-feed position between tips and FAQ) */}
+      <div className="my-10" aria-hidden={false}>
+        <AdUnit slot="horizontal" />
+      </div>
       {/* FAQ */}
       <section id="faq" className="scroll-mt-20">
         <div className="mb-3 flex items-center gap-2">
@@ -264,6 +278,25 @@ export function ToolContent({ tool }: { tool: Tool }) {
             All categories
           </Link>
         </div>
+        {crossLinks.length > 0 ? (
+          <>
+            <h3 className="mb-2 mt-4 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Related tools
+            </h3>
+            <div className="flex flex-wrap gap-2 text-xs">
+              {crossLinks.map((t) => (
+                <Link
+                  key={t.slug}
+                  href={`/tools/${t.slug}`}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-background px-3 py-1.5 font-medium text-foreground transition hover:border-primary hover:text-primary hover:shadow-sm"
+                >
+                  {t.name}
+                  <ArrowRight className="size-3" />
+                </Link>
+              ))}
+            </div>
+          </>
+        ) : null}
       </section>
     </div>
   )

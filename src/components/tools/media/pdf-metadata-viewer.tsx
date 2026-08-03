@@ -244,7 +244,7 @@ export default function PdfMetadataViewer() {
                     </dt>
                     <dd className="mt-0.5 break-words font-mono text-sm">
                       {value || (
-                        <span className="text-muted-foreground/50">—</span>
+                        <span className="text-muted-foreground/80">—</span>
                       )}
                     </dd>
                   </div>

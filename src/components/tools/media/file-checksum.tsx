@@ -123,7 +123,7 @@ function HashRow({ result }: { result: HashResult | null }) {
       </div>
       <pre className="fl-scroll overflow-auto rounded-md border border-border bg-muted/30 p-2 font-mono text-xs break-all whitespace-pre-wrap">
         {empty ? (
-          <span className="text-muted-foreground/50">—</span>
+          <span className="text-muted-foreground/80">—</span>
         ) : unsupported ? (
           <span className="text-amber-700 dark:text-amber-400">
             MD5 not supported in this browser

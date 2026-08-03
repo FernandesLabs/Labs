@@ -174,19 +174,28 @@
 @media (prefers-reduced-motion: reduce) {
   .fl-fade-in, .fl-card-hover { animation: none; transition: none; }
 }
-/* Overflow safety: prevent tool results from breaking out of their containers */
+/* Overflow safety: prevent tool results from breaking out of their containers.
+   These rules ensure that long content (code blocks, tables, pre-formatted
+   text) SCROLLS inside its container instead of overlapping siblings or
+   causing horizontal page scroll. */
 pre, code, table {
   max-width: 100%;
 }
 pre {
   overflow-x: auto;
+  overflow-y: auto;
   overflow-wrap: break-word;
   word-break: break-word;
+}
+code {
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 table {
   display: block;
   overflow-x: auto;
   width: 100%;
+  max-width: 100%;
 }
 textarea {
   max-width: 100%;
