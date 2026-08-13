@@ -19,13 +19,14 @@ declare global {
  * the units render as small banners (or nothing at all), which is what
  * happened before: ad areas looked as small as a single tool card.
  *
- *  - horizontal → medium-rectangle sized on desktop (250px), leaderboard on
- *    mobile (90px). The most profitable in-content format.
+ *  - horizontal → leaderboard height (~90px). A horizontal banner is a
+ *    leaderboard, NOT a 300×250 rectangle — reserving 250px left a huge
+ *    empty gap between the category chips and the tool grid.
  *  - vertical   → half-page size (600px). Only shown in the desktop sidebar.
  *  - footer     → leaderboard (90px mobile / 120px desktop).
  */
 const SLOT_MIN_HEIGHT: Record<'horizontal' | 'vertical' | 'footer', string> = {
-  horizontal: 'min-h-[90px] sm:min-h-[250px]',
+  horizontal: 'min-h-[90px]',
   vertical: 'min-h-[600px]',
   footer: 'min-h-[90px] sm:min-h-[120px]',
 }
@@ -137,15 +138,20 @@ export function AdUnit({
 
   // No slot ID is configured yet. A manual `<ins>` without `data-ad-slot`
   // is invalid and will never serve an ad — rendering it just produces a
-  // dead element (and a silent AdSense error). Instead we reserve the space
-  // with a subtle marker. Auto Ads (enable_page_level_ads, injected in
-  // layout.tsx) fills the page with ads independently of these units.
+  // dead element (and a silent AdSense error). Auto Ads
+  // (enable_page_level_ads, injected in layout.tsx) fills the page with ads
+  // independently of these units, so show a subtle, labelled placeholder
+  // instead of a bare empty box.
   if (!adSlot) {
     return (
       <div
-        className={`block w-full ${minHeight} ${className ?? ''}`}
-        aria-hidden="true"
-      />
+        className={`flex w-full items-center justify-center rounded-lg border border-dashed border-border/60 bg-muted/20 px-4 text-center ${minHeight} ${className ?? ''}`}
+        aria-label="Advertisement"
+      >
+        <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground/50">
+          Advertisement
+        </span>
+      </div>
     )
   }
 
