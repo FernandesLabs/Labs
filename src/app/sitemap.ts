@@ -49,7 +49,7 @@ const PRIORITY_TOOL_SLUGS = new Set([
 // Google caches it more aggressively and doesn't waste crawl budget
 // re-fetching "changed" sitemaps that haven't actually changed.
 // Update this date when you deploy significant content changes.
-const LAST_UPDATED = new Date('2026-08-03')
+const LAST_UPDATED = new Date('2026-08-13')
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = `https://${siteConfig.site.domain}`

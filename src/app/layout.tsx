@@ -80,11 +80,29 @@ export default function RootLayout({
         {/* Google AdSense loader — must be in <head> for crawler verification.
             Only rendered once when enabled and clientId is configured. */}
         {siteConfig.adsense.enabled && siteConfig.adsense.clientId ? (
-          <script
-            async
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${siteConfig.adsense.clientId}`}
-            crossOrigin="anonymous"
-          />
+          <>
+            <script
+              async
+              src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${siteConfig.adsense.clientId}`}
+              crossOrigin="anonymous"
+            />
+            {/* Auto Ads page-level config.
+                When no manual slot IDs are configured, manual <ins> units
+                have no data-ad-slot and therefore cannot serve. Auto Ads
+                (enable_page_level_ads) lets Google place ads automatically
+                across the site — this is what actually turns the "Authorized"
+                AdSense account into serving ads. Skipped once manual slots
+                are set so Auto Ads doesn't fight manual placements. */}
+            {!siteConfig.adsense.slots.horizontal &&
+            !siteConfig.adsense.slots.vertical &&
+            !siteConfig.adsense.slots.footer ? (
+              <script
+                dangerouslySetInnerHTML={{
+                  __html: `(adsbygoogle=window.adsbygoogle||[]).push({google_ad_client:"${siteConfig.adsense.clientId}",enable_page_level_ads:true,overlays:{bottom:true}});`,
+                }}
+              />
+            ) : null}
+          </>
         ) : null}
       </head>
       <body

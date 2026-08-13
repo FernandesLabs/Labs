@@ -93,7 +93,7 @@ export function AdUnit({
   // Push the ad into the AdSense queue once the <ins> is in the DOM.
   // Retries every 500ms if the AdSense script hasn't loaded yet.
   React.useEffect(() => {
-    if (!configured || !clientId || !mounted || pushed) return
+    if (!configured || !clientId || !mounted || pushed || !adSlot) return
     const tryPush = () => {
       try {
         ;(window.adsbygoogle = window.adsbygoogle || []).push({})
@@ -105,7 +105,7 @@ export function AdUnit({
     }
     const timer = setTimeout(tryPush, 100)
     return () => clearTimeout(timer)
-  }, [configured, clientId, mounted, pushed])
+  }, [configured, clientId, adSlot, mounted, pushed])
 
   // AdSense not configured at all (no client ID) → show a professional
   // branded placeholder. This keeps the layout stable (no layout shift when
@@ -135,8 +135,21 @@ export function AdUnit({
     )
   }
 
-  // Client-only: real AdSense ad unit. `data-ad-slot` is omitted when no
-  // slot ID exists — Auto ads match the best available ad to this unit.
+  // No slot ID is configured yet. A manual `<ins>` without `data-ad-slot`
+  // is invalid and will never serve an ad — rendering it just produces a
+  // dead element (and a silent AdSense error). Instead we reserve the space
+  // with a subtle marker. Auto Ads (enable_page_level_ads, injected in
+  // layout.tsx) fills the page with ads independently of these units.
+  if (!adSlot) {
+    return (
+      <div
+        className={`block w-full ${minHeight} ${className ?? ''}`}
+        aria-hidden="true"
+      />
+    )
+  }
+
+  // Client-only: real AdSense ad unit with an explicit slot ID.
   const isVertical = slot === 'vertical'
   const format = isVertical ? 'vertical' : 'auto'
   return (
@@ -145,7 +158,7 @@ export function AdUnit({
       className={`adsbygoogle block w-full ${minHeight} ${className ?? ''}`}
       style={{ display: 'block' }}
       data-ad-client={clientId}
-      {...(adSlot ? { 'data-ad-slot': adSlot } : {})}
+      data-ad-slot={adSlot}
       data-ad-format={format}
       data-full-width-responsive="true"
     />
