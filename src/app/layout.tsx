@@ -5,6 +5,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { ServiceWorkerRegister } from "@/components/hub/service-worker-register";
+import { AutoAds } from "@/components/ads/auto-ads";
 import { siteConfig } from "@/lib/site-config";
 
 // Only the weights actually used across the app (normal/medium/semibold/bold/
@@ -78,31 +79,19 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         {/* Google AdSense loader — must be in <head> for crawler verification.
-            Only rendered once when enabled and clientId is configured. */}
+            Only rendered once when enabled and clientId is configured.
+            The Auto Ads page-level config is pushed separately by the
+            <AutoAds /> client component (see src/components/ads/auto-ads.tsx),
+            NOT as an inline <head> script — an inline script in <head> is
+            executed twice during React streaming/hydration, which triggers
+            AdSense's "Only one 'enable_page_level_ads' allowed per page"
+            console error. */}
         {siteConfig.adsense.enabled && siteConfig.adsense.clientId ? (
-          <>
-            <script
-              async
-              src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${siteConfig.adsense.clientId}`}
-              crossOrigin="anonymous"
-            />
-            {/* Auto Ads page-level config.
-                When no manual slot IDs are configured, manual <ins> units
-                have no data-ad-slot and therefore cannot serve. Auto Ads
-                (enable_page_level_ads) lets Google place ads automatically
-                across the site — this is what actually turns the "Authorized"
-                AdSense account into serving ads. Skipped once manual slots
-                are set so Auto Ads doesn't fight manual placements. */}
-            {!siteConfig.adsense.slots.horizontal &&
-            !siteConfig.adsense.slots.vertical &&
-            !siteConfig.adsense.slots.footer ? (
-              <script
-                dangerouslySetInnerHTML={{
-                  __html: `(adsbygoogle=window.adsbygoogle||[]).push({google_ad_client:"${siteConfig.adsense.clientId}",enable_page_level_ads:true,overlays:{bottom:true}});`,
-                }}
-              />
-            ) : null}
-          </>
+          <script
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${siteConfig.adsense.clientId}`}
+            crossOrigin="anonymous"
+          />
         ) : null}
       </head>
       <body
@@ -110,6 +99,7 @@ export default function RootLayout({
       >
         <ThemeProvider>{children}</ThemeProvider>
         <ServiceWorkerRegister />
+        <AutoAds />
         {siteConfig.analytics.googleAnalyticsId ? (
           <>
             <script

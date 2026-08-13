@@ -99,6 +99,7 @@ Open **http://localhost:3000** — you should see 132 tools. 🎉
 
 ```bash
 bun run lint       # Check code quality (ESLint)
+bun run test       # Run the test suite (Bun test runner)
 bun run build      # Production build (do NOT run in sandbox — use Vercel)
 bun run db:push    # Push Prisma schema to database
 bun run db:generate # Generate Prisma client

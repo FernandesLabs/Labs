@@ -487,19 +487,17 @@ function ToolCard({
         />
         <div className="flex w-full items-start justify-between gap-2">
           <div
-            className="flex h-8 w-8 items-center justify-center rounded-md text-xs font-bold"
+            className="flex h-8 w-8 items-center justify-center rounded-md text-xs font-bold text-foreground"
             style={{
               backgroundColor: `color-mix(in oklch, ${cat.color} 14%, transparent)`,
-              color: cat.color,
             }}
           >
             {tool.name.slice(0, 2).toUpperCase()}
           </div>
           <span
-            className="inline-flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide"
+            className="inline-flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-foreground"
             style={{
               borderColor: `color-mix(in oklch, ${cat.color} 35%, transparent)`,
-              color: cat.color,
             }}
           >
             {CATEGORY_ICONS[tool.category]}

@@ -176,11 +176,10 @@ export function ToolView({
           <div className="min-w-0 flex-1">
             <div className="mb-1.5 flex flex-wrap items-center gap-2">
               <span
-                className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide"
+                className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-foreground"
                 style={{
                   borderColor: `${cat.color}40`,
                   backgroundColor: `${cat.color}12`,
-                  color: cat.color,
                 }}
               >
                 <span

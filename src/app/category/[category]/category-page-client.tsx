@@ -254,10 +254,9 @@ function CategoryToolCard({
       />
       <div className="flex w-full items-start justify-between gap-2">
         <span
-          className="grid size-9 shrink-0 place-items-center rounded-lg text-xs font-bold transition-transform duration-200 group-hover:scale-105"
+          className="grid size-9 shrink-0 place-items-center rounded-lg text-xs font-bold text-foreground transition-transform duration-200 group-hover:scale-105"
           style={{
             backgroundColor: `color-mix(in oklch, ${catColor} 16%, transparent)`,
-            color: catColor,
           }}
         >
           {tool.name.slice(0, 2).toUpperCase()}
