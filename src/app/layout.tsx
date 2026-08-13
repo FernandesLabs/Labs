@@ -5,6 +5,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { ServiceWorkerRegister } from "@/components/hub/service-worker-register";
+import { AutoAds } from "@/components/ads/auto-ads";
 import { siteConfig } from "@/lib/site-config";
 
 // Only the weights actually used across the app (normal/medium/semibold/bold/
@@ -78,7 +79,13 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         {/* Google AdSense loader — must be in <head> for crawler verification.
-            Only rendered once when enabled and clientId is configured. */}
+            Only rendered once when enabled and clientId is configured.
+            The Auto Ads page-level config is pushed separately by the
+            <AutoAds /> client component (see src/components/ads/auto-ads.tsx),
+            NOT as an inline <head> script — an inline script in <head> is
+            executed twice during React streaming/hydration, which triggers
+            AdSense's "Only one 'enable_page_level_ads' allowed per page"
+            console error. */}
         {siteConfig.adsense.enabled && siteConfig.adsense.clientId ? (
           <script
             async
@@ -92,6 +99,7 @@ export default function RootLayout({
       >
         <ThemeProvider>{children}</ThemeProvider>
         <ServiceWorkerRegister />
+        <AutoAds />
         {siteConfig.analytics.googleAnalyticsId ? (
           <>
             <script
