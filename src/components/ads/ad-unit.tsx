@@ -25,10 +25,17 @@ declare global {
  *  - vertical   → half-page size (600px). Only shown in the desktop sidebar.
  *  - footer     → leaderboard (90px mobile / 120px desktop).
  */
-const SLOT_MIN_HEIGHT: Record<'horizontal' | 'vertical' | 'footer', string> = {
+const SLOT_MIN_HEIGHT: Record<
+  'horizontal' | 'vertical' | 'footer' | 'inArticle',
+  string
+> = {
   horizontal: 'min-h-[90px]',
   vertical: 'min-h-[600px]',
   footer: 'min-h-[90px] sm:min-h-[120px]',
+  // In-article / in-content unit — a tall responsive slot (300×250 up to
+  // 728×90 / fluid). Reserving 250px mobile / 280px desktop prevents CLS
+  // when the creative is smaller or fails to fill.
+  inArticle: 'min-h-[250px] md:min-h-[280px]',
 }
 
 /**
@@ -63,7 +70,7 @@ export function AdUnit({
   slot = 'horizontal',
   className,
 }: {
-  slot?: 'horizontal' | 'vertical' | 'footer'
+  slot?: 'horizontal' | 'vertical' | 'footer' | 'inArticle'
   className?: string
 }) {
   const configured = isAdsenseConfigured()

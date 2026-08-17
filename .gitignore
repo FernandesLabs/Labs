@@ -50,5 +50,10 @@ test
 prompt
 
 server.log
+
+# Google Search Console export files (data backups — never commit)
+*.zip
+fernandeslabs.com-*.csv
+fernandeslabs.com-*
 # Skills directory
 /skills/

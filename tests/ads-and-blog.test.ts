@@ -1,16 +1,17 @@
 /// <reference types="bun-types" />
 import { describe, expect, test } from 'bun:test'
-import { GET } from '@/app/ads.txt/route'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { blogPosts, getBlogPost } from '@/lib/blog/posts'
 import { toolMetaList, toolMetaBySlug } from '@/lib/tools/tool-meta'
 
 describe('ads.txt', () => {
-  test('declares the configured publisher id with DIRECT relationship', async () => {
-    const res = GET()
-    const text = await res.text()
-    // .env sets NEXT_PUBLIC_ADSENSE_CLIENT_ID=ca-pub-2766049026468980
+  test('declares the publisher id with DIRECT relationship (static file)', () => {
+    const text = readFileSync(join(import.meta.dir, '..', 'public', 'ads.txt'), 'utf8')
+    // The static public/ads.txt must always match the AdSense publisher ID.
     expect(text).toContain('google.com, pub-2766049026468980, DIRECT, f08c47fec0942fa0')
-    expect(res.headers.get('content-type')).toBe('text/plain')
+    const appAds = readFileSync(join(import.meta.dir, '..', 'public', 'app-ads.txt'), 'utf8')
+    expect(appAds).toContain('google.com, pub-2766049026468980, DIRECT, f08c47fec0942fa0')
   })
 })
 

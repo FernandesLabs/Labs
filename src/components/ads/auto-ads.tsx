@@ -33,7 +33,8 @@ export function AutoAds() {
     const hasManualSlots = Boolean(
       siteConfig.adsense.slots.horizontal ||
         siteConfig.adsense.slots.vertical ||
-        siteConfig.adsense.slots.footer
+        siteConfig.adsense.slots.footer ||
+        siteConfig.adsense.slots.inArticle
     )
     // Auto Ads would fight manual placements — skip when slots are configured.
     if (hasManualSlots) return

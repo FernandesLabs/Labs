@@ -222,6 +222,10 @@ export function SiteFooter() {
           <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
             <p>Built by Fernandes Labs</p>
             <span className="hidden text-border sm:inline">·</span>
+            <Link href="/about" className="transition hover:text-foreground">About</Link>
+            <span className="text-border">·</span>
+            <Link href="/blog" className="transition hover:text-foreground">Blog</Link>
+            <span className="text-border">·</span>
             <Link href="/privacy" className="transition hover:text-foreground">Privacy</Link>
             <span className="text-border">·</span>
             <Link href="/terms" className="transition hover:text-foreground">Terms</Link>
