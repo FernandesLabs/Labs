@@ -22,7 +22,12 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/api/'],
+        // `/api/` — API routes (not for indexing).
+        // `/*XTransformPort*` — the dev preview gateway accepts a
+        // ?XTransformPort=<port> query param to route to a local server.
+        // Crawlers must never index those query-string variants (each one
+        // is a duplicate of the canonical URL).
+        disallow: ['/api/', '/*XTransformPort*'],
       },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,

@@ -9,6 +9,7 @@ import {
   Code2,
   Lightbulb,
   ArrowRight,
+  ShieldCheck,
 } from 'lucide-react'
 import type { Tool } from '@/lib/tools/types'
 import { CATEGORY_META } from '@/lib/tools/types'
@@ -21,7 +22,7 @@ import {
   getRelatedTools,
 } from '@/app/tools/[slug]/tool-seo'
 import { getToolContentOverride } from '@/app/tools/[slug]/tool-content-overrides'
-import { AdUnit } from '@/components/ads/ad-unit'
+import { ContentAdSlot } from '@/components/ads/content-ad-slot'
 import { toolMetaList } from '@/lib/tools/tool-meta'
 /**
  * Generates SEO content for a tool page: an intro paragraph, concrete
@@ -64,6 +65,7 @@ export function ToolContent({ tool }: { tool: Tool }) {
     [override, tool]
   )
   const examples = override?.examples ?? []
+  const bestPractices = override?.bestPractices ?? []
   const [openFaq, setOpenFaq] = React.useState<number | null>(0)
   const cat = CATEGORY_META[tool.category]
   const crossLinks = React.useMemo(() => {
@@ -182,6 +184,31 @@ export function ToolContent({ tool }: { tool: Tool }) {
           ))}
         </ul>
       </section>
+      {/* Technical SEO best practices (only for overrides that define it) */}
+      {bestPractices.length > 0 ? (
+        <section id="best-practices" className="scroll-mt-20">
+          <div className="mb-3 flex items-center gap-2">
+            <span className="h-5 w-1 rounded-full bg-primary" aria-hidden />
+            <h2 className="flex items-center gap-2 text-xl font-bold tracking-tight text-foreground">
+              <ShieldCheck className="size-5 text-primary" />
+              {tool.category === 'seo'
+                ? 'Technical SEO best practices'
+                : 'Best practices'}
+            </h2>
+          </div>
+          <ul className="space-y-2">
+            {bestPractices.map((b, i) => (
+              <li
+                key={i}
+                className="flex items-start gap-2 rounded-lg border border-border/40 bg-muted/20 px-3 py-2 text-sm leading-relaxed text-muted-foreground"
+              >
+                <ShieldCheck className="mt-0.5 size-3.5 shrink-0 text-primary/60" />
+                <span>{b}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
       {/* Tips */}
       <section id="tips" className="scroll-mt-20">
         <div className="mb-3 flex items-center gap-2">
@@ -203,10 +230,9 @@ export function ToolContent({ tool }: { tool: Tool }) {
           ))}
         </ul>
       </section>
-      {/* In-article ad unit (in-feed position between tips and FAQ) */}
-      <div className="my-10" aria-hidden={false}>
-        <AdUnit slot="horizontal" />
-      </div>
+      {/* In-article ad unit — high-viewability slot between the intro
+          content and the FAQ (see ContentAdSlot for CLS strategy). */}
+      <ContentAdSlot />
       {/* FAQ */}
       <section id="faq" className="scroll-mt-20">
         <div className="mb-3 flex items-center gap-2">

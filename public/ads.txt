@@ -1,0 +1,3 @@
+# Fernandes Labs — Authorized Digital Sellers
+# Format: <domain>, <publisher-id>, <relationship>, <certification-id>
+google.com, pub-2766049026468980, DIRECT, f08c47fec0942fa0

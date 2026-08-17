@@ -22,6 +22,7 @@ const ALL_ITEMS: TocItem[] = [
   { id: 'examples', label: 'Examples' },
   { id: 'how-to', label: 'How to use' },
   { id: 'use-cases', label: 'Use cases' },
+  { id: 'best-practices', label: 'Best practices' },
   { id: 'tips', label: 'Tips' },
   { id: 'faq', label: 'FAQ' },
 ]

@@ -10,8 +10,8 @@ describe('sitemap.xml', () => {
   const locs = urls.map((u) => u.url)
 
   test('contains every indexable page', () => {
-    // 4 static (/, /blog, /privacy, /terms) + 6 blog + 8 categories + 132 tools
-    expect(urls.length).toBe(4 + blogPosts.length + CATEGORY_ORDER.length + toolMetaList.length)
+    // 5 static (/, /blog, /about, /privacy, /terms) + 6 blog + 8 categories + 132 tools
+    expect(urls.length).toBe(5 + blogPosts.length + CATEGORY_ORDER.length + toolMetaList.length)
   })
 
   test('homepage is first and highest priority', () => {

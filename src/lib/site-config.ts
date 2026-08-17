@@ -49,6 +49,7 @@ export const siteConfig = {
       horizontal: nullableStr(process.env.NEXT_PUBLIC_ADSENSE_SLOT_HORIZONTAL),
       vertical: nullableStr(process.env.NEXT_PUBLIC_ADSENSE_SLOT_VERTICAL),
       footer: nullableStr(process.env.NEXT_PUBLIC_ADSENSE_SLOT_FOOTER),
+      inArticle: nullableStr(process.env.NEXT_PUBLIC_ADSENSE_SLOT_IN_ARTICLE),
     },
   },
   /** Google Analytics 4 — create at https://analytics.google.com */
@@ -90,6 +91,21 @@ export const siteConfig = {
       'https://github.com/FernandesLabs/Labs'
     ),
     twitter: nullableStr(process.env.NEXT_PUBLIC_SOCIAL_TWITTER),
+  },
+  /**
+   * Founder identity — powers the Person JSON-LD on the homepage and the
+   * author signals on the About page. Optional: if no name is configured,
+   * the Person schema is omitted (Organization + WebSite publisher remain).
+   * Set NEXT_PUBLIC_FOUNDER_NAME to activate. E-E-A-T note: use a real,
+   * verifiable identity — Google checks entity consistency.
+   */
+  founder: {
+    name: nullableStr(process.env.NEXT_PUBLIC_FOUNDER_NAME),
+    jobTitle: str(
+      process.env.NEXT_PUBLIC_FOUNDER_JOB_TITLE,
+      'Founder & Lead Developer'
+    ),
+    profileUrl: nullableStr(process.env.NEXT_PUBLIC_FOUNDER_PROFILE_URL),
   },
 }
 /** Helper: is AdSense fully configured and ready to show real ads? */
