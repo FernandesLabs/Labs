@@ -57,7 +57,7 @@ const SEO_OVERRIDES: Record<
   'ip-lookup': {
     title: 'IP Address Lookup — Find IP Location, ISP & More',
     description:
-      'What is my IP? Look up any IP address — location, ISP, timezone and ASN. Instant results, no sign-up. Your IP is detected automatically.',
+      'What is my IP? Look up any IPv4 address or hostname — location, ISP and timezone. Instant results, no sign-up. Your IP is detected automatically.',
   },
   'email-signature-generator': {
     title: 'Email Signature Generator — Free HTML Signature Maker',
@@ -70,9 +70,9 @@ const SEO_OVERRIDES: Record<
       'Follow the full redirect chain of any URL and detect 301, 302 redirects instantly. Free redirect tester with status codes — no sign-up.',
   },
   'canonical-url-checker': {
-    title: 'Canonical URL Checker — Find the Canonical of Any Page',
+    title: 'Canonical URL Checker — Normalize Any URL',
     description:
-      'Check the canonical URL of any webpage instantly. Detect duplicate-content issues, self-canonicals and redirects — free, no sign-up.',
+      'Normalize the canonical form of any URL — strip tracking params (utm_*, gclid, fbclid), sort query strings and drop fragments. Free canonical tag generator, no sign-up.',
   },
   'robots-txt-generator': {
     title: 'Robots.txt Generator — Create robots.txt for Google',
@@ -82,17 +82,17 @@ const SEO_OVERRIDES: Record<
   'css-gradient-generator': {
     title: 'CSS Gradient Generator — Create & Copy Gradient CSS',
     description:
-      'Generate beautiful CSS gradients with a live preview. Linear, radial and conic — copy the CSS in one click. Free online tool.',
+      'Generate beautiful CSS gradients with a live preview. Linear and radial — copy the CSS in one click. Free online tool.',
   },
   'image-metadata-viewer': {
     title: 'Image Metadata Viewer — View EXIF & GPS Online',
     description:
-      'View EXIF metadata, GPS coordinates and camera settings from any image. Free online metadata viewer — everything stays in your browser.',
+      'View EXIF metadata, GPS coordinates and camera settings from your JPEG and TIFF images. Free online metadata viewer — everything stays in your browser.',
   },
   'citation-generator': {
-    title: 'Citation Generator — Free APA, MLA & Harvard Citations',
+    title: 'Citation Generator — Free APA, MLA & Chicago Citations',
     description:
-      'Generate citations and references online — APA, MLA, Harvard and more. Free citation generator, no sign-up, export-ready.',
+      'Generate citations and references online — APA, MLA and Chicago. Free citation generator, no sign-up, export-ready.',
   },
   'color-contrast-checker': {
     title: 'Color Contrast Checker — WCAG AA & AAA Test',
@@ -142,7 +142,7 @@ const SEO_OVERRIDES: Record<
   'mime-detector': {
     title: 'MIME Type Detector — Identify File MIME Types',
     description:
-      'Detect the MIME type of any file from its content and extension. Free MIME detector, works offline in your browser.',
+      'Detect the MIME type of any file from its extension or file name. Free MIME detector, works offline in your browser.',
   },
   'user-agent-parser': {
     title: 'User Agent Parser — Identify Browser & Device',
@@ -197,7 +197,7 @@ const SEO_OVERRIDES: Record<
   'image-resizer': {
     title: 'Image Resizer — Resize Images Online Free',
     description:
-      'Resize images online — JPG, PNG, WebP. Free image resizer, no upload, everything stays in your browser.',
+      'Resize images online — JPG, PNG, WebP in, PNG or JPEG out. Free image resizer, no upload, everything stays in your browser.',
   },
   'password-generator': {
     title: 'Password Generator — Strong Random Passwords',
@@ -282,7 +282,7 @@ const SEO_OVERRIDES: Record<
   'ssl-checker': {
     title: 'SSL Checker — Verify SSL/TLS Certificates',
     description:
-      'Check the SSL/TLS certificate of any domain — issuer, expiry, chain. Free SSL checker tool, instant results.',
+      'Check the SSL/TLS certificate of any domain — issuer, expiry, SANs and validity. Free SSL checker tool, instant results.',
   },
   'aria-validator': {
     title: 'ARIA Validator — Check Accessibility Attributes',

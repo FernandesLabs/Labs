@@ -5,6 +5,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { ServiceWorkerRegister } from "@/components/hub/service-worker-register";
+import { ConsentManager } from "@/components/ads/consent-manager";
 import { AutoAds } from "@/components/ads/auto-ads";
 import { siteConfig } from "@/lib/site-config";
 
@@ -78,27 +79,37 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* Google AdSense loader — must be in <head> for crawler verification.
-            Only rendered once when enabled and clientId is configured.
-            The Auto Ads page-level config is pushed separately by the
-            <AutoAds /> client component (see src/components/ads/auto-ads.tsx),
-            NOT as an inline <head> script — an inline script in <head> is
-            executed twice during React streaming/hydration, which triggers
-            AdSense's "Only one 'enable_page_level_ads' allowed per page"
-            console error. */}
-        {siteConfig.adsense.enabled && siteConfig.adsense.clientId ? (
-          <script
-            async
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${siteConfig.adsense.clientId}`}
-            crossOrigin="anonymous"
-          />
-        ) : null}
+        {/* Google Consent Mode v2 — consent "default" MUST be set before any
+            Google tag (AdSense/Analytics) fires. All non-essential storage
+            starts denied; the ConsentManager component updates it after the
+            user chooses. Adsense is only ever loaded after an accepted
+            choice (see src/lib/ads/consent.ts) — site verification is
+            covered by the static public/ads.txt. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){ window.dataLayer.push(arguments); }
+              gtag('consent', 'default', {
+                'ad_storage': 'denied',
+                'ad_user_data': 'denied',
+                'ad_personalization': 'denied',
+                'analytics_storage': 'denied',
+                'functionality_storage': 'denied',
+                'personalization_storage': 'denied',
+                'security_storage': 'granted',
+                'wait_for_update': 500
+              });
+            `,
+          }}
+        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >
         <ThemeProvider>{children}</ThemeProvider>
         <ServiceWorkerRegister />
+        <ConsentManager />
         <AutoAds />
         {siteConfig.analytics.googleAnalyticsId ? (
           <>

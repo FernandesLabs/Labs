@@ -15,6 +15,7 @@ const SECTIONS = [
   { id: 'analytics', label: 'Analytics' },
   { id: 'advertising', label: 'Advertising' },
   { id: 'cookies', label: 'Cookies' },
+  { id: 'consent', label: 'Consent' },
   { id: 'donations', label: 'Crypto donations' },
   { id: 'children', label: "Children's privacy" },
   { id: 'rights', label: 'Your rights' },
@@ -86,6 +87,19 @@ export default function PrivacyPage() {
           site; their privacy practices are governed by their respective
           policies.
         </p>
+        <p className="mt-2">
+          To understand how Google uses data when you visit sites or apps that
+          partner with it, please read{' '}
+          <a
+            href="https://www.google.com/policies/privacy/partners/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium text-primary underline underline-offset-2 hover:text-primary/80"
+          >
+            How Google uses data when you use our partners&apos; sites or apps
+          </a>
+          .
+        </p>
       </section>
       <section id="cookies" className="scroll-mt-20">
         <h2 className="text-xl font-semibold text-foreground">Cookies</h2>
@@ -114,6 +128,25 @@ export default function PrivacyPage() {
           None of this data is sent to our servers — all localStorage data
           stays in your browser and can be cleared at any time via your
           browser settings.
+        </p>
+      </section>
+      <section id="consent" className="scroll-mt-20">
+        <h2 className="text-xl font-semibold text-foreground">
+          Consent &amp; Choices
+        </h2>
+        <p className="mt-2">
+          When you first visit our site, a consent banner asks whether you
+          accept non-essential cookies (personalized advertising and
+          analytics). We implement Google Consent Mode v2: until you choose
+          &quot;Accept all&quot;, AdSense and analytics run in a
+          non-personalized, cookie-free mode, and the AdSense script is not
+          loaded at all. Your choice is stored locally on your device and can
+          be changed at any time by clearing your browser storage for this
+          site.
+        </p>
+        <p className="mt-2">
+          Choosing &quot;Reject&quot; does not affect your ability to use any
+          of our tools — every tool works fully without cookies.
         </p>
       </section>
       <section id="donations" className="scroll-mt-20">

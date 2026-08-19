@@ -1377,7 +1377,7 @@
     "slug": "mime-detector",
     "category": "media",
     "name": "MIME Type Detector",
-    "description": "Detect MIME types from file extensions or uploaded files.",
+    "description": "Detect MIME types from file extensions or file names.",
     "keywords": [
       "mime",
       "type",
