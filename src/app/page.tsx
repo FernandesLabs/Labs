@@ -124,6 +124,45 @@ export default function Home() {
         toolCount={tools.length}
         onOpenPalette={() => setPaletteOpen(true)}
       />
+      {/* Editorial intro — substantial unique content so Google (and AdSense
+          reviewers) can determine what the site is about. */}
+      <section
+        aria-label="About Fernandes Labs"
+        className="border-b border-border/60 bg-muted/20"
+      >
+        <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+          <h2 className="text-2xl font-bold tracking-tight text-foreground">
+            Free online tools for developers, designers &amp; marketers
+          </h2>
+          <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+            Fernandes Labs is a growing collection of 132 fast, privacy-first
+            tools that run entirely in your browser. Format and validate JSON,
+            generate secure passwords, look up IP addresses and DNS records,
+            audit redirects and canonical tags, compress images, and calculate
+            everything from mortgage payments to BMR — all without creating an
+            account, uploading a single file, or being tracked.
+          </p>
+          <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+            Every tool is built around the same promise: your data stays on
+            your device. Processing happens client-side using modern Web APIs,
+            so sensitive inputs like API keys, passwords, and private documents
+            never leave your computer. The tools work offline once loaded and
+            are installable as a Progressive Web App for on-the-go use.
+          </p>
+          <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+            Each tool ships with hand-written documentation, real examples,
+            and practical tips written by our team of developers and SEO
+            specialists. The site is free and supported by clearly labeled
+            advertising and affiliate links — never by selling your data.
+            <a
+              href="/about"
+              className="ml-1 font-medium text-primary underline underline-offset-2 hover:text-primary/80"
+            >
+              Learn more about who we are.
+            </a>
+          </p>
+        </div>
+      </section>
       <HubView
         tools={tools}
         toolsBySlug={new Map(tools.map((t) => [t.slug, t]))}
