@@ -28,6 +28,21 @@ export function setConsentChoice(choice: ConsentChoice): void {
   window.dispatchEvent(new Event(CONSENT_EVENT))
 }
 
+/** Dispatched when the user asks to revisit/withdraw their cookie choice. */
+export const CONSENT_RESET_EVENT = 'fl-consent-reset'
+
+/**
+ * Clear the stored choice and ask the ConsentManager to re-open the banner
+ * (GDPR: consent must be withdrawable). Called from the footer "Cookies"
+ * settings link.
+ */
+export function resetConsentChoice(): void {
+  if (typeof window === 'undefined') return
+  window.localStorage.removeItem(STORAGE_KEY)
+  pushConsentSignal('update', 'denied')
+  window.dispatchEvent(new Event(CONSENT_RESET_EVENT))
+}
+
 /**
  * Push a consent signal into the dataLayer used by Google's consent mode.
  * `window.gtag` is defined by the inline head script in layout.tsx.

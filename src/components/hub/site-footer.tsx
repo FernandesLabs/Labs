@@ -17,6 +17,7 @@ import { toast } from 'sonner'
 import { CATEGORY_META, CATEGORY_ORDER } from '@/lib/tools/types'
 import { toolMetaList } from '@/lib/tools/tool-meta'
 import { siteConfig } from '@/lib/site-config'
+import { resetConsentChoice } from '@/lib/ads/consent'
 
 /**
  * SiteFooter — the global footer shared by the hub, tool pages, and category
@@ -40,6 +41,11 @@ export function SiteFooter() {
   React.useEffect(() => {
     setYear(new Date().getFullYear())
   }, [])
+  // GDPR: users must be able to revisit/withdraw their cookie consent.
+  const openCookieSettings = () => {
+    resetConsentChoice()
+    toast.info('Cookie preferences cleared — choose again below.')
+  }
   return (
     <footer className="mt-auto border-t border-border/70 bg-muted/30">
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
@@ -229,6 +235,14 @@ export function SiteFooter() {
             <Link href="/privacy" className="transition hover:text-foreground">Privacy</Link>
             <span className="text-border">·</span>
             <Link href="/terms" className="transition hover:text-foreground">Terms</Link>
+            <span className="text-border">·</span>
+            <button
+              type="button"
+              onClick={openCookieSettings}
+              className="transition hover:text-foreground"
+            >
+              Cookies
+            </button>
           </div>
           <p className="tabular-nums">
             © {year} Fernandes Labs. All tools run in your browser.

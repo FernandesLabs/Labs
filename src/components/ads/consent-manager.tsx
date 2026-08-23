@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Cookie } from 'lucide-react'
 import {
   CONSENT_EVENT,
+  CONSENT_RESET_EVENT,
   getConsentChoice,
   isConsentGranted,
   loadAdsenseScript,
@@ -36,12 +37,21 @@ export function ConsentManager() {
     getConsentChoice()
   )
 
-  // Show the banner if no choice has been recorded yet.
-  React.useEffect(() => {
-    if (getConsentChoice() !== null) return
-    const t = setTimeout(() => setVisible(true), 900)
-    return () => clearTimeout(t)
-  }, [])
+// Show the banner if no choice has been recorded yet — or re-show it when
+// the user asks to review/withdraw their choice (footer "Cookies" link).
+React.useEffect(() => {
+  if (getConsentChoice() !== null) return
+  const t = setTimeout(() => setVisible(true), 900)
+  const reopen = () => {
+    setChoice(null)
+    setVisible(true)
+  }
+  window.addEventListener(CONSENT_RESET_EVENT, reopen)
+  return () => {
+    clearTimeout(t)
+    window.removeEventListener(CONSENT_RESET_EVENT, reopen)
+  }
+}, [])
 
   // When consent is granted, load the AdSense script exactly once.
   React.useEffect(() => {

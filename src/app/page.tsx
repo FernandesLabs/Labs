@@ -126,6 +126,9 @@ export default function Home() {
       />
       {/* Editorial intro — substantial unique content so Google (and AdSense
           reviewers) can determine what the site is about. */}
+{/* Editorial intro — substantial unique content so Google (and AdSense
+          reviewers) can determine what the site is about, plus keyword-rich
+          internal links to every category. */}
       <section
         aria-label="About Fernandes Labs"
         className="border-b border-border/60 bg-muted/20"
@@ -135,31 +138,48 @@ export default function Home() {
             Free online tools for developers, designers &amp; marketers
           </h2>
           <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-            Fernandes Labs is a growing collection of 132 fast, privacy-first
-            tools that run entirely in your browser. Format and validate JSON,
-            generate secure passwords, look up IP addresses and DNS records,
-            audit redirects and canonical tags, compress images, and calculate
-            everything from mortgage payments to BMR — all without creating an
-            account, uploading a single file, or being tracked.
+            Fernandes Labs is a collection of 132 free online tools that run
+            entirely in your browser — no sign-up, no uploads, no tracking.
+            Format and validate JSON, generate secure passwords, look up IP
+            addresses and DNS records, test 301 redirects, compress images,
+            and calculate everything from loan payments to BMR. Pick a
+            category to start:
           </p>
-          <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-            Every tool is built around the same promise: your data stays on
-            your device. Processing happens client-side using modern Web APIs,
-            so sensitive inputs like API keys, passwords, and private documents
-            never leave your computer. The tools work offline once loaded and
-            are installable as a Progressive Web App for on-the-go use.
+          <ul className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 text-sm sm:grid-cols-3 lg:grid-cols-4">
+            {CATEGORY_ORDER.map((cat) => (
+              <li key={cat}>
+                <a
+                  href={`/category/${cat}`}
+                  className="font-medium text-primary underline-offset-2 hover:underline"
+                >
+                  Free {CATEGORY_META[cat].label.toLowerCase()} tools
+                </a>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-4 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+            Every tool processes data client-side with modern Web APIs, so
+            sensitive inputs like API keys, passwords, and private documents
+            never leave your device. Each page includes hand-written guides,
+            real examples, and practical tips from our team.
           </p>
-          <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-            Each tool ships with hand-written documentation, real examples,
-            and practical tips written by our team of developers and SEO
-            specialists. The site is free and supported by clearly labeled
-            advertising and affiliate links — never by selling your data.
+          <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+            The site is free, supported by clearly labeled ads and affiliate
+            links — never by selling data.{' '}
             <a
               href="/about"
-              className="ml-1 font-medium text-primary underline underline-offset-2 hover:text-primary/80"
+              className="font-medium text-primary underline underline-offset-2 hover:text-primary/80"
             >
-              Learn more about who we are.
+              Learn more about who we are
+            </a>{' '}
+            or read our{' '}
+            <a
+              href="/blog"
+              className="font-medium text-primary underline underline-offset-2 hover:text-primary/80"
+            >
+              latest guides
             </a>
+            .
           </p>
         </div>
       </section>
