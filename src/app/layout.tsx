@@ -6,7 +6,6 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { ServiceWorkerRegister } from "@/components/hub/service-worker-register";
 import { ConsentManager } from "@/components/ads/consent-manager";
-import { AutoAds } from "@/components/ads/auto-ads";
 import { siteConfig } from "@/lib/site-config";
 
 // Only the weights actually used across the app (normal/medium/semibold/bold/
@@ -110,7 +109,6 @@ export default function RootLayout({
         <ThemeProvider>{children}</ThemeProvider>
         <ServiceWorkerRegister />
         <ConsentManager />
-        <AutoAds />
         {siteConfig.analytics.googleAnalyticsId ? (
           <>
             <script

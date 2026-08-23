@@ -64,9 +64,9 @@ export function ConsentManager() {
       aria-modal="false"
       className="fixed inset-x-0 bottom-0 z-50 p-3 sm:p-4"
     >
-      <div className="mx-auto flex max-w-4xl flex-col gap-3 rounded-xl border border-border/70 bg-card p-4 shadow-2xl sm:flex-row sm:items-center sm:gap-4 sm:p-5">
+      <div className="mx-auto flex max-w-4xl flex-col gap-2.5 rounded-xl border border-border/70 bg-card p-3 shadow-2xl sm:flex-row sm:items-center sm:gap-4 sm:p-5">
         <div className="flex min-w-0 flex-1 items-start gap-3 sm:items-center">
-          <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
+          <span className="hidden size-9 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary sm:grid">
             <Cookie className="size-5" />
           </span>
           <div className="min-w-0 flex-1">
@@ -74,16 +74,15 @@ export function ConsentManager() {
               We value your privacy
             </p>
             <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
-              We use cookies to personalise content and ads, and to analyse
-              our traffic. You can accept all, or reject non-essential
-              cookies. See our{' '}
+              We use cookies for ads and analytics. Accept all, or reject
+              non-essential cookies —{' '}
               <Link
                 href="/privacy"
                 className="font-medium text-primary underline underline-offset-2 hover:text-primary/80"
               >
                 Privacy Policy
-              </Link>{' '}
-              for details.
+              </Link>
+              .
             </p>
           </div>
         </div>

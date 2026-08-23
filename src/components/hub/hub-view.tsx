@@ -278,10 +278,9 @@ export function HubView({
         ))}
       </div>
 
-      {/* Above-the-fold ad unit (below hero, before the tool grid) */}
-      <div className="mb-8" aria-hidden={false}>
-        <AdUnit slot="horizontal" />
-      </div>
+      {/* Above-the-fold ad removed (page-experience): the homepage competes in
+          search — a leaderboard between the intro and the tool grid hurt LCP
+          and ad-to-content balance. Monetization stays via the lower strip. */}
       {/* Tools */}
       <div className="space-y-8">
         {/* Quick-access rows (only when not filtering) */}

@@ -233,10 +233,9 @@ export function ToolView({
           </div>
         </header>
 
-        {/* Top ad unit */}
-        <div className="mb-6">
-          <AdUnit slot="horizontal" />
-        </div>
+        {/* Top ad removed (Better Ads Standards / page-experience): a leaderboard
+            directly under the header delayed LCP and crowded the tool on mobile.
+            Monetization continues via the in-article, footer, and sidebar units. */}
 
         {/* Tool + sidebar layout */}
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
