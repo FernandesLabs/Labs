@@ -2,6 +2,7 @@
 import * as React from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import dynamic from 'next/dynamic'
 import { ChevronRight, Home, FileText } from 'lucide-react'
 import { SiteHeader } from '@/components/hub/site-header'
 import { SiteFooter } from '@/components/hub/site-footer'
@@ -9,6 +10,13 @@ import { BackToTop } from '@/components/hub/back-to-top'
 import { ReadingProgress } from '@/components/hub/reading-progress'
 import { SkipToContent } from '@/components/hub/skip-to-content'
 import { toolMetaList } from '@/lib/tools/tool-meta'
+
+// Lazy-load the palette (cmdk + Dialog, ~60KB) — only needed on ⌘K / click.
+// Legal pages don't pass `posts` — the palette stays tools-only here.
+const CommandPalette = dynamic(
+  () => import('@/components/hub/command-palette').then((m) => m.CommandPalette),
+  { ssr: false }
+)
 
 /**
  * LegalPage — shared layout shell for long-form legal / info pages
@@ -33,6 +41,7 @@ export function LegalPage({
   sections?: { id: string; label: string }[]
 }) {
   const router = useRouter()
+  const [paletteOpen, setPaletteOpen] = React.useState(false)
   const hasToc = sections.length >= 2
   // Year is fixed at build time and updated only after hydration — rendering
   // `new Date()` directly causes a server/client mismatch.
@@ -48,7 +57,7 @@ export function LegalPage({
       <SiteHeader
         onHome={() => router.push('/')}
         toolCount={toolMetaList.length}
-        onOpenPalette={() => router.push('/')}
+        onOpenPalette={() => setPaletteOpen(true)}
       />
       <main id="main-content" className="flex-1">
         {/* Breadcrumb */}
@@ -102,6 +111,14 @@ export function LegalPage({
         </div>
       </main>
       <SiteFooter />
+      {/* ⌘K / Search button — real palette (tools-only on legal pages). */}
+      <CommandPalette
+        open={paletteOpen}
+        onOpenChange={setPaletteOpen}
+        onSelect={(slug) => {
+          window.location.href = `/tools/${slug}`
+        }}
+      />
       <BackToTop />
     </div>
   )

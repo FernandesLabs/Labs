@@ -2,6 +2,8 @@
 import type { Metadata } from 'next'
 import { HomePageClient } from '@/components/hub/home-page-client'
 import { siteConfig } from '@/lib/site-config'
+import { blogPosts } from '@/lib/blog/posts'
+import { toPalettePosts } from '@/lib/blog/blog-utils'
 
 /**
  * Home page (the hub) — server component.
@@ -41,5 +43,5 @@ export const metadata: Metadata = {
 }
 
 export default function Home() {
-  return <HomePageClient />
+  return <HomePageClient posts={toPalettePosts(blogPosts)} />
 }

@@ -9,6 +9,8 @@ import { ReadingProgress } from '@/components/hub/reading-progress'
 import { SkipToContent } from '@/components/hub/skip-to-content'
 import { AdblockBanner } from '@/components/ads/adblock-banner'
 import { Rss } from 'lucide-react'
+import dynamic from 'next/dynamic'
+import type { PalettePost } from '@/components/hub/command-palette'
 import {
   CalendarDays,
   FileText,
@@ -21,6 +23,7 @@ import {
 } from 'lucide-react'
 import { toolMetaList } from '@/lib/tools/tool-meta'
 import { blogPosts } from '@/lib/blog/posts'
+import type { PalettePost } from '@/components/hub/command-palette'
 import {
   blogCategoryColor,
   formatIsoDate,
@@ -54,8 +57,20 @@ const POSTS = postsByDateDesc(blogPosts).map((p) => ({
 
 const CATEGORIES = getBlogCategories(blogPosts)
 
-export function BlogIndexClient() {
+// Lazy-load the palette (cmdk + Dialog, ~60KB) — only needed on ⌘K / click.
+const CommandPalette = dynamic(
+  () => import('@/components/hub/command-palette').then((m) => m.CommandPalette),
+  { ssr: false }
+)
+
+export function BlogIndexClient({
+  posts = [],
+}: {
+  /** Slim guide list for the ⌘K palette (server-computed, see page.tsx). */
+  posts?: PalettePost[]
+}) {
   const router = useRouter()
+  const [paletteOpen, setPaletteOpen] = React.useState(false)
   const [query, setQuery] = React.useState('')
   const [activeCategory, setActiveCategory] = React.useState<string | null>(null)
   const searchRef = React.useRef<HTMLInputElement | null>(null)
@@ -100,7 +115,7 @@ export function BlogIndexClient() {
       <SiteHeader
         onHome={() => router.push('/')}
         toolCount={toolMetaList.length}
-        onOpenPalette={() => router.push('/')}
+        onOpenPalette={() => setPaletteOpen(true)}
       />
       <main
         id="main-content"
@@ -415,6 +430,15 @@ export function BlogIndexClient() {
         )}
       </main>
       <SiteFooter />
+      {/* ⌘K / Search button — real palette with tools + guides (was a
+          redirect to the hub, which made ⌘K useless on blog pages). */}
+      <CommandPalette
+        open={paletteOpen}
+        onOpenChange={setPaletteOpen}
+        onSelect={(slug) => router.push(`/tools/${slug}`)}
+        onSelectPost={(slug) => router.push(`/blog/${slug}`)}
+        posts={posts}
+      />
       <BackToTop />
     </div>
   )

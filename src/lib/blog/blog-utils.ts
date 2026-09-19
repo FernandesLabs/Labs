@@ -232,3 +232,22 @@ export function splitBodyAtMiddleHeading(
 
   return [body.slice(0, best), body.slice(best)]
 }
+
+/**
+ * Slim guide entries for the ⌘K command palette ("Guides & tutorials" group):
+ * title/category/minutes only — markdown bodies never reach the client bundle.
+ * Shape is structurally identical to `PalettePost` in command-palette.tsx.
+ */
+export function toPalettePosts(posts: BlogPost[]): {
+  slug: string
+  title: string
+  category: string
+  minutes: number
+}[] {
+  return postsByDateDesc(posts).map((p) => ({
+    slug: p.slug,
+    title: p.title,
+    category: p.category,
+    minutes: readingTimeMinutes(p.body),
+  }))
+}

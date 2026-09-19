@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import { toolMetadata } from '@/lib/tools/tool-metadata'
 import { siteConfig } from '@/lib/site-config'
 import { blogPosts } from '@/lib/blog/posts'
-import { guidesForTools, readingTimeMinutes } from '@/lib/blog/blog-utils'
+import { guidesForTools, readingTimeMinutes, toPalettePosts } from '@/lib/blog/blog-utils'
 import { generateToolTitle, generateToolDescription } from './tool-seo'
 import { ToolPageClient } from './tool-page-client'
 import type { ToolGuide } from '@/components/hub/tool-related-guides'
@@ -103,5 +103,11 @@ export default async function ToolPage({ params }: Props) {
     })
   )
 
-  return <ToolPageClient slug={tool.slug} guides={relatedGuides} />
+  return (
+    <ToolPageClient
+      slug={tool.slug}
+      guides={relatedGuides}
+      posts={toPalettePosts(blogPosts)}
+    />
+  )
 }

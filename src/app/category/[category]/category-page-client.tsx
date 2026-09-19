@@ -14,8 +14,16 @@ import { AdUnit } from '@/components/ads/ad-unit'
 import { toolMetaList } from '@/lib/tools/tool-meta'
 import { fuzzyMatch } from '@/lib/tools/fuzzy-search'
 import { usePreloadOnHover } from '@/lib/tools/preload'
+import dynamic from 'next/dynamic'
+import type { PalettePost } from '@/components/hub/command-palette'
 import type { ToolMeta, ToolCategory } from '@/lib/tools/types'
 import { CATEGORY_META } from '@/lib/tools/types'
+
+// Lazy-load the palette (cmdk + Dialog, ~60KB) — only needed on ⌘K / click.
+const CommandPalette = dynamic(
+  () => import('@/components/hub/command-palette').then((m) => m.CommandPalette),
+  { ssr: false }
+)
 /**
  * Client component for the category landing page.
  * Renders the category hero + a searchable grid of tools in that category
@@ -27,28 +35,28 @@ export function CategoryPageClient({
   tools,
   otherCategories,
   guides,
+  posts = [],
 }: {
   category: ToolCategory
   tools: ToolMeta[]
   otherCategories: { category: ToolCategory; meta: typeof CATEGORY_META[ToolCategory]; count: number }[]
   guides: { slug: string; title: string; description: string; minutes: number }[]
+  /** Slim guide list for the ⌘K palette (server-computed, see page.tsx). */
+  posts?: PalettePost[]
 }) {
   const router = useRouter()
   const cat = CATEGORY_META[category]
   const [query, setQuery] = React.useState('')
+  const [paletteOpen, setPaletteOpen] = React.useState(false)
   const searchRef = React.useRef<HTMLInputElement | null>(null)
   const filtered = React.useMemo(() => {
     if (!query.trim()) return tools
     return tools.filter((t) => fuzzyMatch(t as never, query))
   }, [tools, query])
-  // ⌘K → back to hub command palette; / → focus search
+  // "/" focuses the category tool search. (⌘K is handled globally inside
+  // CommandPalette — this page no longer redirects to the hub.)
   React.useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
-        e.preventDefault()
-        router.push('/')
-        return
-      }
       const target = e.target as HTMLElement | null
       const tag = target?.tagName?.toLowerCase()
       const isTyping =
@@ -60,7 +68,7 @@ export function CategoryPageClient({
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [router])
+  }, [])
   return (
     <div className="flex min-h-screen flex-col">
       <SkipToContent />
@@ -68,7 +76,7 @@ export function CategoryPageClient({
       <SiteHeader
         onHome={() => router.push('/')}
         toolCount={toolMetaList.length}
-        onOpenPalette={() => router.push('/')}
+        onOpenPalette={() => setPaletteOpen(true)}
       />
       <main id="main-content" className="flex-1">
         {/* Breadcrumb */}
@@ -289,6 +297,14 @@ export function CategoryPageClient({
         </section>
       </main>
       <SiteFooter />
+      {/* ⌘K / Search button — real palette with tools + guides. */}
+      <CommandPalette
+        open={paletteOpen}
+        onOpenChange={setPaletteOpen}
+        onSelect={(slug) => router.push(`/tools/${slug}`)}
+        onSelectPost={(slug) => router.push(`/blog/${slug}`)}
+        posts={posts}
+      />
       <BackToTop />
     </div>
   )

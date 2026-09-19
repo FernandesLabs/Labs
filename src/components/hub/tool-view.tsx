@@ -30,6 +30,7 @@ import { SkipToContent } from './skip-to-content'
 import { useToolHistory } from '@/lib/tools/use-tool-history'
 import { preloadTool } from '@/lib/tools/preload'
 import { toolMetaList } from '@/lib/tools/tool-meta'
+import type { PalettePost } from './command-palette'
 
 // Lazy-load heavy components that aren't needed on initial render:
 //   - CommandPalette (cmdk + Dialog) — only needed when ⌘K is pressed (~40KB)
@@ -73,6 +74,7 @@ export function ToolView({
   toolsBySlug: _toolsBySlug,
   recent: _recent,
   guides = [],
+  posts = [],
   onBack,
   onSelect,
 }: {
@@ -82,6 +84,8 @@ export function ToolView({
   recent: string[]
   /** Blog guides whose relatedTools include this tool (server-resolved). */
   guides?: ToolGuide[]
+  /** Slim guide list for the ⌘K palette's "Guides" group (server-resolved). */
+  posts?: PalettePost[]
   onBack: () => void
   onSelect: (slug: string) => void
 }) {
@@ -100,15 +104,10 @@ export function ToolView({
     window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
   }, [tool.slug, recordUse])
 
-  // Global keyboard shortcuts:
-  //   ⌘K / Ctrl+K → toggle the command palette
-  //   Esc         → close the palette (if open)
+  // Global keyboard shortcut: Esc closes the palette if open. (⌘K is handled
+  // globally inside CommandPalette to avoid double-toggling.)
   React.useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
-        e.preventDefault()
-        setPaletteOpen((v) => !v)
-      }
       if (e.key === 'Escape' && paletteOpen) {
         setPaletteOpen(false)
       }
@@ -354,6 +353,11 @@ export function ToolView({
           setPaletteOpen(false)
           onSelect(slug)
         }}
+        onSelectPost={(slug) => {
+          setPaletteOpen(false)
+          window.location.href = `/blog/${slug}`
+        }}
+        posts={posts}
       />
     </div>
   )

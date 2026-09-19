@@ -19,6 +19,7 @@ import {
   slugifyHeading,
   blogCategoryColor,
   splitBodyAtMiddleHeading,
+  toPalettePosts,
 } from '@/lib/blog/blog-utils'
 
 interface Props {
@@ -246,6 +247,7 @@ export default async function BlogPostPage({ params }: Props) {
       newerPost={newer ? { slug: newer.slug, title: newer.title, category: newer.category } : null}
       authorName={authorName}
       authorRole={authorRole}
+      posts={toPalettePosts(blogPosts)}
     >
       <script
         type="application/ld+json"

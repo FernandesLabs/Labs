@@ -14,6 +14,7 @@ import { AdblockBanner } from '@/components/ads/adblock-banner'
 import { tools } from '@/lib/tools/registry'
 import { toolMetaList } from '@/lib/tools/tool-meta'
 import { CATEGORY_META, CATEGORY_ORDER } from '@/lib/tools/types'
+import type { PalettePost } from '@/components/hub/command-palette'
 
 // Lazy-load dialog-heavy components that only open on user interaction.
 // This saves ~60KB of JS (cmdk + Dialog x2) on the initial page load,
@@ -39,7 +40,12 @@ const ShortcutsHelp = dynamic(
  *     to `/tools/<slug>`.
  *   - Listens for `#cat=<category>` (legacy) and activates that filter.
  */
-export function HomePageClient() {
+export function HomePageClient({
+  posts = [],
+}: {
+  /** Slim guide list for the ⌘K palette's "Guides" group (server-computed). */
+  posts?: PalettePost[]
+}) {
   const router = useRouter()
   const [paletteOpen, setPaletteOpen] = React.useState(false)
   const [helpOpen, setHelpOpen] = React.useState(false)
@@ -91,8 +97,8 @@ export function HomePageClient() {
         tag === 'select' ||
         target?.isContentEditable
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
-        e.preventDefault()
-        setPaletteOpen((v) => !v)
+        // ⌘K is handled globally inside CommandPalette — ignore here to
+        // avoid double-toggling.
         return
       }
       if (e.key === '?' && !isTyping) {
@@ -202,6 +208,7 @@ export function HomePageClient() {
         open={paletteOpen}
         onOpenChange={setPaletteOpen}
         onSelect={openTool}
+        posts={posts}
       />
       <ShortcutsHelp open={helpOpen} onOpenChange={setHelpOpen} />
       <BackToTop />

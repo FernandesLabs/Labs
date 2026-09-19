@@ -12,7 +12,7 @@ import {
   type ToolCategory,
 } from '@/lib/tools/types'
 import { blogPosts } from '@/lib/blog/posts'
-import { guidesForTools, readingTimeMinutes } from '@/lib/blog/blog-utils'
+import { guidesForTools, readingTimeMinutes, toPalettePosts } from '@/lib/blog/blog-utils'
 import { CategoryPageClient } from './category-page-client'
 /**
  * Category landing page — `/category/<category>` (e.g. `/category/developer`).
@@ -166,6 +166,7 @@ export default async function CategoryPage({ params }: PageProps) {
         tools={tools}
         otherCategories={otherCategories}
         guides={guides}
+        posts={toPalettePosts(blogPosts)}
       />
     </>
   )

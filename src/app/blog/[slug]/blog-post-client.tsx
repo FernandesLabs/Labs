@@ -15,6 +15,8 @@ import {
 import { SiteHeader } from '@/components/hub/site-header'
 import { SiteFooter } from '@/components/hub/site-footer'
 import { BackToTop } from '@/components/hub/back-to-top'
+import dynamic from 'next/dynamic'
+import type { PalettePost } from '@/components/hub/command-palette'
 import { SkipToContent } from '@/components/hub/skip-to-content'
 import { ReadingProgress } from '@/components/hub/reading-progress'
 import { AdblockBanner } from '@/components/ads/adblock-banner'
@@ -29,6 +31,12 @@ export interface AdjacentPost {
   category: string
 }
 
+// Lazy-load the palette (cmdk + Dialog, ~60KB) — only needed on ⌘K / click.
+const CommandPalette = dynamic(
+  () => import('@/components/hub/command-palette').then((m) => m.CommandPalette),
+  { ssr: false }
+)
+
 export function BlogPostClient({
   postTitle,
   postExcerpt,
@@ -39,6 +47,7 @@ export function BlogPostClient({
   newerPost,
   authorName,
   authorRole,
+  posts = [],
   children,
 }: {
   postTitle: string
@@ -54,9 +63,12 @@ export function BlogPostClient({
   authorName: string
   /** Role line under the author name, e.g. "Founder & Lead Developer". */
   authorRole: string
+  /** Slim guide list for the ⌘K palette (server-computed, see page.tsx). */
+  posts?: PalettePost[]
   children: React.ReactNode
 }) {
   const router = useRouter()
+  const [paletteOpen, setPaletteOpen] = React.useState(false)
   const formattedDate = formatIsoDate(postDate)
   return (
     <div className="flex min-h-screen flex-col">
@@ -68,7 +80,7 @@ export function BlogPostClient({
       <SiteHeader
         onHome={() => router.push('/')}
         toolCount={toolMetaList.length}
-        onOpenPalette={() => router.push('/')}
+        onOpenPalette={() => setPaletteOpen(true)}
       />
       <main
         id="main-content"
@@ -204,6 +216,14 @@ export function BlogPostClient({
         </div>
       </main>
       <SiteFooter />
+      {/* ⌘K / Search button — real palette with tools + guides. */}
+      <CommandPalette
+        open={paletteOpen}
+        onOpenChange={setPaletteOpen}
+        onSelect={(slug) => router.push(`/tools/${slug}`)}
+        onSelectPost={(slug) => router.push(`/blog/${slug}`)}
+        posts={posts}
+      />
       <BackToTop />
     </div>
   )

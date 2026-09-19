@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { siteConfig } from '@/lib/site-config'
 import { BlogIndexClient } from './blog-index-client'
+import { blogPosts } from '@/lib/blog/posts'
+import { toPalettePosts } from '@/lib/blog/blog-utils'
 
 export const metadata: Metadata = {
   title: 'Blog — Guides & Tutorials | Fernandes Labs',
@@ -31,5 +33,7 @@ export const metadata: Metadata = {
  * post slugs there as they are written).
  */
 export default function BlogPage() {
-  return <BlogIndexClient />
+  // Slim guide list for the ⌘K palette's "Guides & tutorials" group — the
+  // palette is a site-wide search: tools + guides from every page.
+  return <BlogIndexClient posts={toPalettePosts(blogPosts)} />
 }
