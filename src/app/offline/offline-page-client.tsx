@@ -4,6 +4,7 @@ import * as React from 'react'
 import Link from 'next/link'
 import { WifiOff, RefreshCw, Home, ShieldCheck, Wrench, BookOpen } from 'lucide-react'
 import { toolMetaList } from '@/lib/tools/tool-meta'
+import type { ToolMeta } from '@/lib/tools/types'
 
 /**
  * OfflinePageClient — the branded fallback shown by the service worker when a
@@ -36,19 +37,28 @@ export function OfflinePageClient() {
   // Recently used tools (same localStorage key as use-tool-history) — gives
   // returning visitors a one-tap path back to the tools they rely on, which
   // are the pages most likely to already be in the runtime cache.
-  const recentlyUsed = React.useMemo(() => {
-    if (typeof window === 'undefined') return []
+  //
+  // HYDRATION NOTE: this MUST be read in an effect, not in a useMemo/render
+  // path. Reading localStorage during the first client render produces markup
+  // that differs from the server HTML (server has no storage), which React
+  // reports as a hydration mismatch and discards the whole tree. Start empty
+  // (matches SSR), then fill in after hydration — same pattern as
+  // useToolHistory's mount effect above.
+  const [recentlyUsed, setRecentlyUsed] = React.useState<ToolMeta[]>([])
+  React.useEffect(() => {
     try {
       const raw = window.localStorage.getItem('fl-recent-tools')
       const slugs: unknown = raw ? JSON.parse(raw) : []
-      if (!Array.isArray(slugs)) return []
-      return slugs
-        .filter((s): s is string => typeof s === 'string')
-        .map((s) => toolMetaList.find((t) => t.slug === s))
-        .filter((t): t is NonNullable<typeof t> => Boolean(t))
-        .slice(0, 4)
+      if (!Array.isArray(slugs)) return
+      setRecentlyUsed(
+        slugs
+          .filter((s): s is string => typeof s === 'string')
+          .map((s) => toolMetaList.find((t) => t.slug === s))
+          .filter((t): t is ToolMeta => Boolean(t))
+          .slice(0, 4)
+      )
     } catch {
-      return []
+      /* private mode / corrupted storage — stay empty */
     }
   }, [])
 
