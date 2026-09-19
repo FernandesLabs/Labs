@@ -171,3 +171,64 @@ export function guidesForTools(
     .filter((p) => p.relatedTools.some((t) => set.has(t)))
     .slice(0, max)
 }
+
+/**
+ * Split a markdown post body at the `## ` heading closest to the middle, so a
+ * mid-content ad unit can be injected between the two halves.
+ *
+ * Fence-aware: lines inside ``` code blocks are never treated as headings
+ * (posts embed fenced examples that could otherwise false-match).
+ *
+ * Guard rails — returns null (no split, no mid ad) when:
+ *   - the body is shorter than MIN_SPLIT_CHARS (short posts would end up with
+ *     a cramped ad and hurt the reading experience / AdSense viewability), or
+ *   - the best heading sits outside the 25–75% window (a split at the very
+ *     start/end is effectively a top/bottom ad — already covered elsewhere).
+ *
+ * The heading line itself starts the SECOND half, so the section keeps its
+ * heading. Anchor ids and the TOC are unaffected: both halves render through
+ * the same slugifyHeading pipeline.
+ */
+const MIN_SPLIT_CHARS = 4000
+
+export function splitBodyAtMiddleHeading(
+  body: string
+): [string, string] | null {
+  if (body.length < MIN_SPLIT_CHARS) return null
+
+  let inFence = false
+  const headingOffsets: number[] = []
+  let lineStart = 0
+
+  for (let i = 0; i <= body.length; i++) {
+    const ch = i < body.length ? body[i] : '\n'
+    if (ch === '\n') {
+      const line = body.slice(lineStart, i)
+      const trimmed = line.trimStart()
+      if (trimmed.startsWith('```')) {
+        inFence = !inFence
+      } else if (!inFence && trimmed.startsWith('## ')) {
+        headingOffsets.push(lineStart)
+      }
+      lineStart = i + 1
+    }
+  }
+
+  if (headingOffsets.length === 0) return null
+
+  const middle = body.length / 2
+  let best = -1
+  let bestDist = Infinity
+  for (const offset of headingOffsets) {
+    const dist = Math.abs(offset - middle)
+    if (dist < bestDist) {
+      bestDist = dist
+      best = offset
+    }
+  }
+
+  // Keep the ad out of the intro and the conclusion.
+  if (best < body.length * 0.25 || best > body.length * 0.75) return null
+
+  return [body.slice(0, best), body.slice(best)]
+}

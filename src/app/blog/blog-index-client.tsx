@@ -8,6 +8,7 @@ import { BackToTop } from '@/components/hub/back-to-top'
 import { ReadingProgress } from '@/components/hub/reading-progress'
 import { SkipToContent } from '@/components/hub/skip-to-content'
 import { AdblockBanner } from '@/components/ads/adblock-banner'
+import { Rss } from 'lucide-react'
 import {
   CalendarDays,
   FileText,
@@ -118,13 +119,28 @@ export function BlogIndexClient() {
         </nav>
 
         <header className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-            Guides &amp; Tutorials
-          </h1>
-          <p className="mt-2 max-w-2xl text-base text-muted-foreground">
-            In-depth guides, best practices, and tutorials for developers,
-            designers, and marketers. Learn about the tools you use every day.
-          </p>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+                Guides &amp; Tutorials
+              </h1>
+              <p className="mt-2 max-w-2xl text-base text-muted-foreground">
+                In-depth guides, best practices, and tutorials for developers,
+                designers, and marketers. Learn about the tools you use every day.
+              </p>
+            </div>
+            {/* RSS subscribe — readers who follow the feed are repeat visitors
+                (returning-traffic is an engagement signal Google notices). */}
+            <a
+              href="/feed.xml"
+              type="application/rss+xml"
+              className="inline-flex h-10 shrink-0 items-center gap-2 self-start rounded-lg border border-border/70 bg-card px-3.5 text-xs font-semibold text-muted-foreground transition hover:border-orange-500/50 hover:text-foreground"
+              aria-label="Subscribe to the RSS feed"
+            >
+              <Rss className="size-4 text-orange-500" aria-hidden />
+              Subscribe
+            </a>
+          </div>
         </header>
 
         {/* Search + category filter bar */}

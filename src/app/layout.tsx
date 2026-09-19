@@ -61,6 +61,10 @@ export const metadata: Metadata = {
         },
       }
     : {}),
+  // RSS autodiscovery is emitted as a literal <link> in <head> below (NOT via
+  // `alternates.types` here): metadata objects are shallow-merged per segment,
+  // so any page defining its own `alternates` would REPLACE this object and
+  // silently drop the discovery link. A raw <link> is on every page, always.
   openGraph: {
     title: "Fernandes Labs — Free Online Tools",
     description:
@@ -106,6 +110,13 @@ export default function RootLayout({
               });
             `,
           }}
+        />
+        {/* RSS autodiscovery — on every page (see metadata comment above). */}
+        <link
+          rel="alternate"
+          type="application/rss+xml"
+          title="Fernandes Labs Blog — RSS"
+          href="/feed.xml"
         />
       </head>
       <body

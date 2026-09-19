@@ -7,6 +7,7 @@ import {
   Zap,
   Github,
   Mail,
+  Rss,
   ArrowRight,
   Lock,
   Globe,
@@ -160,6 +161,16 @@ export function SiteFooter() {
                 >
                   <Mail className="size-3.5" />
                   Contact
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/feed.xml"
+                  type="application/rss+xml"
+                  className="inline-flex items-center gap-1.5 text-muted-foreground transition hover:text-foreground"
+                >
+                  <Rss className="size-3.5 text-orange-500" aria-hidden />
+                  RSS feed
                 </a>
               </li>
               <li>
