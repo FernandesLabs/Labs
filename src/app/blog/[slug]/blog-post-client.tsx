@@ -22,6 +22,7 @@ import { ReadingProgress } from '@/components/hub/reading-progress'
 import { AdblockBanner } from '@/components/ads/adblock-banner'
 import { NewsletterCta } from '@/components/hub/newsletter-cta'
 import { ShareRow } from '@/components/hub/share-row'
+import { FeedbackWidget } from '@/components/hub/feedback-widget'
 import { toolMetaList } from '@/lib/tools/tool-meta'
 import { blogCategoryColor, formatIsoDate } from '@/lib/blog/blog-utils'
 
@@ -38,6 +39,7 @@ const CommandPalette = dynamic(
 )
 
 export function BlogPostClient({
+  postSlug,
   postTitle,
   postExcerpt,
   postDate,
@@ -50,6 +52,7 @@ export function BlogPostClient({
   posts = [],
   children,
 }: {
+  postSlug: string
   postTitle: string
   postExcerpt: string
   postDate: string
@@ -165,6 +168,11 @@ export function BlogPostClient({
         <ShareRow title={postTitle} className="mb-6" />
 
         {children}
+
+        {/* Guide feedback — anonymous 👍/👎, aggregate social proof */}
+        <div className="mt-10">
+          <FeedbackWidget slug={postSlug} label="guide" />
+        </div>
 
         {/* Prev / next post navigation — keeps readers inside the cluster */}
         {olderPost || newerPost ? (

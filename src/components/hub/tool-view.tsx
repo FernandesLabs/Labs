@@ -26,6 +26,7 @@ import { ToolRelatedGuides, type ToolGuide } from './tool-related-guides'
 import { BackToTop } from './back-to-top'
 import { MobileSidebar } from './mobile-sidebar'
 import { ReadingProgress } from './reading-progress'
+import { FeedbackWidget } from './feedback-widget'
 import { SkipToContent } from './skip-to-content'
 import { useToolHistory } from '@/lib/tools/use-tool-history'
 import { preloadTool } from '@/lib/tools/preload'
@@ -255,6 +256,11 @@ export function ToolView({
 
             {/* SEO content (intro / how-to / FAQ / use cases / tips) */}
             <ToolContent tool={tool} />
+
+            {/* Feedback — anonymous 👍/👎, aggregated count as social proof */}
+            <div className="mt-8">
+              <FeedbackWidget slug={tool.slug} label="tool" />
+            </div>
 
             {/* Bottom ad unit */}
             <div className="mt-8">

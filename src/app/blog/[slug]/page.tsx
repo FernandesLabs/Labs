@@ -238,6 +238,7 @@ export default async function BlogPostPage({ params }: Props) {
 
   return (
     <BlogPostClient
+      postSlug={post.slug}
       postTitle={post.title}
       postExcerpt={post.description}
       postDate={post.date}

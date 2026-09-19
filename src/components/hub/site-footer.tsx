@@ -19,6 +19,7 @@ import { CATEGORY_META, CATEGORY_ORDER } from '@/lib/tools/types'
 import { toolMetaList } from '@/lib/tools/tool-meta'
 import { siteConfig } from '@/lib/site-config'
 import { resetConsentChoice } from '@/lib/ads/consent'
+import { PwaInstallButton } from './pwa-install-button'
 
 /**
  * SiteFooter — the global footer shared by the hub, tool pages, and category
@@ -183,6 +184,10 @@ export function SiteFooter() {
                   <Github className="size-3.5" />
                   GitHub
                 </a>
+              </li>
+              <li>
+                {/* Hidden until the browser offers installability (beforeinstallprompt). */}
+                <PwaInstallButton className="inline-flex items-center gap-1.5 text-muted-foreground transition hover:text-foreground" />
               </li>
             </ul>
           </nav>

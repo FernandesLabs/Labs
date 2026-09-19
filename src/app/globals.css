@@ -204,3 +204,17 @@ textarea {
 .fl-section, main {
   overflow-x: hidden;
 }
+/* Feedback widget thank-you pop (see components/hub/feedback-widget.tsx) */
+@keyframes feedback-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  60% {
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

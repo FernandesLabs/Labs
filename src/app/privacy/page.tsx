@@ -119,8 +119,11 @@ export default function PrivacyPage() {
             your favorited and recently-used tools.
           </li>
           <li>
-            <strong>Feedback votes</strong> (localStorage): remembers your
-            tool feedback.
+            <strong>Feedback votes</strong> (localStorage + anonymous server
+            tally): remembers your 👍/👎 choice in your browser, and adds one
+            anonymous count to our servers. We store only the page name and
+            yes/no — no accounts, no emails, no tracking identifiers, no IP
+            addresses attached to the vote.
           </li>
           <li>
             <strong>Analytics cookies</strong>: set by Google Analytics.
@@ -130,9 +133,11 @@ export default function PrivacyPage() {
           </li>
         </ul>
         <p className="mt-2">
-          None of this data is sent to our servers — all localStorage data
-          stays in your browser and can be cleared at any time via your
-          browser settings.
+          Everything except the anonymous feedback tally is localStorage data
+          that stays in your browser and can be cleared at any time via your
+          browser settings — it is never sent to us. The feedback tally cannot
+          be linked back to you: it contains no account, email, or tracking
+          identifiers of any kind.
         </p>
       </section>
       <section id="consent" className="scroll-mt-20">

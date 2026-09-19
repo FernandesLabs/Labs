@@ -112,7 +112,8 @@ export function CommandPalette({
   )
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="overflow-hidden p-0 shadow-lg sm:max-w-lg">
+      {/* aria-describedby={undefined} silences Radix's missing-Description warning */}
+      <DialogContent aria-describedby={undefined} className="overflow-hidden p-0 shadow-lg sm:max-w-lg">
         {/* VisuallyHidden title fixes the Radix DialogTitle accessibility error */}
         <VisuallyHidden>
           <DialogTitle>Search tools and guides</DialogTitle>

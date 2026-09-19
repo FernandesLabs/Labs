@@ -30,3 +30,14 @@ model Post {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+/// Anonymous 👍/👎 votes for tool pages and blog guides.
+/// One row per vote; no user identifiers are stored (see /privacy).
+model ToolFeedback {
+  id        String   @id @default(cuid())
+  pageSlug  String
+  helpful   Boolean
+  createdAt DateTime @default(now())
+
+  @@index([pageSlug])
+}
