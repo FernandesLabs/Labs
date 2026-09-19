@@ -123,6 +123,20 @@ export function postsByDateDesc(posts: BlogPost[]): BlogPost[] {
 }
 
 /**
+ * True when the post is younger than 7 days. Used for the "New" badge on the
+ * blog index and post header. Computed SERVER-side (page.tsx / build time) so
+ * `Date.now()` never enters a client render path — the badge simply refreshes
+ * on the next deploy, which is exactly when content freshness changes anyway.
+ */
+export const FRESH_WINDOW_MS = 7 * 86_400_000
+
+export function isFreshPost(date: string, now: number = Date.now()): boolean {
+  const ts = new Date(date).getTime()
+  if (Number.isNaN(ts)) return false
+  return now - ts < FRESH_WINDOW_MS && now - ts >= 0
+}
+
+/**
  * Chronological neighbors of a post (newest-first list): the previous item is
  * the next-older post, the next item is the next-newer post. Powers the
  * prev/next footer navigation on blog posts — a standard engagement pattern

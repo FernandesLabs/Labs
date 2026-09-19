@@ -2,7 +2,12 @@ import type { Metadata } from 'next'
 import { siteConfig } from '@/lib/site-config'
 import { BlogIndexClient, type BlogCatalogPost } from './blog-index-client'
 import { blogPosts } from '@/lib/blog/posts'
-import { toPalettePosts, postsByDateDesc, readingTimeMinutes } from '@/lib/blog/blog-utils'
+import {
+  toPalettePosts,
+  postsByDateDesc,
+  readingTimeMinutes,
+  isFreshPost,
+} from '@/lib/blog/blog-utils'
 
 export const metadata: Metadata = {
   title: 'Blog — Guides & Tutorials | Fernandes Labs',
@@ -46,6 +51,7 @@ export default function BlogPage() {
     minutes: readingTimeMinutes(p.body),
     keywords: p.keywords.join(' ').toLowerCase(),
     searchText: `${p.title} ${p.description} ${p.keywords.join(' ')}`.toLowerCase(),
+    fresh: isFreshPost(p.date),
   }))
   // Slim guide list for the ⌘K palette's "Guides & tutorials" group — the
   // palette is a site-wide search: tools + guides from every page.

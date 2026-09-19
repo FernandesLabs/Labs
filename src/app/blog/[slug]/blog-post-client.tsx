@@ -45,6 +45,7 @@ export function BlogPostClient({
   postDate,
   postCategory,
   readingMinutes,
+  fresh = false,
   olderPost,
   newerPost,
   authorName,
@@ -58,6 +59,8 @@ export function BlogPostClient({
   postDate: string
   postCategory: string
   readingMinutes: number
+  /** True when the post is < 7 days old (server-computed, see isFreshPost). */
+  fresh?: boolean
   /** Next-older post (chronologically previous) — may be null on the oldest post. */
   olderPost?: AdjacentPost | null
   /** Next-newer post (chronologically next) — may be null on the newest post. */
@@ -129,6 +132,12 @@ export function BlogPostClient({
               <CalendarDays className="size-3" />
               {formattedDate}
             </span>
+            {fresh ? (
+              <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                <span className="size-1.5 animate-pulse rounded-full bg-emerald-500" aria-hidden />
+                New
+              </span>
+            ) : null}
             <span className="inline-flex items-center gap-1">
               <Clock className="size-3" />
               {readingMinutes} min read

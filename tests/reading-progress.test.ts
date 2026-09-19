@@ -101,3 +101,34 @@ describe('reading-progress-store', () => {
     expect(readGuideProgress(null)).toEqual([])
   })
 })
+
+// ─── isFreshPost (blog-utils) ───────────────────────────────────────────
+import { isFreshPost, FRESH_WINDOW_MS } from '@/lib/blog/blog-utils'
+
+describe('isFreshPost', () => {
+  const NOW = new Date('2026-09-20T12:00:00Z').getTime()
+
+  test('post published today is fresh', () => {
+    expect(isFreshPost('2026-09-20', NOW)).toBe(true)
+  })
+
+  test('post exactly at the 7-day boundary is no longer fresh (strictly younger)', () => {
+    expect(isFreshPost(new Date(NOW - FRESH_WINDOW_MS).toISOString(), NOW)).toBe(false)
+  })
+
+  test('post one second past the boundary is not fresh', () => {
+    expect(isFreshPost(new Date(NOW - FRESH_WINDOW_MS - 1).toISOString(), NOW)).toBe(false)
+  })
+
+  test('old posts are not fresh', () => {
+    expect(isFreshPost('2026-08-03', NOW)).toBe(false)
+  })
+
+  test('future dates are not fresh (clock-skew guard)', () => {
+    expect(isFreshPost('2026-09-25', NOW)).toBe(false)
+  })
+
+  test('invalid dates are not fresh', () => {
+    expect(isFreshPost('not-a-date', NOW)).toBe(false)
+  })
+})

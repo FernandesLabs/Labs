@@ -847,6 +847,234 @@ The golden rule: **do not open the file with its default application.** Instead:
 If \`invoice.pdf\` turns out to start with \`4D 5A\`, delete it — and if it arrived by email, report it. The magic bytes never lie, because unlike the filename, nobody thought to forge them.
 `,
   },
+  {
+    slug: 'unix-timestamps-explained',
+    title: 'Unix Timestamps Explained: UTC, Timezones & Common Pitfalls',
+    description:
+      'What a Unix timestamp really is, why the epoch starts in 1970, how to convert timestamps to dates (and back) correctly, and the timezone and 2038 bugs that catch everyone out.',
+    date: '2026-09-18',
+    category: 'Developer',
+    keywords: [
+      'unix timestamp',
+      'unix timestamp converter',
+      'epoch time',
+      'convert timestamp to date',
+      'what is unix time',
+      'year 2038 problem',
+    ],
+    relatedTools: ['unix-timestamp-converter', 'cron-expression-generator'],
+    body: `
+## What is a Unix timestamp?
+
+A **Unix timestamp** (also called *epoch time*, *POSIX time*, or *Unix time*) is the number of **seconds** that have elapsed since **00:00:00 UTC on 1 January 1970** — the moment computers agreed to call "zero". That instant is known as **the Unix epoch**.
+
+Right now, somewhere around \`1,780,000,000\` seconds have passed since then. That integer is what your database stores, what your API returns in a \`created_at\` field, and what your logs print when something happens. It looks cryptic, but it solves a real problem: a plain number has **no timezone, no locale, no formatting** — it is the same instant everywhere on Earth.
+
+## Why developers use timestamps instead of dates
+
+- **Sorting is trivial** — bigger number = later. No date parsing required.
+- **No ambiguity** — \`03/04/2026\` means March 4th or April 3rd depending on where you are. \`1743724800\` means exactly one instant, everywhere.
+- **Arithmetic works** — "90 days from now" is \`now + 90 * 86400\`. Try that with a formatted date string.
+- **Storage is compact** — one integer column instead of a timezone-aware datetime type (which your database may or may not handle correctly).
+
+## Seconds vs milliseconds: the #1 mistake
+
+Not every system agrees on the unit:
+
+| System | Unit | Example value for Sep 2026 |
+|---|---|---|
+| Unix / Linux \`date +%s\`, PHP \`time()\` | **seconds** | \`1789836000\` |
+| JavaScript \`Date.now()\`, Java \`System.currentTimeMillis()\` | **milliseconds** | \`1789836000000\` |
+| .NET ticks, some telemetry systems | 100-nanosecond ticks | \`6387...\` (much longer) |
+
+The classic bug: a backend stores **seconds**, a frontend calls \`new Date(value)\` — which expects **milliseconds** — and every date renders as *January 1970*. If your dates all show 1970, multiply by 1000. If they show the far future, divide by 1000.
+
+Quick sanity check: a **seconds** timestamp is 10 digits (until the year 2286); a **milliseconds** timestamp is 13 digits. If you see 10 digits, it's seconds.
+
+## Converting timestamps: the fast way
+
+The fastest, safest conversion — paste the value into the [Unix Timestamp Converter](/tools/unix-timestamp-converter) and read the result in UTC *and* your local timezone at the same time. Seeing both at once is the point: it makes timezone bugs visible instead of invisible.
+
+In code, the conversion looks like this:
+
+\`\`\`js
+// Timestamp → Date (value in seconds!)
+const date = new Date(1789836000 * 1000);
+
+// Date → timestamp (seconds — drop the milliseconds)
+const ts = Math.floor(Date.now() / 1000);
+\`\`\`
+
+\`\`\`bash
+# Linux / macOS
+date +%s                 # now, in seconds
+date -d @1789836000      # timestamp → human date
+date -j -f %s 1789836000 # (macOS/BSD variant)
+\`\`\`
+
+## Timezones: why your +2 hours keep disappearing
+
+A timestamp is **timezone-free** — it always means the same absolute instant. Timezones only appear when you *display* the value:
+
+- \`1789836000\` is **2026-09-19 16:40 UTC** — simultaneously 17:40 in Lisbon (summer), 18:40 in Berlin, and 12:40 in New York.
+- The same timestamp formatted with different timezone settings produces different clock times, and that is correct behaviour.
+
+The dangerous part is **local time parsing**. When a user types \`2026-09-27 12:00\` and your code parses it with the *browser's* timezone but stores it as if it were UTC, you have silently shifted every appointment by the user's UTC offset. The fix is discipline:
+
+1. **Store timestamps** (UTC, seconds or milliseconds).
+2. **Convert to local time only for display.**
+3. Never parse a wall-clock string without knowing which timezone it belongs to.
+
+## Daylight saving time: the 25-hour day
+
+Timezones are bad enough; daylight saving makes them *irregular*:
+
+- Some days have **23 or 25 hours**. "Add 24 hours" and "add 1 day" are **not** the same operation.
+- Two clocks per year are ambiguous or impossible (the repeated hour in autumn, the skipped hour in spring).
+- Scheduling logic that assumes fixed daily offsets will drift — this is why cron-style systems (see the [Cron Expression Generator](/tools/cron-expression-generator)) work in **local wall-clock time** while timestamps work in absolute time. They are different tools for different questions: *"run at 09:00 every weekday"* is a wall-clock question; *"7 days after this event"* is an absolute-time question.
+
+## The year 2038 problem
+
+Most legacy systems store the timestamp in a **signed 32-bit integer**, which overflows on **19 January 2038** at 03:14:07 UTC. After that moment, 32-bit timestamps wrap around to 1901 — planes get unscheduled, subscriptions expire in the past, security certificates invalidate.
+
+Modern 64-bit systems (every phone and laptop sold this decade) are unaffected — the limit moves to roughly 292 billion years. The risk lives in embedded devices, industrial controllers, and old databases with 32-bit integer columns. If you maintain such a system, migrating those columns to 64-bit is the fix, and the deadline is closer than it looks.
+
+## Common pitfalls checklist
+
+- **Unit mismatch** — seconds vs milliseconds. Check digit count (10 vs 13) before converting.
+- **Parsing without a timezone** — \`2026-09-27\` alone is interpreted differently across languages (UTC in some, local in others). Be explicit.
+- **Floating-point timestamps** — \`1789836000.123\` truncates differently per language. Prefer integers.
+- **Client clocks lie** — never trust \`Date.now()\` on the client for authorization or ordering; use server time.
+- **Copying test values** — a "current timestamp" from a tutorial is years stale; generate a fresh one from the [Unix Timestamp Converter](/tools/unix-timestamp-converter) when testing.
+
+Timestamps reward a small amount of discipline: keep one unit, store UTC, convert at the edge, and treat wall-clock time as a display concern. Get those four habits right and the whole class of "off by two hours, sometimes" bugs disappears.
+`,
+  },
+  {
+    slug: 'utm-parameters-guide',
+    title: 'UTM Parameters Explained: Track Campaigns Without Breaking Analytics',
+    description:
+      'How to build UTM tracking URLs the right way: utm_source vs utm_medium vs utm_campaign, naming conventions that keep reports clean, encoding mistakes to avoid, and QR-code tracking.',
+    date: '2026-09-20',
+    category: 'SEO',
+    keywords: [
+      'utm parameters',
+      'utm builder',
+      'utm tracking url',
+      'campaign url builder',
+      'utm_source utm_medium utm_campaign',
+      'qr code campaign tracking',
+    ],
+    relatedTools: [
+      'campaign-url-builder',
+      'utm-builder',
+      'qr-campaign-generator',
+      'url-encoder-decoder',
+    ],
+    body: `
+## What are UTM parameters?
+
+**UTM parameters** are short labels you append to a URL so your analytics tool can tell you *where each visitor came from*. They are the difference between a report that says "1,400 visits from google.com" and one that says "620 visits from the *spring-sale newsletter*, 480 from *LinkedIn post #3*, 300 from a *partner banner*".
+
+The name is history, not marketing: **U**rchin **T**racking **M**odule — Urchin was the analytics company Google bought in 2005 and turned into Google Analytics. The convention outlived the product and is now understood by essentially every analytics platform.
+
+## The five parameters that matter
+
+| Parameter | Question it answers | Good values |
+|---|---|---|
+| \`utm_source\` | **Who** sent the traffic? | \`newsletter\`, \`linkedin\`, \`partner-blog\` |
+| \`utm_medium\` | **What kind** of channel? | \`email\`, \`cpc\`, \`social\`, \`referral\` |
+| \`utm_campaign\` | **Which initiative**? | \`spring-sale-2026\`, \`product-launch\` |
+| \`utm_term\` | Which paid keyword? | \`crm+software\` |
+| \`utm_content\` | Which creative/link variant? | \`cta-top\`, \`banner-a\` vs \`banner-b\` |
+
+Only \`utm_source\` and \`utm_medium\` are effectively required — without them your analytics tool buckets the visit into "(direct)" or "unattributed". The rest are optional but powerful: \`utm_content\` is what makes A/B comparisons possible ("the green button won, 2.3× more clicks").
+
+## A worked example
+
+Base URL:
+
+\`\`\`
+https://fernandeslabs.com/tools/json-formatter
+\`\`\`
+
+Tagged for a LinkedIn post promoting it as part of a launch campaign:
+
+\`\`\`
+https://fernandeslabs.com/tools/json-formatter
+  ?utm_source=linkedin
+  &utm_medium=social
+  &utm_campaign=launch-week
+  &utm_content=post-dev-tools
+\`\`\`
+
+Every click on that exact link is now separable in your reports from every other LinkedIn click. Build variants of it in seconds with the [Campaign URL Builder](/tools/campaign-url-builder) — it constructs the URL and keeps the parameter names consistent.
+
+## Naming conventions: where analytics goes to die
+
+UTM parameters are **case-sensitive and literal** in most analytics tools. These three values create **three separate report rows** for the same newsletter:
+
+\`\`\`
+utm_source=Newsletter
+utm_source=newsletter
+utm_source=NEWSLETTER
+\`\`\`
+
+Pick a convention and enforce it mechanically:
+
+- **All lowercase**, always (\`spring-sale\`, never \`Spring-Sale\`).
+- **Dashes, not spaces** — spaces must be encoded (\`spring%20sale\`) and are invisible in copied links.
+- **No PII** — no emails or names in parameters; many tools strip or block them, and it leaks data in referrer headers.
+- **A fixed medium vocabulary** — \`email\`, \`social\`, \`cpc\`, \`referral\`, \`qr\`. If one campaign says \`social-paid\` and the next says \`paid-social\`, your channel report splits in two.
+- **Dates in campaign names, not sources** — \`launch-2026-09\` expires naturally; \`linkedin-2026\` as a source does not.
+
+Teams that skip this end up with reports listing 40 variations of Facebook and no way to merge them after the fact.
+
+## Encoding: the silent report killer
+
+URLs can only contain a limited character set. Anything else — spaces, \`&\`, \`+\`, non-Latin characters — must be **percent-encoded**. Two failure modes are common:
+
+1. **Unencoded ampersands inside values.** \`utm_campaign=spring&sale\` produces campaign \`spring\` **plus a broken parameter** \`sale\`. If your campaign name contains \`&\`, use a dash: \`spring-sale\`.
+2. **Double encoding.** An encoded value that gets encoded again turns \`spring-sale\` into \`spring%252Dsale\` in reports. This happens when a URL passes through multiple systems (email service → redirect → landing page) and gets "helpfully" encoded at each hop.
+
+If you are building tagged links by hand, run the result through the [URL Encoder / Decoder](/tools/url-encoder-decoder) and decode it again to see exactly what a browser will receive. Or skip hand-building entirely: the [Campaign URL Builder](/tools/campaign-url-builder) and [UTM Builder](/tools/utm-builder) encode correctly as they go.
+
+## QR codes are UTM campaigns too
+
+A printed QR code is a **tracked channel** like any other — and unlike a link in an email, you cannot change the destination after printing. Tag the URL *inside* the QR code:
+
+\`\`\`
+https://fernandeslabs.com/tools/qr-generator
+  ?utm_source=poster
+  &utm_medium=qr
+  &utm_campaign=conference-2026
+  &utm_content=booth-banner
+\`\`\`
+
+Two rules make QR attribution work:
+
+- **Always use a unique campaign/source** (\`utm_medium=qr\` separates scans from web clicks in the same report).
+- **Shorten before generating** — every parameter adds characters, and more characters mean a denser, harder-to-scan code. The [QR Campaign Generator](/tools/qr-campaign-generator) builds the tagged URL and the code together, so the tag survives to print.
+
+Because the code on the banner is fixed, \`utm_content=booth-banner\` vs \`utm_content=flyer\` is how you later tell *which physical placement* actually drove visits.
+
+## Do UTM parameters hurt SEO?
+
+No — with one caveat. Google treats tagged URLs as separate addresses from the canonical page. As long as your pages declare a **canonical URL** (the tagged parameters are stripped from the canonical), link equity consolidates on the clean URL and the tagged variants do not compete in search results. Publish links with UTMs freely on social and in email; just verify your CMS emits self-referencing canonicals (the [Canonical URL Checker](/tools/canonical-url-checker) confirms it in one paste).
+
+## A 30-second pre-flight checklist
+
+Before you publish a tagged link:
+
+1. All lowercase, dashes for spaces?
+2. \`utm_source\` and \`utm_medium\` present, with values from your fixed vocabulary?
+3. URL decodes to exactly the parameters you intended?
+4. Opened the link in a private window — does it land on the right page?
+5. For print/QR: unique source, short URL, generated from the final tagged address?
+
+Clean UTM data is not a reporting nicety — it is the input to every "which channel should we double down on" decision you will make next quarter. Tag deliberately, and the answer is sitting in your analytics instead of buried under forty spelling variants.
+`,
+  },
 ]
 
 export function getBlogPost(slug: string): BlogPost | undefined {

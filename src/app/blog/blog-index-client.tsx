@@ -45,6 +45,9 @@ export interface BlogCatalogPost {
   minutes: number
   keywords: string
   searchText: string
+  /** True when the post is < 7 days old (computed server-side at build —
+   *  keeps Date.now() out of the client render path entirely). */
+  fresh?: boolean
 }
 
 /**
@@ -530,6 +533,12 @@ export function BlogIndexClient({
                         <h2 className="mt-2 text-lg font-bold text-foreground transition group-hover:text-primary">
                           {post.title}
                         </h2>
+                        {post.fresh ? (
+                          <span className="mt-1.5 inline-flex items-center gap-1 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                            <span className="size-1.5 animate-pulse rounded-full bg-emerald-500" aria-hidden />
+                            New
+                          </span>
+                        ) : null}
                         <p className="mt-1.5 flex-1 text-sm leading-relaxed text-muted-foreground">
                           {post.excerpt}
                         </p>

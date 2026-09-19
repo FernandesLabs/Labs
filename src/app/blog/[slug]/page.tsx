@@ -20,6 +20,7 @@ import {
   blogCategoryColor,
   splitBodyAtMiddleHeading,
   toPalettePosts,
+  isFreshPost,
 } from '@/lib/blog/blog-utils'
 
 interface Props {
@@ -244,6 +245,7 @@ export default async function BlogPostPage({ params }: Props) {
       postDate={post.date}
       postCategory={post.category}
       readingMinutes={readingMinutes}
+      fresh={isFreshPost(post.date)}
       olderPost={older ? { slug: older.slug, title: older.title, category: older.category } : null}
       newerPost={newer ? { slug: newer.slug, title: newer.title, category: newer.category } : null}
       authorName={authorName}
@@ -349,6 +351,11 @@ export default async function BlogPostPage({ params }: Props) {
                   <span className="mt-1.5 text-sm font-semibold leading-snug text-foreground transition group-hover:text-primary">
                     {p.title}
                   </span>
+                  {isFreshPost(p.date) ? (
+                    <span className="mt-1 inline-flex w-fit items-center gap-1 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                      New
+                    </span>
+                  ) : null}
                   <span className="mt-auto pt-2 text-[11px] text-muted-foreground">
                     {readingTimeMinutes(p.body)} min read
                   </span>
