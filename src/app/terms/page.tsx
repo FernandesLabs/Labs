@@ -7,6 +7,11 @@ export const metadata: Metadata = {
   description:
     'Terms governing the use of Fernandes Labs free online tools.',
   robots: { index: true, follow: true },
+  // Explicit canonical — without this the page inherited the homepage URL
+  // from the root layout and told Google it was a duplicate of "/".
+  alternates: {
+    canonical: `https://${siteConfig.site.domain}/terms`,
+  },
 }
 
 const SECTIONS = [

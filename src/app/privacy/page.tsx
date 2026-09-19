@@ -7,6 +7,11 @@ export const metadata: Metadata = {
   description:
     'How Fernandes Labs handles your data. All tools run client-side; we do not collect or store your input.',
   robots: { index: true, follow: true },
+  // Explicit canonical — without this the page inherited the homepage URL
+  // from the root layout and told Google it was a duplicate of "/".
+  alternates: {
+    canonical: `https://${siteConfig.site.domain}/privacy`,
+  },
 }
 
 const SECTIONS = [

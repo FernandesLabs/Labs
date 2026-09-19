@@ -546,6 +546,307 @@ Instead of hand-writing syntax and prefix lines, use the [CSS Gradient Generator
 Combine it with the [Color Converter](/tools/color-converter) to tweak hex values across formats, and verify accessible color pairs with the [Color Contrast Checker](/tools/color-contrast-checker) — everything runs in your browser, with nothing uploaded anywhere.
 `,
   },
+  {
+    slug: 'font-accessibility-guide',
+    title: 'Font Accessibility: Sizes, Weights & Legibility Rules That Matter',
+    description:
+      'How to choose genuinely readable fonts: minimum sizes, WCAG resize and spacing rules, line length, weight choices — and how to test any font pairing in seconds.',
+    date: '2026-09-04',
+    category: 'Design',
+    keywords: [
+      'font accessibility',
+      'font accessibility checker',
+      'accessible font size',
+      'wcag text legibility',
+      'minimum font size for website',
+      'readable body text',
+    ],
+    relatedTools: [
+      'font-accessibility-checker',
+      'color-contrast-checker',
+      'aria-validator',
+      'unicode-inspector',
+    ],
+    body: `
+## Why font accessibility matters
+
+Roughly **1 in 6 adults** has some form of low vision, and even users with perfect eyesight struggle with text that is too small, too light, or crammed into lines that are too long. Font accessibility is the practice of making your typography readable for everyone — and it is one of the cheapest improvements you can make, because it costs nothing but attention.
+
+It also has a measurable SEO angle: Google's page-experience signals reward content that is easy to consume, and accessibility audits (Lighthouse, axe) flag typography problems automatically. A page that fails basic legibility tends to have higher bounce rates, which eventually shows up in rankings.
+
+## The WCAG rules that affect typography
+
+The Web Content Accessibility Guidelines (WCAG) — the reference standard cited by accessibility laws worldwide — cover text in several success criteria:
+
+| Criterion | What it requires |
+|---|---|
+| **1.4.3 Contrast (Minimum)** | Body text needs at least **4.5:1** contrast against its background (3:1 for large text). |
+| **1.4.4 Resize Text** | Text must remain functional when resized to **200%** — no clipped content, no overlaps. |
+| **1.4.10 Reflow** | At 320 CSS pixels wide, content must reflow into one column without two-dimensional scrolling. |
+| **1.4.12 Text Spacing** | Users must be able to increase line height (to 1.5×), paragraph spacing (2×), letter spacing (0.12×) and word spacing (0.16×) without breaking the layout. |
+| **1.4.8 Visual Presentation** | For AAA conformance: line height ≥ 1.5, paragraph spacing ≥ 1.5× line height, line length ≤ 80 characters. |
+
+You don't need AAA for most projects — but every one of these is a real user complaint waiting to happen if ignored.
+
+## What size should body text be?
+
+The practical baseline most style guides converge on:
+
+- **16 px (1 rem) minimum** for body text on the web. Anything below 14 px should be reserved for captions or metadata, never primary content.
+- **12 px is the absolute floor** — and only for genuinely secondary labels. If you catch yourself using 10 px text, you are designing for a design tool, not for humans.
+- **Line height 1.5–1.7** for paragraphs. Headings can be tighter (1.1–1.3).
+- **Paragraph spacing** should be at least as large as the line height, so paragraphs read as distinct blocks.
+
+There is no law that says 16 px — but below that, reading speed measurably drops for low-vision users, and mobile browsers zoom or reflow unpredictably.
+
+## Weight, family and line length
+
+- **Avoid light weights (below 400) for body text.** Thin strokes vanish on low-contrast screens and on budget devices. Use 400–500 for paragraphs, 600–700 for headings.
+- **Prefer fonts with a large x-height** — the height of the lowercase letters relative to the capitals. Fonts like Inter, Source Sans, Verdana or Atkinson Hyperlegible were designed for exactly this. Decorative or condensed fonts are fine for headlines, hostile for paragraphs.
+- **Keep lines between 45 and 75 characters.** Longer lines make the eye lose its place when returning from the next line; shorter lines force choppy saccades.
+- **Do not justify body text.** Justification creates uneven "rivers" of white space that are especially hard for readers with dyslexia.
+- **Never rely on color alone** to convey meaning in text (e.g. red for errors) — pair it with an icon or label. And check that your text/background pair passes contrast rules with the [Color Contrast Checker](/tools/color-contrast-checker).
+
+## How to test a font combination in seconds
+
+You don't need to memorize the criteria above — the [Font Accessibility Checker](/tools/font-accessibility-checker) walks you through them:
+
+1. Enter the font size (in px), weight, line height, and the text color plus background color.
+2. The tool evaluates the combination against WCAG legibility guidance — contrast ratio, size floor, weight, and line-height rules — and tells you exactly which check fails and why.
+3. Adjust the values and re-run until everything passes, then copy the final values into your CSS.
+
+Because the tool runs entirely in your browser, you can paste in proprietary brand palettes without anything being uploaded anywhere.
+
+## Common mistakes (and the fix)
+
+- **Using \`opacity\` or a muted gray like #999 on white** for body text — fails 4.5:1. Use #595959 or darker.
+- **Setting \`font-size\` in \`px\` everywhere** and blocking browser zoom in the viewport meta tag. Use \`rem\` for text and never disable zoom — WCAG 1.4.4 explicitly tests it.
+- **Uppercase body text or letter-spacing: 3px** on paragraphs — casing shapes help word recognition; forced tracking destroys it. Uppercase is fine for short labels.
+- **Embedding text in images.** Text in images cannot be resized, reflowed, translated or read by screen readers. If you must, provide the same content as real text.
+- **Dark-mode inversions that keep the same colors** — a light-gray text (#ccc) on dark gray (#222) can pass contrast yet still cause halation (glare) for astigmatic readers. Slightly reduce brightness contrast in dark mode (e.g. #e0e0e0 on #1a1a1a) rather than pure white on black.
+
+## The 30-second accessibility audit
+
+Before you ship a page, run through this:
+
+1. **Zoom to 200%** — does the layout survive?
+2. **Squint test** — can you still read body text? If not, contrast or size is off.
+3. **Measure your line length** — between 45 and 75 characters?
+4. **Run the exact values through the [Font Accessibility Checker](/tools/font-accessibility-checker)** and fix whatever it flags.
+5. **Check color pairs** with the [Color Contrast Checker](/tools/color-contrast-checker), including link colors against both backgrounds.
+
+Accessible typography is not a design constraint — it is what good typography has always been. The same 16 px, 1.5 line-height, high-contrast combination that passes WCAG is simply the combination that reads comfortably for everyone.
+`,
+  },
+  {
+    slug: 'mime-types-explained',
+    title: 'MIME Types Explained: What "Content-Type" Actually Tells the Browser',
+    description:
+      'What a MIME type is, where it comes from, why mismatches break downloads and enable XSS — and how to detect the real MIME type of any file, offline, in your browser.',
+    date: '2026-09-10',
+    category: 'Developer',
+    keywords: [
+      'mime type',
+      'mime detector',
+      'content type checker',
+      'what is my mime type',
+      'x-content-type-options',
+      'file content type',
+    ],
+    relatedTools: [
+      'mime-detector',
+      'file-signature-inspector',
+      'http-header-checker',
+      'file-checksum',
+    ],
+    body: `
+## What a MIME type actually is
+
+MIME stands for **Multipurpose Internet Mail Extensions** — a standard born for email attachments in the early 1990s that became the way the entire web describes file formats. Every HTTP response carries one in its \`Content-Type\` header:
+
+\`\`\`http
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+\`\`\`
+
+A MIME type has two parts separated by a slash:
+
+- **A type** — the broad category: \`text\`, \`image\`, \`audio\`, \`video\`, \`application\`, \`font\`, \`model\`.
+- **A subtype** — the specific format: \`html\`, \`png\`, \`json\`, \`pdf\`, \`svg+xml\`…
+
+Optional **parameters** follow after a semicolon, like \`charset=utf-8\` or \`boundary=...\` for multipart forms. So \`text/html; charset=utf-8\` reads as: "this is an HTML document, encoded in UTF-8."
+
+## Where the browser gets a file's MIME type
+
+Here is the part that surprises people: **the MIME type is whatever the server says it is** — it is not derived from the file. When you upload \`photo.jpg\` to a static host, the server looks up the \`.jpg\` extension in a config table and confidently declares \`image/jpeg\`. Two consequences:
+
+1. **The extension, not the content, usually decides the declared type.** Rename a PNG to \`.jpg\` and most servers will label it \`image/jpeg\` even though the bytes are pure PNG.
+2. **Misconfigured servers lie accidentally.** A server without an SVG mapping may serve an SVG as \`application/octet-stream\` ("unknown binary"), forcing a download instead of rendering.
+
+## Common MIME types worth memorizing
+
+| Extension | MIME type |
+|---|---|
+| \`.html\` | \`text/html\` |
+| \`.css\` | \`text/css\` |
+| \`.js\` / \`.mjs\` | \`text/javascript\` |
+| \`.json\` | \`application/json\` |
+| \`.pdf\` | \`application/pdf\` |
+| \`.png\` | \`image/png\` |
+| \`.jpg\` | \`image/jpeg\` |
+| \`.webp\` | \`image/webp\` |
+| \`.svg\` | \`image/svg+xml\` |
+| \`.mp4\` | \`video/mp4\` |
+| \`.woff2\` | \`font/woff2\` |
+| \`.zip\` | \`application/zip\` |
+| unknown binary | \`application/octet-stream\` |
+
+Note the historical baggage: plain \`text/javascript\` is the modern standard, but older servers still emit \`application/javascript\` — both work in browsers today.
+
+## Why MIME mismatches are dangerous
+
+Browsers trust \`Content-Type\` for security-critical decisions:
+
+- **\`text/html\` means "execute me."** If a server serves user-uploaded files as \`text/html\`, an attacker can upload a "profile picture" that is actually an HTML page with scripts — and it will run on **your origin**, a classic stored-XSS vector. The fix is serving uploads as \`application/octet-stream\` (or better, from a separate domain) so the browser never interprets them as HTML.
+- **\`X-Content-Type-Options: nosniff\`** tells the browser: do not second-guess the declared type. Without it, browsers "MIME sniff" the actual bytes and may execute a mislabeled script anyway. With it, a script served as \`text/plain\` is blocked outright — which is exactly why the header stops the attack, and also why a misconfigured server that labels JavaScript as plain text will find its scripts refused by modern browsers.
+- **Strict MIME checking breaks sloppy servers.** Stylesheets served as \`text/plain\` are ignored in nosniff mode. If your CSS suddenly "doesn't load," inspect the \`Content-Type\` response header before touching the CSS itself.
+
+## How to check a file's real MIME type — offline
+
+Because the declared type comes from the server, the interesting question is usually **what the file really is**, based on its content. That is determined by the file's binary signature (magic bytes), which is exactly what the [MIME Detector](/tools/mime-detector) reads:
+
+1. Open the [MIME Detector](/tools/mime-detector) and drop in any file.
+2. It reads the first bytes of the file locally — the file never leaves your browser — and reports the detected MIME type and the matching extension.
+3. Compare the detected type with what your server declares. Mismatch? Fix the server mapping or re-export the file.
+
+For deeper verification, combine it with the [File Signature Inspector](/tools/file-signature-inspector) (shows the raw magic bytes) and the [HTTP Header Checker](/tools/http-header-checker) (shows the \`Content-Type\` your server actually sends for a URL).
+
+## Fixing MIME problems on your server
+
+**Nginx** — check \`mime.types\` is included and add anything missing:
+
+\`\`\`nginx
+types {
+    text/javascript js mjs;
+    image/webp webp;
+    image/svg+xml svg svgz;
+    font/woff2 woff2;
+}
+# And enforce nosniff globally:
+add_header X-Content-Type-Options nosniff always;
+\`\`\`
+
+**Apache** — \`mod_mime\` maps extensions, and headers go in \`\.htaccess\`:
+
+\`\`\`apache
+AddType image/webp .webp
+AddType font/woff2 .woff2
+AddType image/svg+xml .svg .svgz
+Header always set X-Content-Type-Options nosniff
+\`\`\`
+
+**Object storage (S3, R2, etc.)** — set the \`ContentType\` metadata at upload time; the SDK will not guess it for you.
+
+## The 60-second audit
+
+1. Run a key URL through the [HTTP Header Checker](/tools/http-header-checker) — is \`Content-Type\` correct and is \`nosniff\` present?
+2. Drop a representative file into the [MIME Detector](/tools/mime-detector) — does the real content match what the server claims?
+3. Check user-upload handling: are uploads ever served as \`text/html\`? If yes, fix that today.
+
+MIME types look like plumbing, but they decide whether a file renders, downloads, or executes. Ten minutes of checking is cheaper than one security incident.
+`,
+  },
+  {
+    slug: 'file-signatures-magic-bytes',
+    title: "File Signatures & Magic Bytes: How to Identify Any File's Real Type",
+    description:
+      'Every file starts with a signature that reveals what it really is. Learn the most common magic bytes, why extensions lie, and how to inspect files safely in your browser.',
+    date: '2026-09-16',
+    category: 'Security',
+    keywords: [
+      'file signature',
+      'magic bytes',
+      'file signature checker',
+      'identify file type',
+      'spoofed file extension',
+      'file header analysis',
+    ],
+    relatedTools: [
+      'file-signature-inspector',
+      'mime-detector',
+      'file-checksum',
+      'image-metadata-viewer',
+    ],
+    body: `
+## A file's name says nothing about its content
+
+You can rename \`malware.exe\` to \`invoice.pdf\` with two clicks. The extension is metadata — an arbitrary label — while the file's **actual format** is determined by its bytes. Operating systems hide extensions by default, which makes it trivially easy to send someone a disguised file that looks like a document in an email or a chat app.
+
+Fortunately, almost every file format starts with a predictable byte pattern called a **file signature** — informally, **magic bytes**. Read those first few bytes and the file tells you what it really is.
+
+## Famous magic bytes you can learn by heart
+
+| Signature (hex) | File type | Why you recognize it |
+|---|---|---|
+| \`FF D8 FF\` | JPEG image | Starts with the "JPEG SOI" marker |
+| \`89 50 4E 47 0D 0A 1A 0A\` | PNG image | The infamous **‰PNG** opening |
+| \`47 49 46 38\` | GIF image | ASCII \`GIF8\` |
+| \`25 50 44 46 2D\` | PDF document | ASCII \`%PDF-\` |
+| \`50 4B 03 04\` | ZIP archive | Also .docx, .xlsx, .jar, .apk — they are all ZIPs |
+| \`D0 CF 11 E0 A1 B1 1A E1\` | Legacy Office | Old .doc / .xls binary format |
+| \`7F 45 4C 46\` | Linux executable (ELF) | \`DEL\` + \`ELF\` |
+| \`4D 5A\` | Windows executable | ASCII \`MZ\` — Mark Zbikowski, the DOS developer |
+| \`1F 8B\` | gzip archive | Compressed Linux downloads |
+| \`52 49 46 46\` | RIFF container | WAV and AVI files |
+| \`42 4D\` | BMP image | ASCII \`BM\` |
+
+The \`50 4B 03 04\` ZIP signature explains a useful trick: a .docx that "won't open" can often be unzipped manually — because it *is* a zip file containing XML.
+
+## How signature detection works
+
+A detector reads the file at **offset 0** and compares the leading bytes against a table of known signatures. In JavaScript it is a few lines over an \`ArrayBuffer\`:
+
+\`\`\`js
+const buf = await file.slice(0, 16).arrayBuffer();
+const bytes = new Uint8Array(buf);
+if (bytes[0] === 0x89 && bytes[1] === 0x50) console.log('PNG');
+if (bytes[0] === 0xFF && bytes[1] === 0xD8) console.log('JPEG');
+if (bytes[0] === 0x25 && bytes[1] === 0x50) console.log('PDF');
+\`\`\`
+
+Some formats hide their signature at a fixed non-zero offset — e.g. disk images or some container formats mark their header a few hundred bytes in — so robust inspectors check a small set of known offsets and use content heuristics (like UTF-8 validation for text formats) as a fallback. That is exactly what the [File Signature Inspector](/tools/file-signature-inspector) does: it reads the header locally in your browser, decodes the signature, and tells you the most likely true format.
+
+## Why this matters for security
+
+**Attack 1 — the spoofed extension.** Email attachment: \`Report.pdf\` whose signature is \`4D 5A\` — a Windows executable. The PDF reader association never gets involved because there is no PDF inside. Users who "always open PDFs" never see it coming.
+
+**Attack 2 — the polyglot file.** Crafted files that are valid in two formats at once — a file that is both a harmless GIF to the image validator and a PHP script to the server. Signature checks at offset 0 alone can be fooled by polyglots; that is why upload pipelines layer checks (see below).
+
+**Attack 3 — the renamed upload.** A web app that validates uploads by extension only will happily accept \`payload.exe\` renamed to \`payload.png\` — and then serve it. If the server also declares it \`image/png\` while the bytes are an executable, extension-based "validation" has achieved nothing.
+
+## A defense-in-depth upload checklist
+
+If you run any app that accepts uploads, validate in this order:
+
+1. **Size limit first** — cheap DoS protection before any parsing happens.
+2. **MIME type from content**, not from the client-supplied header: read the magic bytes with the [MIME Detector](/tools/mime-detector) logic (server-side) or a library.
+3. **Signature check** for the exact expected type — a PNG must start with \`89 50 4E 47\`, not merely "look like an image".
+4. **Re-encode the image** if applicable (ImageMagick, sharp) — this destroys polyglot payloads by rewriting every pixel.
+5. **Serve uploads safely**: never as \`text/html\`, ideally from a sandboxed domain, with \`X-Content-Type-Options: nosniff\`.
+6. **Checksum** the stored file with the [File Checksum tool](/tools/file-checksum) so its integrity can be verified later.
+
+## Inspecting a suspicious file in 30 seconds — safely
+
+The golden rule: **do not open the file with its default application.** Instead:
+
+1. Open the [File Signature Inspector](/tools/file-signature-inspector).
+2. Drop the file in. Everything is read locally by your browser — the file never touches a server, so even genuinely malicious files cannot execute (a browser reading bytes is not an execution context).
+3. Read the verdict: the detected signature and true format.
+4. Cross-check with the [MIME Detector](/tools/mime-detector) and, for images, peek at embedded location and camera data with the [Image Metadata Viewer](/tools/image-metadata-viewer).
+
+If \`invoice.pdf\` turns out to start with \`4D 5A\`, delete it — and if it arrived by email, report it. The magic bytes never lie, because unlike the filename, nobody thought to forge them.
+`,
+  },
 ]
 
 export function getBlogPost(slug: string): BlogPost | undefined {

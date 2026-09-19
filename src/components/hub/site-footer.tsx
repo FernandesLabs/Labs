@@ -230,6 +230,8 @@ export function SiteFooter() {
             <span className="hidden text-border sm:inline">·</span>
             <Link href="/about" className="transition hover:text-foreground">About</Link>
             <span className="text-border">·</span>
+            <Link href="/contact" className="transition hover:text-foreground">Contact</Link>
+            <span className="text-border">·</span>
             <Link href="/blog" className="transition hover:text-foreground">Blog</Link>
             <span className="text-border">·</span>
             <Link href="/privacy" className="transition hover:text-foreground">Privacy</Link>

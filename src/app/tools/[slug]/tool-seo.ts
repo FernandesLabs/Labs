@@ -304,6 +304,21 @@ const SEO_OVERRIDES: Record<
     description:
       'Generate SEO-friendly page titles with power words and optimal length. Free title generator for content writers.',
   },
+  // Breakout tools from Search Console (Sep 2026 export):
+  // font-accessibility-checker is the site's highest-CTR page (4 clicks /
+  // 87 impressions, 4.6% CTR) but had no hand-tuned snippet. diff-checker
+  // shows steady long-tail impressions. Both were falling back to the
+  // generic template titles before.
+  'font-accessibility-checker': {
+    title: 'Font Accessibility Checker — WCAG Size & Legibility Test',
+    description:
+      'Check font accessibility instantly — test font size, weight and legibility against WCAG guidelines for readable body text. Free, no sign-up.',
+  },
+  'diff-checker': {
+    title: 'Diff Checker — Compare Two Texts & Highlight Changes',
+    description:
+      'Compare two texts or code snippets side by side and highlight every difference instantly. Free online diff checker — private, runs in your browser.',
+  },
 }
 
 /** Hand-tuned title + description for a tool (falls back to templates). */

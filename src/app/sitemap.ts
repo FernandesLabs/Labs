@@ -42,6 +42,12 @@ const PRIORITY_TOOL_SLUGS = new Set([
   'image-resizer',
   'ai-cost-calculator',
   'ai-persona-generator',
+  // Breakout tools from the Sep 2026 Search Console export — proven
+  // impressions/clicks that deserve first-priority crawl:
+  'font-accessibility-checker', // 4 clicks / 87 impr, 4.6% CTR (best on site)
+  'diff-checker',
+  'invoice-generator',
+  'unix-timestamp-converter',
 ])
 
 // A stable "last modified" date. Using a fixed date (instead of
@@ -49,7 +55,7 @@ const PRIORITY_TOOL_SLUGS = new Set([
 // Google caches it more aggressively and doesn't waste crawl budget
 // re-fetching "changed" sitemaps that haven't actually changed.
 // Update this date when you deploy significant content changes.
-const LAST_UPDATED = new Date('2026-08-23')
+const LAST_UPDATED = new Date('2026-09-19')
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = `https://${siteConfig.site.domain}`
@@ -73,6 +79,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: LAST_UPDATED,
       changeFrequency: 'monthly',
       priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/contact`,
+      lastModified: LAST_UPDATED,
+      changeFrequency: 'monthly',
+      priority: 0.5,
     },
     {
       url: `${baseUrl}/privacy`,

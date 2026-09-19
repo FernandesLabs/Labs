@@ -45,9 +45,14 @@ export const metadata: Metadata = {
     apple: "/fl-logo.svg",
   },
   manifest: "/manifest.webmanifest",
-  alternates: {
-    canonical: `https://${siteConfig.site.domain}/`,
-  },
+  // NOTE: no root-level `alternates.canonical` here on purpose. In Next.js
+  // App Router, every child page WITHOUT its own canonical INHERITS this
+  // root value — which made /privacy and /terms emit
+  // `<link rel="canonical" href="https://…/">` (pointing at the homepage!),
+  // telling Google those pages were duplicates of the home page.
+  // Each route now declares its own explicit canonical; metadataBase below
+  // still resolves relative canonical URLs for any route that uses one.
+  // The homepage canonical lives in `src/app/page.tsx` (server metadata).
   // Google Search Console verification — paste your token in site-config.ts
   ...(siteConfig.searchConsole.verificationToken
     ? {
