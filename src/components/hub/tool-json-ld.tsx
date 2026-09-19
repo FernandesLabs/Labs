@@ -34,10 +34,12 @@ import { getToolContentOverride } from '@/app/tools/[slug]/tool-content-override
  */
 export function ToolJsonLd({ tool }: { tool: Tool }) {
   const cat = CATEGORY_META[tool.category]
-  const origin =
-    typeof window !== 'undefined'
-      ? window.location.origin
-      : `https://${siteConfig.site.domain}`
+  // Always emit the canonical production domain, never `window.location.origin`.
+  // Using window.location caused a hydration mismatch (server renders the
+  // canonical domain, the client re-renders with the visitor's host, e.g.
+  // localhost) AND would embed non-canonical URLs in the JSON-LD when the page
+  // is served from any non-canonical host (preview deploys, www vs apex...).
+  const origin = `https://${siteConfig.site.domain}`
   const toolUrl = `${origin}/tools/${tool.slug}`
   const categoryUrl = `${origin}/category/${tool.category}`
 

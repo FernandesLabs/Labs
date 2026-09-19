@@ -3,8 +3,11 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { toolMetadata } from '@/lib/tools/tool-metadata'
 import { siteConfig } from '@/lib/site-config'
+import { blogPosts } from '@/lib/blog/posts'
+import { guidesForTools, readingTimeMinutes } from '@/lib/blog/blog-utils'
 import { generateToolTitle, generateToolDescription } from './tool-seo'
 import { ToolPageClient } from './tool-page-client'
+import type { ToolGuide } from '@/components/hub/tool-related-guides'
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -79,10 +82,26 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  * Tool page — server component that looks up the tool by slug and delegates
  * client-side rendering (which needs the lazy-loaded Component) to
  * `ToolPageClient`.
+ *
+ * Also resolves the blog guides whose `relatedTools` include this tool (the
+ * tool → guide side of the internal-linking loop) and passes a slim,
+ * serializable slice down for the sidebar "Guides & tutorials" card. The
+ * markdown bodies never enter the client bundle — only slug/title/category/
+ * minutes do.
  */
 export default async function ToolPage({ params }: Props) {
   const { slug } = await params
   const tool = toolMetadata.find((t) => t.slug === slug)
   if (!tool) notFound()
-  return <ToolPageClient slug={tool.slug} />
+
+  const relatedGuides: ToolGuide[] = guidesForTools([tool.slug], blogPosts, 3).map(
+    (post) => ({
+      slug: post.slug,
+      title: post.title,
+      category: post.category,
+      minutes: readingTimeMinutes(post.body),
+    })
+  )
+
+  return <ToolPageClient slug={tool.slug} guides={relatedGuides} />
 }

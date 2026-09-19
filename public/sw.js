@@ -1,11 +1,14 @@
 // Fernandes Labs Tool Network — Service Worker
 // Cache-first for static assets, network-first for HTML, stale-while-revalidate fallback.
-const SW_VERSION = 'fl-v1'
+// v2: precaches the branded /offline fallback page and serves it when a
+//     navigation request fails both the network and every cache.
+const SW_VERSION = 'fl-v2'
 const STATIC_CACHE = `${SW_VERSION}-static`
 const RUNTIME_CACHE = `${SW_VERSION}-runtime`
-// Assets to precache on install (app shell + shared assets)
+// Assets to precache on install (app shell + shared assets + offline fallback)
 const PRECACHE_URLS = [
   '/',
+  '/offline',
   '/manifest.webmanifest',
   '/fl-logo.svg',
 ]
@@ -37,7 +40,9 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(req.url)
   // Only handle same-origin requests; let cross-origin (CDN libs) pass through.
   if (url.origin !== self.location.origin) return
-  // Navigation requests (HTML pages): network-first, fall back to cached shell.
+  // Navigation requests (HTML pages): network-first, fall back to the cached
+  // copy of the requested page, then the cached homepage shell, then the
+  // branded /offline page (always precached).
   if (req.mode === 'navigate') {
     event.respondWith(
       fetch(req)
@@ -46,7 +51,12 @@ self.addEventListener('fetch', (event) => {
           caches.open(RUNTIME_CACHE).then((c) => c.put('/', copy))
           return res
         })
-        .catch(() => caches.match('/').then((r) => r || caches.match(req)))
+        .catch(() =>
+          caches
+            .match(req)
+            .then((r) => r || caches.match('/'))
+            .then((r) => r || caches.match('/offline'))
+        )
     )
     return
   }

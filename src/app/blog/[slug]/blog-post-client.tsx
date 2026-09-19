@@ -16,6 +16,7 @@ import { SiteHeader } from '@/components/hub/site-header'
 import { SiteFooter } from '@/components/hub/site-footer'
 import { BackToTop } from '@/components/hub/back-to-top'
 import { SkipToContent } from '@/components/hub/skip-to-content'
+import { ReadingProgress } from '@/components/hub/reading-progress'
 import { AdblockBanner } from '@/components/ads/adblock-banner'
 import { NewsletterCta } from '@/components/hub/newsletter-cta'
 import { ShareRow } from '@/components/hub/share-row'
@@ -59,6 +60,9 @@ export function BlogPostClient({
   const formattedDate = formatIsoDate(postDate)
   return (
     <div className="flex min-h-screen flex-col">
+      {/* Scroll progress — guides are 1,000+ word reads; tool pages already
+          ship this, so the reading experience stays consistent site-wide. */}
+      <ReadingProgress />
       <SkipToContent />
       <AdblockBanner />
       <SiteHeader

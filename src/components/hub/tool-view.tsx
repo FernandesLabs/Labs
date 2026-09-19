@@ -22,6 +22,7 @@ import { SiteFooter } from './site-footer'
 import { FavoriteButton } from './favorite-button'
 import { ToolContent } from './tool-content'
 import { ToolJsonLd } from './tool-json-ld'
+import { ToolRelatedGuides, type ToolGuide } from './tool-related-guides'
 import { BackToTop } from './back-to-top'
 import { MobileSidebar } from './mobile-sidebar'
 import { ReadingProgress } from './reading-progress'
@@ -71,6 +72,7 @@ export function ToolView({
   tools,
   toolsBySlug: _toolsBySlug,
   recent: _recent,
+  guides = [],
   onBack,
   onSelect,
 }: {
@@ -78,6 +80,8 @@ export function ToolView({
   tools: Tool[]
   toolsBySlug: Map<string, Tool>
   recent: string[]
+  /** Blog guides whose relatedTools include this tool (server-resolved). */
+  guides?: ToolGuide[]
   onBack: () => void
   onSelect: (slug: string) => void
 }) {
@@ -298,6 +302,9 @@ export function ToolView({
                   <ExternalLink className="size-3" />
                 </Link>
               </section>
+
+              {/* Related guides — blog posts covering this tool (hidden when none exist) */}
+              <ToolRelatedGuides guides={guides} />
 
               {/* Vertical ad */}
               <div className="hidden lg:block">
