@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic'
 import { SiteHeader } from '@/components/hub/site-header'
 import { SiteFooter } from '@/components/hub/site-footer'
 import { HubView } from '@/components/hub/hub-view'
-import { SeoLinksSection } from '@/components/hub/seo-links-section'
+import { SeoLinksSection, type SeoGuideLink } from '@/components/hub/seo-links-section'
 import { CurationSection } from '@/components/hub/curation-section'
 import { BackToTop } from '@/components/hub/back-to-top'
 import { SkipToContent } from '@/components/hub/skip-to-content'
@@ -42,9 +42,13 @@ const ShortcutsHelp = dynamic(
  */
 export function HomePageClient({
   posts = [],
+  guides = [],
 }: {
   /** Slim guide list for the ⌘K palette's "Guides" group (server-computed). */
   posts?: PalettePost[]
+  /** Slim guide links for the SEO internal-linking block (server-computed —
+   *  keeps post markdown out of the homepage client bundle). */
+  guides?: SeoGuideLink[]
 }) {
   const router = useRouter()
   const [paletteOpen, setPaletteOpen] = React.useState(false)
@@ -202,7 +206,7 @@ export function HomePageClient({
       <CurationSection />
       {/* SEO: internal-linking section with crawlable anchors to the top
           tools, all blog posts, and the About page (link equity + E-E-A-T). */}
-      <SeoLinksSection />
+      <SeoLinksSection guides={guides} />
       <SiteFooter />
       <CommandPalette
         open={paletteOpen}

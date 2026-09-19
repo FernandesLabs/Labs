@@ -8,10 +8,8 @@ import { BackToTop } from '@/components/hub/back-to-top'
 import { ReadingProgress } from '@/components/hub/reading-progress'
 import { SkipToContent } from '@/components/hub/skip-to-content'
 import { AdblockBanner } from '@/components/ads/adblock-banner'
-import { Rss } from 'lucide-react'
-import dynamic from 'next/dynamic'
-import type { PalettePost } from '@/components/hub/command-palette'
 import {
+  Rss,
   CalendarDays,
   FileText,
   ArrowRight,
@@ -20,17 +18,34 @@ import {
   X,
   Sparkles,
   SearchX,
+  BookOpen,
 } from 'lucide-react'
-import { toolMetaList } from '@/lib/tools/tool-meta'
-import { blogPosts } from '@/lib/blog/posts'
+import dynamic from 'next/dynamic'
 import type { PalettePost } from '@/components/hub/command-palette'
+import { toolMetaList } from '@/lib/tools/tool-meta'
 import {
   blogCategoryColor,
   formatIsoDate,
-  getBlogCategories,
-  postsByDateDesc,
-  readingTimeMinutes,
 } from '@/lib/blog/blog-utils'
+import {
+  readGuideProgress,
+  removeGuideProgress,
+  type GuideProgressEntry,
+} from '@/lib/blog/reading-progress-store'
+
+/** Server-computed, slim guide metadata — full markdown NEVER reaches the
+ *  client bundle (the old module-scope blogPosts import shipped ~80KB of
+ *  post bodies for search that only uses title/excerpt/keywords). */
+export interface BlogCatalogPost {
+  slug: string
+  title: string
+  excerpt: string
+  category: string
+  date: string
+  minutes: number
+  keywords: string
+  searchText: string
+}
 
 /**
  * BlogIndexClient — client-side wrapper for the blog index.
@@ -38,24 +53,17 @@ import {
  * The blog page itself (`page.tsx`) is a server component that exports the
  * `metadata` (title, description, canonical). This client component handles
  * the interactive parts:
+ *   - "Continue reading" strip (per-guide scroll progress from localStorage)
  *   - instant client-side search (title + excerpt + keywords)
  *   - category filter chips with live counts
  *   - a featured "latest guide" hero card
  *   - `/` keyboard shortcut to focus search (same pattern as the hub and
  *     category pages)
+ *
+ * NOTE: `POSTS` is passed in from the server as `catalog` — do not import
+ * `blogPosts` here; it would pull every guide's full markdown body (~80KB)
+ * into the client bundle.
  */
-const POSTS = postsByDateDesc(blogPosts).map((p) => ({
-  slug: p.slug,
-  title: p.title,
-  excerpt: p.description,
-  category: p.category,
-  date: p.date,
-  minutes: readingTimeMinutes(p.body),
-  keywords: p.keywords.join(' ').toLowerCase(),
-  searchText: `${p.title} ${p.description} ${p.keywords.join(' ')}`.toLowerCase(),
-}))
-
-const CATEGORIES = getBlogCategories(blogPosts)
 
 // Lazy-load the palette (cmdk + Dialog, ~60KB) — only needed on ⌘K / click.
 const CommandPalette = dynamic(
@@ -64,8 +72,11 @@ const CommandPalette = dynamic(
 )
 
 export function BlogIndexClient({
+  catalog = [],
   posts = [],
 }: {
+  /** Server-computed slim guide metadata (search, cards, categories). */
+  catalog?: BlogCatalogPost[]
   /** Slim guide list for the ⌘K palette (server-computed, see page.tsx). */
   posts?: PalettePost[]
 }) {
@@ -74,6 +85,14 @@ export function BlogIndexClient({
   const [query, setQuery] = React.useState('')
   const [activeCategory, setActiveCategory] = React.useState<string | null>(null)
   const searchRef = React.useRef<HTMLInputElement | null>(null)
+  // "Continue reading" history — read AFTER hydration (never during first
+  // render: the server has no localStorage, so reading it in render would be
+  // a hydration mismatch — same rule as use-tool-history).
+  const [progress, setProgress] = React.useState<GuideProgressEntry[]>([])
+
+  React.useEffect(() => {
+    setProgress(readGuideProgress())
+  }, [])
 
   // "/" focuses the search box — consistent with the hub + category pages.
   React.useEffect(() => {
@@ -93,17 +112,47 @@ export function BlogIndexClient({
 
   const filtered = React.useMemo(() => {
     const q = query.trim().toLowerCase()
-    return POSTS.filter((p) => {
+    return catalog.filter((p) => {
       if (activeCategory && p.category !== activeCategory) return false
       if (!q) return true
       return p.searchText.includes(q)
     })
-  }, [query, activeCategory])
+  }, [catalog, query, activeCategory])
+
+  // Category chips with per-category counts (same data the server used to
+  // compute at module scope — now derived from the slim catalog prop).
+  const categories = React.useMemo(() => {
+    const counts = new Map<string, number>()
+    for (const p of catalog) counts.set(p.category, (counts.get(p.category) ?? 0) + 1)
+    return [...counts.entries()]
+      .map(([name, count]) => ({ name, count, color: blogCategoryColor(name) }))
+      .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
+  }, [catalog])
+
+  // "Continue reading" — at most 3 entries, mapped to catalog metadata
+  // (entries for deleted/unknown slugs are dropped). Hidden while searching
+  // or filtering so results stay a uniform, scannable grid (same rule as
+  // the featured hero).
+  const continueReading = React.useMemo(() => {
+    if (query.trim() || activeCategory) return []
+    return progress
+      .map((e) => {
+        const post = catalog.find((p) => p.slug === e.slug)
+        return post ? { ...e, post } : null
+      })
+      .filter((e): e is GuideProgressEntry & { post: BlogCatalogPost } => Boolean(e))
+      .slice(0, 3)
+  }, [progress, catalog, query, activeCategory])
+
+  const dismissReading = (slug: string) => {
+    setProgress((prev) => prev.filter((e) => e.slug !== slug))
+    removeGuideProgress(slug)
+  }
 
   // When no filter is active the first card (newest post) is promoted to the
   // hero; the remaining cards render below. While searching/filtering the
   // hero is dropped so results stay a uniform, scannable grid.
-  const featured = !query.trim() && !activeCategory ? POSTS[0] : null
+  const featured = !query.trim() && !activeCategory ? catalog[0] : null
   const rest = featured ? filtered.slice(1) : filtered
   const featuredColor = featured ? blogCategoryColor(featured.category) : null
 
@@ -209,10 +258,10 @@ export function BlogIndexClient({
             >
               All guides
               <span className="rounded-full bg-muted/70 px-1.5 text-[10px] tabular-nums">
-                {POSTS.length}
+                {catalog.length}
               </span>
             </button>
-            {CATEGORIES.map((c) => {
+            {categories.map((c) => {
               const active = activeCategory === c.name
               return (
                 <button
@@ -250,7 +299,82 @@ export function BlogIndexClient({
           </div>
         </div>
 
-        {POSTS.length === 0 ? (
+        {/* Continue reading — persisted scroll position per guide (localStorage
+            only, see /privacy). Hidden while searching/filtering; dismissible. */}
+        {continueReading.length > 0 ? (
+          <section
+            aria-label="Continue reading"
+            className="mb-8 rounded-2xl border border-border/70 bg-gradient-to-br from-primary/[0.04] to-transparent p-5"
+          >
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <h2 className="inline-flex items-center gap-2 text-sm font-bold tracking-tight text-foreground">
+                <BookOpen className="size-4 text-primary" aria-hidden />
+                Continue reading
+              </h2>
+              <span className="text-[11px] text-muted-foreground/70">
+                saved on this device
+              </span>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-3">
+              {continueReading.map(({ slug, pct, post }) => {
+                const color = blogCategoryColor(post.category)
+                return (
+                  <div
+                    key={slug}
+                    className="group relative rounded-xl border border-border/70 bg-card transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
+                  >
+                    <Link
+                      href={`/blog/${slug}`}
+                      className="block p-4 focus-visible:outline-none"
+                      aria-label={`Resume ${post.title} — ${pct}% read`}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide">
+                          <span
+                            className="size-2 rounded-full"
+                            style={{ backgroundColor: color }}
+                            aria-hidden
+                          />
+                          <span style={{ color }}>{post.category}</span>
+                        </span>
+                        <span className="text-[11px] font-semibold tabular-nums text-muted-foreground">
+                          {pct}% read
+                        </span>
+                      </div>
+                      <p className="mt-1.5 line-clamp-2 text-sm font-semibold leading-snug text-foreground transition group-hover:text-primary">
+                        {post.title}
+                      </p>
+                      {/* Resume position — the bar doubles as a skip hint */}
+                      <div className="mt-3 h-1 overflow-hidden rounded-full bg-muted">
+                        <div
+                          className="h-full rounded-full transition-all"
+                          style={{ width: `${pct}%`, backgroundColor: color }}
+                        />
+                      </div>
+                      <span className="mt-2.5 inline-flex items-center gap-1 text-xs font-medium text-primary">
+                        Resume
+                        <ArrowRight
+                          className="size-3.5 transition group-hover:translate-x-0.5"
+                          aria-hidden
+                        />
+                      </span>
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => dismissReading(slug)}
+                      aria-label={`Remove ${post.title} from continue reading`}
+                      className="absolute right-1.5 top-1.5 rounded-full p-1.5 text-muted-foreground/60 opacity-0 transition hover:bg-muted hover:text-foreground focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring group-hover:opacity-100"
+                    >
+                      <X className="size-3.5" aria-hidden />
+                    </button>
+                  </div>
+                )
+              })}
+            </div>
+          </section>
+        ) : null}
+
+        {catalog.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border/70 bg-muted/20 p-12 text-center">
             <FileText className="h-10 w-10 text-muted-foreground/80" />
             <p className="mt-3 text-base font-medium text-foreground">
@@ -273,7 +397,7 @@ export function BlogIndexClient({
               <span className="font-semibold text-foreground tabular-nums">
                 {filtered.length}
               </span>{' '}
-              of {POSTS.length} guides
+              of {catalog.length} guides
               {query.trim() ? (
                 <>
                   {' '}for{' '}

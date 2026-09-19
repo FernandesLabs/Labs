@@ -1,6 +1,14 @@
 import Link from 'next/link'
 import { ArrowRight, BookOpen, Wrench, Info } from 'lucide-react'
-import { blogPosts } from '@/lib/blog/posts'
+
+/** Slim guide metadata passed from a Server Component — importing `blogPosts`
+ *  directly here would ship every guide's full markdown body (~80KB) in the
+ *  homepage's client bundle. Only slug/title/description are needed. */
+export interface SeoGuideLink {
+  slug: string
+  title: string
+  description: string
+}
 
 /**
  * SeoLinksSection — homepage internal-linking block (Phase 2 link equity).
@@ -86,7 +94,7 @@ const TOP_TOOLS: { slug: string; anchor: string; blurb: string }[] = [
   },
 ]
 
-export function SeoLinksSection() {
+export function SeoLinksSection({ guides = [] }: { guides?: SeoGuideLink[] }) {
   return (
     <section
       aria-label="Popular tools and blog guides"
@@ -136,7 +144,7 @@ export function SeoLinksSection() {
           canonical tags, robots.txt, IP lookups and more.
         </p>
         <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {blogPosts.map((post) => (
+          {guides.map((post) => (
             <li key={post.slug}>
               <Link
                 href={`/blog/${post.slug}`}

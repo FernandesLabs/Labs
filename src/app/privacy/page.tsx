@@ -119,6 +119,11 @@ export default function PrivacyPage() {
             your favorited and recently-used tools.
           </li>
           <li>
+            <strong>Reading progress</strong> (localStorage): remembers where
+            you stopped in a guide so the blog can show a &ldquo;Continue
+            reading&rdquo; shortcut. Stays on your device — never sent to us.
+          </li>
+          <li>
             <strong>Feedback votes</strong> (localStorage + anonymous server
             tally): remembers your 👍/👎 choice in your browser, and adds one
             anonymous count to our servers. We store only the page name and

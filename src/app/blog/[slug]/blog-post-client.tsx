@@ -76,8 +76,9 @@ export function BlogPostClient({
   return (
     <div className="flex min-h-screen flex-col">
       {/* Scroll progress — guides are 1,000+ word reads; tool pages already
-          ship this, so the reading experience stays consistent site-wide. */}
-      <ReadingProgress />
+          ship this, so the reading experience stays consistent site-wide.
+          persistSlug saves the position so /blog can offer "Continue reading". */}
+      <ReadingProgress persistSlug={postSlug} />
       <SkipToContent />
       <AdblockBanner />
       <SiteHeader

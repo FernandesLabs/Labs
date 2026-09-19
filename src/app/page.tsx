@@ -43,5 +43,13 @@ export const metadata: Metadata = {
 }
 
 export default function Home() {
-  return <HomePageClient posts={toPalettePosts(blogPosts)} />
+  // Slim guide links for the SEO internal-linking block — slug/title/
+  // description only, so the ~80KB of post markdown never reaches the
+  // homepage's client bundle.
+  const guides = blogPosts.map((p) => ({
+    slug: p.slug,
+    title: p.title,
+    description: p.description,
+  }))
+  return <HomePageClient posts={toPalettePosts(blogPosts)} guides={guides} />
 }
