@@ -13,6 +13,7 @@ import { BlogToc } from '@/components/hub/blog-toc'
 import { MobileSidebar } from '@/components/hub/mobile-sidebar'
 import {
   extractToc,
+  getAdjacentPosts,
   getRelatedPosts,
   readingTimeMinutes,
   slugifyHeading,
@@ -82,6 +83,35 @@ export default async function BlogPostPage({ params }: Props) {
   const tocItems = extractToc(post.body)
   const readingMinutes = readingTimeMinutes(post.body)
   const relatedPosts = getRelatedPosts(post, blogPosts, 3)
+  // Chronological neighbors for the prev/next footer navigation.
+  const { newer, older } = getAdjacentPosts(post, blogPosts)
+  // E-E-A-T: attribute the article to a real person when NEXT_PUBLIC_FOUNDER_NAME
+  // is configured; otherwise fall back to the team identity (still linked to
+  // the About page from the byline). The JSON-LD author mirrors the visible
+  // byline — Google checks entity consistency between markup and page.
+  const authorName = siteConfig.founder.name ?? 'The Fernandes Labs Team'
+  const authorRole = siteConfig.founder.name
+    ? siteConfig.founder.jobTitle
+    : 'Editors & Developers'
+  const jsonLdAuthor = siteConfig.founder.name
+    ? {
+        '@type': 'Person',
+        name: siteConfig.founder.name,
+        jobTitle: siteConfig.founder.jobTitle,
+        ...(siteConfig.founder.profileUrl
+          ? { url: siteConfig.founder.profileUrl }
+          : {}),
+        worksFor: {
+          '@type': 'Organization',
+          name: siteConfig.site.name,
+          url: siteConfig.site.url,
+        },
+      }
+    : {
+        '@type': 'Organization',
+        name: authorName,
+        url: `${siteConfig.site.url}/about`,
+      }
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -95,11 +125,7 @@ export default async function BlogPostPage({ params }: Props) {
         dateModified: post.date,
         inLanguage: 'en',
         mainEntityOfPage: url,
-        author: {
-          '@type': 'Organization',
-          name: siteConfig.site.name,
-          url: siteConfig.site.url,
-        },
+        author: jsonLdAuthor,
         publisher: {
           '@type': 'Organization',
           name: siteConfig.site.name,
@@ -130,6 +156,10 @@ export default async function BlogPostPage({ params }: Props) {
       postDate={post.date}
       postCategory={post.category}
       readingMinutes={readingMinutes}
+      olderPost={older ? { slug: older.slug, title: older.title, category: older.category } : null}
+      newerPost={newer ? { slug: newer.slug, title: newer.title, category: newer.category } : null}
+      authorName={authorName}
+      authorRole={authorRole}
     >
       <script
         type="application/ld+json"

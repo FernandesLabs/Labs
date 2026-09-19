@@ -11,6 +11,8 @@ import {
   CATEGORY_ORDER,
   type ToolCategory,
 } from '@/lib/tools/types'
+import { blogPosts } from '@/lib/blog/posts'
+import { guidesForTools, readingTimeMinutes } from '@/lib/blog/blog-utils'
 import { CategoryPageClient } from './category-page-client'
 /**
  * Category landing page — `/category/<category>` (e.g. `/category/developer`).
@@ -106,6 +108,18 @@ export default async function CategoryPage({ params }: PageProps) {
     meta: CATEGORY_META[c],
     count: toolMetaList.filter((t) => t.category === c).length,
   }))
+  // Blog guides that cover at least one tool in this category — server-rendered
+  // so crawlers see the tools ↔ guides cross-links (topical cluster signal).
+  const guides = guidesForTools(
+    tools.map((t) => t.slug),
+    blogPosts,
+    3
+  ).map((p) => ({
+    slug: p.slug,
+    title: p.title,
+    description: p.description,
+    minutes: readingTimeMinutes(p.body),
+  }))
   // Structured data: BreadcrumbList + ItemList (the list of tools in this category).
   const structuredData = {
     '@context': 'https://schema.org',
@@ -151,6 +165,7 @@ export default async function CategoryPage({ params }: PageProps) {
         category={cat}
         tools={tools}
         otherCategories={otherCategories}
+        guides={guides}
       />
     </>
   )

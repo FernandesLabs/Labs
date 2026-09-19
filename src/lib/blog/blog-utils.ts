@@ -95,3 +95,79 @@ export const BLOG_CATEGORY_COLORS: Record<string, string> = {
 export function blogCategoryColor(category: string): string {
   return BLOG_CATEGORY_COLORS[category] ?? '#64748b'
 }
+
+/**
+ * Deterministic ISO-date ("2026-08-03") → "August 3, 2026" formatter.
+ * No Date object, no timezone parsing — server HTML and client hydration
+ * always produce identical output (prevents hydration mismatches for users
+ * west of UTC, where Date parsing would shift the date a day back).
+ * Single source of truth — previously duplicated in two client components.
+ */
+const MONTHS = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+] as const
+
+export function formatIsoDate(iso: string): string {
+  const [y, m, d] = iso.split('-').map(Number)
+  if (!y || !m || !d || m < 1 || m > 12 || d < 1 || d > 31) return iso
+  return `${MONTHS[m - 1]} ${d}, ${y}`
+}
+
+/**
+ * Sort posts newest-first (ISO dates sort lexicographically).
+ * Used by the blog index, prev/next navigation, and category guides.
+ */
+export function postsByDateDesc(posts: BlogPost[]): BlogPost[] {
+  return [...posts].sort((a, b) => b.date.localeCompare(a.date))
+}
+
+/**
+ * Chronological neighbors of a post (newest-first list): the previous item is
+ * the next-older post, the next item is the next-newer post. Powers the
+ * prev/next footer navigation on blog posts — a standard engagement pattern
+ * that keeps readers inside the topical cluster.
+ */
+export function getAdjacentPosts(
+  current: BlogPost,
+  all: BlogPost[]
+): { newer: BlogPost | null; older: BlogPost | null } {
+  const sorted = postsByDateDesc(all)
+  const idx = sorted.findIndex((p) => p.slug === current.slug)
+  if (idx === -1) return { newer: null, older: null }
+  return {
+    newer: idx > 0 ? sorted[idx - 1] : null,
+    older: idx < sorted.length - 1 ? sorted[idx + 1] : null,
+  }
+}
+
+/**
+ * Distinct blog categories with post counts, newest-post-first order.
+ * Powers the filter chips on the blog index.
+ */
+export function getBlogCategories(
+  posts: BlogPost[]
+): { name: string; count: number; color: string }[] {
+  const counts = new Map<string, number>()
+  for (const p of posts) counts.set(p.category, (counts.get(p.category) ?? 0) + 1)
+  return [...counts.entries()]
+    .map(([name, count]) => ({ name, count, color: blogCategoryColor(name) }))
+    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
+}
+
+/**
+ * Blog guides topically related to a set of tool slugs (e.g. every tool in a
+ * category): a guide matches when ANY of its relatedTools is in the set.
+ * Powers the "Guides & tutorials" section on the category landing pages —
+ * this is the blog ↔ tools cross-link that ties the topical clusters together.
+ */
+export function guidesForTools(
+  toolSlugs: string[],
+  posts: BlogPost[],
+  max = 3
+): BlogPost[] {
+  const set = new Set(toolSlugs)
+  return postsByDateDesc(posts)
+    .filter((p) => p.relatedTools.some((t) => set.has(t)))
+    .slice(0, max)
+}

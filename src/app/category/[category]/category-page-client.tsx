@@ -2,7 +2,7 @@
 import * as React from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Search, X, ArrowRight, ChevronRight, Home, Layers } from 'lucide-react'
+import { Search, X, ArrowRight, ChevronRight, Home, Layers, BookOpen, Clock } from 'lucide-react'
 import { SiteHeader } from '@/components/hub/site-header'
 import { SiteFooter } from '@/components/hub/site-footer'
 import { BackToTop } from '@/components/hub/back-to-top'
@@ -19,16 +19,19 @@ import { CATEGORY_META } from '@/lib/tools/types'
 /**
  * Client component for the category landing page.
  * Renders the category hero + a searchable grid of tools in that category
- * + cross-links to other categories.
+ * + server-provided links to related blog guides + cross-links to other
+ * categories.
  */
 export function CategoryPageClient({
   category,
   tools,
   otherCategories,
+  guides,
 }: {
   category: ToolCategory
   tools: ToolMeta[]
   otherCategories: { category: ToolCategory; meta: typeof CATEGORY_META[ToolCategory]; count: number }[]
+  guides: { slug: string; title: string; description: string; minutes: number }[]
 }) {
   const router = useRouter()
   const cat = CATEGORY_META[category]
@@ -200,6 +203,66 @@ export function CategoryPageClient({
             </>
           )}
         </section>
+        {/* Related guides — server-rendered blog cross-links (topical cluster) */}
+        {guides.length > 0 ? (
+          <section className="mx-auto max-w-6xl px-4 pb-4" aria-labelledby="category-guides-heading">
+            <div className="mb-3 flex items-end justify-between gap-3">
+              <div>
+                <h2
+                  id="category-guides-heading"
+                  className="text-sm font-bold uppercase tracking-wider text-muted-foreground"
+                >
+                  <BookOpen className="mr-1.5 inline size-3.5 text-primary" aria-hidden />
+                  Guides &amp; tutorials
+                </h2>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Learn the best practices behind these {cat.label.toLowerCase()} tools.
+                </p>
+              </div>
+              <Link
+                href="/blog"
+                className="group inline-flex shrink-0 items-center gap-1 text-xs font-medium text-primary hover:underline"
+              >
+                All guides
+                <ArrowRight className="size-3 transition group-hover:translate-x-0.5" aria-hidden />
+              </Link>
+            </div>
+            <div
+              className={
+                guides.length === 1
+                  ? 'grid gap-3 sm:grid-cols-2'
+                  : guides.length === 2
+                    ? 'grid gap-3 sm:grid-cols-2 lg:grid-cols-2'
+                    : 'grid gap-3 sm:grid-cols-3'
+              }
+            >
+              {guides.map((g) => (
+                <Link
+                  key={g.slug}
+                  href={`/blog/${g.slug}`}
+                  className="group flex flex-col rounded-xl border border-border/80 bg-card p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5"
+                >
+                  <h3 className="text-sm font-semibold leading-snug text-foreground transition-colors group-hover:text-primary">
+                    {g.title}
+                  </h3>
+                  <p className="mt-1.5 line-clamp-2 flex-1 text-xs leading-relaxed text-muted-foreground">
+                    {g.description}
+                  </p>
+                  <span className="mt-3 inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground">
+                    <Clock className="size-3" aria-hidden />
+                    {g.minutes} min read
+                    <span className="text-border">·</span>
+                    <span className="text-primary transition group-hover:underline">Read guide</span>
+                    <ArrowRight
+                      className="size-3 text-primary transition group-hover:translate-x-0.5"
+                      aria-hidden
+                    />
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </section>
+        ) : null}
         {/* Other categories */}
         <section className="mx-auto max-w-6xl px-4 pb-12">
           <h2 className="mb-3 text-sm font-bold uppercase tracking-wider text-muted-foreground">
