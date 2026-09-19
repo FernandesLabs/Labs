@@ -19,6 +19,7 @@ import {
   Sparkles,
   SearchX,
   BookOpen,
+  ChevronDown,
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import type { PalettePost } from '@/components/hub/command-palette'
@@ -74,6 +75,12 @@ const CommandPalette = dynamic(
   { ssr: false }
 )
 
+/** Guides rendered per page (hero included in the budget). The index shows
+ *  the newest PAGE_SIZE guides and reveals the rest behind a "Load more"
+ *  button — keeps the initial grid scannable (and the DOM lean) as the
+ *  library grows past a dozen posts. */
+const PAGE_SIZE = 12
+
 export function BlogIndexClient({
   catalog = [],
   posts = [],
@@ -87,6 +94,9 @@ export function BlogIndexClient({
   const [paletteOpen, setPaletteOpen] = React.useState(false)
   const [query, setQuery] = React.useState('')
   const [activeCategory, setActiveCategory] = React.useState<string | null>(null)
+  // Pagination — every filter change (search/category) resets to the first
+  // page so results always start at the newest guide.
+  const [visibleCount, setVisibleCount] = React.useState(PAGE_SIZE)
   const searchRef = React.useRef<HTMLInputElement | null>(null)
   // "Continue reading" history — read AFTER hydration (never during first
   // render: the server has no localStorage, so reading it in render would be
@@ -156,8 +166,26 @@ export function BlogIndexClient({
   // hero; the remaining cards render below. While searching/filtering the
   // hero is dropped so results stay a uniform, scannable grid.
   const featured = !query.trim() && !activeCategory ? catalog[0] : null
-  const rest = featured ? filtered.slice(1) : filtered
   const featuredColor = featured ? blogCategoryColor(featured.category) : null
+
+  // Paged slice of `filtered` — PAGE_SIZE counts the hero card, so the page
+  // budget is identical whether or not a hero is showing. `visibleRest` is
+  // what the grid actually renders (the hero is pulled out of the slice).
+  const visibleFiltered = filtered.slice(0, visibleCount)
+  const visibleRest = featured ? visibleFiltered.slice(1) : visibleFiltered
+  const hiddenCount = filtered.length - visibleFiltered.length
+  // Honest result count: exactly what is on screen (paged).
+  const visibleTotal = visibleFiltered.length
+
+  // Search/category setters also reset pagination (single render, no effect).
+  const applySearch = (value: string) => {
+    setQuery(value)
+    setVisibleCount(PAGE_SIZE)
+  }
+  const applyCategory = (category: string | null) => {
+    setActiveCategory(category)
+    setVisibleCount(PAGE_SIZE)
+  }
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -220,7 +248,7 @@ export function BlogIndexClient({
               ref={searchRef}
               type="search"
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e) => applySearch(e.target.value)}
               placeholder="Search guides… try “redirect”, “mime”, “contrast”"
               aria-label="Search guides"
               className="h-11 w-full rounded-full border border-border/80 bg-card pl-10 pr-20 text-sm text-foreground shadow-sm outline-none transition placeholder:text-muted-foreground/60 focus:border-primary/60 focus:ring-2 focus:ring-primary/20 [&::-webkit-search-cancel-button]:hidden"
@@ -229,7 +257,7 @@ export function BlogIndexClient({
               <button
                 type="button"
                 onClick={() => {
-                  setQuery('')
+                  applySearch('')
                   searchRef.current?.focus()
                 }}
                 className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1.5 text-muted-foreground transition hover:bg-muted hover:text-foreground"
@@ -251,7 +279,7 @@ export function BlogIndexClient({
           <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Filter by category">
             <button
               type="button"
-              onClick={() => setActiveCategory(null)}
+              onClick={() => applyCategory(null)}
               aria-pressed={activeCategory === null}
               className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                 activeCategory === null
@@ -270,7 +298,7 @@ export function BlogIndexClient({
                 <button
                   key={c.name}
                   type="button"
-                  onClick={() => setActiveCategory(active ? null : c.name)}
+                  onClick={() => applyCategory(active ? null : c.name)}
                   aria-pressed={active}
                   className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                     active
@@ -394,11 +422,12 @@ export function BlogIndexClient({
           </div>
         ) : (
           <>
-            {/* Result count */}
+            {/* Result count — reflects what is actually on screen
+                (paged), not just what matched the filter. */}
             <p className="mb-4 text-xs text-muted-foreground" aria-live="polite">
               Showing{' '}
               <span className="font-semibold text-foreground tabular-nums">
-                {filtered.length}
+                {visibleTotal}
               </span>{' '}
               of {catalog.length} guides
               {query.trim() ? (
@@ -426,8 +455,8 @@ export function BlogIndexClient({
                 <button
                   type="button"
                   onClick={() => {
-                    setQuery('')
-                    setActiveCategory(null)
+                    applySearch('')
+                    applyCategory(null)
                   }}
                   className="mt-4 rounded-lg border border-border bg-background px-3.5 py-2 text-xs font-medium text-foreground transition hover:border-primary hover:text-primary"
                 >
@@ -501,7 +530,7 @@ export function BlogIndexClient({
                 ) : null}
 
                 <div className="grid gap-6 sm:grid-cols-2">
-                  {rest.map((post) => {
+                  {visibleRest.map((post) => {
                     const color = blogCategoryColor(post.category)
                     return (
                       <Link
@@ -557,6 +586,42 @@ export function BlogIndexClient({
                     )
                   })}
                 </div>
+
+                {/* Load more — reveals the next page of the (filtered) list.
+                    Search/category changes reset pagination to page one. */}
+                {hiddenCount > 0 ? (
+                  <div className="mt-8 flex flex-col items-center gap-2.5">
+                    <button
+                      type="button"
+                      onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
+                      className="group inline-flex h-11 items-center gap-2 rounded-full border border-border bg-card px-5 text-sm font-semibold text-foreground shadow-sm transition hover:-translate-y-0.5 hover:border-primary/60 hover:text-primary hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:translate-y-0 active:scale-95"
+                      aria-label={`Load ${Math.min(PAGE_SIZE, hiddenCount)} more guides — ${hiddenCount} remaining`}
+                    >
+                      Load more guides
+                      <span className="rounded-full bg-muted/80 px-2 py-0.5 text-[10px] font-bold tabular-nums text-muted-foreground transition group-hover:bg-primary/10 group-hover:text-primary">
+                        +{Math.min(PAGE_SIZE, hiddenCount)}
+                      </span>
+                      <ChevronDown
+                        className="size-4 text-muted-foreground transition group-hover:translate-y-0.5 group-hover:text-primary"
+                        aria-hidden
+                      />
+                    </button>
+                    <p className="text-[11px] text-muted-foreground/70">
+                      newest first · {hiddenCount} more below
+                    </p>
+                  </div>
+                ) : catalog.length > PAGE_SIZE && !query.trim() && !activeCategory ? (
+                  /* End-of-list marker — only meaningful once the list has
+                     actually been paginated at least once. */
+                  <p
+                    className="mt-8 flex items-center justify-center gap-3 text-xs text-muted-foreground/70"
+                    aria-label={`All ${catalog.length} guides shown`}
+                  >
+                    <span className="h-px w-10 bg-border" aria-hidden />
+                    That&apos;s all {catalog.length} guides
+                    <span className="h-px w-10 bg-border" aria-hidden />
+                  </p>
+                ) : null}
               </>
             )}
           </>

@@ -1075,6 +1075,253 @@ Before you publish a tagged link:
 Clean UTM data is not a reporting nicety — it is the input to every "which channel should we double down on" decision you will make next quarter. Tag deliberately, and the answer is sitting in your analytics instead of buried under forty spelling variants.
 `,
   },
+  {
+    slug: 'open-graph-meta-tags-guide',
+    title: 'Open Graph Meta Tags: Control How Your Links Look When Shared',
+    description:
+      'How Open Graph tags work and how to get them right: the four required properties, og:image sizes that render everywhere, Twitter card fallbacks, caching traps, and a debugging checklist.',
+    date: '2026-09-19',
+    category: 'SEO',
+    keywords: [
+      'open graph meta tags',
+      'og:image size',
+      'og:title og:description',
+      'twitter card meta tags',
+      'link preview image',
+      'open graph debugger',
+    ],
+    relatedTools: ['open-graph-preview', 'meta-tag-generator'],
+    body: `
+## What Open Graph tags actually do
+
+When you paste a URL into WhatsApp, X, LinkedIn, Slack, or iMessage, the app doesn't screenshot your page — it **fetches the page's HTML and looks for a small set of \`<meta>\` tags in the \`<head>\`** to build the link preview: the title, the description, and the image card.
+
+The vocabulary those apps agree on is the **Open Graph protocol**, created by Facebook in 2010. It defines page-level metadata through \`property\` attributes:
+
+\`\`\`html
+<meta property="og:title" content="JSON Formatter & Validator" />
+<meta property="og:description" content="Format, validate, and minify JSON instantly." />
+<meta property="og:image" content="https://fernandeslabs.com/api/og?tool=json-formatter" />
+<meta property="og:url" content="https://fernandeslabs.com/tools/json-formatter" />
+\`\`\`
+
+If those tags are missing, sharing apps improvise — usually by grabbing the page's \`<title>\`, the meta description, and a random image from the page, or nothing at all. An unbranded, cropped, or empty preview measurably hurts click-through: the card is often the *only* thing a reader sees before deciding whether to tap.
+
+## The four required properties
+
+The Open Graph spec names four properties that every page should declare:
+
+| Tag | What it controls | Notes |
+|---|---|---|
+| \`og:title\` | The bold headline of the card | Can differ from the \`<title>\` tag — shorter and punchier is fine |
+| \`og:type\` | What kind of object this is | \`website\` for pages, \`article\` for blog posts (with \`article:published_time\`) |
+| \`og:image\` | The preview image | The single most important tag — must be an **absolute URL** |
+| \`og:url\` | The canonical address of the page | Should match your canonical URL so shares consolidate |
+
+Two more are effectively required in practice:
+
+- \`og:description\` — two lines of pitch text under the title.
+- \`og:site_name\` — the brand name shown on some platforms (Facebook, LinkedIn).
+
+And one that gets forgotten constantly:
+
+- \`og:image:alt\` — an accessibility description of the image. X and Facebook both support it; screen readers announce it on shared cards.
+
+## Getting og:image right (where most sites fail)
+
+The image is where previews succeed or die. Each platform has its own renderer, but one size covers all of them:
+
+**1200 × 630 pixels** — a 1.91:1 ratio. This is Facebook's documented recommendation and it renders cleanly on LinkedIn, Slack, Discord, and X's large-card layout.
+
+The full rulebook, per platform:
+
+| Platform | Minimum | Recommended | File limit |
+|---|---|---|---|
+| Facebook | 200 × 200 px | 1200 × 630 px | 8 MB |
+| X (large card) | 300 × 157 px | 1200 × 628 px (2:1) | 5 MB |
+| WhatsApp | 300 px wide | 1200 × 630 px, **≤ 4:1 ratio** | ~300 KB safe |
+
+Three details that bite in production:
+
+1. **Under 600 × 315, Facebook shows a small square thumbnail instead of the large card.** Technically valid, visually weak — don't ship it.
+2. **WhatsApp is the strictest consumer.** Images over roughly 300 KB frequently fail to render at all, and anything wider than a 4:1 ratio gets cropped. A 1200 × 630 **JPEG at quality ~80** almost always lands under the limit; a PNG of the same dimensions often doesn't.
+3. **Declare the dimensions** so platforms don't have to fetch the image to learn its size:
+
+\`\`\`html
+<meta property="og:image" content="https://example.com/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Dashboard screenshot with the weekly report" />
+\`\`\`
+
+You can generate a spec-correct card for any page in seconds with the [Open Graph Preview](/tools/open-graph-preview) tool — it renders the 1200 × 630 canvas and shows exactly what the shared card will look like before you paste the link anywhere.
+
+## Twitter/X cards: one extra tag, then Open Graph does the rest
+
+X supports its own card vocabulary but **falls back to Open Graph** for every field it doesn't find. The only tag X *requires* that Open Graph doesn't cover is the card type:
+
+\`\`\`html
+<meta name="twitter:card" content="summary_large_image" />
+\`\`\`
+
+- \`summary_large_image\` — big 2:1 image with the title/description below. This is what you want for articles and landing pages.
+- \`summary\` — small square thumbnail beside the text. Fine for links where the image isn't the story.
+
+Everything else is fallback: \`twitter:title\` → \`og:title\`, \`twitter:description\` → \`og:description\`, \`twitter:image\` → \`og:image\`. So a page with complete Open Graph tags needs exactly **one** extra line to look right on X. Add \`twitter:image:alt\` only if you want alt text on X that differs from the OG alt.
+
+## The caching trap: why your fix "doesn't work"
+
+You update the tags, redeploy, paste the link — and the *old* preview appears. The tags aren't broken; the platform **cached the previous scrape**.
+
+- **Facebook/WhatsApp**: each URL is scraped once and the result is cached aggressively. Facebook's Sharing Debugger re-scrapes on demand ("Scrape Again" button). WhatsApp caches even harder and has no debugger — the practical fix is appending a throwaway query parameter (\`?v=2\`) to force a fresh URL through the cache.
+- **X, LinkedIn, Slack**: short-lived caches; usually a fresh paste after a few minutes is enough.
+
+This trap is why preview tags must be **in the initial server-rendered HTML**. If your tags only appear after JavaScript runs, most scrapers — which do not execute JS the way browsers do, or give up before hydration — will see nothing and render a bare link.
+
+## Common failures, ranked by frequency
+
+1. **Relative image URLs** — \`og:image="/og.png"\` is invalid; scrapers have no origin to resolve it against. Always the full \`https://\` address.
+2. **Tags injected client-side** — see above. Server-render them.
+3. **Image too heavy for WhatsApp** — the card silently drops the image. Compress to JPEG.
+4. **One set of tags for the whole site** — every page shares the homepage card. Generic cards on a specific article read as spam and get fewer clicks.
+5. **Duplicate properties** — two \`og:image\` tags (one from the theme, one from a plugin) with different sizes: platforms pick arbitrarily.
+6. **Special characters not escaped** — an unescaped \`&\` or quote in a content attribute can terminate the tag mid-value. If your titles contain \`&\`, encode it (\`&amp;\`) or verify the rendered head with the [Meta Tag Generator](/tools/meta-tag-generator), which emits correctly escaped attributes.
+
+## Debug checklist
+
+Before shipping any page that will be shared:
+
+1. View source (not the inspector) — the tags are in the **initial HTML**?
+2. \`og:image\` is an absolute HTTPS URL that returns a 200?
+3. Image is 1200 × 630, under ~300 KB, JPEG or PNG?
+4. \`twitter:card\` present with \`summary_large_image\`?
+5. Render the card with the [Open Graph Preview](/tools/open-graph-preview) tool — is the title readable at thumbnail size?
+6. Paste the URL into Facebook's Sharing Debugger and X's Card Validator once, after deploy — did each platform see what you intended?
+
+Link previews are one of the few SEO surfaces you can fully control and verify in minutes. Given that the card *is* the page for most social audiences, it is minutes extremely well spent.
+`,
+  },
+  {
+    slug: 'password-entropy-guide',
+    title: 'Password Entropy Explained: The Math Behind Truly Strong Passwords',
+    description:
+      'What password entropy actually measures, the length × character-pool formula, crack-time tables with honest assumptions, why human passwords fall short, and the NIST rules that follow from the math.',
+    date: '2026-09-19',
+    category: 'Security',
+    keywords: [
+      'password entropy',
+      'strong password',
+      'password strength',
+      'entropy formula',
+      'crack time',
+      'nist password guidelines',
+    ],
+    relatedTools: [
+      'password-generator',
+      'password-strength-checker',
+      'hash-generator',
+      'uuid-generator',
+    ],
+    body: `
+## Entropy is a count of possibilities
+
+Password strength has a precise unit: **entropy**, measured in bits. Each bit doubles the number of possible passwords an attacker must try. A password with 40 bits of entropy lives in a space of 2⁴⁰ candidates; 60 bits means 2⁶⁰ — a million times larger.
+
+Entropy is not about how the password *looks* (\`P@ssw0rd!\` scores well on the old "uppercase + symbol" checklists and terribly in reality). It measures **how unpredictable the selection process was**. A password is strong when it was chosen uniformly at random from a large pool — because that maximizes the space an attacker must search.
+
+## The formula
+
+For a password of **L** characters chosen randomly from a pool of **R** possible characters:
+
+\`\`\`
+entropy (bits) = L × log₂(R)
+\`\`\`
+
+The character pool **R** depends on what the password is allowed to contain:
+
+| Pool | R | Bits per character |
+|---|---|---|
+| Lowercase only | 26 | 4.70 |
+| Lowercase + digits | 36 | 5.17 |
+| Upper + lower + digits | 62 | 5.95 |
+| All printable ASCII (adds symbols) | 94 | 6.55 |
+
+Every bit of pool expansion adds less than length does: going from 26 to 94 symbols buys you ~1.85 bits per character, while **each extra character multiplies the entire search space**. This is the mathematical reason length beats complexity.
+
+## Worked examples
+
+| Password pattern | Entropy |
+|---|---|
+| 8 lowercase letters | 8 × 4.70 ≈ **38 bits** |
+| 12 lowercase + digits | 12 × 5.17 ≈ **62 bits** |
+| 16 alphanumeric (mixed case) | 16 × 5.95 ≈ **95 bits** |
+| 12 full ASCII random | 12 × 6.55 ≈ **79 bits** |
+| 20 full ASCII random | 20 × 6.55 ≈ **131 bits** |
+
+The [Password Generator](/tools/password-generator) builds passwords from a stated pool and length, so the entropy is a property of the *generator settings* — not a hopeful guess. The [Password Strength Checker](/tools/password-strength-checker) estimates the entropy of a password you already use.
+
+## How long would cracking actually take?
+
+Translate bits into time with an explicit attacker model. Offline attack against a stolen password database (the common case — sites store **hashes**, not passwords, and the attacker guesses against the hash): a plausible 2026 setup is **10¹¹ guesses per second** on commodity GPU hardware.
+
+Under that assumption:
+
+| Entropy | Candidates | Time to exhaust |
+|---|---|---|
+| 38 bits | 2.7 × 10¹¹ | ~3 seconds |
+| 60 bits | 1.2 × 10¹⁸ | ~4 months |
+| 80 bits | 1.2 × 10²⁴ | ~380,000 years |
+| 100 bits | 1.3 × 10³⁰ | ~400 billion years |
+
+Read the table honestly: at 10¹¹/s, **60 bits survives months, not "forever"** — and specialized rigs are faster. For credentials that matter, aim for **80 bits and up**. Against *online* guessing (typing into a login form, rate-limited to thousands of attempts per second), even 60 bits is effectively unbreakable — which is why leaked-database attacks are the threat that actually consumes passwords.
+
+## Why human-generated passwords fall short
+
+The formula assumes **uniform random selection**. Humans are terrible random generators, and every pattern shrinks the real pool:
+
+- \`Tr0ub4dor&3\` — looks random, but the substitutions are predictable (a→4, o→0, e→3 are what every cracking rule set tries *first*). Real entropy: closer to 30 bits than 40.
+- Password1!-style patterns — capital first, symbol last, year appended. Cracking tools encode these shapes and search them orders of magnitude faster than raw brute force.
+- Reused personal data — birthdays, team names, \`<site>\`123. Dictionary + context attacks cover these immediately.
+
+This is why entropy estimated from a *human choosing* must be discounted from entropy of a *uniform draw* — the whole point of a generator is that it removes you from the process.
+
+## Passphrases: entropy you can memorize
+
+Random words beat random characters per unit of memorability. A **diceware-style** passphrase draws N words uniformly from a 7,776-word list (6⁵ — five dice per word):
+
+\`\`\`
+entropy = N × log₂(7776) ≈ N × 12.9 bits
+\`\`\`
+
+| Words | Entropy | Example |
+|---|---|---|
+| 4 | ~52 bits | quartz-lantern-moss-tide |
+| 5 | ~65 bits | quartz-lantern-moss-tide-gravel |
+| 6 | ~78 bits | …add a sixth word |
+
+Five words give you the same ~65 bits as 12 random lowercase-and-digit characters — and you can type it on a phone without mashing the symbol key. The rules that keep passphrase entropy honest: the words must be **truly random** (roll dice or use a generator — your "random" word picks are not), and **don't** substitute leetspeak or append predictable tweaks, which just adds a false sense of scale.
+
+## What NIST's rules follow from the math
+
+NIST SP 800-63B — the US standard that most modern guidance descends from — falls directly out of this model:
+
+- **Minimum 8 characters**, and **allow at least 64** (long passphrases must be legal).
+- **No composition rules** ("must contain a symbol") — they push users toward predictable substitutions that *lower* real entropy.
+- **Check against breached-password lists** — a leaked password has zero effective entropy regardless of its length.
+- **No forced periodic rotation** without evidence of compromise — rotation pushes \`Summer2024!\` → \`Summer2025!\`, and predictability is the enemy.
+- **All printable ASCII and Unicode allowed**, spaces included — pool size should not be artificially capped.
+
+## Practical rules of thumb
+
+1. **Length first.** 16+ random characters, or 5+ random words, for anything you care about.
+2. **Let a generator pick.** Human patterns are the vulnerability. The [Password Generator](/tools/password-generator) draws uniformly from the pool you configure.
+3. **Unique per site.** Entropy is irrelevant if the same password leaks from three sites. A password manager holds the uniqueness; you hold one strong master passphrase (5–6 diceware words).
+4. **Verify with the [Password Strength Checker](/tools/password-strength-checker)** — it discounts dictionary words and patterns instead of rewarding \`P@ssw0rd\`.
+5. **Where you can't memorize it, you don't have to** — for machine credentials, API keys, and WiFi preshared keys, generate 128+ bits with no memorability constraint (a [UUID Generator](/tools/uuid-generator) output at 122 random bits, or a long ASCII string, both work).
+
+Entropy gives you something no password "strength meter" from the 2000s can: a number you can reason about. Count the pool, multiply by the length, compare against the attacker's budget — and the vague advice "use a strong password" becomes arithmetic.
+`,
+  },
 ]
 
 export function getBlogPost(slug: string): BlogPost | undefined {
