@@ -3,25 +3,28 @@
 import * as React from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ChevronRight, Home, CalendarDays, Tag } from 'lucide-react'
+import { ChevronRight, Home, CalendarDays, Clock } from 'lucide-react'
 import { SiteHeader } from '@/components/hub/site-header'
 import { SiteFooter } from '@/components/hub/site-footer'
 import { BackToTop } from '@/components/hub/back-to-top'
 import { SkipToContent } from '@/components/hub/skip-to-content'
 import { AdblockBanner } from '@/components/ads/adblock-banner'
 import { toolMetaList } from '@/lib/tools/tool-meta'
+import { blogCategoryColor } from '@/lib/blog/blog-utils'
 
 export function BlogPostClient({
   postTitle,
   postExcerpt,
   postDate,
   postCategory,
+  readingMinutes,
   children,
 }: {
   postTitle: string
   postExcerpt: string
   postDate: string
   postCategory: string
+  readingMinutes: number
   children: React.ReactNode
 }) {
   const router = useRouter()
@@ -61,13 +64,28 @@ export function BlogPostClient({
         {/* Post header */}
         <header className="mb-8">
           <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-            <span className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-0.5 font-semibold text-primary">
-              <Tag className="size-3" />
+            <span
+              className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 font-semibold"
+              style={{
+                color: blogCategoryColor(postCategory),
+                borderColor: `${blogCategoryColor(postCategory)}55`,
+                backgroundColor: `${blogCategoryColor(postCategory)}14`,
+              }}
+            >
+              <span
+                className="size-2 rounded-full"
+                style={{ backgroundColor: blogCategoryColor(postCategory) }}
+                aria-hidden
+              />
               {postCategory}
             </span>
             <span className="inline-flex items-center gap-1">
               <CalendarDays className="size-3" />
               {formattedDate}
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <Clock className="size-3" />
+              {readingMinutes} min read
             </span>
           </div>
           <h1 className="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">

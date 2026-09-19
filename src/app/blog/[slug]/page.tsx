@@ -9,6 +9,15 @@ import { blogPosts, getBlogPost } from '@/lib/blog/posts'
 import { toolMetadata } from '@/lib/tools/tool-metadata'
 import { AdUnit } from '@/components/ads/ad-unit'
 import { BlogPostClient } from './blog-post-client'
+import { BlogToc } from '@/components/hub/blog-toc'
+import { MobileSidebar } from '@/components/hub/mobile-sidebar'
+import {
+  extractToc,
+  getRelatedPosts,
+  readingTimeMinutes,
+  slugifyHeading,
+  blogCategoryColor,
+} from '@/lib/blog/blog-utils'
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -70,6 +79,9 @@ export default async function BlogPostPage({ params }: Props) {
     .map((s) => toolMetadata.find((t) => t.slug === s))
     .filter((t): t is NonNullable<typeof t> => Boolean(t))
     .slice(0, 6)
+  const tocItems = extractToc(post.body)
+  const readingMinutes = readingTimeMinutes(post.body)
+  const relatedPosts = getRelatedPosts(post, blogPosts, 3)
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -117,20 +129,39 @@ export default async function BlogPostPage({ params }: Props) {
       postExcerpt={post.description}
       postDate={post.date}
       postCategory={post.category}
+      readingMinutes={readingMinutes}
     >
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <article className="mx-auto max-w-3xl">
+      {/* Content + sticky TOC rail (toc collapses into a disclosure above the
+          article on mobile — same pattern as the tool pages). */}
+      <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_220px] lg:items-start lg:gap-8">
+        <aside className="lg:order-2">
+          <MobileSidebar>
+            <section className="rounded-xl border border-border/70 bg-card p-4">
+              <BlogToc items={tocItems} />
+            </section>
+          </MobileSidebar>
+        </aside>
+        <article className="mx-auto max-w-3xl lg:order-1 lg:mx-0 lg:max-w-none">
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
           components={{
-            h2: ({ children }) => (
-              <h2 className="mb-3 mt-10 text-2xl font-bold tracking-tight text-foreground">
-                {children}
-              </h2>
-            ),
+            h2: ({ children }) => {
+              // Anchor ids for the TOC scroll-spy — slugified exactly like
+              // extractToc does on the raw markdown (see blog-utils).
+              const id = slugifyHeading(childrenToText(children))
+              return (
+                <h2
+                  id={id}
+                  className="mb-3 mt-10 scroll-mt-24 text-2xl font-bold tracking-tight text-foreground"
+                >
+                  {children}
+                </h2>
+              )
+            },
             h3: ({ children }) => (
               <h3 className="mb-2 mt-8 text-xl font-bold tracking-tight text-foreground">
                 {children}
@@ -222,7 +253,61 @@ export default async function BlogPostPage({ params }: Props) {
             </div>
           </section>
         ) : null}
+
+        {/* Related guides — cross-links between posts (topical cluster). */}
+        {relatedPosts.length > 0 ? (
+          <section className="mt-6">
+            <h2 className="text-sm font-bold tracking-tight text-foreground">
+              Keep reading
+            </h2>
+            <p className="mb-3 mt-1 text-xs text-muted-foreground">
+              More hand-written guides from the blog.
+            </p>
+            <div className="grid gap-3 sm:grid-cols-3">
+              {relatedPosts.map((p) => (
+                <Link
+                  key={p.slug}
+                  href={`/blog/${p.slug}`}
+                  className="group flex flex-col rounded-xl border border-border/70 bg-card p-4 transition hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-md"
+                >
+                  <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide">
+                    <span
+                      className="size-2 rounded-full"
+                      style={{ backgroundColor: blogCategoryColor(p.category) }}
+                      aria-hidden
+                    />
+                    <span style={{ color: blogCategoryColor(p.category) }}>
+                      {p.category}
+                    </span>
+                  </span>
+                  <span className="mt-1.5 text-sm font-semibold leading-snug text-foreground transition group-hover:text-primary">
+                    {p.title}
+                  </span>
+                  <span className="mt-auto pt-2 text-[11px] text-muted-foreground">
+                    {readingTimeMinutes(p.body)} min read
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </section>
+        ) : null}
       </article>
+      </div>
     </BlogPostClient>
   )
+}
+
+/**
+ * Flatten ReactMarkdown heading children into plain text so the h2 anchor id
+ * (rendered DOM) matches the TOC id extracted from the raw markdown.
+ */
+function childrenToText(node: React.ReactNode): string {
+  if (typeof node === 'string') return node
+  if (typeof node === 'number') return String(node)
+  if (Array.isArray(node)) return node.map(childrenToText).join('')
+  if (React.isValidElement(node)) {
+    const props = node.props as { children?: React.ReactNode }
+    return childrenToText(props.children)
+  }
+  return ''
 }

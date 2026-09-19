@@ -8,9 +8,10 @@ import { BackToTop } from '@/components/hub/back-to-top'
 import { ReadingProgress } from '@/components/hub/reading-progress'
 import { SkipToContent } from '@/components/hub/skip-to-content'
 import { AdblockBanner } from '@/components/ads/adblock-banner'
-import { CalendarDays, FileText, ArrowRight } from 'lucide-react'
+import { CalendarDays, FileText, ArrowRight, Clock } from 'lucide-react'
 import { toolMetaList } from '@/lib/tools/tool-meta'
 import { blogPosts } from '@/lib/blog/posts'
+import { blogCategoryColor, readingTimeMinutes } from '@/lib/blog/blog-utils'
 
 /**
  * BlogIndexClient — client-side wrapper for the blog index.
@@ -26,6 +27,7 @@ const POSTS = blogPosts.map((p) => ({
   excerpt: p.description,
   category: p.category,
   date: p.date,
+  minutes: readingTimeMinutes(p.body),
 }))
 
 /**
@@ -103,9 +105,21 @@ export function BlogIndexClient() {
               <Link
                 key={post.slug}
                 href={`/blog/${post.slug}`}
-                className="group flex flex-col rounded-xl border border-border/70 bg-card p-5 transition hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5"
+                className="group flex flex-col rounded-xl border border-border/70 bg-card p-5 transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5"
               >
-                <span className="text-xs font-semibold uppercase tracking-wide text-primary">
+                <span
+                  className="inline-flex w-fit items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide"
+                  style={{
+                    color: blogCategoryColor(post.category),
+                    borderColor: `${blogCategoryColor(post.category)}55`,
+                    backgroundColor: `${blogCategoryColor(post.category)}14`,
+                  }}
+                >
+                  <span
+                    className="size-2 rounded-full"
+                    style={{ backgroundColor: blogCategoryColor(post.category) }}
+                    aria-hidden
+                  />
                   {post.category}
                 </span>
                 <h2 className="mt-1 text-lg font-bold text-foreground transition group-hover:text-primary">
@@ -117,6 +131,9 @@ export function BlogIndexClient() {
                 <span className="mt-3 inline-flex items-center gap-2 text-xs text-muted-foreground">
                   <CalendarDays className="size-3" />
                   {formatIsoDate(post.date)}
+                  <span className="text-border">·</span>
+                  <Clock className="size-3" />
+                  {post.minutes} min read
                 </span>
                 <span className="mt-1.5 inline-flex items-center gap-1 text-sm font-medium text-primary">
                   Read more
