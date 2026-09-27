@@ -22,6 +22,7 @@ import {
   getRelatedTools,
 } from '@/app/tools/[slug]/tool-seo'
 import { getToolContentOverride } from '@/app/tools/[slug]/tool-content-overrides'
+import { resolveSectionHeading } from '@/app/tools/[slug]/section-headings'
 import { ContentAdSlot } from '@/components/ads/content-ad-slot'
 import { toolMetaList } from '@/lib/tools/tool-meta'
 /**
@@ -82,7 +83,7 @@ export function ToolContent({ tool }: { tool: Tool }) {
         <div className="mb-3 flex items-center gap-2">
           <span className="h-5 w-1 rounded-full bg-primary" aria-hidden />
           <h2 className="text-xl font-bold tracking-tight text-foreground">
-            About the {tool.name}
+            {resolveSectionHeading('about', tool)}
           </h2>
         </div>
         <p className="text-sm leading-relaxed text-muted-foreground sm:text-base">
@@ -102,7 +103,7 @@ export function ToolContent({ tool }: { tool: Tool }) {
             <span className="h-5 w-1 rounded-full bg-primary" aria-hidden />
             <h2 className="flex items-center gap-2 text-xl font-bold tracking-tight text-foreground">
               <Code2 className="size-5 text-primary" />
-              Examples
+              {resolveSectionHeading('examples', tool)}
             </h2>
           </div>
           <div className="space-y-3">
@@ -147,7 +148,7 @@ export function ToolContent({ tool }: { tool: Tool }) {
         <div className="mb-3 flex items-center gap-2">
           <span className="h-5 w-1 rounded-full bg-primary" aria-hidden />
           <h2 className="text-xl font-bold tracking-tight text-foreground">
-            How to use
+            {resolveSectionHeading('howTo', tool)}
           </h2>
         </div>
         <ol className="space-y-3">
@@ -169,7 +170,7 @@ export function ToolContent({ tool }: { tool: Tool }) {
           <span className="h-5 w-1 rounded-full bg-primary" aria-hidden />
           <h2 className="flex items-center gap-2 text-xl font-bold tracking-tight text-foreground">
             <Sparkles className="size-5 text-primary" />
-            Common use cases
+            {resolveSectionHeading('useCases', tool)}
           </h2>
         </div>
         <ul className="grid gap-2 sm:grid-cols-2">
@@ -191,9 +192,7 @@ export function ToolContent({ tool }: { tool: Tool }) {
             <span className="h-5 w-1 rounded-full bg-primary" aria-hidden />
             <h2 className="flex items-center gap-2 text-xl font-bold tracking-tight text-foreground">
               <ShieldCheck className="size-5 text-primary" />
-              {tool.category === 'seo'
-                ? 'Technical SEO best practices'
-                : 'Best practices'}
+              {resolveSectionHeading('bestPractices', tool)}
             </h2>
           </div>
           <ul className="space-y-2">
@@ -215,7 +214,7 @@ export function ToolContent({ tool }: { tool: Tool }) {
           <span className="h-5 w-1 rounded-full bg-primary" aria-hidden />
           <h2 className="flex items-center gap-2 text-xl font-bold tracking-tight text-foreground">
             <Lightbulb className="size-5 text-amber-500" />
-            Tips
+            {resolveSectionHeading('tips', tool)}
           </h2>
         </div>
         <ul className="space-y-2">
@@ -238,7 +237,7 @@ export function ToolContent({ tool }: { tool: Tool }) {
         <div className="mb-3 flex items-center gap-2">
           <span className="h-5 w-1 rounded-full bg-primary" aria-hidden />
           <h2 className="text-xl font-bold tracking-tight text-foreground">
-            Frequently asked questions
+            {resolveSectionHeading('faq', tool)}
           </h2>
         </div>
         <div className="space-y-2">
@@ -251,26 +250,46 @@ export function ToolContent({ tool }: { tool: Tool }) {
                   open ? 'border-primary/40' : 'border-border/70'
                 }`}
               >
-                <button
-                  type="button"
-                  onClick={() => setOpenFaq(open ? null : i)}
-                  className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition hover:bg-muted/30"
-                  aria-expanded={open}
+                {/* h3 > button: the WAI-ARIA accordion pattern — each
+                    question is a real heading (crawlable semantics) and the
+                    button stays the single interactive element. */}
+                <h3 className="m-0">
+                  <button
+                    type="button"
+                    onClick={() => setOpenFaq(open ? null : i)}
+                    className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition hover:bg-muted/30"
+                    aria-expanded={open}
+                    aria-controls={`faq-panel-${i}`}
+                    id={`faq-trigger-${i}`}
+                  >
+                    <span className="text-sm font-medium text-foreground">
+                      {faq.q}
+                    </span>
+                    <ChevronDown
+                      className={`size-4 shrink-0 text-muted-foreground transition-transform duration-200 ${
+                        open ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </button>
+                </h3>
+                {/* Always rendered, collapsed via grid-rows 0fr→1fr: every
+                    answer is present in the server HTML (the old conditional
+                    render only shipped answer #1 to the first crawl) and
+                    the expand/collapse still animates. */}
+                <div
+                  id={`faq-panel-${i}`}
+                  role="region"
+                  aria-labelledby={`faq-trigger-${i}`}
+                  className={`grid transition-[grid-template-rows] duration-200 ease-out ${
+                    open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+                  }`}
                 >
-                  <span className="text-sm font-medium text-foreground">
-                    {faq.q}
-                  </span>
-                  <ChevronDown
-                    className={`size-4 shrink-0 text-muted-foreground transition-transform duration-200 ${
-                      open ? 'rotate-180' : ''
-                    }`}
-                  />
-                </button>
-                {open ? (
-                  <div className="border-t border-border/40 px-4 py-3 text-sm leading-relaxed text-muted-foreground">
-                    {faq.a}
+                  <div className="overflow-hidden">
+                    <div className="border-t border-border/40 px-4 py-3 text-sm leading-relaxed text-muted-foreground">
+                      {faq.a}
+                    </div>
                   </div>
-                ) : null}
+                </div>
               </div>
             )
           })}

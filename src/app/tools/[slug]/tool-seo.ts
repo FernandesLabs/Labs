@@ -1,5 +1,6 @@
 import type { ToolCategory } from '@/lib/tools/types'
 import { CATEGORY_META } from '@/lib/tools/types'
+import { toolMetaList } from '@/lib/tools/tool-meta'
 /**
  * SEO content generators shared by:
  *   - The server component `app/tools/[slug]/page.tsx` (for JSON-LD)
@@ -603,9 +604,20 @@ export const RELATED_TOOLS: Record<string, string[]> = {
   'token-counter': ['ai-cost-calculator', 'prompt-optimizer', 'word-counter'],
 }
 
-/** Related tool slugs for a given tool (curated map, else same-category). */
+/**
+ * Related tool slugs for a given tool (curated map, else same-category).
+ *
+ * The fallback matters for internal linking: ~90 tools have no curated map
+ * entry, and before this fix they rendered ZERO related-tool links (the
+ * comment above promised same-category neighbours but the code returned
+ * an empty array). Same-category links give every tool page a crawl path
+ * to its siblings and distribute category-hub authority.
+ */
 export function getRelatedTools(slug: string, category: string): string[] {
   const curated = RELATED_TOOLS[slug]
   if (curated && curated.length > 0) return curated
-  return []
+  return toolMetaList
+    .filter((t) => t.category === category && t.slug !== slug)
+    .slice(0, 6)
+    .map((t) => t.slug)
 }

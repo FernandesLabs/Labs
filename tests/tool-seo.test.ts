@@ -73,7 +73,17 @@ describe('tool-seo generators', () => {
     expect(related.length).toBeGreaterThanOrEqual(4)
   })
 
-  test('getRelatedTools returns empty for an unmapped tool', () => {
-    expect(getRelatedTools('no-such-tool', 'network')).toEqual([])
+  test('getRelatedTools falls back to same-category neighbours for unmapped tools', () => {
+    // Behaviour changed in the GSC-driven SEO round: the old code returned
+    // [] (zero internal links) for the ~90 tools without a curated entry.
+    // Same-category neighbours are the documented, intended fallback.
+    const rel = getRelatedTools('slug-generator', 'text')
+    expect(rel.length).toBeGreaterThan(0)
+    expect(rel).not.toContain('slug-generator')
+    for (const slug of rel) {
+      expect(toolMetaBySlug.get(slug)?.category).toBe('text')
+    }
+    // A truly unknown slug/category still yields no links (no crash).
+    expect(getRelatedTools('no-such-tool', 'no-such-category')).toEqual([])
   })
 })

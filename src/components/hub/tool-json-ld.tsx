@@ -4,6 +4,7 @@ import { CATEGORY_META, type Tool } from '@/lib/tools/types'
 import { siteConfig } from '@/lib/site-config'
 import { generateFaq } from './tool-content'
 import { generateToolHowTo } from '@/app/tools/[slug]/tool-seo'
+import { resolveSectionHeading } from '@/app/tools/[slug]/section-headings'
 import { getToolContentOverride } from '@/app/tools/[slug]/tool-content-overrides'
 
 /**
@@ -124,11 +125,14 @@ export function ToolJsonLd({ tool }: { tool: Tool }) {
             },
           })),
         },
-        // 4. HowTo — maps the "How to use" steps
+        // 4. HowTo — maps the "How to use" steps. The name mirrors the
+        // visible H2 (resolveSectionHeading) so the structured data and
+        // the on-page heading stay in lockstep — e.g. ip-lookup emits
+        // "How to look up an IP address" in both.
         {
           '@type': 'HowTo',
           '@id': `${toolUrl}#howto`,
-          name: `How to use the ${tool.name}`,
+          name: resolveSectionHeading('howTo', tool),
           description: tool.description,
           step: howToSteps.map((step, i) => ({
             '@type': 'HowToStep',
