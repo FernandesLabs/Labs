@@ -166,9 +166,9 @@ const SEO_OVERRIDES: Record<
       'Calculate your BMR and daily calorie needs with Mifflin-St Jeor. Free BMR calculator with instant results.',
   },
   'unicode-inspector': {
-    title: 'Unicode Inspector — Character & Codepoint Viewer',
+    title: 'Unicode Inspector — Character & Code Point Lookup',
     description:
-      'Inspect Unicode characters, codepoints, and encodings in any text. Free Unicode inspector for developers.',
+      'Look up any Unicode character — code point, name, UTF-8 bytes and category. Free Unicode inspector for developers, works in your browser.',
   },
   'http-header-checker': {
     title: 'HTTP Header Checker — Inspect Response Headers',
@@ -286,9 +286,9 @@ const SEO_OVERRIDES: Record<
       'Check the SSL/TLS certificate of any domain — issuer, expiry, SANs and validity. Free SSL checker tool, instant results.',
   },
   'aria-validator': {
-    title: 'ARIA Validator — Check Accessibility Attributes',
+    title: 'ARIA Validator — Free HTML Accessibility Checker',
     description:
-      'Validate ARIA roles, states and accessibility attributes in HTML. Free ARIA validator for accessibility.',
+      'Check ARIA roles, states and HTML accessibility issues instantly — 12 automated rules with concrete fix suggestions. Free ARIA validator, runs entirely in your browser.',
   },
   'duplicate-line-remover': {
     title: 'Duplicate Line Remover — Remove Duplicates Online',

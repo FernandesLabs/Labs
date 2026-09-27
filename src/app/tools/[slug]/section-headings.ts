@@ -142,6 +142,29 @@ export const SECTION_HEADINGS: Record<string, ToolSectionHeadings> = {
     tips: 'Capitalization tips',
     faq: 'Capitalization tool FAQ',
   },
+  // ── 26 impressions at position 24.3 — the BEST organic position on the
+  //    site (queries anonymized in the export; phrase set: aria validator,
+  //    accessibility checker, check ARIA attributes) ──
+  'aria-validator': {
+    about: 'About this ARIA and accessibility validator',
+    examples: 'ARIA validation examples',
+    howTo: 'How to validate ARIA attributes in HTML',
+    useCases: 'When to run an accessibility check on markup',
+    bestPractices: 'ARIA and accessibility best practices',
+    tips: 'ARIA validator tips',
+    faq: 'ARIA validator FAQ',
+  },
+  // ── 87 impressions at position 45.5 — the only page earning real
+  //    organic clicks (4, 4.6% CTR; queries: font accessibility checker,
+  //    WCAG font size, readable font size check) ──
+  'font-accessibility-checker': {
+    about: 'About this font accessibility checker',
+    examples: 'Font accessibility check examples',
+    howTo: 'How to check font accessibility against WCAG',
+    useCases: 'When to test font readability',
+    tips: 'Font accessibility tips',
+    faq: 'Font accessibility checker FAQ',
+  },
 }
 
 interface HeadingTool {

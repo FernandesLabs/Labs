@@ -41,9 +41,25 @@ describe('section headings (GSC-driven, export 2026-09-19)', () => {
       'ssl-checker', // 69
       'unicode-inspector', // 44 (pos 47.8)
       'capitalization-tool', // 35
+      // Rising-zone round (export window ended 2026-09-16):
+      'aria-validator', // 26 impressions at pos 24.3 — best position on site
+      'font-accessibility-checker', // 87 impressions, pos 45.5, only page with real organic CTR (4.6%)
     ]
     const missing = priority.filter((slug) => !SECTION_HEADINGS[slug])
     expect(missing).toEqual([])
+  })
+
+  test('aria-validator howTo pins the ARIA validation phrase', () => {
+    expect(SECTION_HEADINGS['aria-validator']!.howTo).toBe(
+      'How to validate ARIA attributes in HTML'
+    )
+    expect(SECTION_HEADINGS['aria-validator']!.faq).toBe('ARIA validator FAQ')
+  })
+
+  test('font-accessibility-checker howTo carries the WCAG phrase', () => {
+    expect(SECTION_HEADINGS['font-accessibility-checker']!.howTo).toBe(
+      'How to check font accessibility against WCAG'
+    )
   })
 
   test('ip-lookup headings carry the exact query phrases', () => {
