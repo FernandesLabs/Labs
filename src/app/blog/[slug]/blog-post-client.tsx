@@ -3,24 +3,28 @@
 import * as React from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ChevronRight, Home, CalendarDays, Tag } from 'lucide-react'
+import { ChevronRight, Home, CalendarDays, Tag, User } from 'lucide-react'
 import { SiteHeader } from '@/components/hub/site-header'
 import { SiteFooter } from '@/components/hub/site-footer'
 import { BackToTop } from '@/components/hub/back-to-top'
 import { SkipToContent } from '@/components/hub/skip-to-content'
 import { AdblockBanner } from '@/components/ads/adblock-banner'
 import { toolMetaList } from '@/lib/tools/tool-meta'
+import { siteConfig } from '@/lib/site-config'
 
 export function BlogPostClient({
   postTitle,
   postExcerpt,
   postDate,
+  postUpdated,
   postCategory,
   children,
 }: {
   postTitle: string
   postExcerpt: string
   postDate: string
+  /** ISO date of the last edit, or null if never revised. */
+  postUpdated?: string
   postCategory: string
   children: React.ReactNode
 }) {
@@ -28,6 +32,12 @@ export function BlogPostClient({
   // Deterministic date formatting — no Date object, no timezone parsing, so
   // the server-rendered HTML and the client hydration always match.
   const formattedDate = formatIsoDate(postDate)
+  const formattedUpdated = postUpdated ? formatIsoDate(postUpdated) : null
+  // Author byline. This used to render no byline at all, while the Article
+  // JSON-LD claimed an anonymous Organization — an authorship gap on exactly
+  // the topics (SEO, network, finance) where Google looks hardest for one.
+  const authorName = siteConfig.founder.name ?? siteConfig.site.name
+  const authorIsPerson = Boolean(siteConfig.founder.name)
   return (
     <div className="flex min-h-screen flex-col">
       <SkipToContent />
@@ -67,7 +77,16 @@ export function BlogPostClient({
             </span>
             <span className="inline-flex items-center gap-1">
               <CalendarDays className="size-3" />
-              {formattedDate}
+              <time dateTime={postDate}>{formattedDate}</time>
+              {formattedUpdated ? (
+                <>
+                  <span aria-hidden>·</span>
+                  <span>
+                    Updated{' '}
+                    <time dateTime={postUpdated}>{formattedUpdated}</time>
+                  </span>
+                </>
+              ) : null}
             </span>
           </div>
           <h1 className="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
@@ -75,6 +94,21 @@ export function BlogPostClient({
           </h1>
           <p className="mt-3 max-w-2xl text-base leading-relaxed text-muted-foreground">
             {postExcerpt}
+          </p>
+          {/*
+            Visible byline. Mirrors the `author` in the Article JSON-LD so the
+            structured data and the on-page content agree — the same
+            consistency rule that the FAQ schema violation broke.
+          */}
+          <p className="mt-4 flex items-center gap-1.5 text-xs text-muted-foreground">
+            <User className="size-3.5" />
+            <span>
+              By{' '}
+              <span className="font-medium text-foreground">{authorName}</span>
+              {authorIsPerson && siteConfig.founder.jobTitle ? (
+                <span>, {siteConfig.founder.jobTitle}</span>
+              ) : null}
+            </span>
           </p>
         </header>
 

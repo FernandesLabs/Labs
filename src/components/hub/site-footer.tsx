@@ -1,6 +1,7 @@
 'use client'
 import * as React from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import {
   Heart,
   ShieldCheck,
@@ -18,6 +19,13 @@ import { CATEGORY_META, CATEGORY_ORDER } from '@/lib/tools/types'
 import { toolMetaList } from '@/lib/tools/tool-meta'
 import { siteConfig } from '@/lib/site-config'
 import { resetConsentChoice } from '@/lib/ads/consent'
+import { usesServerProxy, SERVER_PROXIED_TOOL_SLUGS } from '@/lib/privacy'
+
+/** Extract `/tools/<slug>` from a pathname; '' for any other route. */
+function currentToolSlug(pathname: string): string {
+  const m = /^\/tools\/([^/?#]+)/.exec(pathname)
+  return m ? m[1] : ''
+}
 
 /**
  * SiteFooter — the global footer shared by the hub, tool pages, and category
@@ -37,6 +45,7 @@ export function SiteFooter() {
   // hydration. `new Date()` directly in the render would make the server HTML
   // and the hydrated client differ (e.g. across year boundaries), which
   // throws a hydration mismatch on every page.
+  const pathname = usePathname()
   const [year, setYear] = React.useState(2026)
   React.useEffect(() => {
     setYear(new Date().getFullYear())
@@ -46,6 +55,9 @@ export function SiteFooter() {
     resetConsentChoice()
     toast.info('Cookie preferences cleared — choose again below.')
   }
+  // True when the current page is one of the tools that proxies through our
+  // server, so the privacy badge can state the truth on that page.
+  const pageUsesServerProxy = usesServerProxy(currentToolSlug(pathname))
   return (
     <footer className="mt-auto border-t border-border/70 bg-muted/30">
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
@@ -74,7 +86,8 @@ export function SiteFooter() {
             </div>
             <p className="mt-3 max-w-xs text-xs leading-relaxed text-muted-foreground">
               {toolMetaList.length} free online tools for developers, designers,
-              and marketers. Privacy-first, client-side, no tracking, no sign-up.
+              and marketers. Mostly client-side and privacy-first — no sign-up,
+              and the few tools that need a server say so on the page.
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
               <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
@@ -208,8 +221,27 @@ export function SiteFooter() {
               <ShieldCheck className="size-4" />
             </span>
             <div>
-              <p className="text-xs font-semibold text-foreground">Client-side only</p>
-              <p className="text-[10px] text-muted-foreground">Your data never leaves your browser.</p>
+              {/*
+                This badge used to read "Client-side only — Your data never
+                leaves your browser" unconditionally, so it appeared on every
+                page including /about and /privacy. That is false for the six
+                tools in SERVER_PROXIED_TOOL_SLUGS, which must send the entered
+                address/URL to our server to bypass browser CORS.
+
+                The claim is now scoped rather than absolute, so it is true on
+                every page it appears on: it names how many tools it covers
+                and, on the six proxied pages, what actually happens.
+              */}
+              <p className="text-xs font-semibold text-foreground">
+                {pageUsesServerProxy
+                  ? 'Proxied lookups'
+                  : 'Mostly client-side'}
+              </p>
+              <p className="text-[10px] text-muted-foreground">
+                {pageUsesServerProxy
+                  ? 'This lookup goes through our server and is never logged.'
+                  : `${SERVER_PROXIED_TOOL_SLUGS.length} network tools use a server; the other 126 run in your browser.`}
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-2.5">

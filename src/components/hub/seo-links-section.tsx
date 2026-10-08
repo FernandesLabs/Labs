@@ -1,6 +1,8 @@
 import Link from 'next/link'
-import { ArrowRight, BookOpen, Wrench, Info } from 'lucide-react'
+import { ArrowRight, BookOpen, Wrench, Info, LayoutGrid } from 'lucide-react'
 import { blogPosts } from '@/lib/blog/posts'
+import { toolMetaList } from '@/lib/tools/tool-meta'
+import { CATEGORY_META, CATEGORY_ORDER } from '@/lib/tools/types'
 
 /**
  * SeoLinksSection — homepage internal-linking block (Phase 2 link equity).
@@ -73,6 +75,56 @@ export function SeoLinksSection() {
       className="border-t border-border/60 bg-muted/20"
     >
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
+        {/*
+          Category links.
+
+          These used to live in a ~150-word editorial intro directly under the
+          hero. That block pushed the tool grid below the fold and read as
+          filler, so it was replaced by a compact trust row up top (see
+          app/page.tsx). These anchors are the part worth keeping: 8 crawlable
+          internal links that carry category-level keyword anchors and pass
+          PageRank to every category hub. Moving them here instead of deleting
+          them preserves the internal linking.
+        */}
+        <div className="mb-3 flex items-center gap-2">
+          <span className="h-5 w-1 rounded-full bg-primary" aria-hidden />
+          <h2 className="flex items-center gap-2 text-xl font-bold tracking-tight text-foreground">
+            <LayoutGrid className="size-5 text-primary" />
+            Browse by category
+          </h2>
+        </div>
+        <ul className="mb-10 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+          {CATEGORY_ORDER.map((cat) => {
+            const meta = CATEGORY_META[cat]
+            const count = toolMetaList.filter((t) => t.category === cat).length
+            return (
+              <li key={cat}>
+                <Link
+                  href={`/category/${cat}`}
+                  className="group flex h-full items-start gap-2.5 rounded-xl border border-border/70 bg-card p-3.5 shadow-sm transition hover:border-primary/60 hover:shadow"
+                >
+                  <span
+                    className="mt-0.5 size-2.5 shrink-0 rounded-full"
+                    style={{ backgroundColor: meta.color }}
+                    aria-hidden
+                  />
+                  <span className="min-w-0">
+                    <span className="block text-sm font-semibold text-foreground group-hover:text-primary">
+                      Free {meta.label.toLowerCase()} tools
+                    </span>
+                    <span className="mt-0.5 block text-xs leading-relaxed text-muted-foreground">
+                      {meta.blurb}
+                    </span>
+                    <span className="mt-1 block text-[10px] text-muted-foreground/80">
+                      {count} tools
+                    </span>
+                  </span>
+                </Link>
+              </li>
+            )
+          })}
+        </ul>
+
         {/* Top tools */}
         <div className="mb-3 flex items-center gap-2">
           <span className="h-5 w-1 rounded-full bg-primary" aria-hidden />

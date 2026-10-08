@@ -14,9 +14,29 @@ export const metadata: Metadata = {
     title: 'Blog — Guides & Tutorials | Fernandes Labs',
     description:
       'In-depth guides, tutorials, and best practices for developers, designers, and marketers.',
-    url: `https://${siteConfig.site.domain}/blog`,
+    url: siteConfig.site.url,
     siteName: siteConfig.site.name,
     type: 'website',
+    // Declaring `openGraph` here REPLACES the root layout's openGraph
+    // object outright (Next.js metadata is keyed-merged at the top level,
+    // and `openGraph` is a single key). Without an explicit `images` this
+    // page shipped with no og:image at all, so /blog shared as a bare text
+    // card. Same static asset the layout uses.
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Fernandes Labs — blog guides',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Blog — Guides & Tutorials | Fernandes Labs',
+    description:
+      'In-depth guides, tutorials, and best practices for developers, designers, and marketers.',
+    images: ['/og-image.png'],
   },
 }
 

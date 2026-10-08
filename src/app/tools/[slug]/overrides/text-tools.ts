@@ -176,7 +176,14 @@ c  U+0063  LATIN SMALL LETTER C             Letter  63      0063
     ],
     faqs: [
       { q: 'Why does non-ASCII text show U+ names?', a: 'The full Unicode name database is too large to ship client-side, so the tool includes only the official names for ASCII code points 0 to 127. Any other character is labelled Code point U+XXXX with its code point, which still uniquely identifies the character.' },
-      { q: 'What do spaces and tabs look like?', a: 'Whitespace would be invisible in the table, so an ordinary space is drawn as a raised middle dot and the non-breaking space as a special glyph. Tabs, line feeds, and carriage returns are rendered as \t, \n, and \r, and other control characters appear as hexadecimal escapes.' },
+      // NOTE: the escape sequences below are written out doubled. In the
+      // original single-backslash form JS interpreted `\r` as a literal
+      // carriage return and `\t`/`\n` as real tab/newline characters, so the
+      // rendered page showed whitespace where the text described escapes.
+      // JSON-LD and the visible DOM then disagreed on the same string, which
+      // is precisely the schema/content mismatch we just fixed everywhere
+      // else. Doubling keeps the literal characters the copy intends.
+      { q: 'What do spaces and tabs look like?', a: 'Whitespace would be invisible in the table, so an ordinary space is drawn as a raised middle dot and the non-breaking space as a special glyph. Tabs, line feeds, and carriage returns are rendered as \\t, \\n, and \\r, and other control characters appear as hexadecimal escapes.' },
       { q: 'Why is the table limited to 512 rows?', a: 'Rendering every character of very long input would bog down the browser, so only the first 512 code points are shown and a note warns when text is truncated. The category and byte totals still count the whole string, so the stats remain accurate for full documents.' },
       { q: 'What is a code point exactly?', a: 'A code point is the numeric identity of a character in Unicode, written here as U+XXXX. The tool iterates text by code point, so emoji such as the globe sample appear as a single row instead of being split across the surrogate halves JavaScript uses internally.' },
       { q: 'How are the seven categories counted?', a: 'Seven categories are counted: Letter, Number, Punctuation, Symbol, Space, Control, and Other. Each character is classified with Unicode property tests for five of them, explicit control ranges for the sixth, and everything else falls into Other, with the stat grid totalling each bucket.' },

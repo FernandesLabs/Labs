@@ -9,7 +9,8 @@ import {
   getRelatedTools,
   getSeoOverride,
 } from '@/app/tools/[slug]/tool-seo'
-import { toolMetaBySlug } from '@/lib/tools/tool-meta'
+import { toolMetaBySlug, toolMetaList } from '@/lib/tools/tool-meta'
+import { CATEGORY_META, CATEGORY_ORDER } from '@/lib/tools/types'
 
 const tool = (slug: string) => {
   const t = toolMetaBySlug.get(slug)
@@ -30,11 +31,33 @@ describe('tool-seo generators', () => {
     )
   })
 
-  test('generateToolTitle falls back to a branded template and stays short', () => {
+  test('generateToolTitle falls back to the capability from the description', () => {
+    // Was: "{name} — Free Online {Category} Tool | Fernandes Labs", which
+    // spent the title's best keywords on generic filler and made 82 titles
+    // near-identical. Now the tool's own description provides the descriptor.
     const title = generateToolTitle(tool('slug-generator'))
     expect(title).toContain('Slug Generator')
-    expect(title).toContain('Fernandes Labs')
-    expect(title.length).toBeLessThanOrEqual(70)
+    expect(title).toContain('URL-safe slugs')
+    expect(title.length).toBeLessThanOrEqual(62)
+  })
+
+  test('every generated title is unique and within the SERP budget', () => {
+    const titles = toolMetaList.map((t) => generateToolTitle(t))
+    expect(new Set(titles).size).toBe(toolMetaList.length)
+    for (const t of titles) expect(t.length).toBeLessThanOrEqual(62)
+  })
+
+  test('every generated description is unique and free of browser-only overclaims on proxied tools', () => {
+    const descs = toolMetaList.map((t) => generateToolDescription(t))
+    expect(new Set(descs).size).toBe(toolMetaList.length)
+    for (const t of toolMetaList) {
+      if (t.category !== 'network') continue
+      // The network tools DO send input to our server; claiming otherwise in
+      // indexed copy is both inaccurate and an E-E-A-T liability.
+      expect(generateToolDescription(t)).not.toMatch(
+        /never leaves your (browser|device)|entirely in your browser|no uploads/
+      )
+    }
   })
 
   test('generateToolDescription is non-empty and within SERP length', () => {
@@ -73,7 +96,53 @@ describe('tool-seo generators', () => {
     expect(related.length).toBeGreaterThanOrEqual(4)
   })
 
-  test('getRelatedTools returns empty for an unmapped tool', () => {
-    expect(getRelatedTools('no-such-tool', 'network')).toEqual([])
+  test('getRelatedTools falls back to same-category siblings for unmapped tools', () => {
+    // Regression guard: this used to return [] for the 89 tools missing from
+    // RELATED_TOOLS, leaving them with zero crawlable cross-links.
+    const related = getRelatedTools('no-such-tool', 'network')
+    expect(related.length).toBeGreaterThan(0)
+    expect(related).not.toContain('no-such-tool')
+    // every returned slug must be a real tool
+    const known = new Set(toolMetaList.map((t) => t.slug))
+    for (const slug of related) expect(known.has(slug)).toBe(true)
+  })
+
+  test('getRelatedTools never links a tool to itself and honours the limit', () => {
+    for (const t of toolMetaList) {
+      const related = getRelatedTools(t.slug, t.category, 8)
+      expect(related).not.toContain(t.slug)
+      expect(related.length).toBeLessThanOrEqual(8)
+      expect(new Set(related).size).toBe(related.length) // no duplicates
+    }
+  })
+
+  test('category pages have substantive unique guide copy', () => {
+    // Category pages were the thinnest indexable content on the site (~60
+    // unique words). These guide sections are what makes them worth indexing.
+    const guides = CATEGORY_ORDER.map((c) => CATEGORY_META[c].guide)
+    // Unique per category.
+    expect(new Set(guides).size).toBe(CATEGORY_ORDER.length)
+    for (const g of guides) {
+      expect(g.length).toBeGreaterThan(400)
+      expect(g.split(/\s+/).length).toBeGreaterThan(70)
+    }
+  })
+
+  test('category guides do not overclaim client-side handling for network', () => {
+    expect(CATEGORY_META.network.guide).toMatch(/proxied through our server/i)
+    for (const c of CATEGORY_ORDER) {
+      if (c === 'network') continue
+      expect(CATEGORY_META[c].guide).not.toMatch(
+        /never sent to our servers|never leaves your browser/i
+      )
+    }
+  })
+
+  test('every tool page now has at least one crawlable related link', () => {
+    // The bug this prevents: tool pages shipping no /tools/* hrefs at all.
+    const orphans = toolMetaList
+      .filter((t) => getRelatedTools(t.slug, t.category).length === 0)
+      .map((t) => t.slug)
+    expect(orphans).toEqual([])
   })
 })

@@ -16,7 +16,7 @@ const SECTIONS = [
   { id: 'liability', label: 'Limitation of liability' },
   { id: 'use', label: 'Acceptable use' },
   { id: 'ip', label: 'Intellectual property' },
-  { id: 'ads', label: 'Advertising & affiliates' },
+  { id: 'ads', label: 'Advertising' },
   { id: 'third-party', label: 'Third-party links' },
   { id: 'changes', label: 'Changes to terms' },
   { id: 'contact', label: 'Contact' },
@@ -112,14 +112,15 @@ export default function TermsPage() {
       </section>
       <section id="ads" className="scroll-mt-20">
         <h2 className="text-xl font-semibold text-foreground">
-          Advertising &amp; Affiliate Links
+          Advertising
         </h2>
         <p className="mt-2">
-          The Service displays advertisements via Google AdSense and may
-          include affiliate links. We may earn a commission when you click
-          affiliate links and sign up for third-party services. Affiliate
-          links are marked as such. We are not responsible for the products
-          or services of third-party advertisers.
+          The Service displays advertisements via Google AdSense. Advertising
+          is the Service&apos;s only form of monetisation — there are no
+          affiliate links and no paid placements on this site. We do not
+          receive payment for the content on any page, and we are not
+          responsible for the products or services of third-party
+          advertisers.
         </p>
       </section>
       <section id="third-party" className="scroll-mt-20">

@@ -50,11 +50,31 @@ export default function PrivacyPage() {
           Tool Data (Not Collected)
         </h2>
         <p className="mt-2">
-          All tools on {domain} process data client-side in your browser.
-          The text, files, passwords, URLs, or other inputs you enter are
-          <strong> never sent to our servers</strong>. We cannot see, access,
-          or recover your data. This makes our tools safe for sensitive
+          Most tools on {domain} process data entirely client-side in your
+          browser. The text, files, passwords, and other inputs you enter
+          into them are{' '}
+          <strong>never sent to our servers</strong>. We cannot see, access,
+          or recover that data. This makes those tools safe for sensitive
           inputs like passwords, private keys, and personal documents.
+        </p>
+        <p className="mt-2">
+          <strong>Six tools are an exception.</strong> IP Lookup, DNS Lookup,
+          SSL Checker, Ping, Redirect Checker and HTTP Header Checker need to
+          look up information about a domain, IP address or URL. Your browser
+          cannot do that itself — it blocks cross-origin requests from web
+          pages — so the request is made by our server instead. That means{' '}
+          <strong>the address or URL you enter into those six tools is
+          transmitted to our server</strong> in order to perform the lookup.
+        </p>
+        <p className="mt-2">
+          We do not store or log these values: the proxy request is made with
+          caching disabled, is not written to any database, and is not
+          associated with any identifier of yours. Because a lookup is only
+          meaningful while you are waiting for it, there is nothing retained
+          to retrieve later. Note that the underlying lookups are served by
+          third-party public data providers (for example the geolocation and
+          DNS resolution providers our proxy calls), which have their own
+          privacy practices and may process the address independently of us.
         </p>
       </section>
       <section id="analytics" className="scroll-mt-20">

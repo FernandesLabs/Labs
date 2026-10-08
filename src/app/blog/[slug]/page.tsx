@@ -65,7 +65,34 @@ export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params
   const post = getBlogPost(slug)
   if (!post) notFound()
-  const url = `https://${siteConfig.site.domain}/blog/${post.slug}`
+  const url = `${siteConfig.site.url}/blog/${post.slug}`
+  // A real named author is the goal; Organization is the fallback until
+  // NEXT_PUBLIC_FOUNDER_NAME is set. See site-config.ts for the E-E-A-T note.
+  const authorNode = siteConfig.founder.name
+    ? {
+        '@type': 'Person',
+        '@id': `${siteConfig.site.url}/#person`,
+        name: siteConfig.founder.name,
+        jobTitle: siteConfig.founder.jobTitle,
+        url: siteConfig.founder.profileUrl ?? `${siteConfig.site.url}/about`,
+        ...(siteConfig.founder.sameAs.length > 0
+          ? { sameAs: siteConfig.founder.sameAs }
+          : {}),
+        worksFor: { '@id': `${siteConfig.site.url}/#organization` },
+      }
+    : {
+        '@type': 'Organization',
+        '@id': `${siteConfig.site.url}/#organization`,
+        name: siteConfig.site.name,
+        url: siteConfig.site.url,
+      }
+  // An Article that documents the output of one of our own tools should say
+  // which one, so the tool page and the post reinforce each other instead of
+  // competing. Search Console showed cannibalisation on the IP-lookup cluster
+  // (tool: 4,440 impressions / post: 742, both on the same head term).
+  const toolRefs = post.relatedTools
+    .map((slug) => toolMetadata.find((t) => t.slug === slug))
+    .filter((t): t is NonNullable<typeof t> => Boolean(t))
   const relatedTools = post.relatedTools
     .map((s) => toolMetadata.find((t) => t.slug === s))
     .filter((t): t is NonNullable<typeof t> => Boolean(t))
@@ -80,16 +107,18 @@ export default async function BlogPostPage({ params }: Props) {
         headline: post.title,
         description: post.description,
         datePublished: post.date,
-        dateModified: post.date,
+        // `dateModified` was hardcoded to `datePublished`, so Google had no
+        // way to tell updated posts from untouched ones. Posts now carry a
+        // real `updated` date (post.updated ?? post.date).
+        dateModified: post.updated ?? post.date,
         inLanguage: 'en',
         mainEntityOfPage: url,
-        author: {
-          '@type': 'Organization',
-          name: siteConfig.site.name,
-          url: siteConfig.site.url,
-        },
+        // Prefer a real named author (NEXT_PUBLIC_FOUNDER_NAME). An anonymous
+        // Organization is the fallback, not the target — see site-config.ts.
+        author: authorNode,
         publisher: {
           '@type': 'Organization',
+          '@id': `${siteConfig.site.url}/#organization`,
           name: siteConfig.site.name,
           url: siteConfig.site.url,
           logo: {
@@ -99,6 +128,16 @@ export default async function BlogPostPage({ params }: Props) {
             height: 512,
           },
         },
+        // Tie the article to the tools it documents.
+        ...(toolRefs.length > 0
+          ? {
+              about: toolRefs.map((t) => ({
+                '@type': 'SoftwareApplication',
+                name: t.name,
+                url: `${siteConfig.site.url}/tools/${t.slug}`,
+              })),
+            }
+          : {}),
       },
       {
         '@type': 'BreadcrumbList',
@@ -116,6 +155,7 @@ export default async function BlogPostPage({ params }: Props) {
       postTitle={post.title}
       postExcerpt={post.description}
       postDate={post.date}
+      postUpdated={post.updated}
       postCategory={post.category}
     >
       <script

@@ -27,18 +27,23 @@ import { toolMetaList } from '@/lib/tools/tool-meta'
 /**
  * Generates SEO content for a tool page: an intro paragraph, concrete
  * input→output examples, "how to use" steps, "common use cases", "tips",
- * and an FAQ accordion.
+ * and an FAQ section.
  *
  * Content priority:
- *   1. Hand-written override (tool-content-overrides.ts) — for the top
- *      tools with the highest search intent. Unique, specific, deep.
- *   2. Template generator (tool-seo.ts) — for the other 129 tools.
+ *   1. Hand-written override (`overrides/*.ts`). All 132 tools have one —
+ *      enforced by `tests/override-coverage.test.ts`.
+ *   2. Template generator (`tool-seo.ts`). Kept as a safety net for any tool
+ *      added without an override; currently unused in production.
  *
- * The same content is emitted as FAQPage + HowTo JSON-LD by the server
- * component (`page.tsx`), so the visible text and structured data match.
+ * SEO note: every question AND answer rendered here is also emitted as
+ * `FAQPage` JSON-LD by `ToolJsonLd`. Google requires marked-up content to be
+ * visible to users, so the FAQ uses native <details> and all six answers are
+ * always present in the served HTML. Do not reintroduce a JS accordion that
+ * hides answers — that mismatch is what caused the Sept 2026 impression
+ * collapse.
  */
 // Re-export so ToolJsonLd (and other consumers) can build FAQPage schema
-// from the same source as the visible accordion.
+// from the same source as the visible FAQ section.
 export const generateFaq = (tool: Tool) =>
   getToolContentOverride(tool.slug)?.faqs ?? generateToolFaq(tool)
 export function ToolContent({ tool }: { tool: Tool }) {
@@ -66,14 +71,12 @@ export function ToolContent({ tool }: { tool: Tool }) {
   )
   const examples = override?.examples ?? []
   const bestPractices = override?.bestPractices ?? []
-  const [openFaq, setOpenFaq] = React.useState<number | null>(0)
   const cat = CATEGORY_META[tool.category]
   const crossLinks = React.useMemo(() => {
-    const slugs = getRelatedTools(tool.slug, tool.category)
+    const slugs = getRelatedTools(tool.slug, tool.category, 8)
     return slugs
       .map((s) => toolMetaList.find((t) => t.slug === s))
       .filter((t): t is NonNullable<typeof t> => Boolean(t))
-      .slice(0, 8)
   }, [tool.slug, tool.category])
   return (
     <div className="mt-12 space-y-10">
@@ -88,12 +91,6 @@ export function ToolContent({ tool }: { tool: Tool }) {
         <p className="text-sm leading-relaxed text-muted-foreground sm:text-base">
           {intro}
         </p>
-        {override ? (
-          <div className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">
-            <CheckCircle2 className="size-3" />
-            Hand-written guide
-          </div>
-        ) : null}
       </section>
       {/* Concrete examples (only for tools with overrides) */}
       {examples.length > 0 ? (
@@ -241,39 +238,40 @@ export function ToolContent({ tool }: { tool: Tool }) {
             Frequently asked questions
           </h2>
         </div>
+        {/*
+          Native <details>/<summary> rather than a JS-controlled accordion.
+
+          SEO reason (this replaced a React `openFaq` state that rendered only
+          the FIRST answer into the HTML): every answer below is marked up in
+          the `FAQPage` JSON-LD emitted by ToolJsonLd, so Google requires all
+          of that marked-up content to be visible to a user. With the old
+          accordion, 5 of 6 answers existed only inside the schema and were
+          absent from the served HTML — a structured-data policy violation
+          replicated across all 132 tool pages.
+
+          <details> puts every answer in the static HTML with zero JavaScript,
+          keeps the disclosure UI, and is keyboard/screen-reader accessible by
+          default. `open` on the first item preserves the previous behaviour of
+          showing one answer on load.
+        */}
         <div className="space-y-2">
-          {faqs.map((faq, i) => {
-            const open = openFaq === i
-            return (
-              <div
-                key={i}
-                className={`overflow-hidden rounded-lg border bg-card transition-colors ${
-                  open ? 'border-primary/40' : 'border-border/70'
-                }`}
-              >
-                <button
-                  type="button"
-                  onClick={() => setOpenFaq(open ? null : i)}
-                  className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition hover:bg-muted/30"
-                  aria-expanded={open}
-                >
-                  <span className="text-sm font-medium text-foreground">
-                    {faq.q}
-                  </span>
-                  <ChevronDown
-                    className={`size-4 shrink-0 text-muted-foreground transition-transform duration-200 ${
-                      open ? 'rotate-180' : ''
-                    }`}
-                  />
-                </button>
-                {open ? (
-                  <div className="border-t border-border/40 px-4 py-3 text-sm leading-relaxed text-muted-foreground">
-                    {faq.a}
-                  </div>
-                ) : null}
+          {faqs.map((faq, i) => (
+            <details
+              key={i}
+              open={i === 0}
+              className="group overflow-hidden rounded-lg border border-border/70 bg-card open:border-primary/40"
+            >
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-left transition hover:bg-muted/30 [&::-webkit-details-marker]:hidden">
+                <span className="text-sm font-medium text-foreground">
+                  {faq.q}
+                </span>
+                <ChevronDown className="size-4 shrink-0 text-muted-foreground transition-transform duration-200 group-open:rotate-180" />
+              </summary>
+              <div className="border-t border-border/40 px-4 py-3 text-sm leading-relaxed text-muted-foreground">
+                {faq.a}
               </div>
-            )
-          })}
+            </details>
+          ))}
         </div>
       </section>
       {/* Internal linking footer */}
