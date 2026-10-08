@@ -16,9 +16,27 @@ export const metadata: Metadata = {
     title: 'Contact Fernandes Labs',
     description:
       'Support, bug reports, feature requests and partnership inquiries — we answer every email.',
-    url: `https://${siteConfig.site.domain}/contact`,
+    url: siteConfig.site.url,
     siteName: siteConfig.site.name,
     type: 'website',
+    // Declaring `openGraph` here REPLACES the root layout's openGraph object
+    // (Next.js merges metadata at the top level, and `openGraph` is one key),
+    // so `images` must be restated or the page ships with no og:image.
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Fernandes Labs — contact',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Contact Fernandes Labs',
+    description:
+      'Support, bug reports, feature requests and partnership inquiries — we answer every email.',
+    images: ['/og-image.png'],
   },
 }
 

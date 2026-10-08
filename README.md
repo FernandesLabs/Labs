@@ -1,6 +1,8 @@
 # Fernandes Labs — Free Online Tools Network
 
-A production-ready **Next.js 16** application with **132 free, privacy-first, client-side tools** across 8 categories. No sign-up. No tracking. Works offline. Built for SEO and monetization from day one.
+A production-ready **Next.js 16** application with **132 free tools** across 8 categories. No sign-up. No uploads. Works offline. Built for SEO from day one.
+
+126 of the 132 run entirely in your browser. The six network tools (IP Lookup, DNS Lookup, SSL Checker, Ping, Redirect Checker, HTTP Header Checker) proxy their lookups through a server route to bypass browser CORS — see [`src/lib/privacy.ts`](src/lib/privacy.ts) for the single source of truth.
 
 ---
 
@@ -38,7 +40,7 @@ A production-ready **Next.js 16** application with **132 free, privacy-first, cl
 - **100% client-side** processing (except network tools which use a server API proxy)
 - **Web Crypto API** for all randomness (passwords, UUIDs, hashes) — never `Math.random()`
 - **Per-tool JSON-LD** structured data (WebApplication schema) for SEO
-- **Auto-generated sitemap.xml** (135 URLs) and robots.txt
+- **Auto-generated sitemap.xml** (151 URLs) and robots.txt
 - **Privacy Policy + Terms of Service** pages (AdSense-ready)
 - **Per-tool SEO content** — intro, how-to steps, and FAQ accordion on every tool page
 - **Network tools API proxy** — DNS, IP, SSL, HTTP headers, ping, redirect (server-side, bypasses CORS)
@@ -46,7 +48,6 @@ A production-ready **Next.js 16** application with **132 free, privacy-first, cl
 
 ### Monetization (all configurable in one file)
 - **Google AdSense** ad units (horizontal, vertical, footer slots)
-- **Contextual affiliate links** per tool category
 - **Crypto donations** (BTC, ETH, USDC, SOL)
 - **Google Analytics 4** integration
 - **Google Search Console** verification
@@ -167,7 +168,6 @@ See `.env.example` for the full list. Key variables:
 | `NEXT_PUBLIC_ADSENSE_CLIENT_ID` | AdSense client ID | `ca-pub-1234567890123456` |
 | `NEXT_PUBLIC_ADSENSE_SLOT_HORIZONTAL` | Horizontal ad slot ID | `1234567890` |
 | `NEXT_PUBLIC_CRYPTO_BTC` | Bitcoin donation address | `bc1q...` |
-| `NEXT_PUBLIC_AFF_HOSTING` | Hosting affiliate link | `https://cloudflare.com/?aff=YOURID` |
 
 **For local development:** copy `.env.example` to `.env.local` and fill in values.
 **For production:** set them in Vercel → Settings → Environment Variables → Redeploy.
@@ -182,12 +182,13 @@ See `DEPLOYMENT-TUTORIAL.md` for the complete step-by-step guide.
 4. **Wait 1-2 weeks** for Google to index your tools
 5. **Apply for Google AdSense** → add `NEXT_PUBLIC_ADSENSE_ENABLED` + `NEXT_PUBLIC_ADSENSE_CLIENT_ID` env vars → request review
 6. **Create ad units** in AdSense → add `NEXT_PUBLIC_ADSENSE_SLOT_*` env vars
-7. **Sign up for affiliate programs** (all free):
-   - [Namecheap](https://www.namecheap.com/affiliates/) (domains)
-   - [Cloudflare](https://www.cloudflare.com/partners/) (hosting)
-   - [1Password](https://1password.com/partnerships/) (password manager)
-   - [ProtonVPN](https://protonvpn.com) (VPN)
-   - [Ahrefs](https://ahrefs.com/affiliate) (SEO tool — high commission)
+7. **Add crypto wallet addresses** via `NEXT_PUBLIC_CRYPTO_*` env vars (optional)
+
+> **No affiliate links.** The site used to ship "Recommended tools" cards
+> linking to vendor homepages beneath the disclosure "we may earn a commission
+> if you sign up". None of those URLs carried a referral parameter, so no
+> commission was possible and the disclosure was false. They have been removed;
+> advertising is the only monetisation.
 8. **Add crypto wallet addresses** via `NEXT_PUBLIC_CRYPTO_*` env vars
 
 ### Revenue expectations
@@ -199,7 +200,6 @@ See `DEPLOYMENT-TUTORIAL.md` for the complete step-by-step guide.
 | 100,000 | $300–800 | Month 4-6 |
 | 500,000 | $1,500–4,000 | Month 6-12 |
 
-Affiliate links add $50-200 per conversion on top of ad revenue.
 
 ---
 
@@ -211,7 +211,7 @@ src/
 │   ├── page.tsx              # Hub + tool routing (hash-based: #tool=<slug>)
 │   ├── layout.tsx            # Root layout (theme, GA, SW, manifest, Search Console)
 │   ├── globals.css           # Tailwind + brand theme + overflow safety
-│   ├── sitemap.ts            # Auto sitemap.xml (135 URLs)
+│   ├── sitemap.ts            # Auto sitemap.xml (151 URLs)
 │   ├── robots.ts             # Auto robots.txt
 │   ├── privacy/page.tsx      # Privacy policy (AdSense requirement)
 │   ├── terms/page.tsx        # Terms of service
@@ -228,7 +228,6 @@ src/
 │   │   └── ...
 │   ├── ads/                  # Monetization components
 │   │   ├── ad-unit.tsx       # AdSense ad units
-│   │   ├── affiliate-links.tsx # Contextual affiliate links
 │   │   └── crypto-donate.tsx # Crypto donation widget
 │   ├── ui/                   # shadcn/ui component library (50+ components)
 │   └── tools/                # 132 tool components
@@ -281,7 +280,6 @@ Key variables:
 - `NEXT_PUBLIC_GA_MEASUREMENT_ID` — Google Analytics 4
 - `NEXT_PUBLIC_SEARCH_CONSOLE_TOKEN` — Google Search Console verification
 - `NEXT_PUBLIC_CRYPTO_*` — crypto donation wallet addresses
-- `NEXT_PUBLIC_AFF_*` — affiliate links
 
 ### Theme
 Colors are defined as OKLCH values in `src/app/globals.css` (`:root` and `.dark`).
@@ -301,7 +299,6 @@ Brand color: `oklch(0.546 0.215 262.6)` (blue `#2563eb`).
 - [ ] Submit `sitemap.xml` to [Bing Webmaster Tools](https://www.bing.com/webmasters)
 - [ ] Set up Google Analytics 4
 - [ ] Apply for Google AdSense (after 1-2 weeks of being indexed)
-- [ ] Sign up for affiliate programs
 - [ ] Write custom content for your top 10 tools (replace template SEO content)
 - [ ] Get backlinks from directories (Product Hunt, free tool aggregators)
 - [ ] Write 5-10 blog posts ("Top 10 JSON tips", "How QR codes work")

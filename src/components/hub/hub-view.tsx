@@ -236,11 +236,22 @@ export function HubView({
               <kbd className="rounded border bg-muted px-1">⌘K</kbd> for the command palette
             </p>
           </div>
-          {/* Trust badges */}
+          {/*
+            Trust badges.
+
+            "No data leaves your browser" was replaced with "No uploads" for
+            accuracy: six network tools (IP Lookup, DNS Lookup, SSL Checker,
+            Ping, Redirect Checker, HTTP Header Checker) proxy their lookups
+            through our server because browsers block cross-origin requests,
+            so the unqualified claim was false. The precise version of that
+            claim now lives on those six pages and in the footer badge. The
+            accurate-but-vague "Privacy-first" keeps the differentiator without
+            overstating it.
+          */}
           <div className="fl-fade-in mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-muted-foreground" style={{ animationDelay: '0.15s' }}>
             <span className="inline-flex items-center gap-1.5">
               <Lock className="size-3.5 text-emerald-500" />
-              100% client-side
+              No sign-up, no uploads
             </span>
             <span className="inline-flex items-center gap-1.5">
               <Zap className="size-3.5 text-amber-500" />
@@ -248,7 +259,7 @@ export function HubView({
             </span>
             <span className="inline-flex items-center gap-1.5">
               <ShieldCheck className="size-3.5 text-primary" />
-              No data leaves your browser
+              Privacy-first
             </span>
             <span className="inline-flex items-center gap-1.5">
               <TrendingUp className="size-3.5 text-primary" />

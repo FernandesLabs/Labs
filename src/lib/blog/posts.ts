@@ -6,7 +6,14 @@ export type BlogPost = {
   slug: string
   title: string
   description: string
+  /** ISO date first published. */
   date: string
+  /**
+   * ISO date of the last substantive content edit. Feeds `dateModified` in
+   * Article JSON-LD. Omit for a post that has never been revised — Google
+   * reads a `dateModified` identical to `datePublished` as "never updated".
+   */
+  updated?: string
   category: string
   keywords: string[]
   relatedTools: string[]
@@ -16,9 +23,15 @@ export type BlogPost = {
 export const blogPosts: BlogPost[] = [
   {
     slug: 'ip-address-lookup-guide',
-    title: 'IP Address Lookup: How to Find the Location, ISP & More',
+    // Cannibalisation fix. Search Console showed /tools/ip-lookup (4,440
+    // impressions) and this post (742) both targeting "ip address lookup",
+    // splitting one intent across two URLs. The tool page now owns the
+    // commercial head term via its SEO override; this post is retargeted at
+    // informational "how do I…" queries and points at the tool rather than
+    // competing with it. See tool-seo.ts SEO_OVERRIDES['ip-lookup'].
+    title: 'What an IP Address Lookup Actually Tells You (And What It Doesn’t)',
     description:
-      'Everything you need to know about IP address lookups: what an IP address reveals, how to find your own IP, how to look up any IP address online, and when a lookup result is wrong.',
+      'How IP geolocation works, how to find your own IP address on any device, why a lookup can return the wrong city, and how to read ISP and ASN data before you trust it.',
     date: '2026-08-03',
     category: 'Network',
     keywords: ['ip address lookup', 'ip lookup', 'what is my ip', 'ip geolocation', 'find ip'],

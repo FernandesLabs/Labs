@@ -43,6 +43,7 @@ export function BlogPostClient({
   postTitle,
   postExcerpt,
   postDate,
+  postUpdated,
   postCategory,
   readingMinutes,
   fresh = false,
@@ -57,6 +58,13 @@ export function BlogPostClient({
   postTitle: string
   postExcerpt: string
   postDate: string
+  /**
+   * ISO date of the last substantive edit. When present the byline shows
+   * "Updated <date>" and the Article JSON-LD's `dateModified` differs from
+   * `datePublished`. Omit for a never-revised post — Google reads a
+   * `dateModified` equal to `datePublished` as "never updated".
+   */
+  postUpdated?: string
   postCategory: string
   readingMinutes: number
   /** True when the post is < 7 days old (server-computed, see isFreshPost). */
@@ -76,6 +84,8 @@ export function BlogPostClient({
   const router = useRouter()
   const [paletteOpen, setPaletteOpen] = React.useState(false)
   const formattedDate = formatIsoDate(postDate)
+  // Deterministic formatting — no Date object, so no hydration mismatch.
+  const formattedUpdated = postUpdated ? formatIsoDate(postUpdated) : null
   return (
     <div className="flex min-h-screen flex-col">
       {/* Scroll progress — guides are 1,000+ word reads; tool pages already
@@ -169,6 +179,12 @@ export function BlogPostClient({
               </p>
               <p className="mt-0.5 text-muted-foreground">
                 {authorRole} · Published {formattedDate}
+                {formattedUpdated ? (
+                  <>
+                    {' · '}
+                    <time dateTime={postUpdated}>Updated {formattedUpdated}</time>
+                  </>
+                ) : null}
               </p>
             </div>
           </div>

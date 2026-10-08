@@ -2,7 +2,11 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import ReactMarkdown from 'react-markdown'
+// Explicit React import: this file uses `React.ReactNode` / `React.isValidElement`
+// in the TOC helpers below, and with the automatic JSX runtime `React` is not
+// in scope unless imported.
+import * as React from 'react'
+import ReactMarkdown, { type Components } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { siteConfig } from '@/lib/site-config'
 import { blogPosts, getBlogPost } from '@/lib/blog/posts'
@@ -82,7 +86,14 @@ export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params
   const post = getBlogPost(slug)
   if (!post) notFound()
-  const url = `https://${siteConfig.site.domain}/blog/${post.slug}`
+  const url = `${siteConfig.site.url}/blog/${post.slug}`
+  // An Article that documents the output of one of our own tools should say
+  // which one, so the tool page and the post reinforce each other instead of
+  // competing. Search Console showed cannibalisation on the IP-lookup cluster
+  // (tool: 4,440 impressions / post: 742, both on the same head term).
+  const toolRefs = post.relatedTools
+    .map((slug) => toolMetadata.find((t) => t.slug === slug))
+    .filter((t): t is NonNullable<typeof t> => Boolean(t))
   const relatedTools = post.relatedTools
     .map((s) => toolMetadata.find((t) => t.slug === s))
     .filter((t): t is NonNullable<typeof t> => Boolean(t))
@@ -103,19 +114,32 @@ export default async function BlogPostPage({ params }: Props) {
   const jsonLdAuthor = siteConfig.founder.name
     ? {
         '@type': 'Person',
+        // `#person` must match the @id on the homepage's Person node. Without
+        // it, Google sees this byline author and the homepage's founder as two
+        // unrelated people instead of one entity.
+        '@id': `${siteConfig.site.url}/#person`,
         name: siteConfig.founder.name,
         jobTitle: siteConfig.founder.jobTitle,
         ...(siteConfig.founder.profileUrl
           ? { url: siteConfig.founder.profileUrl }
           : {}),
+        // `sameAs` ties the Person to verifiable profiles — the strongest
+        // single E-E-A-T signal. Falls back to profileUrl + GitHub.
+        sameAs: (
+          siteConfig.founder.sameAs.length > 0
+            ? siteConfig.founder.sameAs
+            : [siteConfig.founder.profileUrl, siteConfig.social.github]
+        ).filter(Boolean) as string[],
         worksFor: {
           '@type': 'Organization',
+          '@id': `${siteConfig.site.url}/#organization`,
           name: siteConfig.site.name,
           url: siteConfig.site.url,
         },
       }
     : {
         '@type': 'Organization',
+        '@id': `${siteConfig.site.url}/#organization`,
         name: authorName,
         url: `${siteConfig.site.url}/about`,
       }
@@ -129,12 +153,16 @@ export default async function BlogPostPage({ params }: Props) {
         headline: post.title,
         description: post.description,
         datePublished: post.date,
-        dateModified: post.date,
+        // `dateModified` was hardcoded to `datePublished`, so Google had no
+        // way to tell updated posts from untouched ones. Posts now carry a
+        // real `updated` date (post.updated ?? post.date).
+        dateModified: post.updated ?? post.date,
         inLanguage: 'en',
         mainEntityOfPage: url,
         author: jsonLdAuthor,
         publisher: {
           '@type': 'Organization',
+          '@id': `${siteConfig.site.url}/#organization`,
           name: siteConfig.site.name,
           url: siteConfig.site.url,
           logo: {
@@ -144,6 +172,16 @@ export default async function BlogPostPage({ params }: Props) {
             height: 512,
           },
         },
+        // Tie the article to the tools it documents.
+        ...(toolRefs.length > 0
+          ? {
+              about: toolRefs.map((t) => ({
+                '@type': 'SoftwareApplication',
+                name: t.name,
+                url: `${siteConfig.site.url}/tools/${t.slug}`,
+              })),
+            }
+          : {}),
       },
       {
         '@type': 'BreadcrumbList',
@@ -162,7 +200,12 @@ export default async function BlogPostPage({ params }: Props) {
 
   // Shared renderer config — both halves must produce identical markup so the
   // h2 anchor ids and TOC scroll-spy keep working across the split.
-  const markdownComponents = {
+  //
+  // Typed as `Components` so each renderer gets the correct contextual props.
+  // Without the annotation every callback infers `{ children: any }` with
+  // `children` REQUIRED, which fails to satisfy ReactMarkdown's expected
+  // types (HTML props all make children optional).
+  const markdownComponents: Components = {
     h2: ({ children }) => {
       // Anchor ids for the TOC scroll-spy — slugified exactly like
       // extractToc does on the raw markdown (see blog-utils).
@@ -184,9 +227,12 @@ export default async function BlogPostPage({ params }: Props) {
     p: ({ children }) => (
       <p className="mb-4 leading-relaxed text-muted-foreground">{children}</p>
     ),
-    a: ({ href, children }) => (
+    // `href` is optional in React's anchor props, so destructuring it as a
+    // required parameter fails the Components type. Type it explicitly and
+    // fall back to '#' for anchor-only markdown links.
+    a: ({ href, children }: React.ComponentProps<'a'>) => (
       <a
-        href={href}
+        href={href ?? '#'}
         className="font-medium text-primary underline decoration-primary/40 underline-offset-2 transition hover:decoration-primary"
       >
         {children}
@@ -243,6 +289,7 @@ export default async function BlogPostPage({ params }: Props) {
       postTitle={post.title}
       postExcerpt={post.description}
       postDate={post.date}
+      postUpdated={post.updated}
       postCategory={post.category}
       readingMinutes={readingMinutes}
       fresh={isFreshPost(post.date)}

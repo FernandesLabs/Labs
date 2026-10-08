@@ -28,18 +28,23 @@ import { toolMetaList } from '@/lib/tools/tool-meta'
 /**
  * Generates SEO content for a tool page: an intro paragraph, concrete
  * input→output examples, "how to use" steps, "common use cases", "tips",
- * and an FAQ accordion.
+ * and an FAQ section.
  *
  * Content priority:
- *   1. Hand-written override (tool-content-overrides.ts) — for the top
- *      tools with the highest search intent. Unique, specific, deep.
- *   2. Template generator (tool-seo.ts) — for the other 129 tools.
+ *   1. Hand-written override (`overrides/*.ts`). All 132 tools have one —
+ *      enforced by `tests/override-coverage.test.ts`.
+ *   2. Template generator (`tool-seo.ts`). Kept as a safety net for any tool
+ *      added without an override; currently unused in production.
  *
- * The same content is emitted as FAQPage + HowTo JSON-LD by the server
- * component (`page.tsx`), so the visible text and structured data match.
+ * SEO note: every question AND answer rendered here is also emitted as
+ * `FAQPage` JSON-LD by `ToolJsonLd`. Google requires marked-up content to be
+ * visible to users, so the FAQ uses native <details> and all six answers are
+ * always present in the served HTML. Do not reintroduce a JS accordion that
+ * hides answers — that mismatch is what caused the Sept 2026 impression
+ * collapse.
  */
 // Re-export so ToolJsonLd (and other consumers) can build FAQPage schema
-// from the same source as the visible accordion.
+// from the same source as the visible FAQ section.
 export const generateFaq = (tool: Tool) =>
   getToolContentOverride(tool.slug)?.faqs ?? generateToolFaq(tool)
 export function ToolContent({ tool }: { tool: Tool }) {
@@ -67,14 +72,17 @@ export function ToolContent({ tool }: { tool: Tool }) {
   )
   const examples = override?.examples ?? []
   const bestPractices = override?.bestPractices ?? []
+  // FAQ disclosure state: only the answer for the open question is expanded.
+  // All six answers are ALWAYS in the DOM (collapsed via CSS grid-rows) so the
+  // FAQPage JSON-LD stays consistent with visible content — see the FAQ
+  // section below before touching this.
   const [openFaq, setOpenFaq] = React.useState<number | null>(0)
   const cat = CATEGORY_META[tool.category]
   const crossLinks = React.useMemo(() => {
-    const slugs = getRelatedTools(tool.slug, tool.category)
+    const slugs = getRelatedTools(tool.slug, tool.category, 8)
     return slugs
       .map((s) => toolMetaList.find((t) => t.slug === s))
       .filter((t): t is NonNullable<typeof t> => Boolean(t))
-      .slice(0, 8)
   }, [tool.slug, tool.category])
   return (
     <div className="mt-12 space-y-10">
@@ -89,12 +97,6 @@ export function ToolContent({ tool }: { tool: Tool }) {
         <p className="text-sm leading-relaxed text-muted-foreground sm:text-base">
           {intro}
         </p>
-        {override ? (
-          <div className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">
-            <CheckCircle2 className="size-3" />
-            Hand-written guide
-          </div>
-        ) : null}
       </section>
       {/* Concrete examples (only for tools with overrides) */}
       {examples.length > 0 ? (
@@ -240,6 +242,25 @@ export function ToolContent({ tool }: { tool: Tool }) {
             {resolveSectionHeading('faq', tool)}
           </h2>
         </div>
+        {/*
+          Every answer is always rendered in the server HTML and collapsed
+          visually with CSS `grid-rows`. Do NOT revert to conditionally
+          rendering the panel:
+
+            - SEO: all six answers are marked up in the `FAQPage` JSON-LD from
+              ToolJsonLd, and Google requires marked-up content to be visible
+              to the user. The old `{open ? <answer/> : null}` render shipped
+              only answer #1, so 5 of 6 marked-up answers were absent from the
+              HTML on all 132 tool pages — a structured-data policy violation,
+              and the most likely cause of the 2026-09-01 impression collapse.
+            - A11y: each question is a real <h3> heading and the panel is a
+              `role="region"` wired to its trigger by aria-controls, so the
+              disclosure is keyboard and screen-reader navigable.
+
+          An earlier alternative used native <details>/<summary>. It also put
+          every answer in the HTML but lost the heading semantics and the
+          animation, so the accordion above is the one to keep.
+        */}
         <div className="space-y-2">
           {faqs.map((faq, i) => {
             const open = openFaq === i

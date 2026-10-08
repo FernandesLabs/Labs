@@ -135,63 +135,18 @@ export function HomePageClient({
         toolCount={tools.length}
         onOpenPalette={() => setPaletteOpen(true)}
       />
-      {/* Editorial intro — substantial unique content so Google (and AdSense
-          reviewers) can determine what the site is about, plus keyword-rich
-          internal links to every category. */}
-      <section
-        aria-label="About Fernandes Labs"
-        className="border-b border-border/60 bg-muted/20"
-      >
-        <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-bold tracking-tight text-foreground">
-            Free online tools for developers, designers &amp; marketers
-          </h2>
-          <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-            Fernandes Labs is a collection of 132 free online tools that run
-            entirely in your browser — no sign-up, no uploads, no tracking.
-            Format and validate JSON, generate secure passwords, look up IP
-            addresses and DNS records, test 301 redirects, compress images,
-            and calculate everything from loan payments to BMR. Pick a
-            category to start:
-          </p>
-          <ul className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 text-sm sm:grid-cols-3 lg:grid-cols-4">
-            {CATEGORY_ORDER.map((cat) => (
-              <li key={cat}>
-                <a
-                  href={`/category/${cat}`}
-                  className="font-medium text-primary underline-offset-2 hover:underline"
-                >
-                  Free {CATEGORY_META[cat].label.toLowerCase()} tools
-                </a>
-              </li>
-            ))}
-          </ul>
-          <p className="mt-4 max-w-3xl text-sm leading-relaxed text-muted-foreground">
-            Every tool processes data client-side with modern Web APIs, so
-            sensitive inputs like API keys, passwords, and private documents
-            never leave your device. Each page includes hand-written guides,
-            real examples, and practical tips from our team.
-          </p>
-          <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground">
-            The site is free, supported by clearly labeled ads and affiliate
-            links — never by selling data.{' '}
-            <a
-              href="/about"
-              className="font-medium text-primary underline underline-offset-2 hover:text-primary/80"
-            >
-              Learn more about who we are
-            </a>{' '}
-            or read our{' '}
-            <a
-              href="/blog"
-              className="font-medium text-primary underline underline-offset-2 hover:text-primary/80"
-            >
-              latest guides
-            </a>
-            .
-          </p>
-        </div>
-      </section>
+      {/*
+        NOTE: the ~150-word editorial intro that used to sit here was removed.
+
+        It pushed the tool grid — the actual reason to visit — below the fold
+        and read as filler to anyone who had not used a tool yet. The
+        differentiators it made in prose now live in the hero badge row (see
+        hub-view.tsx), and the internal links it carried were moved to
+        SeoLinksSection, which renders crawlable anchors to all 8 category
+        hubs. Unique homepage copy for crawlers is still present: the
+        <noscript> block below, plus every category blurb, tool blurb and post
+        excerpt in SeoLinksSection.
+      */}
       <HubView
         tools={tools}
         toolsBySlug={new Map(tools.map((t) => [t.slug, t]))}

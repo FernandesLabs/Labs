@@ -166,7 +166,12 @@ export function BlogIndexClient({
   // hero; the remaining cards render below. While searching/filtering the
   // hero is dropped so results stay a uniform, scannable grid.
   const featured = !query.trim() && !activeCategory ? catalog[0] : null
-  const featuredColor = featured ? blogCategoryColor(featured.category) : null
+  // `blogCategoryColor` returns a string, but this was typed `string | null`,
+  // and React's CSSProperties accepts `Color | undefined` — so `null` broke
+  // the three `style` props below. Default to the same fallback
+  // blogCategoryColor uses, which also keeps the gradient string well-formed
+  // when there is no featured guide.
+  const featuredColor = featured ? blogCategoryColor(featured.category) : '#64748b'
 
   // Paged slice of `filtered` — PAGE_SIZE counts the hero card, so the page
   // budget is identical whether or not a hero is showing. `visibleRest` is

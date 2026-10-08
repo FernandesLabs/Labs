@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { siteConfig } from '@/lib/site-config'
 import { LegalPage } from '@/components/hub/legal-page'
+import { serverProxiedToolList } from '@/lib/privacy'
 
 export const metadata: Metadata = {
   title: 'About Fernandes Labs — The Team Behind the Free Tools Network',
@@ -111,11 +113,23 @@ export default function AboutPage() {
             JSON Formatter and Regex Tester, SEO tools like the Redirect
             Checker, Canonical URL Checker, and Robots.txt Generator, network
             diagnostics like IP Lookup and DNS Lookup, plus media, finance,
-            and text tools. Every tool runs entirely in your browser using
-            modern Web APIs — nothing you type or upload is sent to our
-            servers, stored, or logged. That is why the tools are safe for
-            sensitive data such as API keys, passwords, and private
-            documents.
+            and text tools.
+          </p>
+          <p className="mt-2">
+            Almost every tool runs entirely in your browser using modern Web
+            APIs, which is what makes them safe for sensitive data such as API
+            keys, passwords, and private documents. The six network tools are
+            the deliberate exception:{' '}
+            <strong className="font-medium text-foreground">
+              {serverProxiedToolList()}
+            </strong>{' '}
+            have to send the address or URL you enter to our server, because
+            browsers block those cross-origin requests outright. Those lookups
+            are proxied without being stored or logged, and the{' '}
+            <Link href="/privacy" className="underline underline-offset-2">
+              privacy policy
+            </Link>{' '}
+            spells this out in full.
           </p>
         </section>
         <section id="how-we-work" className="scroll-mt-20">
@@ -127,11 +141,11 @@ export default function AboutPage() {
             input-to-output examples, and answers we verify against the
             current standards — RFCs for network protocols, WCAG for
             accessibility tools, and Google&apos;s own documentation for SEO
-            tools. The project is supported by clearly labeled ads and
-            affiliate links, never by selling data. We publish how the site
-            works in our open documentation and review every piece of
-            feedback we receive — bug reports, tool ideas, and corrections
-            all shape the roadmap.
+            tools. The project is funded by clearly labelled ads and nothing else —
+            there are no affiliate links and no paid placements, and we never
+            sell data. We publish how the site works in our open
+            documentation and review every piece of feedback we receive — bug
+            reports, tool ideas, and corrections all shape the roadmap.
           </p>
         </section>
         <section id="contact" className="scroll-mt-20">

@@ -125,13 +125,38 @@ export function CategoryPageClient({
                 <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
                   {cat.seoIntro}
                 </p>
+                {/*
+                  Category guide. Category pages previously carried only
+                  ~60 words of unique text (blurb + seoIntro) while the rest
+                  of the page repeated tool descriptions that already appear
+                  on each tool page — making these the thinnest indexable
+                  pages on the site, despite being the hubs that internal
+                  linking routes authority through. `cat.guide` is unique per
+                  category and names specific tools and decisions.
+                */}
+                <div className="mt-5 max-w-3xl border-t border-border/60 pt-4">
+                  <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+                    When to use these tools
+                  </h2>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    {cat.guide}
+                  </p>
+                </div>
                 <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
                   <span className="inline-flex items-center gap-1 rounded-full bg-muted/70 px-2.5 py-1 font-medium text-foreground">
                     <Layers className="size-3 text-primary" />
                     {tools.length} tools
                   </span>
+                  {/*
+                    Not "100% client-side" for the network category — six of
+                    those tools proxy through our server (see lib/privacy.ts).
+                    A false claim on a category landing page is exactly the
+                    kind of thing that gets a site demoted for low quality.
+                  */}
                   <span className="inline-flex items-center gap-1 rounded-full bg-muted/50 px-2.5 py-1 font-medium text-muted-foreground">
-                    100% client-side
+                    {cat.label === 'Network'
+                      ? 'Proxied lookups, never logged'
+                      : '100% client-side'}
                   </span>
                   <span className="inline-flex items-center gap-1 rounded-full bg-muted/50 px-2.5 py-1 font-medium text-muted-foreground">
                     No sign-up

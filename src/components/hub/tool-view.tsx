@@ -16,7 +16,7 @@ import type { Tool } from '@/lib/tools/types'
 import { CATEGORY_META, CATEGORY_ORDER } from '@/lib/tools/types'
 import { AdblockBanner } from '@/components/ads/adblock-banner'
 import { AdUnit } from '@/components/ads/ad-unit'
-import { AffiliateLinks } from '@/components/ads/affiliate-links'
+
 import { SiteHeader } from './site-header'
 import { SiteFooter } from './site-footer'
 import { FavoriteButton } from './favorite-button'
@@ -32,6 +32,7 @@ import { useToolHistory } from '@/lib/tools/use-tool-history'
 import { preloadTool } from '@/lib/tools/preload'
 import { toolMetaList } from '@/lib/tools/tool-meta'
 import type { PalettePost } from './command-palette'
+import { getRelatedTools } from '@/app/tools/[slug]/tool-seo'
 
 // Lazy-load heavy components that aren't needed on initial render:
 //   - CommandPalette (cmdk + Dialog) — only needed when ⌘K is pressed (~40KB)
@@ -59,7 +60,7 @@ const OnThisPage = dynamic(
  *   - Breadcrumbs (Home › Category › Tool)
  *   - Tool header (name, description, favorite star, "recently used" badge)
  *   - The actual tool component (lazy-loaded via the registry)
- *   - Ad units (top + bottom) and contextual affiliate links
+ *   - Ad units (top + bottom)
  *   - SEO content (intro / how-to / FAQ) — see ToolContent
  *   - JSON-LD structured data — see ToolJsonLd
  *   - "Related tools" rail (same category, excludes current)
@@ -72,7 +73,7 @@ const OnThisPage = dynamic(
 export function ToolView({
   tool,
   tools,
-  toolsBySlug: _toolsBySlug,
+  toolsBySlug,
   recent: _recent,
   guides = [],
   posts = [],
@@ -117,12 +118,15 @@ export function ToolView({
     return () => window.removeEventListener('keydown', handler)
   }, [paletteOpen])
 
-  // Related tools — same category, excluding the current tool (max 6).
+  // Related tools for the sidebar. Uses the curated map in `tool-seo.ts`
+  // (with a same-category fallback) rather than a raw same-category filter,
+  // so hand-picked relationships are respected.
   const related = React.useMemo(() => {
-    return tools
-      .filter((t) => t.category === tool.category && t.slug !== tool.slug)
-      .slice(0, 6)
-  }, [tools, tool.category, tool.slug])
+    const slugs = getRelatedTools(tool.slug, tool.category, 6)
+    return slugs
+      .map((s) => toolsBySlug.get(s))
+      .filter((t): t is NonNullable<typeof t> => Boolean(t))
+  }, [toolsBySlug, tool.category, tool.slug])
 
   // Other categories for the cross-linking rail.
   const otherCategories = React.useMemo(() => {
@@ -249,11 +253,6 @@ export function ToolView({
               <Component />
             </div>
 
-            {/* Contextual affiliate links */}
-            <div className="mt-6">
-              <AffiliateLinks category={tool.category} />
-            </div>
-
             {/* SEO content (intro / how-to / FAQ / use cases / tips) */}
             <ToolContent tool={tool} />
 
@@ -285,9 +284,15 @@ export function ToolView({
                 <ul className="space-y-1">
                   {related.map((t) => (
                     <li key={t.slug}>
-                      <button
-                        type="button"
-                        onClick={() => onSelect(t.slug)}
+                      {/*
+                        Real <Link> rather than a <button> + onSelect.
+                        The button version emitted no href, so these six
+                        links were invisible to crawlers. next/link also
+                        handles client-side nav, so `onSelect` (a full
+                        `window.location.href` reload) is no longer needed.
+                      */}
+                      <Link
+                        href={`/tools/${t.slug}`}
                         onMouseEnter={() => preloadTool(t.slug)}
                         className="group flex w-full items-center justify-between gap-2 rounded-md px-2 py-1.5 text-left text-sm transition hover:bg-muted"
                       >
@@ -295,7 +300,7 @@ export function ToolView({
                           {t.name}
                         </span>
                         <ChevronRight className="size-3.5 shrink-0 text-muted-foreground/80 transition group-hover:translate-x-0.5 group-hover:text-foreground" />
-                      </button>
+                      </Link>
                     </li>
                   ))}
                 </ul>

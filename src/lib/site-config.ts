@@ -73,17 +73,12 @@ export const siteConfig = {
     },
     donationAmounts: [1, 5, 10, 25, 50],
   },
-  /** Affiliate links */
-  affiliate: {
-    enabled: bool(process.env.NEXT_PUBLIC_AFFILIATE_ENABLED, true),
-    links: {
-      hosting: nullableStr(process.env.NEXT_PUBLIC_AFF_HOSTING) || 'https://cloudflare.com',
-      domain: nullableStr(process.env.NEXT_PUBLIC_AFF_DOMAIN) || 'https://namecheap.com',
-      vpn: nullableStr(process.env.NEXT_PUBLIC_AFF_VPN) || 'https://protonvpn.com',
-      passwordManager: nullableStr(process.env.NEXT_PUBLIC_AFF_PASSWORD_MANAGER),
-      seoTool: nullableStr(process.env.NEXT_PUBLIC_AFF_SEO_TOOL),
-    },
-  },
+  // NOTE: the previous `affiliate` block (NEXT_PUBLIC_AFF_*) has been
+  // removed. There is no affiliate programme. What it pointed at were plain
+  // vendor homepages (https://cloudflare.com etc.) with no referral tracking,
+  // rendered under the disclosure "we may earn a commission if you sign up" —
+  // a claim that was false, since no commission was possible. Advertising
+  // (AdSense) is the site's only monetisation.
   /** Social/profile links */
   social: {
     github: str(
@@ -93,11 +88,25 @@ export const siteConfig = {
     twitter: nullableStr(process.env.NEXT_PUBLIC_SOCIAL_TWITTER),
   },
   /**
-   * Founder identity — powers the Person JSON-LD on the homepage and the
-   * author signals on the About page. Optional: if no name is configured,
-   * the Person schema is omitted (Organization + WebSite publisher remain).
-   * Set NEXT_PUBLIC_FOUNDER_NAME to activate. E-E-A-T note: use a real,
-   * verifiable identity — Google checks entity consistency.
+   * Author identity — powers the Person JSON-LD (homepage + every blog
+   * post), the visible byline on posts, and `author` in Article schema.
+   *
+   * Optional: with no name configured the Person node is omitted and posts
+   * fall back to the Organization, which is the current state. That is a
+   * real ranking gap — Search Console showed 0.19% CTR at average position
+   * 78, and an anonymous author on YMYL-adjacent topics (finance, health
+   * and network tools) is a signal Google weighs directly.
+   *
+   * E-E-A-T note: use a real, verifiable identity and never invent one.
+   * Google cross-checks entity consistency. Set these in `.env`:
+   *
+   *   NEXT_PUBLIC_FOUNDER_NAME="Real Name"
+   *   NEXT_PUBLIC_FOUNDER_JOB_TITLE="Founder & Lead Developer"
+   *   NEXT_PUBLIC_FOUNDER_PROFILE_URL="https://www.fernandeslabs.com/about"
+   *   NEXT_PUBLIC_FOUNDER_SAME_AS="https://github.com/<user>,https://x.com/<user>"
+   *
+   * `sameAs` is what ties the Person node to verifiable profiles — fill it
+   * in alongside the name rather than leaving it empty.
    */
   founder: {
     name: nullableStr(process.env.NEXT_PUBLIC_FOUNDER_NAME),
@@ -106,6 +115,11 @@ export const siteConfig = {
       'Founder & Lead Developer'
     ),
     profileUrl: nullableStr(process.env.NEXT_PUBLIC_FOUNDER_PROFILE_URL),
+    /** Comma-separated profile URLs, e.g. GitHub / X / LinkedIn. */
+    sameAs: (process.env.NEXT_PUBLIC_FOUNDER_SAME_AS ?? '')
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean),
   },
 }
 /** Helper: is AdSense fully configured and ready to show real ads? */

@@ -18,11 +18,16 @@ import {
  */
 export async function GET() {
   try {
+    // Prisma v6's `groupBy` overload resolves the result type through an
+    // intersection that also carries a runtime-only brand, so a direct
+    // `as FeedbackGroupRow[]` assertion is rejected. The query itself is
+    // exactly the one documented in lib/feedback/aggregate.ts — only the
+    // static type assertion needs the double cast.
     const rows = (await db.toolFeedback.groupBy({
       by: ['pageSlug', 'helpful'],
       _count: { _all: true },
       _max: { createdAt: true },
-    })) as FeedbackGroupRow[]
+    })) as unknown as FeedbackGroupRow[]
 
     const pages = aggregateFeedbackRows(rows)
     return NextResponse.json({ ok: true, totals: feedbackTotals(pages), pages })

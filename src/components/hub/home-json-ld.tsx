@@ -97,7 +97,10 @@ export function HomeJsonLd() {
   if (founder.name) {
     graph.push({
       '@type': 'Person',
-      '@id': `${baseUrl}/#founder`,
+      // NOTE: `#person`, not `#founder`. Blog posts reference this same @id
+      // for their `author`, and a mismatched id means Google sees two
+      // unrelated people instead of one entity.
+      '@id': `${baseUrl}/#person`,
       name: founder.name,
       jobTitle: founder.jobTitle,
       url: founder.profileUrl ?? aboutUrl,
@@ -107,9 +110,13 @@ export function HomeJsonLd() {
         '@id': `${aboutUrl}#webpage`,
         url: aboutUrl,
       },
-      sameAs: [founder.profileUrl, siteConfig.social.github].filter(
-        Boolean
-      ) as string[],
+      // Prefer the explicit NEXT_PUBLIC_FOUNDER_SAME_AS list (the profiles
+      // the author actually controls); fall back to profileUrl + GitHub.
+      sameAs: (
+        founder.sameAs.length > 0
+          ? founder.sameAs
+          : [founder.profileUrl, siteConfig.social.github]
+      ).filter(Boolean) as string[],
     })
   }
 

@@ -69,14 +69,29 @@ export const metadata: Metadata = {
     title: "Fernandes Labs — Free Online Tools",
     description:
       "Fast, privacy-first tools for developers, designers, and marketers. No sign-up. No tracking.",
+    url: siteConfig.site.url,
     siteName: "Fernandes Labs",
     type: "website",
+    // The root layout previously declared no `images`, so the homepage (and
+    // /blog, /about, /privacy, /terms, which inherit this) had no og:image at
+    // all. Any shared link rendered as a bare text card. This static asset is
+    // a real 1200×630 image, unlike the per-tool /api/og route which only
+    // accepts a `slug` query param.
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Fernandes Labs — free online tools for developers, designers and marketers",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Fernandes Labs — Free Online Tools",
     description:
       "Fast, privacy-first tools for developers, designers, and marketers.",
+    images: ["/og-image.png"],
   },
 };
 export default function RootLayout({

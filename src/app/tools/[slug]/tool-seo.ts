@@ -1,6 +1,11 @@
 import type { ToolCategory } from '@/lib/tools/types'
 import { CATEGORY_META } from '@/lib/tools/types'
+// Two metadata sources, both needed:
+//   - `toolMetaList` — used by other exports in this file
+//   - `toolMetadata` — used to validate related-tool slugs and supply
+//     same-category fallbacks (server-safe, not the 'use client' registry)
 import { toolMetaList } from '@/lib/tools/tool-meta'
+import { toolMetadata } from '@/lib/tools/tool-metadata'
 /**
  * SEO content generators shared by:
  *   - The server component `app/tools/[slug]/page.tsx` (for JSON-LD)
@@ -10,6 +15,13 @@ import { toolMetaList } from '@/lib/tools/tool-meta'
  * stay in sync — Google sees the same Q&A in the rendered HTML and in the
  * FAQPage JSON-LD.
  */
+
+const KNOWN_SLUGS = new Set(toolMetadata.map((t) => t.slug))
+
+/** True when `slug` matches a real tool in the registry. */
+function isKnownSlug(slug: string): boolean {
+  return KNOWN_SLUGS.has(slug)
+}
 
 /**
  * Local type accepted by all generator functions below.
@@ -211,7 +223,7 @@ const SEO_OVERRIDES: Record<
       'Format, validate and minify JSON with inline error reporting. Free JSON beautifier — works offline, no data leaves your browser.',
   },
   'base64-encoder-decoder': {
-    title: 'Base64 Encoder & Decoder — Free Online Tool',
+    title: 'Base64 Encoder & Decoder — Encode or Decode Text',
     description:
       'Encode text to Base64 or decode Base64 back to text with UTF-8 support. Free Base64 tool, client-side only.',
   },
@@ -226,7 +238,7 @@ const SEO_OVERRIDES: Record<
       'Convert colors between HEX, RGB and HSL with a live preview. Free color converter for designers and developers.',
   },
   'url-encoder-decoder': {
-    title: 'URL Encoder & Decoder — Free Online',
+    title: 'URL Encoder & Decoder — Encode or Decode URLs',
     description:
       'Encode or decode URLs and URL components (percent-encoding). Free URL encoder/decoder tool, no sign-up.',
   },
@@ -329,34 +341,88 @@ export function getSeoOverride(
   return SEO_OVERRIDES[tool.slug] ?? null
 }
 
+/** Google renders roughly 55–60 characters of a desktop title before truncating. */
+const TITLE_MAX = 62
+/** Meta descriptions are truncated around 155–160 characters. */
+const DESC_MAX = 158
+/** Below this, a trimmed capability fragment reads worse than the tool name alone. */
+const MIN_CAPABILITY_BUDGET = 24
+
+function stripTrailingPeriod(s: string): string {
+  return s.trim().replace(/\.$/, '')
+}
+
+/** Uppercase the first character, leave the rest as authored. */
+function sentenceCase(s: string): string {
+  return s.charAt(0).toUpperCase() + s.slice(1)
+}
+
+/**
+ * Conjunctions / prepositions that read badly when a title is cut mid-phrase
+ * ("…Build cron schedules visually and"). Trimmed after truncation.
+ */
+const TRAILING_STOPWORDS = new Set([
+  'a', 'an', 'and', 'as', 'at', 'by', 'for', 'from', 'in', 'into', 'of',
+  'on', 'or', 'that', 'the', 'to', 'up', 'via', 'with', 'without', 'your',
+])
+
+/**
+ * Truncate to `max` characters without cutting a word in half, then drop any
+ * dangling trailing function word so the title still reads as a phrase.
+ * Returns an empty string when nothing usable remains.
+ */
+function truncateOnWordBoundary(s: string, max: number): string {
+  if (s.length <= max) return s
+  const clipped = s.slice(0, max)
+  const lastSpace = clipped.lastIndexOf(' ')
+  const out = lastSpace > 0 ? clipped.slice(0, lastSpace) : ''
+  return dropTrailingStopword(out.replace(/[\s,.;:—-]+$/, ''))
+}
+
+function dropTrailingStopword(s: string): string {
+  let parts = s.split(' ')
+  while (parts.length > 1 && TRAILING_STOPWORDS.has(parts[parts.length - 1].toLowerCase())) {
+    parts = parts.slice(0, -1)
+  }
+  return parts.join(' ')
+}
+
 /**
  * Generate a unique, keyword-rich <title> for a tool page.
  *
- * Format: "{ToolName} — Free Online {CategoryLabel} Tool | Fernandes Labs"
+ * Format: "{ToolName} — {capability from the tool's own description}".
  *
- * Why this is better than the old "{ToolName} — Free Online Tool — Fernandes Labs":
- *   - Includes the category label (e.g. "Developer", "SEO") → adds a secondary
- *     keyword and helps Google understand topical relevance.
- *   - Uses a single em-dash + pipe separator for cleaner SERP display.
- *   - Stays within 50–60 characters for most tools (the brand tail is trimmed
- *     automatically if the total would exceed 62 chars).
+ * The capability is the tool's hand-written `description`, which is already
+ * specific and per-tool (e.g. "Count words, characters, sentences, and
+ * reading time"). Titles are longer than the previous template, so the
+ * category label and brand tail were dropped — they were generic filler that
+ * cost real keyword space and made 82 titles near-identical.
  *
- * Example: "JSON Formatter — Free Online Developer Tool | Fernandes Labs"
+ * Example: "Word Counter — Count words, characters, sentences, and reading time"
  */
 export function generateToolTitle(tool: ToolLike): string {
   const override = getSeoOverride(tool)
   if (override) return override.title
-  const catLabel = CATEGORY_META[tool.category as ToolCategory]?.label ?? 'Utility'
   const brand = 'Fernandes Labs'
-  const full = `${tool.name} — Free Online ${catLabel} Tool | ${brand}`
-  // If the title is too long (> 62 chars), drop the category word to keep it
-  // within Google's display limit. The brand stays so users recognise the
-  // result in the SERP.
-  if (full.length > 62) {
-    const short = `${tool.name} — Free Online Tool | ${brand}`
-    return short
+
+  // Lead with the tool's own searchable name plus its concrete capability,
+  // rather than the old "{Name} — Free Online {Category} Tool | {Brand}"
+  // template. That template spent its most valuable SERP real estate on the
+  // generic words "Free Online ... Tool", pushed the actual capability off the
+  // end, and produced 82 near-identical titles.
+  const capability = sentenceCase(stripTrailingPeriod(tool.description))
+  const candidate = `${tool.name} — ${capability}`
+  if (candidate.length <= TITLE_MAX) return candidate
+
+  // Capability is too long to fit whole — trim it on a word boundary rather
+  // than discarding it for generic filler like "Free Online Tool", which is a
+  // weak use of the most valuable pixels in the SERP.
+  const budget = TITLE_MAX - tool.name.length - ' — '.length
+  if (budget >= MIN_CAPABILITY_BUDGET) {
+    const trimmed = truncateOnWordBoundary(capability, budget)
+    if (trimmed) return `${tool.name} — ${trimmed}`
   }
-  return full
+  return tool.name
 }
 
 /**
@@ -364,36 +430,58 @@ export function generateToolTitle(tool: ToolLike): string {
  *
  * Target length: 120–160 characters.
  *
- * Structure:
- *   "{activeVerb} {primaryKeyword} {detail}. Free, online, no sign-up — runs
- *    entirely in your browser. {categoryContext} tool by Fernandes Labs."
+ * The previous version appended a fixed 100-character tail to every tool
+ * (" Free online {kw} tool — no sign-up, no tracking, runs entirely in your
+ * browser. {Category} tool by Fernandes Labs."), which meant all 82
+ * non-override tools ended in the same boilerplate and most got truncated
+ * mid-sentence with an ellipsis before the useful part even rendered.
  *
- * This is richer than the raw `tool.description` (which averages only ~59
- * chars and lacks value props like "free", "no sign-up", "in your browser").
+ * Now: the hand-written capability sentence leads, followed by one accurate
+ * differentiator. The privacy claim is category-aware — the six `network`
+ * tools proxy through our server to bypass CORS, so claiming "nothing leaves
+ * your browser" on those pages would be false.
  */
 export function generateToolDescription(tool: ToolLike): string {
   const override = getSeoOverride(tool)
   if (override) return override.description
-  const catLabel = CATEGORY_META[tool.category as ToolCategory]?.label ?? 'utility'
-  const primaryKw = tool.keywords?.[0] ?? tool.name.toLowerCase()
-  // Start from the base description (already specific per tool), then append
-  // the value-proposition tail.
-  const base = tool.description.replace(/\.$/, '')
-  const desc = `${base}. Free online ${primaryKw} tool — no sign-up, no tracking, runs entirely in your browser. ${catLabel} tool by Fernandes Labs.`
-  // Truncate to 160 chars on a word boundary if needed.
-  if (desc.length <= 160) return desc
-  return desc.slice(0, 157).replace(/\s+\S*$/, '') + '…'
+
+  const base = stripTrailingPeriod(tool.description)
+
+  const differentiator =
+    tool.category === 'network'
+      ? // Server-side proxy: be accurate rather than maximally flattering.
+        "Free — proxied server-side to bypass CORS; we don't log queries."
+      : 'Free — no sign-up, no uploads.'
+
+  const full = `${base}. ${differentiator}`
+  if (full.length <= DESC_MAX) return full
+  return truncateOnWordBoundary(full, DESC_MAX - 1) + '…'
 }
+/** Longer, more specific intro paragraph (Priority 7 — improve content). */
+/**
+ * Whether this tool routes input through our server (`/api/network`).
+ * Duplicated from `@/lib/privacy` as a tiny local helper to keep this module
+ * dependency-free; `tests/privacy-claims.test.ts` asserts the two agree.
+ */
+function toolIsProxied(category: string): boolean {
+  return category === 'network'
+}
+
 /** Longer, more specific intro paragraph (Priority 7 — improve content). */
 export function generateToolIntro(tool: ToolLike): string {
   const cat = CATEGORY_META[tool.category as ToolCategory]
   const kws = tool.keywords?.slice(0, 3).join(', ') || tool.name.toLowerCase()
   const kwsList = tool.keywords?.slice(0, 3).join(', ') || 'this task'
+  const proxied = toolIsProxied(tool.category)
   return (
     `The ${tool.name} is a free online ${cat.label.toLowerCase()} tool that ${tool.description.toLowerCase().replace(/\.$/, '')}. ` +
-    `It runs entirely in your browser — no data is sent to any server, no sign-up is required, and it works offline once the page has loaded. ` +
+    `${proxied
+      ? `Lookups run through our server so your browser can reach the upstream data source — nothing is stored or logged, but the address or URL you enter does transit our infrastructure. `
+      : `It runs entirely in your browser — no data is sent to any server, no sign-up is required, and it works offline once the page has loaded. `}` +
     `Whether you need to ${kws}, or complete related tasks like ${kwsList}, this tool provides a fast, privacy-first solution. ` +
-    `All processing happens client-side using modern Web APIs, which means your input never leaves your device — making it safe for sensitive data such as passwords, private keys, personal documents, or confidential business information. ` +
+    `${proxied
+      ? `Results come from public registry and routing data, so treat them as reference information rather than proof of anything. `
+      : `All processing happens client-side using modern Web APIs, which means your input never leaves your device — making it safe for sensitive data such as passwords, private keys, personal documents, or confidential business information. `}` +
     `The tool is fully responsive and works on phones, tablets, and desktops. It is also installable as a Progressive Web App (PWA), so you can add it to your home screen and launch it like a native app, even when you're offline.`
   )
 }
@@ -406,12 +494,23 @@ export function generateToolUseCases(tool: ToolLike): string[] {
       `Quick, ad-hoc ${kws[0]} work without installing software or signing up.`
     )
   }
-  base.push(
-    `Privacy-sensitive scenarios where data must not leave your device (e.g. passwords, financial inputs, private documents).`
-  )
-  base.push(
-    `Offline use — once the page is loaded, no internet connection is required.`
-  )
+  // Offline use and "data never leaves your device" are both untrue for the
+  // server-proxied network tools.
+  if (toolIsProxied(tool.category)) {
+    base.push(
+      `Checking infrastructure you are responsible for — your own domains, servers and email flows.`
+    )
+    base.push(
+      `Verifying a third party before trusting them with a link, certificate or header set.`
+    )
+  } else {
+    base.push(
+      `Privacy-sensitive scenarios where data must not leave your device (e.g. passwords, financial inputs, private documents).`
+    )
+    base.push(
+      `Offline use — once the page is loaded, no internet connection is required.`
+    )
+  }
   base.push(
     `Cross-platform access from any modern browser on desktop, tablet, or mobile.`
   )
@@ -487,7 +586,9 @@ export function generateToolHowTo(tool: ToolLike): string[] {
     `View the result in the output area below. Use the Copy button to copy the result to your clipboard, or the Download/Save button to save it as a file.`
   )
   steps.push(
-    `All processing happens client-side in your browser. Your data never leaves your device, making this tool safe for sensitive inputs like passwords, private keys, or personal documents.`
+    toolIsProxied(cat)
+      ? `Read the result critically. This lookup returns public registry and routing data, so treat a city or country as a rough registration location rather than proof of a physical location.`
+      : `All processing happens client-side in your browser. Your data never leaves your device, making this tool safe for sensitive inputs like passwords, private keys, or personal documents.`
   )
   return steps
 }
@@ -495,19 +596,30 @@ export function generateToolHowTo(tool: ToolLike): string[] {
 export function generateToolFaq(tool: ToolLike): FaqItem[] {
   const cat = CATEGORY_META[tool.category as ToolCategory]
   const kws = tool.keywords || []
+  const proxied = toolIsProxied(tool.category)
   const faqs: FaqItem[] = [
     {
       q: `Is the ${tool.name} free to use?`,
       a: `Yes, completely free. There are no sign-ups, no hidden costs, and no usage limits. The tool is supported by ads (shown above and below the tool card).`,
     },
-    {
-      q: `Is my data safe when using this tool?`,
-      a: `Absolutely. All processing happens entirely in your browser. Your input is never sent to any server, stored, or tracked. You can safely use this tool with sensitive data like passwords, private documents, or personal information. You can even use it offline once the page is loaded.`,
-    },
-    {
-      q: `Does the ${tool.name} work offline?`,
-      a: `Yes. Once the page has loaded, the tool runs entirely client-side. You can disconnect from the internet and continue using it. The site is also installable as a Progressive Web App (PWA) for offline access from your home screen.`,
-    },
+    proxied
+      ? {
+          q: `Does my ${kws[0] || 'input'} get sent to a server?`,
+          a: `Yes. Browsers block this kind of cross-origin lookup, so the request is made by our server on your behalf. We do not store or log it — the proxy runs with caching disabled and writes nothing to a database — but the value you enter does transit our infrastructure and the upstream public data provider. Do not enter private or internal hostnames.`,
+        }
+      : {
+          q: `Is my data safe when using this tool?`,
+          a: `Absolutely. All processing happens entirely in your browser. Your input is never sent to any server, stored, or tracked. You can safely use this tool with sensitive data like passwords, private documents, or personal information. You can even use it offline once the page is loaded.`,
+        },
+    proxied
+      ? {
+          q: `Does the ${tool.name} work offline?`,
+          a: `No. This tool queries live public data, so it needs an internet connection each time you run a lookup.`,
+        }
+      : {
+          q: `Does the ${tool.name} work offline?`,
+          a: `Yes. Once the page has loaded, the tool runs entirely client-side. You can disconnect from the internet and continue using it. The site is also installable as a Progressive Web App (PWA) for offline access from your home screen.`,
+        },
   ]
   if (cat.label === 'Developer') {
     faqs.push({
@@ -570,14 +682,14 @@ export const RELATED_TOOLS: Record<string, string[]> = {
   'email-signature-generator': ['qr-generator', 'title-generator', 'headline-analyzer', 'campaign-url-builder'],
   'qr-generator': ['email-signature-generator', 'favicon-generator', 'base64-encoder-decoder', 'image-resizer'],
   'json-formatter': ['json-yaml-converter', 'base64-encoder-decoder', 'regex-tester', 'sql-formatter', 'jwt-decoder', 'html-entity-encoder'],
-  'json-yaml-converter': ['json-formatter', 'xml-formatter', 'yaml-validator', 'markdown-to-html'],
+  'json-yaml-converter': ['json-formatter', 'xml-formatter', 'json-ld-generator', 'markdown-to-html'],
   'base64-encoder-decoder': ['url-encoder-decoder', 'hash-generator', 'file-signature-inspector', 'mime-detector'],
   'jwt-decoder': ['jwt-generator', 'base64-encoder-decoder', 'hash-generator', 'json-formatter'],
   'jwt-generator': ['jwt-decoder', 'hash-generator', 'hmac-generator', 'base64-encoder-decoder'],
   'regex-tester': ['json-formatter', 'text-sorter', 'duplicate-line-remover', 'case-converter'],
   'hash-generator': ['hmac-generator', 'file-checksum', 'password-generator', 'base64-encoder-decoder'],
   'hmac-generator': ['hash-generator', 'jwt-generator', 'password-generator'],
-  'password-generator': ['secure-passphrase', 'password-strength-checker', 'hash-generator', 'uuid-generator'],
+  'password-generator': ['secure-passphrase-generator', 'password-strength-checker', 'hash-generator', 'uuid-generator'],
   'color-converter': ['css-gradient-generator', 'color-palette-extractor', 'color-contrast-checker'],
   'css-gradient-generator': ['color-converter', 'color-palette-extractor', 'color-contrast-checker'],
   'color-palette-extractor': ['css-gradient-generator', 'color-converter', 'color-contrast-checker'],
@@ -605,19 +717,44 @@ export const RELATED_TOOLS: Record<string, string[]> = {
 }
 
 /**
- * Related tool slugs for a given tool (curated map, else same-category).
+ * Related tool slugs for a given tool: the curated map, else same-category
+ * fallback, capped at `limit`.
  *
- * The fallback matters for internal linking: ~90 tools have no curated map
- * entry, and before this fix they rendered ZERO related-tool links (the
- * comment above promised same-category neighbours but the code returned
- * an empty array). Same-category links give every tool page a crawl path
- * to its siblings and distribute category-hub authority.
+ * The fallback is what gives every tool page a crawl path to its siblings and
+ * distributes category-hub authority. `RELATED_TOOLS` covers only 43 of 132
+ * tools; before this existed the other 89 rendered ZERO related-tool links
+ * (the docstring always promised same-category neighbours, the code returned
+ * an empty array) — verified live against /tools/remove-blank-lines, which had
+ * no `/tools/*` hrefs at all.
+ *
+ * Curated links come first (they are intentional, hand-picked), then the list
+ * is topped up with same-category siblings. Links are deduped, the tool itself
+ * is excluded, and every slug is validated against the registry so a typo in
+ * the curated map degrades to a missing link rather than a broken anchor.
+ *
+ * `limit` defaults to 6 to match the sidebar rail's width. All three call
+ * sites pass an explicit limit (tool-content 8, tool-view 6, tool page nav 12).
  */
-export function getRelatedTools(slug: string, category: string): string[] {
-  const curated = RELATED_TOOLS[slug]
-  if (curated && curated.length > 0) return curated
-  return toolMetaList
+export function getRelatedTools(
+  slug: string,
+  category: string,
+  limit = 6
+): string[] {
+  const curated = RELATED_TOOLS[slug] ?? []
+
+  // Same-category siblings that aren't already linked from the curated map.
+  const siblings = toolMetaList
     .filter((t) => t.category === category && t.slug !== slug)
-    .slice(0, 6)
     .map((t) => t.slug)
+
+  const seen = new Set<string>()
+  const out: string[] = []
+  for (const candidate of [...curated, ...siblings]) {
+    if (candidate === slug || seen.has(candidate)) continue
+    if (!isKnownSlug(candidate)) continue
+    seen.add(candidate)
+    out.push(candidate)
+    if (out.length >= limit) break
+  }
+  return out
 }
