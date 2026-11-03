@@ -1,5 +1,6 @@
 'use client'
 import * as React from 'react'
+import Link from 'next/link'
 import {
   Check,
   X,
@@ -60,11 +61,69 @@ function estimateXHeight(fontSizePx: number): number {
   return fontSizePx * 0.5
 }
 /**
- * Compute an accessibility score (0-100) for the given font settings.
+ * Measure the real x-height of the selected font with a canvas.
  *
- * - Body text should be ≥ 16px (WCAG 1.4.4 — Resize text).
- * - Line height should be 1.5–1.6 for body.
- * - Line length should be 45–75 characters.
+ * The previous implementation hard-coded 0.5 × font-size and displayed the
+ * result as if it were measured. Canvas `actualBoundingBoxAscent` for the
+ * glyph "x" gives the actual x-height for the loaded font, so the stat is
+ * trustworthy when the browser can measure it (and falls back to the
+ * documented estimate otherwise).
+ */
+function measureXHeight(
+  fontFamily: string,
+  fontSize: number,
+  weight: number
+): number | null {
+  if (typeof document === 'undefined') return null
+  try {
+    const generic = new Set([
+      'serif',
+      'sans-serif',
+      'monospace',
+      'cursive',
+      'fantasy',
+      'system-ui',
+      'ui-serif',
+      'ui-sans-serif',
+      'ui-monospace',
+      'ui-rounded',
+      'inherit',
+      'initial',
+      'unset',
+    ])
+    // Canvas `font` follows CSS font shorthand: multi-word family names need
+    // quotes, while generic keywords must stay unquoted.
+    const family =
+      fontFamily
+        .split(',')
+        .map((part) => part.trim())
+        .filter(Boolean)
+        .map((part) =>
+          generic.has(part.toLowerCase()) ||
+          /^(['"]).*\1$/.test(part)
+            ? part
+            : `"${part.replace(/"/g, '')}"`
+        )
+        .join(', ') || 'sans-serif'
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return null
+    ctx.font = `${weight} ${fontSize}px ${family}`
+    const m = ctx.measureText('x')
+    return m.actualBoundingBoxAscent || null
+  } catch {
+    return null
+  }
+}
+/**
+ * Compute a readability checklist score (0-100) for the given font settings.
+ *
+ * - Body text uses a practical starting point of ≥ 16px.
+ * - Line height targets 1.5–1.6 for body.
+ * - Line length should be 45–75 characters per rendered line.
+ *
+ * This is a five-check heuristic, not a WCAG conformance score. The UI
+ * labels it accordingly.
  */
 interface Metrics {
   fontSize: number
@@ -74,6 +133,7 @@ interface Metrics {
   xHeightRatio: number
   sampleChars: number
   sampleLines: number
+  charsPerLine: number | null
   minBodySizeOk: boolean
   lineHeightOk: boolean
   lineHeightInRange: boolean
@@ -86,26 +146,31 @@ function computeMetrics(
   fontSizeStr: string,
   lineHeightStr: string,
   weight: Weight,
-  sample: string
+  sample: string,
+  measured?: { charsPerLine: number; xHeight: number } | null
 ): Metrics {
   const fontSize = parseNum(fontSizeStr, 16)
   const lineHeight = parseNum(lineHeightStr, 1.5)
-  const xHeight = estimateXHeight(fontSize)
+  const xHeight = measured?.xHeight ?? estimateXHeight(fontSize)
   const xHeightRatio = fontSize > 0 ? xHeight / fontSize : 0
   const sampleChars = sample.replace(/\n/g, ' ').trim().length
   const sampleLines = sample.split('\n').length
+  // Prefer the measured characters-per-line; fall back to the full sample
+  // length only for the first paint before the DOM measurement runs.
+  const charsPerLine = measured?.charsPerLine ?? null
+  const effectiveCharsPerLine = charsPerLine ?? sampleChars
   const minBodySizeOk = fontSize >= 16
   const lineHeightOk = lineHeight >= 1.4
   const lineHeightInRange = lineHeight >= 1.5 && lineHeight <= 1.6
   const lineLengthOk =
-    sampleChars >= 45 && sampleChars <= 75
+    effectiveCharsPerLine >= 45 && effectiveCharsPerLine <= 75
   const weightOk = weight >= 400 && weight <= 700
   const checks: { label: string; pass: boolean; detail: string }[] = [
     {
       label: 'Body font size ≥ 16px',
       pass: minBodySizeOk,
       detail: minBodySizeOk
-        ? `${fontSize}px is at or above the WCAG-recommended 16px body minimum.`
+        ? `${fontSize}px meets this checklist's 16px starting point. WCAG does not set a minimum font size.`
         : `${fontSize}px is below 16px — text may be hard to read on small screens.`,
     },
     {
@@ -116,26 +181,26 @@ function computeMetrics(
         : `Line height ${lineHeight} is too tight — increase to at least 1.4.`,
     },
     {
-      label: 'Line height in 1.5–1.6 (optimal)',
+      label: 'Line height in 1.5–1.6 target range',
       pass: lineHeightInRange,
       detail: lineHeightInRange
-        ? `Line height ${lineHeight} is in the optimal 1.5–1.6 range for body copy.`
-        : `WCAG 1.4.12 recommends 1.5 for body text; ${lineHeight} is outside that range.`,
+        ? `Line height ${lineHeight} meets this checklist's body-copy target; reader preferences vary.`
+        : `Line height ${lineHeight} is outside this checklist's target. WCAG 1.4.12 tests user spacing overrides, not this default value.`,
     },
     {
       label: 'Line length 45–75 characters',
       pass: lineLengthOk,
       detail: lineLengthOk
-        ? `Sample is ${sampleChars} characters — comfortable for reading.`
-        : sampleChars < 45
-          ? `Sample is ${sampleChars} characters — too short for a comfortable line.`
-          : `Sample is ${sampleChars} characters — too long; readers lose their place.`,
+        ? `About ${Math.round(effectiveCharsPerLine)} characters per rendered line — comfortable for reading.`
+        : effectiveCharsPerLine < 45
+          ? `About ${Math.round(effectiveCharsPerLine)} characters per line — too short for a comfortable line.`
+          : `About ${Math.round(effectiveCharsPerLine)} characters per line — too long; readers lose their place.`,
     },
     {
-      label: 'Font weight supported',
+      label: 'Font weight in 400–700 range',
       pass: weightOk,
       detail: weightOk
-        ? `Weight ${weight} is a standard weight.`
+        ? `Weight ${weight} is within the checklist range. Available weights depend on the loaded font.`
         : `Weight ${weight} is unusual.`,
     },
   ]
@@ -150,6 +215,7 @@ function computeMetrics(
     xHeightRatio,
     sampleChars,
     sampleLines,
+    charsPerLine,
     minBodySizeOk,
     lineHeightOk,
     lineHeightInRange,
@@ -174,10 +240,74 @@ export default function FontAccessibilityChecker() {
   const [fontWeight, setFontWeight] = React.useState<Weight>(400)
   const [lineHeight, setLineHeight] = React.useState('1.5')
   const [sample, setSample] = React.useState(DEFAULT_SAMPLE)
+  const previewRef = React.useRef<HTMLDivElement | null>(null)
+  const [measured, setMeasured] = React.useState<{
+    charsPerLine: number
+    xHeight: number
+  } | null>(null)
   const metrics = React.useMemo(
-    () => computeMetrics(fontSize, lineHeight, fontWeight, sample),
-    [fontSize, lineHeight, fontWeight, sample]
+    () =>
+      computeMetrics(
+        fontSize,
+        lineHeight,
+        fontWeight,
+        sample,
+        measured
+      ),
+    [fontSize, lineHeight, fontWeight, sample, measured]
   )
+
+  /**
+   * Measure text fragments only: selecting the entire preview also includes
+   * paragraph boxes, which would double-count lines. Observe container size
+   * and loaded fonts as well as the settings that affect layout.
+   */
+  React.useEffect(() => {
+    const el = previewRef.current
+    if (!el) return
+    let frame = 0
+    let disposed = false
+    const measure = () => {
+      const chars = sample.replace(/\n/g, ' ').trim().length
+      const range = document.createRange()
+      const lineTops = new Set<number>()
+      const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT)
+      while (walker.nextNode()) {
+        range.selectNodeContents(walker.currentNode)
+        for (const rect of Array.from(range.getClientRects())) {
+          if (rect.width > 0 && rect.height > 0) {
+            lineTops.add(Math.round(rect.top * 2) / 2)
+          }
+        }
+      }
+      const lines = Math.max(1, lineTops.size)
+      const charsPerLine = Math.round(chars / lines)
+      const xHeight =
+        measureXHeight(fontFamily, metrics.fontSize, metrics.fontWeight) ??
+        estimateXHeight(metrics.fontSize)
+      setMeasured((previous) =>
+        previous?.charsPerLine === charsPerLine && previous.xHeight === xHeight
+          ? previous
+          : { charsPerLine, xHeight }
+      )
+    }
+    const scheduleMeasurement = () => {
+      if (disposed) return
+      window.cancelAnimationFrame(frame)
+      frame = window.requestAnimationFrame(measure)
+    }
+    scheduleMeasurement()
+    const observer = new ResizeObserver(scheduleMeasurement)
+    observer.observe(el)
+    document.fonts.ready.then(scheduleMeasurement)
+    document.fonts.addEventListener('loadingdone', scheduleMeasurement)
+    return () => {
+      disposed = true
+      window.cancelAnimationFrame(frame)
+      observer.disconnect()
+      document.fonts.removeEventListener('loadingdone', scheduleMeasurement)
+    }
+  }, [sample, fontFamily, metrics.fontSize, metrics.fontWeight, metrics.lineHeight])
   const previewStyle: React.CSSProperties = {
     fontFamily: fontFamily.trim() || 'system-ui, sans-serif',
     fontSize: `${metrics.fontSize}px`,
@@ -200,20 +330,20 @@ export default function FontAccessibilityChecker() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Accessibility className="size-4" />
-            Font Accessibility Checker
+            Font Accessibility &amp; Readability Checker
           </CardTitle>
           <CardDescription>
-            Evaluate typographic settings against WCAG 1.4.x and readable
-            typography best practices. Get live feedback on font size, line
-            height, line length, and font weight, plus a live preview with
-            the specified settings applied.
+            Run a font readability test using practical typography
+            guidelines. Get live feedback on font size, line
+            height, measured characters per line, and font weight — with a
+            live preview at the settings you choose.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Field
             label="Font family"
             htmlFor="fac-family"
-            hint="CSS font-family value"
+            hint="CSS font stack; uses fonts already available in your browser"
           >
             <Input
               id="fac-family"
@@ -268,15 +398,19 @@ export default function FontAccessibilityChecker() {
               />
             </Field>
             <Field
-              label="Sample length"
+              label="Measured line length"
               htmlFor="fac-len"
               hint="45–75 chars target"
             >
               <Input
                 id="fac-len"
                 readOnly
-                value={`${metrics.sampleChars} chars / ${metrics.sampleLines} line(s)`}
-                aria-label="Sample length"
+                value={
+                  metrics.charsPerLine !== null
+                    ? `≈${metrics.charsPerLine} chars/line`
+                    : `${metrics.sampleChars} chars total`
+                }
+                aria-label="Measured characters per line"
               />
             </Field>
           </div>
@@ -324,7 +458,7 @@ export default function FontAccessibilityChecker() {
         aria-live="polite"
       >
         <Stat
-          label="Accessibility score"
+          label="Checklist score (5 checks)"
           value={`${metrics.score}/100`}
           accent={
             metrics.score >= 80
@@ -353,11 +487,12 @@ export default function FontAccessibilityChecker() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <Eye className="size-4" />
-            WCAG compliance
+            Readability checklist
           </CardTitle>
           <CardDescription>
-            Each check below maps to a WCAG 1.4.x success criterion or
-            typography best practice.
+            These five heuristics help compare typography settings. A passing
+            score does not verify WCAG conformance, zoom support, or user text
+            spacing overrides on your website.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -399,6 +534,7 @@ export default function FontAccessibilityChecker() {
             Text rendered with your settings
           </Label>
           <div
+            ref={previewRef}
             className="rounded-lg border border-border bg-background p-6"
             style={previewStyle}
           >
@@ -414,6 +550,19 @@ export default function FontAccessibilityChecker() {
               </span>
             )}
           </div>
+          <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
+            Characters per line are measured from the rendered preview, so
+            resizing the window changes the result. This test does not measure
+            color contrast, font-file licensing, or reading difficulty such as
+            a Flesch score. For contrast, use the{' '}
+            <Link
+              href="/tools/color-contrast-checker"
+              className="underline underline-offset-2 hover:text-foreground"
+            >
+              Color Contrast Checker
+            </Link>
+            .
+          </p>
           <pre className="fl-scroll mt-3 overflow-auto rounded-lg border border-border bg-muted/30 p-3 font-mono text-xs">
             {`font-family: ${fontFamily.trim()};\nfont-size: ${metrics.fontSize}px;\nfont-weight: ${metrics.fontWeight};\nline-height: ${metrics.lineHeight};`}
           </pre>
@@ -426,23 +575,27 @@ export default function FontAccessibilityChecker() {
         <CardContent className="space-y-4">
           <div className="space-y-2 text-sm text-muted-foreground">
             <p>
-              <strong className="text-foreground">1.4.4 Resize text</strong>{' '}
-              (Level AA): text can be resized up to 200% without assistive
-              technology and remain readable. Use relative units (rem, em,
-              %) — but body text should still start at 16px.
+              <a href="https://www.w3.org/WAI/WCAG22/Understanding/resize-text.html" className="font-semibold text-foreground underline underline-offset-2">1.4.4 Resize text</a>{' '}
+              (Level AA): except for captions and images of text, text must
+              support resizing to 200% without loss of content or functionality.
+              WCAG does not specify a minimum font size; 16px is this
+              checklist&apos;s practical starting point. Test resizing on the
+              actual page.
             </p>
             <p>
-              <strong className="text-foreground">1.4.8 Visual
-              Presentation</strong> (Level AAA): line spacing at least
-              1.5× font size; paragraphs separated by at least 1.5× line
-              height; text not justified; width no more than 80
-              characters.
+              <a href="https://www.w3.org/WAI/WCAG22/Understanding/visual-presentation.html" className="font-semibold text-foreground underline underline-offset-2">1.4.8 Visual Presentation</a>{' '}
+              (Level AAA): users need a mechanism to adjust text presentation,
+              including colors, spacing, alignment and a width of at most 80
+              characters (40 for CJK). The 45–75 character checklist target is
+              a separate typography guideline.
             </p>
             <p>
-              <strong className="text-foreground">1.4.12 Text Spacing</strong>{' '}
+              <a href="https://www.w3.org/WAI/WCAG22/Understanding/text-spacing.html" className="font-semibold text-foreground underline underline-offset-2">1.4.12 Text Spacing</a>{' '}
               (Level AA): no loss of content when users override line
               height (1.5×), paragraph spacing (2×), letter spacing (0.12×),
-              or word spacing (0.16×).
+              and word spacing (0.16× the font size) together. These values
+              are not mandatory default styles. Test for clipped text,
+              overlap and lost functionality on your actual page.
             </p>
           </div>
           <div className="flex items-start gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-amber-700 dark:text-amber-400">
@@ -450,10 +603,9 @@ export default function FontAccessibilityChecker() {
             <div>
               <div className="font-medium">Color contrast</div>
               <div className="text-xs">
-                Font accessibility is only half the picture — text color
-                must also meet the 4.5:1 (AA) or 7:1 (AAA) contrast ratio
-                against its background. Use the Color Contrast Checker tool
-                to verify your colors.
+                Normal-size text needs at least 4.5:1 contrast at Level AA;
+                large text has a 3:1 threshold. Use the Color Contrast Checker
+                to verify your foreground and background colors.
               </div>
             </div>
           </div>

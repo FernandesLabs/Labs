@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     title: 'Contact Fernandes Labs',
     description:
       'Support, bug reports, feature requests and partnership inquiries — we answer every email.',
-    url: siteConfig.site.url,
+    url: `https://${siteConfig.site.domain}/contact`,
     siteName: siteConfig.site.name,
     type: 'website',
     // Declaring `openGraph` here REPLACES the root layout's openGraph object
@@ -70,6 +70,20 @@ export default function ContactPage() {
         name: `Contact ${siteConfig.site.name}`,
         mainEntity: { '@id': `https://${domain}/#organization` },
         about: { '@id': `https://${domain}/#organization` },
+      },
+      {
+        // Define the Organization referenced above. Without this node the
+        // ContactPage's mainEntity/about pointed at a non-existent @id.
+        '@type': 'Organization',
+        '@id': `https://${domain}/#organization`,
+        name: siteConfig.site.name,
+        url: `https://${domain}`,
+        logo: {
+          '@type': 'ImageObject',
+          url: `https://${domain}/fl-logo-512.png`,
+          width: 512,
+          height: 512,
+        },
       },
       {
         '@type': 'BreadcrumbList',

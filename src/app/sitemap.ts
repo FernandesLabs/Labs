@@ -8,9 +8,8 @@ import { toolMetadata } from '@/lib/tools/tool-metadata'
 import { blogPosts } from '@/lib/blog/posts'
 import { CATEGORY_ORDER } from '@/lib/tools/types'
 
-// Tools with hand-written, rich content overrides — these are the
-// highest-quality pages and should be crawled first. Google prioritises
-// pages with higher `priority` values.
+// Relative priorities for consumers that use them. Google ignores sitemap
+// priority and changefreq; accurate URLs and lastModified are what matter.
 const PRIORITY_TOOL_SLUGS = new Set([
   'json-formatter',
   'password-generator',
@@ -55,10 +54,17 @@ const PRIORITY_TOOL_SLUGS = new Set([
 // Google caches it more aggressively and doesn't waste crawl budget
 // re-fetching "changed" sitemaps that haven't actually changed.
 // Update this date when you deploy significant content changes.
-// Content was substantially revised on 2026-10-08 (FAQ schema visibility fix,
-// privacy-claim accuracy, per-category guide copy). Bump this whenever a
-// deploy changes page content so Google re-crawls.
-const LAST_UPDATED = new Date('2026-10-08')
+// Content was substantially revised on 2026-10-23 (GSC-driven metadata,
+// readability-test copy, crawlable homepage cards, sitemap freshness).
+const LAST_UPDATED = new Date('2026-10-23')
+
+// Record substantive revisions per URL rather than marking all 132 tools as
+// changed after an audit. Unchanged pages keep their existing timestamp.
+const TOOL_CONTENT_UPDATED: Record<string, string> = {
+  'ip-lookup': '2026-10-29',
+  'robots-txt-generator': '2026-10-29',
+  'font-accessibility-checker': '2026-10-29',
+}
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = `https://${siteConfig.site.domain}`
@@ -67,7 +73,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: `${baseUrl}/`,
-      lastModified: LAST_UPDATED,
+      lastModified: new Date('2026-10-29'),
       changeFrequency: 'weekly',
       priority: 1.0,
     },
@@ -104,10 +110,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
   ]
 
   // Blog posts — long-tail informational content targeting the biggest query
-  // clusters from Search Console.
+  // clusters from Search Console. `lastModified` follows the post's real
+  // revision date, not its first-publish date, so Google can distinguish a
+  // fresh edit from a page that has never changed.
   const blogPages: MetadataRoute.Sitemap = blogPosts.map((post) => ({
     url: `${baseUrl}/blog/${post.slug}`,
-    lastModified: new Date(post.date),
+    lastModified: new Date(post.updated ?? post.date),
     changeFrequency: 'yearly' as const,
     priority: 0.6,
   }))
@@ -120,11 +128,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.8,
   }))
 
-  // Tool pages — 132 pages. Priority tools (with rich content overrides) get
-  // priority 0.9 so Google crawls them first. All others get 0.7.
+  // Tool pages — 132 canonical URLs, with dates for actual content revisions.
   const toolPages: MetadataRoute.Sitemap = toolMetadata.map((tool) => ({
     url: `${baseUrl}/tools/${tool.slug}`,
-    lastModified: LAST_UPDATED,
+    lastModified: TOOL_CONTENT_UPDATED[tool.slug]
+      ? new Date(TOOL_CONTENT_UPDATED[tool.slug])
+      : LAST_UPDATED,
     changeFrequency: 'monthly' as const,
     priority: PRIORITY_TOOL_SLUGS.has(tool.slug) ? 0.9 : 0.7,
   }))

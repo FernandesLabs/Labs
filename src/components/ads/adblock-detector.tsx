@@ -221,7 +221,7 @@ export function AdblockBanner({ enabled }: { enabled: boolean }) {
       toast({
         title: 'Thanks for supporting free, private tools! ✨',
         description:
-          'Your whitelist keeps all 132 tools free — no sign-up, no tracking.',
+          'Your whitelist keeps all 132 tools free — no sign-up, privacy-first.',
       })
       writeTTL(THANKS_KEY)
     }, 2500)
@@ -251,8 +251,8 @@ export function AdblockBanner({ enabled }: { enabled: boolean }) {
               👋 Enjoying the tool?
             </p>
             <p className="mt-1 text-xs leading-relaxed text-muted-foreground sm:text-[13px]">
-              Fernandes Labs runs all 132 tools 100% free and private — no
-              sign-up, no tracking, your data never leaves your browser. The
+              Fernandes Labs keeps all 132 tools free with no sign-up. Most
+              process input in your browser; six network tools use our server. The
               ads on this page pay for the{' '}
               <span className="font-medium text-foreground">fernandeslabs.com</span>{' '}
               domain and server costs so the tools stay free for everyone.

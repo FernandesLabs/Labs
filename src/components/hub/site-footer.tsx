@@ -266,7 +266,7 @@ export function SiteFooter() {
             </span>
             <div>
               <p className="text-xs font-semibold text-foreground">Free &amp; open</p>
-              <p className="text-[10px] text-muted-foreground">{toolMetaList.length} tools, no sign-up, no tracking.</p>
+              <p className="text-[10px] text-muted-foreground">{toolMetaList.length} tools, no sign-up, privacy-first.</p>
             </div>
           </div>
         </div>
@@ -295,7 +295,7 @@ export function SiteFooter() {
             </button>
           </div>
           <p className="tabular-nums">
-            © {year} Fernandes Labs. All tools run in your browser.
+            © {year} Fernandes Labs. Most tools run in your browser.
           </p>
         </div>
       </div>

@@ -75,11 +75,12 @@ const CommandPalette = dynamic(
   { ssr: false }
 )
 
-/** Guides rendered per page (hero included in the budget). The index shows
- *  the newest PAGE_SIZE guides and reveals the rest behind a "Load more"
- *  button — keeps the initial grid scannable (and the DOM lean) as the
- *  library grows past a dozen posts. */
-const PAGE_SIZE = 12
+/** Guides rendered per page (hero included in the budget).
+ *
+ *  Kept above the current library size (13 posts) so every guide is a
+ *  server-rendered, crawlable link on the first paint. The "Load more"
+ *  control stays in place for the day the library outgrows this budget. */
+const PAGE_SIZE = 24
 
 export function BlogIndexClient({
   catalog = [],

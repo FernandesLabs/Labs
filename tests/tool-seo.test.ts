@@ -27,7 +27,7 @@ describe('tool-seo generators', () => {
 
   test('generateToolTitle uses the override when present', () => {
     expect(generateToolTitle(tool('ip-lookup'))).toBe(
-      'IP Address Lookup — Find IP Location, ISP & More'
+      'IP Address Lookup & IP Finder — Location, ISP & ASN'
     )
   })
 

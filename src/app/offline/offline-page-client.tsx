@@ -165,7 +165,7 @@ export function OfflinePageClient() {
         </div>
 
         <p className="mt-6 text-center text-xs text-muted-foreground/70">
-          Fernandes Labs — {toolMetaList.length} free tools that run entirely in
+          Fernandes Labs — {toolMetaList.length} free tools that mostly run in
           your browser.
         </p>
       </main>

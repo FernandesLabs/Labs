@@ -1,6 +1,6 @@
 // src/app/layout.tsx
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
@@ -8,26 +8,25 @@ import { ServiceWorkerRegister } from "@/components/hub/service-worker-register"
 import { ConsentManager } from "@/components/ads/consent-manager";
 import { siteConfig } from "@/lib/site-config";
 
-// Only the weights actually used across the app (normal/medium/semibold/bold/
-// extrabold) are loaded — the old `geist/font` package preloaded ALL weights
-// (26 woff2 files per page), which hurt LCP and wasted bandwidth.
-const geistSans = Geist({
-  subsets: ["latin"],
+// Use the installed Geist package's variable files: two self-hosted assets
+// cover every used weight, and builds do not depend on Google Fonts access.
+const geistSans = localFont({
+  src: "../../node_modules/geist/dist/fonts/geist-sans/Geist-Variable.woff2",
   variable: "--font-geist-sans",
   display: "swap",
-  weight: ["400", "500", "600", "700", "800"],
+  weight: "100 900",
 });
-const geistMono = Geist_Mono({
-  subsets: ["latin"],
+const geistMono = localFont({
+  src: "../../node_modules/geist/dist/fonts/geist-mono/GeistMono-Variable.woff2",
   variable: "--font-geist-mono",
   display: "swap",
-  weight: ["400", "500", "600", "700"],
+  weight: "100 900",
 });
 export const metadata: Metadata = {
   metadataBase: new URL(`https://${siteConfig.site.domain}`),
   title: "Fernandes Labs — Free Online Tools",
   description:
-    "A growing collection of fast, privacy-first tools for developers, designers, and marketers. JSON formatter, QR generator, password generator, and more. No sign-up. No tracking. Works offline.",
+    "A growing collection of fast, privacy-first tools for developers, designers, and marketers. JSON formatter, QR generator, password generator, and more. No sign-up. Most tools work offline.",
   keywords: [
     "free online tools",
     "developer tools",
@@ -68,7 +67,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Fernandes Labs — Free Online Tools",
     description:
-      "Fast, privacy-first tools for developers, designers, and marketers. No sign-up. No tracking.",
+      "Fast, privacy-first tools for developers, designers, and marketers. No sign-up. Most work offline.",
     url: siteConfig.site.url,
     siteName: "Fernandes Labs",
     type: "website",

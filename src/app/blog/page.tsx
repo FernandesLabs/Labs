@@ -12,7 +12,7 @@ import {
 export const metadata: Metadata = {
   title: 'Blog — Guides & Tutorials | Fernandes Labs',
   description:
-    'In-depth guides, tutorials, and best practices for developers, designers, and marketers. Learn about JSON, QR codes, passwords, SEO, and the tools you use every day.',
+    'In-depth guides and tutorials for developers, designers and marketers — JSON, QR codes, passwords, SEO, email signatures and the tools you use every day.',
   alternates: {
     canonical: `https://${siteConfig.site.domain}/blog`,
   },
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     title: 'Blog — Guides & Tutorials | Fernandes Labs',
     description:
       'In-depth guides, tutorials, and best practices for developers, designers, and marketers.',
-    url: siteConfig.site.url,
+    url: `https://${siteConfig.site.domain}/blog`,
     siteName: siteConfig.site.name,
     type: 'website',
     // Declaring `openGraph` here REPLACES the root layout's openGraph

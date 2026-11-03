@@ -13,6 +13,7 @@ import {
   ExternalLink,
 } from 'lucide-react'
 import type { Tool } from '@/lib/tools/types'
+import type { ContentOverride } from '@/app/tools/[slug]/overrides/types'
 import { CATEGORY_META, CATEGORY_ORDER } from '@/lib/tools/types'
 import { AdblockBanner } from '@/components/ads/adblock-banner'
 import { AdUnit } from '@/components/ads/ad-unit'
@@ -32,7 +33,7 @@ import { useToolHistory } from '@/lib/tools/use-tool-history'
 import { preloadTool } from '@/lib/tools/preload'
 import { toolMetaList } from '@/lib/tools/tool-meta'
 import type { PalettePost } from './command-palette'
-import { getRelatedTools } from '@/app/tools/[slug]/tool-seo'
+import { getRelatedTools, getSeoOverride } from '@/app/tools/[slug]/tool-seo'
 
 // Lazy-load heavy components that aren't needed on initial render:
 //   - CommandPalette (cmdk + Dialog) — only needed when ⌘K is pressed (~40KB)
@@ -72,6 +73,7 @@ const OnThisPage = dynamic(
  */
 export function ToolView({
   tool,
+  content,
   tools,
   toolsBySlug,
   recent: _recent,
@@ -81,6 +83,7 @@ export function ToolView({
   onSelect,
 }: {
   tool: Tool
+  content: ContentOverride | null
   tools: Tool[]
   toolsBySlug: Map<string, Tool>
   recent: string[]
@@ -148,7 +151,7 @@ export function ToolView({
         onOpenPalette={() => setPaletteOpen(true)}
       />
 
-      <ToolJsonLd tool={tool} />
+      <ToolJsonLd tool={tool} content={content} />
 
       <main id="main-content" className="mx-auto w-full max-w-6xl flex-1 px-4 pb-16 pt-6 sm:px-6 lg:px-8">
         {/* Breadcrumbs */}
@@ -205,7 +208,13 @@ export function ToolView({
               ) : null}
             </div>
             <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-              {tool.name}
+              {/*
+                The H1 can differ from the registry name when the page targets
+                a broader query phrase (e.g. "IP Address Lookup & IP Finder").
+                Keep the registry name for nav/breadcrumbs; only the page
+                heading uses the SEO override.
+              */}
+              {getSeoOverride(tool)?.h1 ?? tool.name}
             </h1>
             <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
               {tool.description}
@@ -254,7 +263,7 @@ export function ToolView({
             </div>
 
             {/* SEO content (intro / how-to / FAQ / use cases / tips) */}
-            <ToolContent tool={tool} />
+            <ToolContent tool={tool} content={content} />
 
             {/* Feedback — anonymous 👍/👎, aggregated count as social proof */}
             <div className="mt-8">

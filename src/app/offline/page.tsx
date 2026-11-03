@@ -13,7 +13,7 @@ import { OfflinePageClient } from './offline-page-client'
 export const metadata: Metadata = {
   title: "You're offline — Fernandes Labs",
   description:
-    'The Fernandes Labs offline fallback. Pages you have already visited stay available — every tool runs locally in your browser.',
+    'The Fernandes Labs offline fallback. Pages you have already visited stay available — most tools run locally in your browser.',
   robots: {
     index: false,
     follow: false,

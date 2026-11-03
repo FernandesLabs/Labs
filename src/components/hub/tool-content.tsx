@@ -20,8 +20,9 @@ import {
   generateToolTips,
   generateToolUseCases,
   getRelatedTools,
+  getSeoOverride,
 } from '@/app/tools/[slug]/tool-seo'
-import { getToolContentOverride } from '@/app/tools/[slug]/tool-content-overrides'
+import type { ContentOverride } from '@/app/tools/[slug]/overrides/types'
 import { resolveSectionHeading } from '@/app/tools/[slug]/section-headings'
 import { ContentAdSlot } from '@/components/ads/content-ad-slot'
 import { toolMetaList } from '@/lib/tools/tool-meta'
@@ -45,11 +46,17 @@ import { toolMetaList } from '@/lib/tools/tool-meta'
  */
 // Re-export so ToolJsonLd (and other consumers) can build FAQPage schema
 // from the same source as the visible FAQ section.
-export const generateFaq = (tool: Tool) =>
-  getToolContentOverride(tool.slug)?.faqs ?? generateToolFaq(tool)
-export function ToolContent({ tool }: { tool: Tool }) {
-  // Check for a hand-written override first; fall back to templates.
-  const override = React.useMemo(() => getToolContentOverride(tool.slug), [tool.slug])
+export const generateFaq = (tool: Tool, content: ContentOverride | null) =>
+  content?.faqs ?? generateToolFaq(tool)
+export function ToolContent({
+  tool,
+  content: override,
+}: {
+  tool: Tool
+  content: ContentOverride | null
+}) {
+  // The route sends only this tool's override. Importing the lookup here
+  // would put all 132 tools' editorial content into every client bundle.
   const intro = React.useMemo(
     () => override?.intro ?? generateToolIntro(tool),
     [override, tool]
@@ -62,6 +69,9 @@ export function ToolContent({ tool }: { tool: Tool }) {
     () => override?.faqs ?? generateToolFaq(tool),
     [override, tool]
   )
+  // Answer-first summary for the head query. Kept optional: only pages that
+  // were deliberately tuned against a GSC query cluster get one.
+  const summary = React.useMemo(() => getSeoOverride(tool)?.summary, [tool])
   const useCases = React.useMemo(
     () => override?.useCases ?? generateToolUseCases(tool),
     [override, tool]
@@ -86,6 +96,20 @@ export function ToolContent({ tool }: { tool: Tool }) {
   }, [tool.slug, tool.category])
   return (
     <div className="mt-12 space-y-10">
+      {/*
+        Answer-first summary. Rendered before the long-form intro so the
+        first 2–3 sentences answer the head query (and give Google a clean
+        snippet candidate) without hiding the detailed sections below.
+      */}
+      {summary ? (
+        <aside
+          aria-label="Quick answer"
+          className="rounded-xl border border-primary/25 bg-primary/5 p-4 text-sm leading-relaxed text-foreground/90 sm:text-base"
+        >
+          <span className="font-semibold text-foreground">Quick answer: </span>
+          {summary}
+        </aside>
+      ) : null}
       {/* Intro */}
       <section id="about" className="scroll-mt-20">
         <div className="mb-3 flex items-center gap-2">

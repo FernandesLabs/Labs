@@ -3,11 +3,11 @@ import { describe, expect, test } from 'bun:test'
 import robots from '@/app/robots'
 
 describe('robots.txt', () => {
-  test('allows the site root and only disallows /api/ and XTransformPort variants', () => {
+  test('allows the site root and the OG image route, and only disallows /api/ and XTransformPort variants', () => {
     const cfg = robots()
     const rule = cfg.rules[0]
     expect(rule.userAgent).toBe('*')
-    expect(rule.allow).toBe('/')
+    expect(rule.allow).toEqual(['/', '/api/og'])
     expect(rule.disallow).toEqual(['/api/', '/*XTransformPort*'])
   })
 

@@ -11,44 +11,44 @@ export const OVERRIDES: ToolOverrideMap = {
 
   'ip-lookup': {
     intro:
-      'The IP Lookup tool finds your public IP address and shows everything a third party can learn from it: approximate location (country, region, city), timezone, coordinates, internet provider, and ASN. When the page loads, your own IP is detected automatically — no need to search "what is my IP" anywhere else. Paste any IPv4 address or hostname and you get the same report instantly, which makes this the fastest way to find IP address details behind a visitor, a mail server, or a suspicious address in your server logs. Every IP address belongs to a block managed by some organisation — an ISP, a cloud provider, a VPN company — and an IP address lookup reads public registration and geolocation databases to describe that block. That is why it works for verifying your VPN, debugging geo-restrictions, or spotting bots in your analytics: the lookup shows the network identity behind the address, not a street address. All queries run through our server-side proxy to bypass browser CORS restrictions, and the addresses you search are never stored or logged.',
+      'An IP address lookup connects a public IPv4 or IPv6 address with approximate location and network details: country, region, city, timezone, coordinates, ISP or organisation, and ASN. Enter an address or hostname and click Look up, or choose Use my IP to request details for the public address reported by the hosting proxy. This IP finder sends the lookup through our server to ipapi.co; a hostname is resolved to an address before the geolocation request. Results describe a network endpoint rather than identifying the person using it. Use them to investigate addresses in access logs, compare a VPN exit location, or understand which provider operates a server. Country, city and coordinates can be incomplete or out of date, particularly for mobile networks, VPNs and anycast services that use one address in many places. A hostname with several DNS records can also point to different servers, so one lookup does not describe every endpoint. Private addresses such as 192.168.1.1 do not have a useful public geolocation. The tool needs an internet connection, and the lookup may fail if the upstream provider is unavailable or rate-limited. Our application does not store or log the lookup input.',
     examples: [
       {
         input: '8.8.8.8',
-        output: 'Country: United States, Region: California, City: Mountain View, ISP: Google LLC, ASN: AS15169',
-        note: 'Google\'s public DNS resolver — one of the most-looked-up IPs in the world.',
+        output: 'IP: 8.8.8.8; the result includes available location, organisation and ASN fields.',
+        note: 'Google Public DNS uses anycast. A database location does not identify the physical resolver that answered your request.',
       },
       {
-        input: '1.1.1.1',
-        output: 'Country: Australia, Region: New South Wales, City: Sydney, ISP: Cloudflare, Inc., ASN: AS13335',
-        note: 'Cloudflare\'s public DNS resolver. Often used as a fast, privacy-focused alternative to Google DNS.',
+        input: '2606:4700:4700::1111',
+        output: 'The IPv6 address is looked up with the same location, timezone and network fields as an IPv4 address.',
+        note: 'An IPv6 example using Cloudflare Public DNS. Returned details depend on the upstream database and can change.',
       },
       {
         input: 'github.com',
-        output: 'Resolves to an IP owned by GitHub (AS36459), with the lookup showing the data center region the address is registered to.',
-        note: 'Hostnames work too — the tool resolves the domain first, then looks up the IP info behind it.',
+        output: 'The hostname resolves to an IP address, which is then sent to the geolocation provider.',
+        note: 'A domain can resolve to several addresses. The report describes one resolved endpoint, not every server or the website owner.',
       },
     ],
     howTo: [
-      'When the page loads, your own public IP address is displayed automatically at the top of the tool card — nothing to do if you just want to see "what is my IP".',
-      'To look up another address, paste an IPv4 address (e.g. 8.8.8.8) or a hostname (e.g. github.com) into the input field.',
-      'Click Lookup (or press Enter). The results appear instantly: country, region, city, timezone, latitude/longitude, ISP/organization, and ASN.',
-      'Use the Copy button to grab any field\'s value, or open the map link to see the approximate location on OpenStreetMap.',
-      'All lookups are processed through our server-side proxy to bypass browser CORS restrictions — we do not log or store the IPs you search.',
+      'Choose Use my IP if you want to answer "what is my IP"; this starts a lookup rather than running automatically when the page opens.',
+      'For another endpoint, enter an IPv4 address, an IPv6 address or a hostname without a URL scheme or path.',
+      'Click Look up or press Enter and wait for the server to resolve the hostname, if needed, and request the geolocation data.',
+      'Read the IP, ISP / Org and ASN alongside the available location fields. Open View on OpenStreetMap if coordinates are present.',
+      'Treat the location as approximate. If automatic detection is unavailable or the provider rejects the request, enter a known public address or try again later.',
     ],
     useCases: [
-      'Find your own public IP address instantly — no need to search "what is my IP" on Google.',
+      'Find the public IP reported by the hosting proxy using the Use my IP button.',
       'Verify your VPN or proxy is working: the location should match your VPN\'s exit server, not your real one.',
       'Investigate suspicious IPs from server logs, firewall alerts, or email headers.',
       'Identify the ISP and ASN behind a website visitor — or a server you\'re connecting to.',
       'Debug geo-blocking: check which country a service will see your IP as.',
-      'Spot bots and scrapers: cloud-provider ASNs (AWS, GCP, DigitalOcean) are a strong bot signal.',
+      'Add network context to a traffic investigation alongside request patterns and other evidence.',
     ],
     bestPractices: [
-      'Treat geolocation as approximate. Country-level is ~99% accurate; city-level only 50–80%. Never act on an IP lookup\'s coordinates as if they were precise.',
-      'Read the ASN first when triaging traffic: a residential ISP means a real user, a cloud provider (AWS, GCP, Hetzner) usually means automation or a VPN.',
-      'Verify VPNs by comparing the lookup result against your VPN provider\'s advertised exit server location — a mismatch usually means a leak.',
-      'Pair the lookup with a reverse DNS or WHOIS check (our DNS Lookup tool covers this) to confirm the organisation behind an address.',
+      'Treat location fields as approximate database estimates, with no guaranteed accuracy for a particular address.',
+      'Use ASN and organisation as network context. A residential address does not prove a human user, and a cloud address does not prove abuse.',
+      'Compare VPN results with the expected exit region, allowing for stale location data and upstream routing differences.',
+      'Use DNS Lookup to inspect a hostname\'s A and AAAA records when you need to compare several endpoints.',
       'For security decisions, cross-check suspicious IPs against threat-intelligence databases like AbuseIPDB or AlienVault OTX — a geolocation lookup alone is not a verdict.',
       'Remember CGNAT and mobile gateways: many users share one public IP, so a single address can represent hundreds of different people.',
     ],
@@ -59,7 +59,7 @@ export const OVERRIDES: ToolOverrideMap = {
       },
       {
         q: 'What is the difference between IPv4 and IPv6?',
-        a: 'IPv4 is the original addressing scheme: four groups of numbers (e.g. 192.168.1.1), giving about 4.3 billion possible addresses — which ran out. IPv6 is its successor: eight groups of hexadecimal digits separated by colons (e.g. 2606:4700:4700::1111), with an astronomically large address space, so every device can have its own public address without NAT. Functionally, an IP lookup works the same way for both. This tool accepts IPv4 addresses and hostnames; if you paste an IPv6 address, resolve the hostname instead and the lookup will report the network that serves it.',
+        a: 'IPv4 addresses use four decimal groups, such as 8.8.8.8. IPv6 uses hexadecimal groups separated by colons, such as 2606:4700:4700::1111. This tool accepts both formats and hostnames. The provider may return different amounts of location information for different address blocks.',
       },
       {
         q: 'How does IP geolocation work?',
@@ -67,11 +67,11 @@ export const OVERRIDES: ToolOverrideMap = {
       },
       {
         q: 'How accurate is the location shown by an IP lookup?',
-        a: 'Country accuracy is roughly 99%, region accuracy varies by country, and city accuracy is typically 50–80%. The precision drops because ISPs register blocks at their network hubs: a user in a suburb may show up in the city 50 km away where the ISP\'s infrastructure sits. VPNs, mobile networks, and CGNAT make the result even coarser — a mobile user\'s lookup may show a regional gateway hundreds of kilometres away. Use the location as a rough signal, never as a pinpoint.',
+        a: 'There is no guaranteed accuracy for an individual address. A result may identify an ISP gateway, a VPN exit or an approximate service region rather than the device location. Mobile networks, shared public IPs and anycast make city coordinates especially uncertain. Use the result as a clue and cross-check it before making a decision.',
       },
       {
         q: 'How can I use IP lookup for server troubleshooting?',
-        a: 'IP lookups answer three questions that come up constantly when debugging servers. First, who is hammering my server: paste the source IP from your access log and the ASN tells you whether it\'s a residential ISP (a user), a cloud provider (likely a bot or scraper), or a data-center range. Second, is geo-blocking configured correctly: check which country your service sees the IP as and compare it with the country you intend to allow or deny. Third, is the IP reputation consistent with who claims to be: an email server that claims to be in Europe but resolves to an IP registered to an unrelated network abroad is worth investigating. Combine the lookup with a DNS Lookup for the reverse record and you have a complete picture.',
+        a: 'Paste an address from an access log to identify its reported network and approximate region, or enter a hostname to inspect one resolved endpoint. Compare that context with your firewall rules and request patterns. DNS Lookup can show the hostname\'s A and AAAA records. This geolocation tool does not perform reverse DNS, WHOIS, reputation checks or bot verification.',
       },
       {
         q: 'Can someone find my exact home address from my IP?',
@@ -80,7 +80,7 @@ export const OVERRIDES: ToolOverrideMap = {
     ],
     tips: [
       'Your public IP usually changes when your router reconnects on most residential plans — use a dynamic DNS service if you need a stable address.',
-      'The ASN is the fastest bot-detection heuristic: a visitor from AS16509 (AWS) or AS15169 (Google) is rarely a human browsing your site.',
+      'Check the returned IP when searching a hostname: load balancing can lead to a different endpoint on a later lookup.',
       'If the lookup shows a country you don\'t expect, check whether your ISP uses CGNAT — shared IPs are common on mobile and some fibre connections.',
       'Verifying a VPN: run the lookup, then compare the country shown against your VPN provider\'s advertised exit location. Any mismatch is worth investigating.',
     ],

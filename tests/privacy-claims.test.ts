@@ -8,6 +8,13 @@ import {
   toolPrivacyClaim,
 } from '@/lib/privacy'
 import { toolMetaList } from '@/lib/tools/tool-meta'
+import {
+  generateToolDescription,
+  generateToolFaq,
+  generateToolHowTo,
+  generateToolIntro,
+  generateToolUseCases,
+} from '@/app/tools/[slug]/tool-seo'
 
 /**
  * Guards on data-handling accuracy.
@@ -80,14 +87,24 @@ describe('privacy claims match actual behaviour', () => {
   })
 
   test('the shared SEO templates do not overclaim for proxied tools', () => {
-    const seo = readFileSync(
-      join(process.cwd(), 'src/app/tools/[slug]/tool-seo.ts'),
-      'utf8'
-    )
-    // The network branch must exist and must not assert browser-only handling.
-    expect(seo).toContain('toolIsProxied')
-    const ipLookup = toolMetaList.find((t) => t.slug === 'ip-lookup')!
-    expect(ipLookup.category).toBe('network')
+    // Check generated copy rather than an obsolete helper identifier: privacy
+    // handling is slug-based because User-Agent Parser is local despite being
+    // in the network category.
+    for (const slug of SERVER_PROXIED_TOOL_SLUGS) {
+      const tool = toolMetaList.find((t) => t.slug === slug)!
+      const copy = [
+        generateToolDescription(tool),
+        generateToolIntro(tool),
+        ...generateToolUseCases(tool),
+        ...generateToolHowTo(tool),
+        ...generateToolFaq(tool).map((f) => f.a),
+      ].join(' ')
+      expect(copy, slug).not.toMatch(/entirely (?:client-side|in your browser)|never leaves your (?:device|browser)|no uploads/i)
+      expect(generateToolIntro(tool), slug).toContain('through our server')
+      expect(generateToolFaq(tool).find((f) => /work offline/.test(f.q))?.a, slug).toStartWith('No.')
+    }
+    const localNetworkTool = toolMetaList.find((t) => t.slug === 'user-agent-parser')!
+    expect(generateToolIntro(localNetworkTool)).toContain('entirely in your browser')
   })
 
   test('toolPrivacyClaim returns truthful copy per behaviour', () => {

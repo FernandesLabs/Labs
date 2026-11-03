@@ -29,10 +29,11 @@ export const blogPosts: BlogPost[] = [
     // commercial head term via its SEO override; this post is retargeted at
     // informational "how do I…" queries and points at the tool rather than
     // competing with it. See tool-seo.ts SEO_OVERRIDES['ip-lookup'].
-    title: 'What an IP Address Lookup Actually Tells You (And What It Doesn’t)',
+    title: 'IP Geolocation: Why Your IP Lookup Shows the Wrong City',
     description:
-      'How IP geolocation works, how to find your own IP address on any device, why a lookup can return the wrong city, and how to read ISP and ASN data before you trust it.',
+      'Why an IP lookup shows the wrong city, how IP geolocation databases assign locations, and when ISP, ASN or VPN data explains the mismatch.',
     date: '2026-08-03',
+    updated: '2026-10-29',
     category: 'Network',
     keywords: ['ip address lookup', 'ip lookup', 'what is my ip', 'ip geolocation', 'find ip'],
     relatedTools: ['ip-lookup', 'dns-lookup', 'ssl-checker', 'http-header-checker', 'user-agent-parser'],
@@ -47,6 +48,8 @@ There are two versions in use today:
 - **IPv6** — the newer, longer format designed to solve IPv4 address exhaustion: eight groups of hex digits, e.g. \`2606:4700::6810:8078\`.
 
 Every time your device connects to the internet, it is identified by a public IP address assigned by your **ISP** (Internet Service Provider).
+
+This guide explains what an IP lookup can and cannot tell you, and why the result often points at a city you have never visited. To see the address your own connection is using right now, open the [IP Lookup tool](/tools/ip-lookup).
 
 ## What can an IP address lookup reveal?
 
@@ -64,7 +67,7 @@ Crucially: an IP lookup shows the *registered* location of the IP block, **not**
 
 ## How to find your own IP address
 
-The fastest way: open the [IP Lookup tool](/tools/ip-lookup) — your public IP is detected automatically when the page loads. You'll also see your ISP, approximate location, and ASN instantly.
+Open the [IP Lookup tool](/tools/ip-lookup) and choose **Use my IP**. The server looks up the public address supplied by the hosting proxy and returns the available ISP, approximate location and ASN fields. A lookup runs only when you request it. If your hosting connection does not provide a usable client address, enter a public IP explicitly.
 
 On your own device:
 
@@ -79,24 +82,27 @@ Remember the distinction: your device shows your **local (private)** IP like \`1
 
 1. Open the [IP Lookup tool](/tools/ip-lookup).
 2. Paste the IPv4 or IPv6 address you want to investigate into the input field.
-3. You get the country, region, city, timezone, coordinates, ISP, and ASN.
+3. Click **Look up** or press Enter. Available country, region, city, timezone, coordinates, ISP and ASN fields appear when the provider responds.
+
+You can also enter a hostname without a URL scheme or path. The server resolves it to an address first. Domains can have several A or AAAA records, and this result describes one resolved endpoint; use [DNS Lookup](/tools/dns-lookup) to inspect the other records.
 
 The lookup runs through a server-side proxy so it works from any browser without CORS issues — and the site does not log or store the addresses you search.
 
 ## When is an IP lookup useful?
 
 - **"What is my IP?"** — checking your public IP, especially after restarting your router or changing networks.
-- **Verifying a VPN works** — the location shown should match your VPN's exit server, not your real location. If it shows your home city, your VPN is leaking.
+- **Checking a VPN exit** — compare the returned address and region with the expected exit. A city mismatch alone does not prove a leak: geolocation data can be stale or approximate.
 - **Investigating suspicious traffic** — check the geolocation and ASN of an IP hitting your site or sending phishing emails.
 - **Debugging network issues** — confirm which ISP/ASN an address belongs to when diagnosing routing problems.
 - **Geo-targeting checks** — verify what country a content-delivery or edge node appears to be in.
 
-## Why are IP lookup results sometimes wrong?
+## Why your IP lookup shows the wrong city
 
 IP geolocation is not GPS. Databases infer location from registries, routing data, and user reports — so results can be wrong when:
 
 - The IP belongs to a **cloud provider or CDN** (e.g. AWS, Cloudflare) — the registered address is a datacenter, not a user.
 - Your ISP uses **CGNAT** or regional aggregation — thousands of users share one public IP.
+- You are connected through a **VPN or proxy** — the result describes the exit server, not your device.
 - The database hasn't updated after a **block transfer** between organizations.
 
 If a lookup looks suspicious, cross-check with the ASN and ISP fields: a "wrong city" on a mobile network is normal; a mismatch between the claimed ISP and the registered ASN is more meaningful.
@@ -114,10 +120,11 @@ For deeper network checks, combine the IP lookup with the [DNS Lookup](/tools/dn
   },
   {
     slug: 'what-is-a-301-redirect',
-    title: 'What Is a 301 Redirect? How to Check Redirects (Free Tool)',
+    title: '301 vs 302 Redirects: Status Codes, SEO & When to Use Each',
     description:
-      '301 redirects explained: what they are, when to use them, how they affect SEO, and how to check whether a URL redirects correctly with a free redirect checker.',
+      '301 vs 302 redirects explained: status codes, SEO impact, redirect chains and how to test any URL with a free redirect checker.',
     date: '2026-08-03',
+    updated: '2026-10-23',
     category: 'SEO',
     keywords: ['301 redirect', 'redirect checker', 'redirect test', 'seo redirects', 'redirect chain'],
     relatedTools: ['redirect-checker', 'canonical-url-checker', 'http-header-checker', 'robots-txt-generator'],
@@ -135,7 +142,9 @@ The four redirect status codes you'll meet:
 | **307** | Temporary Redirect | Like 302 but preserves the HTTP method (for POST forms) |
 | **308** | Permanent Redirect | Like 301 but preserves the HTTP method |
 
-For SEO purposes the practical split is simple: **use 301/308 when a URL is gone for good, use 302/307 for short-term detours.**
+## 301 vs 302: which redirect should you use?
+
+For SEO purposes the practical split is simple: **use 301/308 when a URL is gone for good, use 302/307 for short-term detours.** A 301 asks search engines to consolidate the old URL into the new one; a 302 keeps the old URL in the index because the move is temporary.
 
 ## Why 301 redirects matter for SEO
 
@@ -197,8 +206,9 @@ Run every old URL through the [Redirect Checker](/tools/redirect-checker) before
     slug: 'email-signature-guide',
     title: 'How to Create an Email Signature for Gmail & Outlook (Free)',
     description:
-      'Step-by-step guide to creating a professional email signature with an HTML signature generator — including Gmail and Outlook setup, size limits, and design best practices.',
+      'Step-by-step guide to a professional email signature with an HTML generator — Gmail, Outlook and Thunderbird setup, size limits and design best practices.',
     date: '2026-08-03',
+    updated: '2026-10-23',
     category: 'Productivity',
     keywords: ['email signature generator', 'email signature gmail', 'html signature', 'outlook signature', 'free email signature'],
     relatedTools: ['email-signature-generator', 'qr-generator', 'title-generator', 'headline-analyzer'],
@@ -278,6 +288,7 @@ Skip the manual HTML: open the [Email Signature Generator](/tools/email-signatur
     description:
       'What a canonical URL is, why duplicate content hurts your rankings, how to check the canonical of any page, and how to fix canonical mistakes on your site.',
     date: '2026-08-03',
+    updated: '2026-10-23',
     category: 'SEO',
     keywords: ['canonical url', 'canonical checker', 'duplicate content', 'rel canonical', 'canonical tag'],
     relatedTools: ['canonical-url-checker', 'redirect-checker', 'sitemap-generator', 'robots-txt-generator'],
@@ -308,11 +319,15 @@ That's why the rule is: **every page gets exactly one self-referencing canonical
 
 ## How to check the canonical of any page
 
-Use the free [Canonical URL Checker](/tools/canonical-url-checker):
+Start by reading the tag the page already declares. Open the page, view the source (Ctrl+U), and search for \`rel="canonical"\` in the \`<head>\`. For a header-based canonical, run \`curl -I https://example.com/page\` and look for a \`Link: <…>; rel="canonical"\` response header. Note whether the URL is absolute, whether it points at the page itself, and whether more than one tag appears.
 
-1. Paste the URL of the page you want to audit.
-2. The tool fetches the page and extracts the canonical declaration — from the HTML tag **and** the HTTP Link header.
-3. You instantly see: the canonical URL, whether it's self-canonical, and any warnings (missing canonical, multiple canonicals, or conflicting declarations).
+Then use the free [Canonical URL Checker](/tools/canonical-url-checker) to build the correct replacement:
+
+1. Paste the URL you intend to canonicalize.
+2. The tool normalizes it — lowercases the host, removes default ports and tracking parameters, sorts query strings and drops fragments — and shows exactly what changed.
+3. Copy the generated \`<link rel="canonical">\` tag and replace the old one in your template.
+
+The checker normalizes the URL you give it; it does not fetch the live page, so the source-view step above is what tells you what the page currently declares. For the full response-header picture, use the [HTTP Header Checker](/tools/http-header-checker).
 
 ## The canonical problems to look for
 
@@ -362,6 +377,7 @@ Run the [Canonical URL Checker](/tools/canonical-url-checker) now and fix the fi
     description:
       'How robots.txt works, what to block and allow, how to reference your sitemap, common mistakes, and how to generate a valid robots.txt file in seconds.',
     date: '2026-08-03',
+    updated: '2026-10-23',
     category: 'SEO',
     keywords: ['robots txt', 'robots.txt generator', 'googlebot', 'crawl budget', 'seo robots'],
     relatedTools: ['robots-txt-generator', 'sitemap-generator', 'canonical-url-checker', 'redirect-checker'],
@@ -432,7 +448,7 @@ The [Robots.txt Generator](/tools/robots-txt-generator) builds a correct file fr
 
 - Visit \`https://yourdomain.com/robots.txt\` in a browser — you should see your file.
 - In **Google Search Console**, use the robots.txt Tester (under Crawling → robots.txt) to simulate a specific URL.
-- After changes, remember Google caches the file for up to 60 days, so don't expect instant effects.
+- After changes, remember Google caches robots.txt for up to 24 hours, so don't expect instant effects.
 
 ## A sensible starter file
 
@@ -450,10 +466,11 @@ And when you're ready to protect crawl budget, add targeted disallows — never 
   },
   {
     slug: 'css-gradient-guide',
-    title: 'CSS Gradients: How to Create Linear, Radial & Conic Gradients',
+    title: 'CSS Gradients: Linear, Radial & Conic Gradient Syntax',
     description:
-      'Learn CSS gradients from scratch: linear-gradient syntax, angles, color stops, radial and conic gradients, and how to generate copy-ready gradient CSS for your site.',
+      'Learn CSS gradient syntax from scratch: linear-gradient angles, color stops, radial and conic gradients, and copy-ready CSS for your site.',
     date: '2026-08-03',
+    updated: '2026-10-23',
     category: 'Design',
     keywords: ['css gradient', 'gradient generator', 'linear gradient', 'background gradient', 'css colors'],
     relatedTools: ['css-gradient-generator', 'color-converter', 'color-contrast-checker', 'color-palette-extractor'],
@@ -468,7 +485,7 @@ The three types:
 - **radial-gradient()** — colors expanding outward from a center point
 - **conic-gradient()** — colors wrapped around a circle (color-wheel style)
 
-## Linear gradients: the basics
+## CSS linear gradient syntax
 
 The basic syntax:
 
@@ -486,6 +503,10 @@ background: linear-gradient(90deg, #ff7e5f 0%, #feb47b 50%, #86a8e7 100%);
 \`\`\`
 
 Here the transition accelerates toward the middle stop. If two stops share a position, the color changes abruptly — a hard edge you can use for stripes.
+
+## CSS gradient lines: angles, direction words and hard stops
+
+The **gradient line** is the axis the colors travel along. Its length and direction are set by the angle or direction keyword; the color stops are placed on that line, which is why the same stop values can look different in a short button and a full-width hero. Direction keywords and angles are two ways to describe the same axis:
 
 ## Direction words vs angles
 
@@ -561,10 +582,11 @@ Combine it with the [Color Converter](/tools/color-converter) to tweak hex value
   },
   {
     slug: 'font-accessibility-guide',
-    title: 'Font Accessibility: Sizes, Weights & Legibility Rules That Matter',
+    title: 'Font Accessibility: Sizes, Weights & Legibility',
     description:
-      'How to choose genuinely readable fonts: minimum sizes, WCAG resize and spacing rules, line length, weight choices — and how to test any font pairing in seconds.',
+      'Choose readable font sizes, weights and line lengths. Learn what WCAG requires, compare typography settings, and test resizing and text spacing on your site.',
     date: '2026-09-04',
+    updated: '2026-10-29',
     category: 'Design',
     keywords: [
       'font accessibility',
@@ -583,80 +605,83 @@ Combine it with the [Color Converter](/tools/color-converter) to tweak hex value
     body: `
 ## Why font accessibility matters
 
-Roughly **1 in 6 adults** has some form of low vision, and even users with perfect eyesight struggle with text that is too small, too light, or crammed into lines that are too long. Font accessibility is the practice of making your typography readable for everyone — and it is one of the cheapest improvements you can make, because it costs nothing but attention.
+Font accessibility depends on more than a font family. Size, weight, spacing, line length and contrast affect how readers use a page. Readers also need to enlarge text and change its spacing without losing content or controls.
 
-It also has a measurable SEO angle: Google's page-experience signals reward content that is easy to consume, and accessibility audits (Lighthouse, axe) flag typography problems automatically. A page that fails basic legibility tends to have higher bounce rates, which eventually shows up in rankings.
+Use typography guidelines to choose a starting point, then check your actual layout. A preview can help compare settings, but it cannot establish that the page using those settings meets WCAG.
 
 ## The WCAG rules that affect typography
 
-The Web Content Accessibility Guidelines (WCAG) — the reference standard cited by accessibility laws worldwide — cover text in several success criteria:
+The [Web Content Accessibility Guidelines (WCAG) 2.2](https://www.w3.org/TR/WCAG22/) cover text presentation and the ability to adjust it. The relevant criteria include:
 
 | Criterion | What it requires |
 |---|---|
-| **1.4.3 Contrast (Minimum)** | Body text needs at least **4.5:1** contrast against its background (3:1 for large text). |
-| **1.4.4 Resize Text** | Text must remain functional when resized to **200%** — no clipped content, no overlaps. |
-| **1.4.10 Reflow** | At 320 CSS pixels wide, content must reflow into one column without two-dimensional scrolling. |
-| **1.4.12 Text Spacing** | Users must be able to increase line height (to 1.5×), paragraph spacing (2×), letter spacing (0.12×) and word spacing (0.16×) without breaking the layout. |
-| **1.4.8 Visual Presentation** | For AAA conformance: line height ≥ 1.5, paragraph spacing ≥ 1.5× line height, line length ≤ 80 characters. |
+| **[1.4.3 Contrast (Minimum)](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html)** | At Level AA, normal-size text generally needs **4.5:1** contrast; large text has a **3:1** threshold. |
+| **[1.4.4 Resize Text](https://www.w3.org/WAI/WCAG22/Understanding/resize-text.html)** | Except for captions and images of text, text must support resizing to **200%** without loss of content or functionality. |
+| **[1.4.10 Reflow](https://www.w3.org/WAI/WCAG22/Understanding/reflow.html)** | Vertically scrolling content must work at an equivalent width of **320 CSS pixels** without scrolling in both dimensions, except where a two-dimensional layout is necessary. |
+| **[1.4.12 Text Spacing](https://www.w3.org/WAI/WCAG22/Understanding/text-spacing.html)** | No loss of content or functionality when users apply line height **1.5×**, paragraph spacing **2×**, letter spacing **0.12×**, and word spacing **0.16×** the font size together. |
+| **[1.4.8 Visual Presentation](https://www.w3.org/WAI/WCAG22/Understanding/visual-presentation.html)** | At Level AAA, a mechanism lets users adjust text presentation, including colors, alignment, spacing and line width of at most **80 characters**, or **40 for CJK**. |
 
-You don't need AAA for most projects — but every one of these is a real user complaint waiting to happen if ignored.
+The text-spacing values are override conditions, not mandatory default CSS. The visual-presentation criterion also concerns available adjustments. Neither criterion turns a particular starting size or line height into proof of conformance.
 
 ## What size should body text be?
 
-The practical baseline most style guides converge on:
+**WCAG does not specify a minimum font size.** A useful starting point for paragraph text is 16px, then adjust for the typeface, language, device and reader feedback:
 
-- **16 px (1 rem) minimum** for body text on the web. Anything below 14 px should be reserved for captions or metadata, never primary content.
-- **12 px is the absolute floor** — and only for genuinely secondary labels. If you catch yourself using 10 px text, you are designing for a design tool, not for humans.
-- **Line height 1.5–1.7** for paragraphs. Headings can be tighter (1.1–1.3).
-- **Paragraph spacing** should be at least as large as the line height, so paragraphs read as distinct blocks.
+- **Start with 16px for body copy.** This is a practical recommendation, not a WCAG minimum. Small labels still need to be readable and resizable.
+- **Use relative sizing thoughtfully.** A value of 1rem follows the root font size, so it equals 16px only when the root computes to 16px.
+- **Try unitless line height around 1.5–1.6** for paragraphs and compare real content. Some readers need more spacing.
+- **Leave space between paragraphs** and allow text containers to grow when users change spacing.
 
-There is no law that says 16 px — but below that, reading speed measurably drops for low-vision users, and mobile browsers zoom or reflow unpredictably.
+Do not treat 12px as a universal safe floor or 16px as an automatic pass. A typeface with a small x-height can look smaller than another face at the same CSS size.
 
 ## Weight, family and line length
 
-- **Avoid light weights (below 400) for body text.** Thin strokes vanish on low-contrast screens and on budget devices. Use 400–500 for paragraphs, 600–700 for headings.
-- **Prefer fonts with a large x-height** — the height of the lowercase letters relative to the capitals. Fonts like Inter, Source Sans, Verdana or Atkinson Hyperlegible were designed for exactly this. Decorative or condensed fonts are fine for headlines, hostile for paragraphs.
-- **Keep lines between 45 and 75 characters.** Longer lines make the eye lose its place when returning from the next line; shorter lines force choppy saccades.
-- **Do not justify body text.** Justification creates uneven "rivers" of white space that are especially hard for readers with dyslexia.
-- **Never rely on color alone** to convey meaning in text (e.g. red for errors) — pair it with an icon or label. And check that your text/background pair passes contrast rules with the [Color Contrast Checker](/tools/color-contrast-checker).
+- **Compare weights on the devices you support.** The checker offers 400–700; choosing one does not verify that your font file includes that weight. Check that the intended font and weight actually load.
+- **Inspect lowercase letters at the intended size.** The x-height ratio compares the height of the lowercase x with the font size. It helps explain apparent size differences, but there is no universal passing ratio.
+- **Try 45–75 characters per line for long paragraphs.** This is a typography guideline, separate from WCAG 1.4.8. Narrow screens and different writing systems need different layouts.
+- **Use left alignment as a starting point for English body copy.** Check for uneven word spacing before justifying paragraphs.
+- **Check foreground and background colors separately** with the [Color Contrast Checker](/tools/color-contrast-checker), including muted text, links and both color themes.
 
-## How to test a font combination in seconds
+## How to compare typography with the font checker
 
-You don't need to memorize the criteria above — the [Font Accessibility Checker](/tools/font-accessibility-checker) walks you through them:
+The [Font Accessibility Checker](/tools/font-accessibility-checker) previews a sample and scores five practical checks. It does not fetch or audit your website, load an uploaded font file, or calculate color contrast.
 
-1. Enter the font size (in px), weight, line height, and the text color plus background color.
-2. The tool evaluates the combination against WCAG legibility guidance — contrast ratio, size floor, weight, and line-height rules — and tells you exactly which check fails and why.
-3. Adjust the values and re-run until everything passes, then copy the final values into your CSS.
+1. Enter your CSS font stack. The preview uses fonts available in your browser; an unavailable family falls back to the next one.
+2. Choose the font size in pixels, a weight from 400 to 700, and a unitless line height.
+3. Paste a representative paragraph. The checklist compares size, two line-height targets, average characters per rendered line, and weight range.
+4. Resize the window and compare the preview. The line-length figure is an approximate average that includes short final lines. The x-height ratio uses canvas metrics where available, or a 0.5 estimate.
+5. Copy the CSS settings, then test them in your actual page. Use the [Color Contrast Checker](/tools/color-contrast-checker) for foreground and background colors.
 
-Because the tool runs entirely in your browser, you can paste in proprietary brand palettes without anything being uploaded anywhere.
+The score is the percentage of those five checks that pass. A result of 100/100 is a useful comparison point, but does not test zoom, reflow, spacing overrides, keyboard access or every other WCAG requirement.
 
 ## Common mistakes (and the fix)
 
-- **Using \`opacity\` or a muted gray like #999 on white** for body text — fails 4.5:1. Use #595959 or darker.
-- **Setting \`font-size\` in \`px\` everywhere** and blocking browser zoom in the viewport meta tag. Use \`rem\` for text and never disable zoom — WCAG 1.4.4 explicitly tests it.
-- **Uppercase body text or letter-spacing: 3px** on paragraphs — casing shapes help word recognition; forced tracking destroys it. Uppercase is fine for short labels.
-- **Embedding text in images.** Text in images cannot be resized, reflowed, translated or read by screen readers. If you must, provide the same content as real text.
-- **Dark-mode inversions that keep the same colors** — a light-gray text (#ccc) on dark gray (#222) can pass contrast yet still cause halation (glare) for astigmatic readers. Slightly reduce brightness contrast in dark mode (e.g. #e0e0e0 on #1a1a1a) rather than pure white on black.
+- **A perfect preview score hides clipped production text.** Remove fixed heights or other constraints that cut off enlarged or widely spaced text.
+- **A font name is entered but the font is unavailable.** Confirm the font loads on your website and compare the fallback font too.
+- **A low-contrast color is reused across themes.** Measure each foreground/background pair; opacity and background images can change the effective colors.
+- **Zoom is disabled in viewport settings.** Allow readers to enlarge the page and verify controls remain usable.
+- **Important words are embedded in an image.** Prefer real text so it can adapt to size and spacing changes; provide appropriate text alternatives for informative images.
 
-## The 30-second accessibility audit
+## Test the typography on your actual website
 
-Before you ship a page, run through this:
+After copying your preferred settings, work through the actual rendered page:
 
-1. **Zoom to 200%** — does the layout survive?
-2. **Squint test** — can you still read body text? If not, contrast or size is off.
-3. **Measure your line length** — between 45 and 75 characters?
-4. **Run the exact values through the [Font Accessibility Checker](/tools/font-accessibility-checker)** and fix whatever it flags.
-5. **Check color pairs** with the [Color Contrast Checker](/tools/color-contrast-checker), including link colors against both backgrounds.
+1. **Enlarge text to 200%.** Inspect paragraphs, navigation, buttons and form labels for lost content or functionality.
+2. **Check reflow at 320 CSS pixels wide.** Read the page without horizontal scrolling through ordinary body copy. Necessary two-dimensional content, such as a data table, has an exception under the reflow criterion.
+3. **Apply all four text-spacing overrides together.** Set line height to 1.5, paragraph spacing to 2em, letter spacing to 0.12em, and word spacing to 0.16em. Inspect for clipped text, overlap and unusable controls.
+4. **Measure text contrast in each theme and state.** Use the actual foreground/background pairs, including links and secondary text.
+5. **Read representative content with the intended and fallback fonts.** Review long words, headings and narrow layouts, and collect reader feedback where possible.
 
-Accessible typography is not a design constraint — it is what good typography has always been. The same 16 px, 1.5 line-height, high-contrast combination that passes WCAG is simply the combination that reads comfortably for everyone.
+These checks cover useful parts of text presentation. A complete accessibility review also needs to consider the rest of the page and its interactions.
 `,
   },
   {
     slug: 'mime-types-explained',
-    title: 'MIME Types Explained: What "Content-Type" Actually Tells the Browser',
+    title: 'MIME Types Explained: What Content-Type Tells the Browser',
     description:
-      'What a MIME type is, where it comes from, why mismatches break downloads and enable XSS — and how to detect the real MIME type of any file, offline, in your browser.',
+      'What a MIME type is, where it comes from, why mismatches break downloads and enable XSS — and how to identify a file’s real type offline.',
     date: '2026-09-10',
+    updated: '2026-10-23',
     category: 'Developer',
     keywords: [
       'mime type',
@@ -726,13 +751,11 @@ Browsers trust \`Content-Type\` for security-critical decisions:
 
 ## How to check a file's real MIME type — offline
 
-Because the declared type comes from the server, the interesting question is usually **what the file really is**, based on its content. That is determined by the file's binary signature (magic bytes), which is exactly what the [MIME Detector](/tools/mime-detector) reads:
+Because the declared type comes from the server, the interesting question is usually **what the file really is**, based on its content. That is determined by the file's binary signature (magic bytes). Use the two tools for different jobs:
 
-1. Open the [MIME Detector](/tools/mime-detector) and drop in any file.
-2. It reads the first bytes of the file locally — the file never leaves your browser — and reports the detected MIME type and the matching extension.
-3. Compare the detected type with what your server declares. Mismatch? Fix the server mapping or re-export the file.
-
-For deeper verification, combine it with the [File Signature Inspector](/tools/file-signature-inspector) (shows the raw magic bytes) and the [HTTP Header Checker](/tools/http-header-checker) (shows the \`Content-Type\` your server actually sends for a URL).
+1. The [MIME Detector](/tools/mime-detector) maps a file name or extension to the MIME type a correct server *should* send. It does not read the bytes.
+2. The [File Signature Inspector](/tools/file-signature-inspector) reads the first 16 bytes locally — the file never leaves your browser — and reports the format the content actually is, plus the matching MIME type.
+3. Compare the declared \`Content-Type\` from the [HTTP Header Checker](/tools/http-header-checker) with the signature-derived type. Mismatch? Fix the server mapping or re-export the file.
 
 ## Fixing MIME problems on your server
 
@@ -771,10 +794,11 @@ MIME types look like plumbing, but they decide whether a file renders, downloads
   },
   {
     slug: 'file-signatures-magic-bytes',
-    title: "File Signatures & Magic Bytes: How to Identify Any File's Real Type",
+    title: 'File Signatures & Magic Bytes: Identify Any File Type',
     description:
-      'Every file starts with a signature that reveals what it really is. Learn the most common magic bytes, why extensions lie, and how to inspect files safely in your browser.',
+      'Every file starts with a signature that reveals what it really is. Learn common magic bytes, why extensions lie, and how to inspect files safely.',
     date: '2026-09-16',
+    updated: '2026-10-23',
     category: 'Security',
     keywords: [
       'file signature',
@@ -864,7 +888,7 @@ If \`invoice.pdf\` turns out to start with \`4D 5A\`, delete it — and if it ar
     slug: 'unix-timestamps-explained',
     title: 'Unix Timestamps Explained: UTC, Timezones & Common Pitfalls',
     description:
-      'What a Unix timestamp really is, why the epoch starts in 1970, how to convert timestamps to dates (and back) correctly, and the timezone and 2038 bugs that catch everyone out.',
+      'What a Unix timestamp is, why the epoch starts in 1970, how to convert timestamps to dates correctly, and the timezone and 2038 bugs to avoid.',
     date: '2026-09-18',
     category: 'Developer',
     keywords: [
@@ -965,9 +989,9 @@ Timestamps reward a small amount of discipline: keep one unit, store UTC, conver
   },
   {
     slug: 'utm-parameters-guide',
-    title: 'UTM Parameters Explained: Track Campaigns Without Breaking Analytics',
+    title: 'UTM Parameters Explained: Track Campaigns Correctly',
     description:
-      'How to build UTM tracking URLs the right way: utm_source vs utm_medium vs utm_campaign, naming conventions that keep reports clean, encoding mistakes to avoid, and QR-code tracking.',
+      'How to build UTM tracking URLs correctly: utm_source vs utm_medium vs utm_campaign, naming conventions, encoding mistakes and QR-code tracking.',
     date: '2026-09-20',
     category: 'SEO',
     keywords: [
@@ -1092,7 +1116,7 @@ Clean UTM data is not a reporting nicety — it is the input to every "which cha
     slug: 'open-graph-meta-tags-guide',
     title: 'Open Graph Meta Tags: Control How Your Links Look When Shared',
     description:
-      'How Open Graph tags work and how to get them right: the four required properties, og:image sizes that render everywhere, Twitter card fallbacks, caching traps, and a debugging checklist.',
+      'How Open Graph tags work: required properties, og:image sizes that render everywhere, Twitter card fallbacks, caching traps and a debugging checklist.',
     date: '2026-09-19',
     category: 'SEO',
     keywords: [
@@ -1216,9 +1240,9 @@ Link previews are one of the few SEO surfaces you can fully control and verify i
   },
   {
     slug: 'password-entropy-guide',
-    title: 'Password Entropy Explained: The Math Behind Truly Strong Passwords',
+    title: 'Password Entropy Explained: The Math Behind Strong Passwords',
     description:
-      'What password entropy actually measures, the length × character-pool formula, crack-time tables with honest assumptions, why human passwords fall short, and the NIST rules that follow from the math.',
+      'What password entropy measures, the length × character-pool formula, realistic crack-time tables, why human passwords fall short, and the NIST rules.',
     date: '2026-09-19',
     category: 'Security',
     keywords: [

@@ -64,8 +64,8 @@ const TOP_TOOLS: { slug: string; anchor: string; blurb: string }[] = [
   },
   {
     slug: 'font-accessibility-checker',
-    anchor: 'Font Accessibility Checker (WCAG)',
-    blurb: 'Check font size, weight and legibility against WCAG accessibility guidelines.',
+    anchor: 'Font Readability Test & Accessibility Checker',
+    blurb: 'Preview your text at different sizes and compare line height, length and weight.',
   },
   {
     slug: 'file-signature-inspector',
@@ -75,7 +75,7 @@ const TOP_TOOLS: { slug: string; anchor: string; blurb: string }[] = [
   {
     slug: 'mime-detector',
     anchor: 'MIME Type Detector — Content-Type Lookup',
-    blurb: 'Detect the true MIME type of any file from its content — offline and private.',
+    blurb: 'Look up a MIME type from a file name or extension, such as .pdf or .png.',
   },
   {
     slug: 'qr-generator',
@@ -165,8 +165,8 @@ export function SeoLinksSection({ guides = [] }: { guides?: SeoGuideLink[] }) {
           </h2>
         </div>
         <p className="mb-5 text-sm text-muted-foreground">
-          The most popular free tools in the network — each one runs entirely
-          in your browser with no sign-up.
+          The most popular free tools in the network — each one is free with
+          no sign-up; most run entirely in your browser.
         </p>
         <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {TOP_TOOLS.map((t) => (

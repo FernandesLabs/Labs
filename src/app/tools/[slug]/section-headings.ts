@@ -190,15 +190,17 @@ export function resolveSectionHeading(key: ToolSectionKey, tool: HeadingTool): s
       return `${tool.name} examples`
     case 'howTo':
       return `How to use the ${tool.name}`
+    // Keep every fallback name-aware. Four identical H2s across 118 pages
+    // ("Common use cases", "Best practices", "Tips", "FAQ") wasted a
+    // relevance signal and made the pages look templated. The explicit
+    // SECTION_HEADINGS above still win for the high-impression pages.
     case 'useCases':
-      return 'Common use cases'
+      return `${tool.name} use cases`
     case 'bestPractices':
-      return tool.category === 'seo'
-        ? 'Technical SEO best practices'
-        : 'Best practices'
+      return `${tool.name} best practices`
     case 'tips':
-      return 'Tips'
+      return `${tool.name} tips`
     case 'faq':
-      return 'Frequently asked questions'
+      return `${tool.name} FAQ`
   }
 }

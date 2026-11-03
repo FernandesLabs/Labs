@@ -62,7 +62,7 @@ export async function GET(): Promise<Response> {
   <channel>
     <title>${escapeXml(`${siteConfig.site.name} Blog`)}</title>
     <link>${escapeXml(`${baseUrl}/blog`)}</link>
-    <description>${escapeXml('Hand-written guides on developer, design, SEO, and network topics — every tool mentioned runs free in your browser.')}</description>
+    <description>${escapeXml('Hand-written guides on developer, design, SEO, and network topics — every tool mentioned is free to use.')}</description>
     <language>en</language>
     <lastBuildDate>${lastBuildDate}</lastBuildDate>
     <ttl>1440</ttl>

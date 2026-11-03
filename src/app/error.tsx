@@ -126,7 +126,7 @@ export default function ErrorPage({
         </div>
 
         <p className="mt-6 text-center text-xs text-muted-foreground/70">
-          Fernandes Labs — free tools that run entirely in your browser.
+          Fernandes Labs — free tools that put your privacy first.
         </p>
       </main>
     </div>

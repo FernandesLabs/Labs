@@ -6,12 +6,14 @@ import { toolMetadata } from '@/lib/tools/tool-metadata'
 import { siteConfig } from '@/lib/site-config'
 import { blogPosts } from '@/lib/blog/posts'
 import { guidesForTools, readingTimeMinutes, toPalettePosts } from '@/lib/blog/blog-utils'
+import { usesServerProxy } from '@/lib/privacy'
 import {
   generateToolTitle,
   generateToolDescription,
   getRelatedTools,
 } from './tool-seo'
 import { ToolPageClient } from './tool-page-client'
+import { getToolContentOverride } from './tool-content-overrides'
 import type { ToolGuide } from '@/components/hub/tool-related-guides'
 
 interface Props {
@@ -153,7 +155,7 @@ export default async function ToolPage({ params }: Props) {
         <div className="mx-auto max-w-6xl px-4 pb-4 text-sm text-muted-foreground sm:px-6 lg:px-8">
           <p>
             The {tool.name} tool needs JavaScript to run.{' '}
-            {tool.category === 'network'
+            {usesServerProxy(tool.slug)
               ? 'This lookup is proxied through our server and is not logged.'
               : 'All processing happens in your browser — your input is never sent to a server.'}
           </p>
@@ -161,6 +163,7 @@ export default async function ToolPage({ params }: Props) {
       </noscript>
       <ToolPageClient
         slug={tool.slug}
+        content={getToolContentOverride(tool.slug)}
         guides={relatedGuides}
         posts={toPalettePosts(blogPosts)}
       />

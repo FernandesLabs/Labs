@@ -1,17 +1,22 @@
 import type { Metadata } from 'next'
 import { siteConfig } from '@/lib/site-config'
+import { socialMetadata } from '@/lib/seo-metadata'
 import { LegalPage } from '@/components/hub/legal-page'
 
+const TITLE = 'Privacy Policy — Fernandes Labs'
+const DESCRIPTION =
+  'How Fernandes Labs handles your data: which tools run in your browser, which six proxy through our server, and what analytics and advertising collect.'
+
 export const metadata: Metadata = {
-  title: 'Privacy Policy — Fernandes Labs',
-  description:
-    'How Fernandes Labs handles your data. All tools run client-side; we do not collect or store your input.',
+  title: TITLE,
+  description: DESCRIPTION,
   robots: { index: true, follow: true },
   // Explicit canonical — without this the page inherited the homepage URL
   // from the root layout and told Google it was a duplicate of "/".
   alternates: {
     canonical: `https://${siteConfig.site.domain}/privacy`,
   },
+  ...socialMetadata('/privacy', TITLE, DESCRIPTION),
 }
 
 const SECTIONS = [
@@ -34,20 +39,18 @@ export default function PrivacyPage() {
   return (
     <LegalPage
       title="Privacy Policy"
-      subtitle={`Last updated: ${new Date().toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      })}`}
+      subtitle="Last updated: October 23, 2026"
       sections={SECTIONS}
     >
       <section id="summary" className="scroll-mt-20">
         <h2 className="text-xl font-semibold text-foreground">Summary</h2>
         <p className="mt-2">
-          {domain} provides free online tools that run entirely in your
-          browser. We do not collect, store, or transmit the data you enter
-          into our tools. This page explains the limited data we do collect
-          (analytics and ad data) and how it is used.
+          {domain} provides free online tools. Most of them run entirely in
+          your browser and never receive the data you enter; six network
+          lookups are proxied through our server because browsers block
+          cross-origin requests. We do not store what you enter into any tool.
+          This page explains those exceptions and the limited analytics and
+          advertising data we do collect.
         </p>
       </section>
       <section id="tool-data" className="scroll-mt-20">

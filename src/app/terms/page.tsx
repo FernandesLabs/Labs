@@ -1,17 +1,21 @@
 import type { Metadata } from 'next'
 import { siteConfig } from '@/lib/site-config'
+import { socialMetadata } from '@/lib/seo-metadata'
 import { LegalPage } from '@/components/hub/legal-page'
 
+const TITLE = 'Terms of Service — Fernandes Labs'
+const DESCRIPTION = 'Terms governing the use of Fernandes Labs free online tools.'
+
 export const metadata: Metadata = {
-  title: 'Terms of Service — Fernandes Labs',
-  description:
-    'Terms governing the use of Fernandes Labs free online tools.',
+  title: TITLE,
+  description: DESCRIPTION,
   robots: { index: true, follow: true },
   // Explicit canonical — without this the page inherited the homepage URL
   // from the root layout and told Google it was a duplicate of "/".
   alternates: {
     canonical: `https://${siteConfig.site.domain}/terms`,
   },
+  ...socialMetadata('/terms', TITLE, DESCRIPTION),
 }
 
 const SECTIONS = [
@@ -33,11 +37,7 @@ export default function TermsPage() {
   return (
     <LegalPage
       title="Terms of Service"
-      subtitle={`Last updated: ${new Date().toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      })}`}
+      subtitle="Last updated: October 23, 2026"
       sections={SECTIONS}
     >
       <section id="acceptance" className="scroll-mt-20">
@@ -54,8 +54,11 @@ export default function TermsPage() {
         </h2>
         <p className="mt-2">
           {domain} provides free, browser-based online tools for
-          developers, designers, and marketers. All tools run client-side;
-          we do not host, process, or store your input data on our servers.
+          developers, designers, and marketers. Most tools run entirely
+          client-side and never send your input to us. Six network tools — IP
+          Lookup, DNS Lookup, SSL Checker, Ping, Redirect Checker and HTTP
+          Header Checker — are proxied through our server to bypass browser
+          CORS restrictions; we do not store or log those queries.
         </p>
       </section>
       <section id="warranty" className="scroll-mt-20">

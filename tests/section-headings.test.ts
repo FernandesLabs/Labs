@@ -89,19 +89,19 @@ describe('section headings (GSC-driven, export 2026-09-19)', () => {
       'How to use the SQL Formatter'
     )
     expect(resolveSectionHeading('examples', t)).toBe('SQL Formatter examples')
-    // Non-name headings stay stable across tools.
-    expect(resolveSectionHeading('useCases', t)).toBe('Common use cases')
-    expect(resolveSectionHeading('tips', t)).toBe('Tips')
+    // Every fallback is name-aware now, so no two pages share generic H2s.
+    expect(resolveSectionHeading('useCases', t)).toBe('SQL Formatter use cases')
+    expect(resolveSectionHeading('tips', t)).toBe('SQL Formatter tips')
   })
 
-  test('SEO-category best-practices heading keeps its label in fallbacks', () => {
+  test('SEO-category best-practices heading keeps its name-aware label', () => {
     const seoTool = toolMetaList.find((t) => t.category === 'seo')!
     expect(resolveSectionHeading('bestPractices', seoTool)).toBe(
-      'Technical SEO best practices'
+      `${seoTool.name} best practices`
     )
     const other = toolMetaList.find((t) => t.category !== 'seo')!
     expect(resolveSectionHeading('bestPractices', other)).toBe(
-      'Best practices'
+      `${other.name} best practices`
     )
   })
 

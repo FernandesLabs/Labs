@@ -21,8 +21,10 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: '*',
-        allow: '/',
-        // `/api/` — API routes (not for indexing).
+        allow: ['/', '/api/og'],
+        // `/api/` — API routes (not for indexing), except `/api/og`, which
+        // serves the social-share and Article images declared in metadata.
+        // Blocking the whole prefix hid those images from Google's crawler.
         // `/*XTransformPort*` — the dev preview gateway accepts a
         // ?XTransformPort=<port> query param to route to a local server.
         // Crawlers must never index those query-string variants (each one

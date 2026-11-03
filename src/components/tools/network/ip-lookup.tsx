@@ -59,11 +59,15 @@ export default function IpLookup(): React.JSX.Element {
       if (target) {
         // Basic IP-or-host sanity check.
         const isIpv4 = /^\d{1,3}(\.\d{1,3}){3}$/.test(target)
+        // The API performs authoritative IP validation with node:net.
+        // Accept IPv6 characters here so valid colon-separated addresses
+        // can reach it, including IPv4-mapped IPv6 addresses.
+        const isIpv6 = target.includes(':') && /^[0-9a-f:.]+$/i.test(target)
         const isDomain = /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/.test(
           target
         )
-        if (!isIpv4 && !isDomain) {
-          toast.error('Enter a valid IPv4 address or hostname')
+        if (!isIpv4 && !isIpv6 && !isDomain) {
+          toast.error('Enter a valid IPv4 address, IPv6 address or hostname')
           return
         }
       }
@@ -117,7 +121,7 @@ export default function IpLookup(): React.JSX.Element {
         <CardHeader>
           <CardTitle>IP Lookup</CardTitle>
           <CardDescription>
-            Geolocate any IPv4 address or hostname, or look up your own
+            Geolocate any IPv4, IPv6 address or hostname, or look up your own
             public IP. Returns city, region, country, coordinates, ISP, and
             timezone via ipapi.co.
           </CardDescription>
@@ -218,6 +222,7 @@ export default function IpLookup(): React.JSX.Element {
                 }
               />
               <Stat label="ISP / Org" value={data.org ?? '—'} />
+              <Stat label="ASN" value={data.asn ?? '—'} />
             </div>
             {mapHref ? (
               <div>

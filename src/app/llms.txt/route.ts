@@ -23,7 +23,7 @@ export async function GET(): Promise<Response> {
   const lines: string[] = [
     `# ${siteConfig.site.name}`,
     '',
-    `> ${siteConfig.site.description ?? ''} Everything runs client-side in the browser — no sign-up, no uploads, no tracking of tool inputs.`,
+    `> ${siteConfig.site.description ?? ''} Most tools run client-side in the browser with no sign-up and no file uploads; six network lookups (IP, DNS, SSL, ping, redirect and HTTP-header checks) are proxied through our server to bypass browser CORS restrictions.`,
     '',
     `Main entry: ${base}/ — searchable hub of every tool. Sitemap: ${base}/sitemap.xml. RSS: ${base}/feed.xml.`,
     '',

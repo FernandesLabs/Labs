@@ -39,6 +39,7 @@ export const OVERRIDES: ToolOverrideMap = {
     useCases: [
       'Outlook desktop signatures — table plus inline-style markup is the only layout Outlook renders dependably, so corp users get the identical brand block as the web output.',
       'Gmail and Google Workspace rollout — the same HTML pastes into the signature editor for an entire team without anyone hand-editing styles.',
+      'Thunderbird and Apple Mail — HTML signatures paste into the account identity settings, so desktop clients get the same branded block as webmail.',
       'Client onboarding kits — agencies hand new customers a ready signature so every email from the account team carries the client\'s own logo block.',
       'Brand consistency audits — a shared URL, brand color, and social set turns scattered staff signatures into one controlled template.',
       'Freelancer personal brand — a compact Modern signature for proposals and invoices replaces a plain-text sign-off with a polished identity.',
@@ -74,8 +75,8 @@ export const OVERRIDES: ToolOverrideMap = {
         a: 'Yes. Every field passes through an escaper that converts & to &amp;, < to &lt;, > to &gt;, and quotes to &quot; before it is interpolated. This means names with ampersands or addresses containing angle brackets cannot corrupt the markup or inject markup into the signature.',
       },
       {
-        q: 'Why does the download include instructions text?',
-        a: 'The Download HTML button wraps the signature in a standalone page with a small note reminding you to right-click the signature and choose Copy before pasting it into your email client. That reminder exists because pasting raw code instead of the rendered block is the most common setup mistake.',
+        q: 'Does it work with Gmail, Outlook and Thunderbird?',
+        a: 'Yes. The output uses nested tables and inline styles, which is the combination Gmail, Outlook (classic and new), Apple Mail and Thunderbird all render. In Gmail, paste the copied signature into Settings → See all settings → Signature. In Outlook desktop, use File → Options → Mail → Signatures. In Thunderbird, open Account Settings → Identity and paste the HTML into the signature box with "Use HTML" enabled. Send yourself a test message in each client before rolling the signature out to a team.',
       },
     ],
     tips: [
@@ -89,7 +90,7 @@ export const OVERRIDES: ToolOverrideMap = {
 
   'canonical-url-checker': {
     intro:
-      'The Canonical URL Checker is a free online tool that turns any messy URL into the clean canonical form search engines expect — and generates the exact <link rel="canonical"> tag to paste into your page\'s <head>. When the same content is reachable through several URLs (http vs https, www vs non-www, trailing slashes, tracking parameters like utm_source or fbclid, query strings in different orders), Google sees near-duplicate pages and splits the ranking signals between them. A canonical tag is the standard way to tell Google which version is the master: point every duplicate at one URL and all the authority consolidates there instead of leaking away. This canonical checker normalizes your URL step by step — host lowercased, default ports removed, tracking parameters stripped, query parameters sorted, fragments and trailing slashes dropped — then shows you exactly what changed and outputs a ready-to-copy canonical tag. Every check runs entirely in your browser, so the URLs you enter never touch a server.',
+      'The Canonical URL Checker is a free online tool that turns any messy URL into the clean canonical form search engines expect — and generates the exact <link rel="canonical"> tag to paste into your page\'s <head>. It is a normalizer and tag generator, not a live crawler: it does not fetch the page to read an existing canonical tag. When the same content is reachable through several URLs (http vs https, www vs non-www, trailing slashes, tracking parameters like utm_source or fbclid, query strings in different orders), Google sees near-duplicate pages and splits the ranking signals between them. A canonical tag is the standard way to tell Google which version is the master: point every duplicate at one URL and all the authority consolidates there instead of leaking away. This canonical checker normalizes your URL step by step — host lowercased, default ports removed, tracking parameters stripped, query parameters sorted, fragments and trailing slashes dropped — then shows you exactly what changed and outputs a ready-to-copy canonical tag. Every check runs entirely in your browser, so the URLs you enter never touch a server.',
     examples: [
       {
         input: 'https://Example.com/blog/sustainable-coffee/?utm_source=newsletter&fbclid=abc123&utm_medium=email&ref=welcome#top',
@@ -163,11 +164,11 @@ export const OVERRIDES: ToolOverrideMap = {
       'For duplicates that shouldn\'t exist at all, prefer a 301 redirect over a canonical tag — it is stronger and consolidates users too.',
     ],
   },
-  // ── robots-txt-generator (125 impressions) ──
+  // ── robots-txt-generator ──
 
   'robots-txt-generator': {
     intro:
-      'The Robots.txt Generator is a free online tool that builds a standards-compliant robots.txt file in seconds — no hand-editing, no syntax mistakes. A robots.txt file is the first thing Googlebot, Bingbot, and every other crawler reads when they visit your domain: it tells them which URLs they may fetch, which folders to leave alone, and where to find your XML sitemap. With this generator you pick a default rule (allow everything, or block everything), then add per-bot rules for specific paths — for example disallow /admin/ and /api/ from all crawlers, stop GPTBot and ClaudeBot from using your content for AI training, or lock down an entire staging environment until launch. Every rule you add is written to the output with correct user-agent syntax, so the only step left is copying the file to the root of your domain as robots.txt. Everything runs in your browser — the settings you enter never leave your device — and the generated file follows the Robots Exclusion Protocol exactly as Google and Bing implement it.',
+      'Use this free robots.txt generator to make a crawl-rules file for Googlebot and other crawlers. Choose whether URLs are allowed by default, add user-agent groups with the paths you want to allow or disallow, and include your sitemap URL. The preview updates as you edit, and you can copy or download the result as robots.txt. If you searched for a robot.txt maker, the filename you need is robots.txt: lowercase, plural, at the root of your website. For a public site, start with Allow all and avoid blocking pages, stylesheets, scripts, or images that Google needs to understand your content. To restrict a folder for all cooperating crawlers, add a custom rule with the user-agent * and a path such as /search/. To set different rules for Google, use Googlebot as the user-agent. This generator prepares the text in your browser; it does not upload the file, fetch your website, or test live crawl access. Review the output before publishing, then verify the deployed file in Search Console. Remember that robots.txt manages crawling: it cannot secure private content or guarantee that a URL stays out of search results.',
     examples: [
       {
         input: 'Default rule: Allow all\nSitemap: https://example.com/sitemap.xml',
@@ -175,78 +176,85 @@ export const OVERRIDES: ToolOverrideMap = {
 Allow: /
 
 Sitemap: https://example.com/sitemap.xml`,
-        note: 'The simplest healthy file: everyone may crawl everything, and the sitemap location is declared for all bots.',
+        note: 'A public site that allows crawling and advertises its sitemap. The Sitemap value must be a complete URL.',
       },
       {
-        input: 'Default: Allow all\nRule: GPTBot → Disallow: /',
+        input: 'Default: Allow all\nCustom user-agent: *\nDisallow: /search/\nDisallow: /preview/\nAllow: /preview/public/',
         output: `User-agent: *
 Allow: /
 
-User-agent: GPTBot
-Disallow: /`,
-        note: 'Search engines keep crawling while GPTBot (used by OpenAI for AI training) is blocked site-wide. Add ClaudeBot, CCBot and PerplexityBot the same way.',
+User-agent: *
+Disallow: /search/
+Disallow: /preview/
+Allow: /preview/public/`,
+        note: 'Google combines groups with the same user-agent. These rules block /search/ and /preview/ while the longer Allow rule keeps /preview/public/ crawlable.',
       },
       {
-        input: 'Default: Disallow all (staging site)',
+        input: 'Default: Allow all\nCustom user-agent: Googlebot\nDisallow: /search/\nSitemap: https://example.com/sitemap.xml',
         output: `User-agent: *
-Disallow: /`,
-        note: 'A staging or development site that must never appear in search results — nothing may be crawled until you change the default rule.',
+Allow: /
+
+User-agent: Googlebot
+Disallow: /search/
+
+Sitemap: https://example.com/sitemap.xml`,
+        note: 'A Google-specific rule: Googlebot cannot crawl /search/, while crawlers matching the wildcard group can. This does not remove already indexed search URLs.',
       },
     ],
     howTo: [
-      'Choose the default rule: "Allow all" for a normal live site, or "Disallow all" for a site under construction or a staging environment.',
-      'Add custom rules for specific crawlers — pick a user-agent (Googlebot, Bingbot, GPTBot, or any custom name) and the paths to Allow or Disallow for it.',
-      'Enter your XML sitemap URL so every crawler can discover your sitemap from the robots.txt file itself.',
-      'Review the live preview, then click Copy to grab the complete robots.txt content.',
-      'Upload the file to the root of your domain (public_html/robots.txt or the equivalent) and verify it at https://yourdomain.com/robots.txt.',
+      'Choose Allow all for a normal public website. Use Disallow all only when your intention is to restrict crawling, not as a way to protect confidential content.',
+      'Click Add rule, enter * for shared path restrictions or Googlebot for Google-specific rules, then add paths beginning with / and choose Allow or Disallow.',
+      'Enter the full XML sitemap URL, such as https://example.com/sitemap.xml. Leave the field empty if you do not have a sitemap.',
+      'Review the preview for accidental Disallow: / rules and any assets needed to render your public pages, then copy or download robots.txt.',
+      'Publish the file at https://yourdomain.com/robots.txt. Check the live text, then use Search Console’s robots.txt report and URL Inspection to verify Google’s access.',
     ],
     useCases: [
-      'Block /admin/, /api/, and other internal folders from search engine crawls to protect crawl budget.',
-      'Stop AI training crawlers (GPTBot, ClaudeBot, CCBot, PerplexityBot) from harvesting your content.',
-      'Lock down a staging or development site so it can never appear in Google results.',
-      'Prevent parameterized URLs (search, filters, pagination) from being crawled as duplicate content.',
-      'Declare your sitemap location centrally so every crawler finds it.',
-      'Temporarily pause crawlers during a migration or rebuild, then re-allow when you launch.',
+      'Create an allow-all robots.txt file with a sitemap declaration for a newly launched public website.',
+      'Request that crawlers skip internal search or filter paths that do not need to be crawled.',
+      'Give Googlebot a different set of crawl rules from the wildcard group used by other crawlers.',
+      'Allow a public subfolder inside a directory that is otherwise disallowed.',
+      'Prepare separate crawl-rule files for a main website and its independently hosted subdomains.',
+      'Review crawl restrictions before a migration so important pages remain accessible after launch.',
     ],
     bestPractices: [
-      'Robots.txt controls crawling, not indexing. To remove a page that is already indexed, use a meta robots noindex tag — never robots.txt alone.',
-      'Disallow private folders, but don\'t rely on robots.txt for security: it is a public request, not an access control, and malicious actors ignore it.',
-      'Block AI crawlers explicitly by user-agent. GPTBot, ClaudeBot (Claude-Web), CCBot, and PerplexityBot each respect robots.txt — if you don\'t block them, they can and will train on your content.',
-      'Keep the file small and simple. Google and Bing may ignore robots.txt files larger than 500 KB entirely.',
-      'One file per site, at the domain root, named exactly robots.txt — lowercase. Anything else will be ignored.',
-      'After publishing changes, test the file in Google Search Console\'s robots.txt tester, and remember that Google caches robots.txt for up to 24 hours (Bing and others may cache longer).',
+      'Robots.txt controls crawling. For a public page that should not appear in Google, use a noindex meta tag or X-Robots-Tag header and let Google crawl it to read the rule.',
+      'Protect private content with authentication. Listing a path in robots.txt makes that path public and does not prevent direct access.',
+      'Keep CSS, JavaScript, and images available when Google needs them to render and understand your public pages.',
+      'Keep the file concise. Google reads up to 500 KiB and ignores content beyond that limit, so important rules must not fall after it.',
+      'Publish UTF-8 plain text named robots.txt at the host root. Rules apply to that protocol, host, and port; subdomains need their own file.',
+      'Check the fetched file and parsing issues in Search Console’s robots.txt report. Use URL Inspection to test whether a particular page is blocked.',
     ],
     faqs: [
       {
-        q: 'What is a robots.txt file and why does every site need one?',
-        a: 'A robots.txt file is a plain-text file at the root of your domain that tells crawlers which parts of your site they are allowed to fetch. It is defined by the Robots Exclusion Protocol and read by Google, Bing, and most other crawlers before anything else. Even if you want everything crawled, a robots.txt file is still worth having because it is the standard place to declare your XML sitemap location — which helps new pages get discovered faster. If you want to make robots txt online without hand-editing syntax, this robots txt generator writes the robots txt file for you in seconds.',
+        q: 'Can I use this robots.txt generator for Google?',
+        a: 'Yes. The generator writes User-agent, Allow, Disallow, and Sitemap lines that Google supports. Use * for general crawl rules or enter Googlebot for Google-specific rules. Download the file as robots.txt and publish it at your website root; there is no separate file to submit to Google. The generator prepares the text but does not check your live website or guarantee indexing.',
       },
       {
         q: 'What is the difference between Allow and Disallow in robots.txt?',
-        a: 'Disallow tells a crawler not to fetch a path; Allow explicitly permits a path — most useful for re-enabling one URL inside a disallowed folder. Both match by URL prefix, so Disallow: /blog blocks /blog, /blog/2026, and everything underneath. When a path matches both an Allow and a Disallow rule, the most specific match wins, and longer patterns win over shorter ones. In practice, most sites only need Disallow rules plus one Allow: / if they allow everything by default.',
+        a: 'Disallow requests that a crawler skip a matching path; Allow permits it. For Google, the longest matching path wins, so Disallow: /preview/ and Allow: /preview/public/ keep the public subfolder crawlable. If equally specific Allow and Disallow rules conflict, Google uses Allow. Paths are case-sensitive: /Preview/ and /preview/ are different.',
       },
       {
-        q: 'How do I block AI crawlers like GPTBot and ClaudeBot?',
-        a: 'Add a rule group for each AI crawler in the generator — set the user-agent to GPTBot, ClaudeBot, CCBot, or PerplexityBot and add Disallow: / to block them site-wide. The generated file will look like: User-agent: GPTBot, then Disallow: / on the next line, repeated per bot. Search engines are unaffected because Googlebot and Bingbot have their own user-agents. This is the officially documented way to opt out of AI training for OpenAI, Anthropic, and Common Crawl — the crawlers check robots.txt before fetching.',
+        q: 'How do I block a folder for all crawlers or just Googlebot?',
+        a: 'Click Add rule and enter * as the user-agent to add a shared restriction, then choose Disallow and enter a folder such as /search/. Enter Googlebot instead to target Google. Google merges repeated groups with the same user-agent, but a matching Googlebot group does not inherit rules from the * group. Repeat any shared restrictions in that Googlebot group when you need them to apply to Google too.',
       },
       {
-        q: 'How do I block a staging or development site from search engines?',
-        a: 'Two layers are safest. First, generate a robots.txt with the default rule set to "Disallow all" (User-agent: * / Disallow: /) and upload it to the staging domain — this stops all crawling. Second, block indexing at the page level with a meta robots noindex tag or an X-Robots-Tag: noindex HTTP header, because Google can still index a page it cannot crawl if it discovers the URL through links. Never use password protection alone as your SEO safety net — add the noindex header too.',
+        q: 'Can robots.txt keep a staging or development site out of Google?',
+        a: 'Disallow: / asks cooperating crawlers not to fetch the site, but a linked URL can still appear in search results. Protect confidential staging environments with authentication. For a publicly accessible test page, use a noindex meta tag or X-Robots-Tag header and keep it crawlable so Google can read that rule. Combining noindex with a robots.txt block prevents Google from seeing the noindex.',
       },
       {
         q: 'Does robots.txt remove pages that are already indexed in Google?',
-        a: 'No. Disallowing a page in robots.txt stops crawling, but pages already in the index can stay there for a long time, and Google may show a snippet-less result ("no information is available for this page"). To remove an existing page, add a meta robots noindex tag or X-Robots-Tag: noindex header and keep the page crawlable — Google must be able to fetch the page to see the noindex. Use Search Console\'s Removals tool for urgent cases.',
+        a: 'No. A Disallow rule prevents crawling rather than deleting a search result. To remove an accessible page from Google, add a noindex meta tag or X-Robots-Tag header and let Google fetch it again. Search Console’s Removals tool can temporarily hide an urgent result while you implement a lasting removal method.',
       },
       {
         q: 'Where do I put the robots.txt file and how do I verify it works?',
-        a: 'The file must be served at the root of your domain: https://yourdomain.com/robots.txt. For www and non-www versions both are separate hosts, so both should serve the file (or one should redirect to the other). After uploading, open the URL in a browser to confirm it loads, then paste it into Google Search Console\'s robots.txt tester to see exactly which URLs are blocked and allowed — and re-submit the sitemap if you changed its location.',
+        a: 'Publish it as plain text at https://yourdomain.com/robots.txt, not inside a subfolder or as robot.txt. Open that address to check the deployed content. In Search Console, the robots.txt report shows the file Google fetched, its fetch time, and parsing issues; URL Inspection checks crawl access for an individual page. Check each host separately, including www and any subdomains you use.',
       },
     ],
     tips: [
-      'Robots.txt supports wildcards: Disallow: /*?* blocks all URLs with query strings, and a trailing $ anchors the match to the end of a URL.',
-      'Google caches robots.txt for up to 24 hours — if you make a change, wait a day before concluding it didn\'t work.',
-      'The most specific matching rule wins, so a per-page Allow can override a folder-wide Disallow.',
-      'Blocking AI crawlers does not affect your search rankings — Googlebot and GPTBot are completely separate systems.',
+      'Use the exact filename robots.txt. A file named robot.txt or Robots.txt is not the root file Google expects.',
+      'Google usually caches robots.txt for up to 24 hours and may keep it longer after fetch failures. Check the report’s fetched version when debugging a change.',
+      'A disallowed /blog path also matches /blogger. Use /blog/ when your intention is to match the folder and its contents.',
+      'A Sitemap line advertises a location; it does not override a Disallow rule or guarantee that the listed URLs will be indexed.',
     ],
   },
   'headline-analyzer': {

@@ -150,7 +150,6 @@ export function HomePageClient({
       <HubView
         tools={tools}
         toolsBySlug={new Map(tools.map((t) => [t.slug, t]))}
-        onSelect={openTool}
         searchRef={searchRef}
         onOpenPalette={() => setPaletteOpen(true)}
         initialCategory={initialCategory}
@@ -188,8 +187,8 @@ export function HomePageClient({
             Fernandes Labs — {toolMetaList.length} Free Online Tools
           </h2>
           <p style={{ marginBottom: '1.5rem', fontSize: '0.875rem' }}>
-            Fast, privacy-first tools that run entirely in your browser. No
-            sign-up. No tracking. Works offline.
+            Fast, privacy-first tools that mostly run in your browser. No
+            sign-up. Most work offline.
           </p>
           {CATEGORY_ORDER.map((cat) => {
             const meta = CATEGORY_META[cat]

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { lookupIp } from '@/lib/network/ip-lookup'
 /**
  * Network tools API proxy.
  *
@@ -25,9 +26,6 @@ function isValidDomain(d: string): boolean {
     d
   )
 }
-function isValidHost(h: string): boolean {
-  return isValidDomain(h) || /^\d{1,3}(\.\d{1,3}){3}$/.test(h)
-}
 function isValidHttpUrl(u: string): boolean {
   try {
     const url = new URL(u)
@@ -50,22 +48,6 @@ async function opDns(req: NextRequest) {
     cache: 'no-store',
   })
   if (!res.ok) return bad(`DNS resolver returned ${res.status}`, 502)
-  const data = await res.json()
-  return NextResponse.json({ ok: true, ...data })
-}
-/** IP geolocation via ipapi.co (server-side, no CORS issue). */
-async function opIp(req: NextRequest) {
-  const ip = req.nextUrl.searchParams.get('ip')?.trim() ?? ''
-  const target = ip || ''
-  if (target && !isValidHost(target)) return bad('Invalid IP address')
-  const url = target
-    ? `https://ipapi.co/${encodeURIComponent(target)}/json/`
-    : `https://ipapi.co/json/`
-  const res = await fetch(url, {
-    headers: { 'user-agent': UA },
-    cache: 'no-store',
-  })
-  if (!res.ok) return bad(`IP lookup returned ${res.status}`, 502)
   const data = await res.json()
   return NextResponse.json({ ok: true, ...data })
 }
@@ -219,7 +201,7 @@ export async function GET(req: NextRequest) {
       case 'dns':
         return await opDns(req)
       case 'ip':
-        return await opIp(req)
+        return await lookupIp(req)
       case 'headers':
         return await opHeaders(req)
       case 'ssl':

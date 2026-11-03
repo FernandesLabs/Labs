@@ -53,9 +53,9 @@ export async function generateMetadata({
   const tools = toolsByCategory(cat)
   const title = `${meta.label} Tools — ${tools.length} Free Online Tools | Fernandes Labs`
   // Unique, keyword-rich description. The blurb is used ONCE (not duplicated
-  // as in the old version). Includes the tool count, category keyword, and
-  // the core value props (free, no sign-up, client-side, offline).
-  const description = `Browse ${tools.length} free ${meta.label.toLowerCase()} tools — ${meta.blurb.toLowerCase().replace(/\.$/, '')}. All privacy-first, run client-side in your browser, no sign-up. Works offline.`
+  // as in the old version). Keep the category label's casing (SEO, DNS, IP,
+  // SSL, AI) instead of lowercasing it into "seo tools" / "dns, ip, ssl".
+  const description = `Browse ${tools.length} free ${meta.label} tools — ${meta.blurb.replace(/\.$/, '')}. Privacy-first, no sign-up, most run in your browser.`
   return {
     title,
     description,
@@ -68,7 +68,9 @@ export async function generateMetadata({
       type: 'website',
       images: [
         {
-          url: `/api/og?slug=${encodeURIComponent(tools[0]?.slug ?? '')}`,
+          // Use the site-wide share card, not the first tool's card: a
+          // category page that previews one arbitrary tool misrepresents it.
+          url: '/og-image.png',
           width: 1200,
           height: 630,
           alt: `${meta.label} Tools — Fernandes Labs`,
@@ -79,6 +81,7 @@ export async function generateMetadata({
       card: 'summary_large_image',
       title: `${meta.label} Tools — Fernandes Labs`,
       description,
+      images: ['/og-image.png'],
     },
     robots: {
       index: true,

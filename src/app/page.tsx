@@ -21,24 +21,36 @@ import { toPalettePosts } from '@/lib/blog/blog-utils'
 export const metadata: Metadata = {
   title: 'Free Online Tools for Developers & Marketers — Fernandes Labs',
   description:
-    '132+ free online tools that run entirely in your browser — ' +
-    'JSON formatter, QR code generator, password generator, IP lookup, redirect checker, calculators and more. No sign-up, no tracking, works offline.',
+    '132+ free online tools — JSON formatter, QR generator, password generator, ' +
+    'IP lookup, redirect checker and more. Privacy-first. No sign-up.',
   alternates: {
     canonical: '/',
   },
   openGraph: {
     title: 'Fernandes Labs — Free Online Tools',
     description:
-      'Fast, privacy-first tools for developers, designers, and marketers. No sign-up. No tracking.',
+      'Fast, privacy-first tools for developers, designers, and marketers. No sign-up.',
     url: '/',
     siteName: siteConfig.site.name,
     type: 'website',
+    // This route overrides the layout's openGraph object, so it must repeat
+    // the image. Without it the built homepage had no og:image / twitter:image
+    // (shared links rendered as bare text cards).
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Fernandes Labs — free online tools for developers and marketers',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Fernandes Labs — Free Online Tools',
     description:
       'Fast, privacy-first tools for developers, designers, and marketers.',
+    images: ['/og-image.png'],
   },
 }
 

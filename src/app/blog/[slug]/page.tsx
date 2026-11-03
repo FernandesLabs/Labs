@@ -40,8 +40,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const post = getBlogPost(slug)
   if (!post) return {}
   const url = `https://${siteConfig.site.domain}/blog/${post.slug}`
+  const ogImage = `/api/og?post=${encodeURIComponent(post.slug)}`
   return {
-    title: `${post.title} | Fernandes Labs Blog`,
+    // Absolute title — appending " | Fernandes Labs Blog" pushed every guide
+    // past the ~60-character SERP budget (74–92 chars), so Google truncated
+    // the part that actually matched the query.
+    title: { absolute: post.title },
     description: post.description,
     alternates: { canonical: url },
     keywords: post.keywords,
@@ -52,11 +56,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       siteName: siteConfig.site.name,
       type: 'article',
       publishedTime: post.date,
+      modifiedTime: post.updated ?? post.date,
       images: [
         {
           // Per-post card: the guide's own title + category color (not the
           // first related tool's card) — social shares preview the article.
-          url: `/api/og?post=${encodeURIComponent(post.slug)}`,
+          url: ogImage,
           width: 1200,
           height: 630,
           alt: post.title,
@@ -67,7 +72,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       card: 'summary_large_image',
       title: post.title,
       description: post.description,
-      images: [`/api/og?post=${encodeURIComponent(post.slug)}`],
+      images: [ogImage],
     },
     robots: {
       index: true,
@@ -138,10 +143,14 @@ export default async function BlogPostPage({ params }: Props) {
         },
       }
     : {
+        // The fallback byline is the editorial team, not the corporate
+        // publisher. Giving it the same @id as the publisher made Google merge
+        // two distinct entities (and lose the author/publisher distinction).
         '@type': 'Organization',
-        '@id': `${siteConfig.site.url}/#organization`,
+        '@id': `${siteConfig.site.url}/#team`,
         name: authorName,
         url: `${siteConfig.site.url}/about`,
+        description: 'The editors and developers who write and review Fernandes Labs guides.',
       }
 
   const jsonLd = {
@@ -152,6 +161,12 @@ export default async function BlogPostPage({ params }: Props) {
         '@id': `${url}#article`,
         headline: post.title,
         description: post.description,
+        // Google's Article guidance expects an image; without one the
+        // article is ineligible for several rich treatments. Always emit the
+        // absolute URL of the per-post OG card.
+        image: [
+          `${siteConfig.site.url}/api/og?post=${encodeURIComponent(post.slug)}`,
+        ],
         datePublished: post.date,
         // `dateModified` was hardcoded to `datePublished`, so Google had no
         // way to tell updated posts from untouched ones. Posts now carry a
@@ -167,7 +182,7 @@ export default async function BlogPostPage({ params }: Props) {
           url: siteConfig.site.url,
           logo: {
             '@type': 'ImageObject',
-            url: `${siteConfig.site.url}/fl-logo.svg`,
+            url: `${siteConfig.site.url}/fl-logo-512.png`,
             width: 512,
             height: 512,
           },

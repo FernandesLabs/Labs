@@ -34,7 +34,7 @@ export const siteConfig = {
     ),
     description: str(
       process.env.NEXT_PUBLIC_SITE_DESCRIPTION,
-      'Free online tools for developers, designers, and marketers. No sign-up. No tracking. Works offline.'
+      'Free online tools for developers, designers, and marketers. No sign-up. Privacy-first. Most tools work offline.'
     ),
     contactEmail: str(
       process.env.NEXT_PUBLIC_CONTACT_EMAIL,

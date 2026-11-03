@@ -1,11 +1,10 @@
 import type { ToolCategory } from '@/lib/tools/types'
 import { CATEGORY_META } from '@/lib/tools/types'
-// Two metadata sources, both needed:
-//   - `toolMetaList` — used by other exports in this file
-//   - `toolMetadata` — used to validate related-tool slugs and supply
-//     same-category fallbacks (server-safe, not the 'use client' registry)
+// `toolMetaList` is the single source of truth for the registry metadata.
+// The proxy helper must be slug-based: the `network` category also contains
+// the User-Agent Parser, which runs entirely in the browser.
 import { toolMetaList } from '@/lib/tools/tool-meta'
-import { toolMetadata } from '@/lib/tools/tool-metadata'
+import { usesServerProxy } from '@/lib/privacy'
 /**
  * SEO content generators shared by:
  *   - The server component `app/tools/[slug]/page.tsx` (for JSON-LD)
@@ -16,7 +15,7 @@ import { toolMetadata } from '@/lib/tools/tool-metadata'
  * FAQPage JSON-LD.
  */
 
-const KNOWN_SLUGS = new Set(toolMetadata.map((t) => t.slug))
+const KNOWN_SLUGS = new Set(toolMetaList.map((t) => t.slug))
 
 /** True when `slug` matches a real tool in the registry. */
 function isKnownSlug(slug: string): boolean {
@@ -63,39 +62,71 @@ export interface FaqItem {
  * descriptions lead with the search term + a concrete benefit + a CTA.
  * Any tool without an override falls back to the template generators below.
  */
-const SEO_OVERRIDES: Record<
-  string,
-  { title: string; description: string }
-> = {
+interface SeoOverride {
+  title: string
+  description: string
+  /**
+   * Optional H1. The visible <h1> used the registry `name`, which is often
+   * narrower than the query language the page already ranks for — e.g.
+   * "IP Lookup" vs the 567-impression query "ip address lookup". Only set
+   * this when the override phrase is materially better than the tool name.
+   */
+  h1?: string
+  /**
+   * Short, answer-first paragraph rendered above the intro. This is the
+   * snippet/featured-result candidate: it answers the head query in the
+   * first 2–3 sentences before the long-form content starts.
+   */
+  summary?: string
+}
+
+const SEO_OVERRIDES: Record<string, SeoOverride> = {
   'ip-lookup': {
-    title: 'IP Address Lookup — Find IP Location, ISP & More',
+    title: 'IP Address Lookup & IP Finder — Location, ISP & ASN',
+    h1: 'IP Address Lookup & IP Finder',
+    summary:
+      'An IP address lookup shows the approximate location, ISP, ASN and timezone behind an IPv4 or IPv6 address or hostname. Enter an address in the IP finder below, or choose Use my IP to check your public address.',
     description:
-      'What is my IP? Look up any IPv4 address or hostname — location, ISP and timezone. Instant results, no sign-up. Your IP is detected automatically.',
+      'What is my IP? Free IP address lookup for IPv4, IPv6 and hostnames. Check location, ISP, ASN and timezone, or choose Use my IP to find your public address.',
   },
   'email-signature-generator': {
-    title: 'Email Signature Generator — Free HTML Signature Maker',
+    title: 'HTML Email Signature Generator — Gmail, Outlook & Thunderbird',
+    h1: 'Free HTML Email Signature Generator',
+    summary:
+      'An email signature generator builds table-based HTML that renders in Gmail, Outlook, Apple Mail and Thunderbird. Fill in your details, pick a template, then paste the copied HTML into your email client.',
     description:
-      'Create a professional email signature in seconds — free HTML generator for Gmail, Outlook and more. No sign-up. Copy the code instantly.',
+      'Create a free HTML email signature for Gmail, Outlook, Apple Mail or Thunderbird. Pick a template, copy the table-based HTML, paste it into your client.',
   },
   'redirect-checker': {
-    title: 'Redirect Checker — Test 301 & 302 Redirects Online',
+    title: '301 Redirect Checker — Test Redirect Chains Online',
+    h1: '301 Redirect Checker',
+    summary:
+      'A redirect checker follows every 301, 302, 307 and 308 hop from a URL to its final destination, so you can confirm that a permanent move is a single hop to the correct page.',
     description:
-      'Follow the full redirect chain of any URL and detect 301, 302 redirects instantly. Free redirect tester with status codes — no sign-up.',
+      'Check any URL for 301 and 302 redirects, follow every hop to the final destination, and spot redirect chains. Free redirect checker, no sign-up.',
   },
   'canonical-url-checker': {
-    title: 'Canonical URL Checker — Normalize Any URL',
+    title: 'Canonical Checker & Generator — Normalize Any URL',
+    h1: 'Canonical URL Checker & Canonical Tag Generator',
+    summary:
+      'A canonical URL is the single version of a page you want Google to index. This tool normalizes a URL you paste in — lowercases the host, strips tracking parameters, sorts the query and removes fragments — and generates the canonical tag. It does not fetch the live page to read an existing tag.',
     description:
-      'Normalize the canonical form of any URL — strip tracking params (utm_*, gclid, fbclid), sort query strings and drop fragments. Free canonical tag generator, no sign-up.',
+      'Check the URL you paste and generate a canonical tag: strip utm_*, gclid and fbclid, sort query strings, drop fragments. Free, no sign-up.',
   },
   'robots-txt-generator': {
-    title: 'Robots.txt Generator — Create robots.txt for Google',
+    title: 'Robots.txt Generator — Free Robot.txt Maker for Google',
+    h1: 'Robots.txt Generator & Robot.txt Maker',
+    summary:
+      'A robots.txt file tells Googlebot and other crawlers which URLs they may request. Add an Allow or Disallow rule, include your sitemap URL, and copy the generated file to your domain root.',
     description:
-      'Generate a robots.txt file online in seconds. Allow/disallow crawlers, add your sitemap URL and copy the finished robots.txt.',
+      'Make a robots.txt file for Google in seconds. Allow or block crawlers, add your sitemap, and copy a valid robots.txt file. Free robot.txt maker, no sign-up.',
   },
   'css-gradient-generator': {
     title: 'CSS Gradient Generator — Create & Copy Gradient CSS',
+    summary:
+      'A CSS gradient is a background image defined in code with linear-gradient() or radial-gradient(). Pick two or more colors, set the angle, and copy the generated CSS.',
     description:
-      'Generate beautiful CSS gradients with a live preview. Linear and radial — copy the CSS in one click. Free online tool.',
+      'Generate a CSS linear-gradient or radial-gradient with a live preview. Copy the background CSS in one click. Free online gradient generator.',
   },
   'image-metadata-viewer': {
     title: 'Image Metadata Viewer — View EXIF & GPS Online',
@@ -123,9 +154,12 @@ const SEO_OVERRIDES: Record<
       'Capitalize text online — title case, sentence case, ALL CAPS and more. Free capitalization tool, instant results, no sign-up.',
   },
   'file-signature-inspector': {
-    title: 'File Signature Inspector — Identify File Types',
+    title: 'File Signature Inspector — File Type Checker by Magic Bytes',
+    h1: 'File Signature Inspector & File Type Checker',
+    summary:
+      'A file signature (magic bytes) is the first few bytes of a file that reveal its real format, regardless of the extension. This inspector identifies common signatures and flags extension mismatches.',
     description:
-      'Identify the real type of any file from its binary signature (magic bytes). Detect spoofed extensions — free online tool.',
+      'Identify a file’s real type from its magic bytes. Detect spoofed extensions and compare with the declared MIME type — free, in your browser.',
   },
   'lorem-ipsum-generator': {
     title: 'Lorem Ipsum Generator — Free Placeholder Text',
@@ -142,6 +176,11 @@ const SEO_OVERRIDES: Record<
     description:
       'Look up any domain\'s DNS records — A, AAAA, MX, TXT, NS, CNAME. Free DNS lookup tool, instant results.',
   },
+  'ping-tool': {
+    title: 'Ping Tool — HTTP Latency (TTFB) Test for Any URL',
+    description:
+      'Measure HTTP latency and time to first byte (TTFB) for any URL with one or three pings. Free, no sign-up; the request runs through our server.',
+  },
   'ai-cost-calculator': {
     title: 'AI Cost Calculator — Compare LLM API Pricing',
     description:
@@ -153,9 +192,11 @@ const SEO_OVERRIDES: Record<
       'Generate signed JSON Web Tokens with custom claims and expiry. Free JWT generator, client-side only, no data leaves your browser.',
   },
   'mime-detector': {
-    title: 'MIME Type Detector — Identify File MIME Types',
+    title: 'MIME Type Detector — Find a File’s MIME Type by Extension',
+    summary:
+      'A MIME type tells a browser how to handle a file, such as text/html or image/png. This detector maps a file name or extension to its MIME type; use the File Signature Inspector when you need to verify the actual bytes.',
     description:
-      'Detect the MIME type of any file from its extension or file name. Free MIME detector, works offline in your browser.',
+      'Find the MIME type for any file extension or file name — text/html, application/pdf, image/png and more. Free MIME type detector, works offline.',
   },
   'user-agent-parser': {
     title: 'User Agent Parser — Identify Browser & Device',
@@ -298,9 +339,11 @@ const SEO_OVERRIDES: Record<
       'Check the SSL/TLS certificate of any domain — issuer, expiry, SANs and validity. Free SSL checker tool, instant results.',
   },
   'aria-validator': {
-    title: 'ARIA Validator — Free HTML Accessibility Checker',
+    title: 'ARIA Validator — 12-Point HTML Accessibility Check',
+    summary:
+      'ARIA roles, states and properties make custom widgets understandable to assistive technology. This validator checks 12 automated HTML/ARIA rules and explains each fix; it does not test color contrast, keyboard navigation or screen-reader output.',
     description:
-      'Check ARIA roles, states and HTML accessibility issues instantly — 12 automated rules with concrete fix suggestions. Free ARIA validator, runs entirely in your browser.',
+      'Check ARIA roles, states and HTML accessibility issues instantly — 12 automated rules with concrete fix suggestions. Free, runs entirely in your browser.',
   },
   'duplicate-line-remover': {
     title: 'Duplicate Line Remover — Remove Duplicates Online',
@@ -323,21 +366,30 @@ const SEO_OVERRIDES: Record<
   // shows steady long-tail impressions. Both were falling back to the
   // generic template titles before.
   'font-accessibility-checker': {
-    title: 'Font Accessibility Checker — WCAG Size & Legibility Test',
+    title: 'Font Readability Test & Font Accessibility Checker',
+    h1: 'Font Accessibility Checker & Readability Test',
+    summary:
+      'Run a font readability test with your own text: compare font size, weight, line height and measured line length in a live preview. The font accessibility checker offers typography guidance; a full WCAG audit also needs contrast, zoom and spacing checks.',
     description:
-      'Check font accessibility instantly — test font size, weight and legibility against WCAG guidelines for readable body text. Free, no sign-up.',
+      'Test font readability with your own text. Compare size, weight, line height and measured line length in a live preview. Free font accessibility checker.',
   },
   'diff-checker': {
     title: 'Diff Checker — Compare Two Texts & Highlight Changes',
     description:
       'Compare two texts or code snippets side by side and highlight every difference instantly. Free online diff checker — private, runs in your browser.',
   },
+  'reading-time-calculator': {
+    title: 'Reading Time Calculator — Words per Minute & Speaking Time',
+    h1: 'Reading Time Calculator & WPM Estimator',
+    summary:
+      'Reading time is word count divided by reading speed — typically 200–250 words per minute for adults, and 130–150 for speaking. Paste your text to estimate reading and speaking time.',
+    description:
+      'Estimate reading and speaking time from any text at 150, 250, 400 and 130 WPM. See word counts and a full speed breakdown. Free and private.',
+  },
 }
 
 /** Hand-tuned title + description for a tool (falls back to templates). */
-export function getSeoOverride(
-  tool: ToolLike
-): { title: string; description: string } | null {
+export function getSeoOverride(tool: ToolLike): SeoOverride | null {
   return SEO_OVERRIDES[tool.slug] ?? null
 }
 
@@ -379,12 +431,26 @@ function truncateOnWordBoundary(s: string, max: number): string {
   return dropTrailingStopword(out.replace(/[\s,.;:—-]+$/, ''))
 }
 
+/**
+ * A title cut at a word boundary can still end in a bare number, a comma, or
+ * a function word ("…rotate pages by 90, 180," / "…with 1 or 3"). Those read
+ * like a broken sentence in the SERP, so trim them iteratively.
+ */
+function isDroppableTitleToken(token: string): boolean {
+  const cleaned = token.replace(/[^\p{L}\p{N}]+/gu, '')
+  if (!cleaned) return true
+  if (/^\d+$/.test(cleaned)) return true
+  return TRAILING_STOPWORDS.has(cleaned.toLowerCase())
+}
+
 function dropTrailingStopword(s: string): string {
-  let parts = s.split(' ')
-  while (parts.length > 1 && TRAILING_STOPWORDS.has(parts[parts.length - 1].toLowerCase())) {
+  let parts = s.split(' ').filter(Boolean)
+  while (parts.length > 1) {
+    const last = parts[parts.length - 1].replace(/[\s,.;:—-]+$/, '')
+    if (!isDroppableTitleToken(last)) break
     parts = parts.slice(0, -1)
   }
-  return parts.join(' ')
+  return parts.join(' ').replace(/[\s,.;:—-]+$/, '')
 }
 
 /**
@@ -403,7 +469,6 @@ function dropTrailingStopword(s: string): string {
 export function generateToolTitle(tool: ToolLike): string {
   const override = getSeoOverride(tool)
   if (override) return override.title
-  const brand = 'Fernandes Labs'
 
   // Lead with the tool's own searchable name plus its concrete capability,
   // rather than the old "{Name} — Free Online {Category} Tool | {Brand}"
@@ -437,9 +502,9 @@ export function generateToolTitle(tool: ToolLike): string {
  * mid-sentence with an ellipsis before the useful part even rendered.
  *
  * Now: the hand-written capability sentence leads, followed by one accurate
- * differentiator. The privacy claim is category-aware — the six `network`
- * tools proxy through our server to bypass CORS, so claiming "nothing leaves
- * your browser" on those pages would be false.
+ * differentiator. The privacy claim is slug-aware — the six server-proxied
+ * tools proxy through our server to bypass CORS, while the network category's
+ * User-Agent Parser stays in the browser.
  */
 export function generateToolDescription(tool: ToolLike): string {
   const override = getSeoOverride(tool)
@@ -447,24 +512,14 @@ export function generateToolDescription(tool: ToolLike): string {
 
   const base = stripTrailingPeriod(tool.description)
 
-  const differentiator =
-    tool.category === 'network'
-      ? // Server-side proxy: be accurate rather than maximally flattering.
-        "Free — proxied server-side to bypass CORS; we don't log queries."
-      : 'Free — no sign-up, no uploads.'
+  const differentiator = usesServerProxy(tool.slug)
+    ? // Server-side proxy: be accurate rather than maximally flattering.
+      "Free — proxied server-side to bypass CORS; we don't log queries."
+    : 'Free — no sign-up, no uploads.'
 
   const full = `${base}. ${differentiator}`
   if (full.length <= DESC_MAX) return full
   return truncateOnWordBoundary(full, DESC_MAX - 1) + '…'
-}
-/** Longer, more specific intro paragraph (Priority 7 — improve content). */
-/**
- * Whether this tool routes input through our server (`/api/network`).
- * Duplicated from `@/lib/privacy` as a tiny local helper to keep this module
- * dependency-free; `tests/privacy-claims.test.ts` asserts the two agree.
- */
-function toolIsProxied(category: string): boolean {
-  return category === 'network'
 }
 
 /** Longer, more specific intro paragraph (Priority 7 — improve content). */
@@ -472,7 +527,7 @@ export function generateToolIntro(tool: ToolLike): string {
   const cat = CATEGORY_META[tool.category as ToolCategory]
   const kws = tool.keywords?.slice(0, 3).join(', ') || tool.name.toLowerCase()
   const kwsList = tool.keywords?.slice(0, 3).join(', ') || 'this task'
-  const proxied = toolIsProxied(tool.category)
+  const proxied = usesServerProxy(tool.slug)
   return (
     `The ${tool.name} is a free online ${cat.label.toLowerCase()} tool that ${tool.description.toLowerCase().replace(/\.$/, '')}. ` +
     `${proxied
@@ -495,8 +550,9 @@ export function generateToolUseCases(tool: ToolLike): string[] {
     )
   }
   // Offline use and "data never leaves your device" are both untrue for the
-  // server-proxied network tools.
-  if (toolIsProxied(tool.category)) {
+  // server-proxied tools. Use the slug, not the category: User-Agent Parser is
+  // in the network category but runs locally.
+  if (usesServerProxy(tool.slug)) {
     base.push(
       `Checking infrastructure you are responsible for — your own domains, servers and email flows.`
     )
@@ -551,9 +607,9 @@ export function generateToolTips(tool: ToolLike): string[] {
     tips.push(
       `Generated values use the Web Crypto API (cryptographically secure) — safer than most online generators that may log your data.`
     )
-  } else if (tool.category === 'network') {
+  } else if (usesServerProxy(tool.slug)) {
     tips.push(
-      `Network tools query external services; if a lookup fails, wait a moment and try again — rate limits are common.`
+      `Network lookups query external services; if a lookup fails, wait a moment and try again — rate limits are common.`
     )
   } else {
     tips.push(
@@ -586,7 +642,7 @@ export function generateToolHowTo(tool: ToolLike): string[] {
     `View the result in the output area below. Use the Copy button to copy the result to your clipboard, or the Download/Save button to save it as a file.`
   )
   steps.push(
-    toolIsProxied(cat)
+    usesServerProxy(tool.slug)
       ? `Read the result critically. This lookup returns public registry and routing data, so treat a city or country as a rough registration location rather than proof of a physical location.`
       : `All processing happens client-side in your browser. Your data never leaves your device, making this tool safe for sensitive inputs like passwords, private keys, or personal documents.`
   )
@@ -596,7 +652,7 @@ export function generateToolHowTo(tool: ToolLike): string[] {
 export function generateToolFaq(tool: ToolLike): FaqItem[] {
   const cat = CATEGORY_META[tool.category as ToolCategory]
   const kws = tool.keywords || []
-  const proxied = toolIsProxied(tool.category)
+  const proxied = usesServerProxy(tool.slug)
   const faqs: FaqItem[] = [
     {
       q: `Is the ${tool.name} free to use?`,
@@ -646,7 +702,7 @@ export function generateToolFaq(tool: ToolLike): FaqItem[] {
       q: `Is it safe to generate passwords and security tokens here?`,
       a: `Yes. All randomness is generated using the Web Crypto API (cryptographically secure), never Math.random(). Your generated values never leave your browser. This is safer than most online generators that may log or transmit your data.`,
     })
-  } else if (cat.label === 'Network') {
+  } else if (proxied) {
     faqs.push({
       q: `Why do some network lookups fail?`,
       a: `Network tools query external services (like DNS resolvers or IP databases). If a service is temporarily unavailable or rate-limits requests, the lookup may fail. Try again in a few moments. The tool itself is working correctly.`,
@@ -694,6 +750,9 @@ export const RELATED_TOOLS: Record<string, string[]> = {
   'css-gradient-generator': ['color-converter', 'color-palette-extractor', 'color-contrast-checker'],
   'color-palette-extractor': ['css-gradient-generator', 'color-converter', 'color-contrast-checker'],
   'color-contrast-checker': ['color-converter', 'color-palette-extractor', 'css-gradient-generator'],
+  'font-accessibility-checker': ['color-contrast-checker', 'aria-validator', 'reading-time-calculator', 'lorem-ipsum-generator'],
+  'aria-validator': ['font-accessibility-checker', 'color-contrast-checker', 'html-entity-encoder'],
+  'reading-time-calculator': ['word-counter', 'character-counter', 'font-accessibility-checker'],
   'image-resizer': ['image-compressor', 'image-metadata-viewer', 'png-to-webp', 'favicon-generator'],
   'image-metadata-viewer': ['file-signature-inspector', 'mime-detector', 'image-resizer'],
   'file-signature-inspector': ['mime-detector', 'hash-generator', 'file-checksum', 'image-metadata-viewer'],

@@ -89,7 +89,6 @@ function Highlight({ text, query }: { text: string; query: string }) {
 export function HubView({
   tools,
   toolsBySlug,
-  onSelect,
   searchRef,
   onOpenPalette,
   initialCategory,
@@ -97,7 +96,6 @@ export function HubView({
 }: {
   tools: Tool[]
   toolsBySlug: Map<string, Tool>
-  onSelect: (slug: string) => void
   searchRef: React.RefObject<HTMLInputElement | null>
   onOpenPalette: () => void
   initialCategory?: string
@@ -192,7 +190,7 @@ export function HubView({
           </h1>
           <p className="fl-fade-in mt-3 max-w-2xl text-base text-muted-foreground sm:text-lg" style={{ animationDelay: '0.05s' }}>
             A growing collection of {tools.length} fast, privacy-first tools for developers,
-            designers, and marketers. No sign-up. No tracking. Works offline.
+            designers, and marketers. No sign-up. Most work offline.
           </p>
           <div className="fl-fade-in mt-6 w-full max-w-xl" style={{ animationDelay: '0.1s' }}>
             {/* Search input — wrapped in a relative container so the icon and
@@ -239,19 +237,18 @@ export function HubView({
           {/*
             Trust badges.
 
-            "No data leaves your browser" was replaced with "No uploads" for
-            accuracy: six network tools (IP Lookup, DNS Lookup, SSL Checker,
-            Ping, Redirect Checker, HTTP Header Checker) proxy their lookups
-            through our server because browsers block cross-origin requests,
-            so the unqualified claim was false. The precise version of that
-            claim now lives on those six pages and in the footer badge. The
-            accurate-but-vague "Privacy-first" keeps the differentiator without
-            overstating it.
+            "No data leaves your browser" was replaced with "Privacy-first"
+            for accuracy: six network tools (IP Lookup, DNS Lookup, SSL
+            Checker, Ping, Redirect Checker, HTTP Header Checker) proxy their
+            lookups through our server because browsers block cross-origin
+            requests, so the unqualified claim was false. The precise version
+            of that claim now lives on those six pages and in the footer
+            badge.
           */}
           <div className="fl-fade-in mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-muted-foreground" style={{ animationDelay: '0.15s' }}>
             <span className="inline-flex items-center gap-1.5">
               <Lock className="size-3.5 text-emerald-500" />
-              No sign-up, no uploads
+              No sign-up, privacy-first
             </span>
             <span className="inline-flex items-center gap-1.5">
               <Zap className="size-3.5 text-amber-500" />
@@ -298,10 +295,10 @@ export function HubView({
         {!isFiltering ? (
           <>
             {favTools.length > 0 ? (
-              <QuickRow title="Favorites" icon={<Star className="h-4 w-4 text-yellow-500" />} tools={favTools} onSelect={onSelect} />
+              <QuickRow title="Favorites" icon={<Star className="h-4 w-4 text-yellow-500" />} tools={favTools} />
             ) : null}
             {recentTools.length > 0 ? (
-              <QuickRow title="Recently Used" icon={<Clock className="h-4 w-4 text-blue-500" />} tools={recentTools} onSelect={onSelect} onClear={clearRecent} clearLabel="Clear history" />
+              <QuickRow title="Recently Used" icon={<Clock className="h-4 w-4 text-blue-500" />} tools={recentTools} onClear={clearRecent} clearLabel="Clear history" />
             ) : null}
             <div className="space-y-2">
               <div className="flex items-center gap-2">
@@ -310,7 +307,7 @@ export function HubView({
               </div>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
                 {featured.map((tool) => (
-                  <ToolCard key={tool.slug} tool={tool} onSelect={onSelect} isFav={favorites.includes(tool.slug)} query="" />
+                  <ToolCard key={tool.slug} tool={tool} isFav={favorites.includes(tool.slug)} query="" />
                 ))}
               </div>
             </div>
@@ -347,7 +344,6 @@ export function HubView({
               setQuery('')
               setActiveCat('all')
             }}
-            onSelect={onSelect}
             tools={tools}
             toolsBySlug={toolsBySlug}
           />
@@ -362,7 +358,7 @@ export function HubView({
               </div>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
                 {items.map((tool) => (
-                  <ToolCard key={tool.slug} tool={tool} onSelect={onSelect} isFav={favorites.includes(tool.slug)} query={query} />
+                  <ToolCard key={tool.slug} tool={tool} isFav={favorites.includes(tool.slug)} query={query} />
                 ))}
               </div>
             </div>
@@ -387,14 +383,12 @@ function QuickRow({
   title,
   icon,
   tools,
-  onSelect,
   onClear,
   clearLabel,
 }: {
   title: string
   icon: React.ReactNode
   tools: Tool[]
-  onSelect: (slug: string) => void
   onClear?: () => void
   clearLabel?: string
 }) {
@@ -413,10 +407,9 @@ function QuickRow({
       </div>
       <div className="fl-scroll flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
         {tools.map((tool) => (
-          <button
+          <Link
             key={tool.slug}
-            type="button"
-            onClick={() => onSelect(tool.slug)}
+            href={`/tools/${tool.slug}`}
             onMouseEnter={() => preloadTool(tool.slug)}
             className="fl-card-hover group flex w-44 shrink-0 flex-col gap-1.5 rounded-xl border border-border/80 bg-card p-3 text-left"
           >
@@ -425,7 +418,7 @@ function QuickRow({
             </div>
             <h3 className="text-sm font-medium">{tool.name}</h3>
             <p className="text-xs text-muted-foreground line-clamp-2">{tool.description}</p>
-          </button>
+          </Link>
         ))}
       </div>
     </div>
@@ -464,12 +457,10 @@ function CategoryChip({
 }
 function ToolCard({
   tool,
-  onSelect,
   isFav,
   query,
 }: {
   tool: Tool
-  onSelect: (slug: string) => void
   isFav: boolean
   query: string
 }) {
@@ -477,16 +468,9 @@ function ToolCard({
   const cat = CATEGORY_META[tool.category]
   return (
     <div className="fl-fade-in relative h-full">
-      <button
-        type="button"
+      <Link
+        href={`/tools/${tool.slug}`}
         {...preloadProps}
-        onClick={() => onSelect(tool.slug)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault()
-            onSelect(tool.slug)
-          }
-        }}
         className="fl-card-hover group relative flex h-full w-full cursor-pointer flex-col items-start gap-2 overflow-hidden rounded-xl border border-border/80 bg-card p-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
         {/* Category color accent strip */}
@@ -524,7 +508,7 @@ function ToolCard({
           {cat.label}
           <ArrowRight className="size-3 opacity-0 transition group-hover:translate-x-0.5 group-hover:opacity-100" />
         </span>
-      </button>
+      </Link>
       {/* Favorite toggle — positioned over the card corner, stops propagation */}
       <div className="absolute right-1.5 top-1.5">
         <FavoriteButton slug={tool.slug} size="sm" />
@@ -536,13 +520,11 @@ function ToolCard({
 function EmptyState({
   query,
   onReset,
-  onSelect,
   tools,
   toolsBySlug,
 }: {
   query: string
   onReset: () => void
-  onSelect: (slug: string) => void
   tools: Tool[]
   toolsBySlug: Map<string, Tool>
 }) {
@@ -597,7 +579,6 @@ function EmptyState({
               <ToolCard
                 key={tool.slug}
                 tool={tool}
-                onSelect={onSelect}
                 isFav={false}
                 query=""
               />

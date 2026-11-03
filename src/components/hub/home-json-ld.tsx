@@ -21,7 +21,10 @@ import { CATEGORY_META, CATEGORY_ORDER } from '@/lib/tools/types'
  */
 export function HomeJsonLd() {
   const baseUrl = siteConfig.site.url
-  const logoUrl = `${baseUrl}/fl-logo.svg`
+  // Google's logo guidance supports raster formats (PNG/JPG), not SVG. The
+  // 512×512 PNG is rendered from the same source as the SVG favicon so the
+  // brand mark stays identical across search results, social cards and the UI.
+  const logoUrl = `${baseUrl}/fl-logo-512.png`
   const aboutUrl = `${baseUrl}/about`
   const founder = siteConfig.founder
   const sameAs = [

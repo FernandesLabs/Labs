@@ -1,17 +1,22 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { siteConfig } from '@/lib/site-config'
+import { socialMetadata } from '@/lib/seo-metadata'
 import { LegalPage } from '@/components/hub/legal-page'
 import { serverProxiedToolList } from '@/lib/privacy'
 
+const TITLE = 'About Fernandes Labs — The Team Behind the Free Tools Network'
+const DESCRIPTION =
+  'Meet the team behind Fernandes Labs: developers and technical SEO specialists building fast, private, free online tools for developers, designers and marketers.'
+
 export const metadata: Metadata = {
-  title: 'About Fernandes Labs — The Team Behind the Free Tools Network',
-  description:
-    'Meet the team behind Fernandes Labs: developers and technical SEO specialists building fast, private, free online tools — 132+ utilities for developers, designers, and marketers.',
+  title: TITLE,
+  description: DESCRIPTION,
   robots: { index: true, follow: true },
   alternates: {
     canonical: `https://${siteConfig.site.domain}/about`,
   },
+  ...socialMetadata('/about', TITLE, DESCRIPTION),
 }
 
 const SECTIONS = [
@@ -43,6 +48,21 @@ export default function AboutPage() {
         name: `About ${siteConfig.site.name}`,
         mainEntity: { '@id': `${baseUrl}/#organization` },
         about: { '@id': `${baseUrl}/#organization` },
+      },
+      {
+        // The page referenced this @id but never defined it, leaving a
+        // dangling node. Define the Organization here so the AboutPage's
+        // mainEntity/about references resolve within the same graph.
+        '@type': 'Organization',
+        '@id': `${baseUrl}/#organization`,
+        name: siteConfig.site.name,
+        url: baseUrl,
+        logo: {
+          '@type': 'ImageObject',
+          url: `${baseUrl}/fl-logo-512.png`,
+          width: 512,
+          height: 512,
+        },
       },
       {
         '@type': 'BreadcrumbList',
@@ -99,7 +119,7 @@ export default function AboutPage() {
             works, a marketer auditing a redirect chain, or a senior engineer
             debugging a production incident, you should be able to open a tool
             and get the answer in seconds — without creating an account,
-            without watching your data leave the browser, and without paying a
+            with most processing staying in your browser, and without paying a
             subscription. If a tool needs to be explained, we write the guide
             ourselves instead of pointing you elsewhere.
           </p>
